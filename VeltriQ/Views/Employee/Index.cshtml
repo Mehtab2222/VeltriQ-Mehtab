@@ -1,0 +1,986 @@
+﻿@{
+    ViewData["Title"] = "Employees";
+}
+
+<style>
+
+    .employee-page {
+        width: 100%;
+    }
+
+    /* HEADER */
+
+    .greeting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 20px;
+    }
+
+    .greeting-section h2 {
+        font-size: 20px;
+        font-weight: 400;
+        color: #fff;
+        margin-bottom: 4px;
+        letter-spacing: -.5px;
+        line-height: 1;
+    }
+
+    .greeting-section p {
+        font-size: 14px;
+        color: #94a3b8;
+    }
+
+    /* BUTTON */
+
+    .add-btn {
+        height: 42px;
+        padding: 0 18px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(124,58,237,.22);
+        transition: .2s ease;
+        flex-shrink: 0;
+    }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    /* CARD */
+
+    .employee-card {
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 16px;
+        padding: 14px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    /* CARD HEADER */
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        gap: 16px;
+    }
+
+    .card-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    /* SEARCH */
+
+    .employee-search {
+        width: 280px;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+        .employee-search input {
+            width: 100%;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid #2a3441;
+            background: #0d1117;
+            padding: 0 14px 0 40px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: .2s ease;
+        }
+
+            .employee-search input:focus {
+                border-color: #7c3aed;
+            }
+
+            .employee-search input::placeholder {
+                color: #6b7280;
+            }
+
+        .employee-search i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+    /* TABLE */
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #2a3441;
+            border-radius: 20px;
+        }
+
+    .employee-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+        .employee-table thead tr {
+            border-bottom: 1px solid rgba(255,255,255,.05);
+        }
+
+        .employee-table th {
+            text-align: left;
+            padding: 0 8px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            white-space: nowrap;
+        }
+
+        .employee-table td {
+            padding: 14px 8px;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+            vertical-align: middle;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .employee-table tbody tr {
+            transition: .2s ease;
+        }
+
+            .employee-table tbody tr:hover {
+                background: rgba(255,255,255,.02);
+            }
+
+    /* EMPLOYEE INFO */
+
+    .employee-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 180px;
+    }
+
+    .employee-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .employee-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 1px;
+        line-height: 1.1;
+    }
+
+    .employee-email {
+        font-size: 11px;
+        color: #6b7280;
+        line-height: 1.1;
+    }
+
+    /* STATUS */
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 30px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+    .status-active {
+        background: rgba(34,197,94,.14);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239,68,68,.14);
+        color: #ef4444;
+    }
+
+    /* ACTIONS */
+
+    .table-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: .2s ease;
+        font-size: 11px;
+    }
+
+        .action-btn:hover {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+    /* RESPONSIVE */
+
+    @@media(max-width: 992px) {
+
+        .greeting-row,
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .employee-search {
+            width: 100%;
+        }
+    }
+
+    .employee-table th:nth-child(1) {
+        width: 28%;
+    }
+
+    .employee-table th:nth-child(2) {
+        width: 15%;
+    }
+
+    .employee-table th:nth-child(3) {
+        width: 17%;
+    }
+
+    .employee-table th:nth-child(4) {
+        width: 10%;
+    }
+
+    .employee-table th:nth-child(5) {
+        width: 14%;
+    }
+
+    .employee-table th:nth-child(6) {
+        width: 16%;
+    }
+    /* MODAL */
+
+    .employee-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: .2s ease;
+        padding: 18px;
+    }
+
+        .employee-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    .modal-box {
+        width: 100%;
+        max-width: 620px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+        transform: translateY(10px) scale(.96);
+        transition: .2s ease;
+        box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+
+    .employee-modal.active .modal-box {
+        transform: translateY(0) scale(1);
+    }
+
+    /* HEADER */
+
+    .modal-header {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+        line-height: 1;
+    }
+
+    .modal-title p {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    .close-modal {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(239,68,68,.12);
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    /* BODY */
+
+    .modal-body {
+        padding: 18px;
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+    .modal-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 14px;
+    }
+
+    /* FORM */
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+    .modal-input {
+        width: 100%;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        outline: none;
+        font-size: 12px;
+    }
+
+        .modal-input:focus {
+            border-color: #7c3aed;
+        }
+
+    textarea.modal-input {
+        height: 75px;
+        padding-top: 10px;
+        resize: none;
+    }
+
+    /* FOOTER */
+
+    .modal-footer {
+        padding: 14px 18px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .cancel-btn {
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .save-btn {
+        height: 38px;
+        padding: 0 18px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    /* RESPONSIVE */
+
+    @@media(max-width: 768px) {
+
+        .modal-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full {
+            grid-column: span 1;
+        }
+
+        .modal-box {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="employee-page">
+
+    <!-- HEADER -->
+
+    <div class="greeting-row">
+
+        <div class="greeting-section">
+            <h2>Employees</h2>
+            <p>Manage all employees in your organization.</p>
+        </div>
+
+        <button class="add-btn" onclick="openEmployeeModal()">
+            <i class="bi bi-plus-lg"></i>
+            Add Employee
+        </button>
+
+    </div>
+
+    <!-- CARD -->
+
+    <div class="employee-card">
+
+        <div class="card-header">
+
+            <div class="card-title">
+                Employee Directory
+            </div>
+
+            <div class="employee-search">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       placeholder="Search employees..." />
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="table-wrapper">
+
+            <table class="employee-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Employee</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Status</th>
+                        <th>Joining Date</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>
+
+                            <div class="employee-info">
+
+                                <img class="employee-avatar"
+                                     src="https://i.pravatar.cc/100?img=12" />
+
+                                <div>
+
+                                    <div class="employee-name">
+                                        John Doe
+                                    </div>
+
+                                    <div class="employee-email">
+                                        john@company.com
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>Human Resources</td>
+
+                        <td>HR Manager</td>
+
+                        <td>
+                            <span class="status-badge status-active">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>12 Jan 2022</td>
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <button class="action-btn">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>
+
+                            <div class="employee-info">
+
+                                <img class="employee-avatar"
+                                     src="https://i.pravatar.cc/100?img=32" />
+
+                                <div>
+
+                                    <div class="employee-name">
+                                        Sarah Johnson
+                                    </div>
+
+                                    <div class="employee-email">
+                                        sarah@company.com
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>Engineering</td>
+
+                        <td>Frontend Developer</td>
+
+                        <td>
+                            <span class="status-badge status-active">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>02 Feb 2023</td>
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <button class="action-btn">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>
+
+                            <div class="employee-info">
+
+                                <img class="employee-avatar"
+                                     src="https://i.pravatar.cc/100?img=15" />
+
+                                <div>
+
+                                    <div class="employee-name">
+                                        Michael Brown
+                                    </div>
+
+                                    <div class="employee-email">
+                                        michael@company.com
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>Finance</td>
+
+                        <td>Accountant</td>
+
+                        <td>
+                            <span class="status-badge status-inactive">
+                                Inactive
+                            </span>
+                        </td>
+
+                        <td>18 Mar 2021</td>
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <button class="action-btn">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>
+
+                            <div class="employee-info">
+
+                                <img class="employee-avatar"
+                                     src="https://i.pravatar.cc/100?img=60" />
+
+                                <div>
+
+                                    <div class="employee-name">
+                                        Emma Wilson
+                                    </div>
+
+                                    <div class="employee-email">
+                                        emma@company.com
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>Marketing</td>
+
+                        <td>SEO Specialist</td>
+
+                        <td>
+                            <span class="status-badge status-active">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>09 Aug 2023</td>
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <button class="action-btn">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>
+
+                            <div class="employee-info">
+
+                                <img class="employee-avatar"
+                                     src="https://i.pravatar.cc/100?img=44" />
+
+                                <div>
+
+                                    <div class="employee-name">
+                                        Robert Chen
+                                    </div>
+
+                                    <div class="employee-email">
+                                        robert@company.com
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>Development</td>
+
+                        <td>Backend Engineer</td>
+
+                        <td>
+                            <span class="status-badge status-active">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>16 Nov 2020</td>
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <button class="action-btn">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="action-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+        <!-- EMPLOYEE MODAL -->
+
+        <div class="employee-modal" id="employeeModal">
+
+            <div class="modal-box">
+
+                <!-- HEADER -->
+
+                <div class="modal-header">
+
+                    <div class="modal-title">
+
+                        <h3>Add Employee</h3>
+
+                        <p>Create a new employee profile.</p>
+
+                    </div>
+
+                    <button class="close-modal"
+                            onclick="closeEmployeeModal()">
+
+                        <i class="bi bi-x-lg"></i>
+
+                    </button>
+
+                </div>
+
+                <!-- BODY -->
+
+                <div class="modal-body">
+
+                    <div class="modal-grid">
+
+                        <div class="form-group">
+
+                            <label>Employee Name</label>
+
+                            <input type="text"
+                                   class="modal-input"
+                                   placeholder="Enter employee name" />
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Email Address</label>
+
+                            <input type="email"
+                                   class="modal-input"
+                                   placeholder="Enter email address" />
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Phone Number</label>
+
+                            <input type="text"
+                                   class="modal-input"
+                                   placeholder="Enter phone number" />
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Department</label>
+
+                            <select class="modal-input">
+
+                                <option>Select Department</option>
+                                <option>Human Resources</option>
+                                <option>Engineering</option>
+                                <option>Finance</option>
+                                <option>Marketing</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Designation</label>
+
+                            <input type="text"
+                                   class="modal-input"
+                                   placeholder="Enter designation" />
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Joining Date</label>
+
+                            <input type="date"
+                                   class="modal-input" />
+
+                        </div>
+
+                        <div class="form-group full">
+
+                            <label>Address</label>
+
+                            <textarea class="modal-input"
+                                      placeholder="Enter employee address"></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+
+                <div class="modal-footer">
+
+                    <button class="cancel-btn"
+                            onclick="closeEmployeeModal()">
+
+                        Cancel
+
+                    </button>
+
+                    <button class="save-btn">
+
+                        Save Employee
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<script>
+
+    function openEmployeeModal() {
+
+        document
+            .getElementById('employeeModal')
+            .classList
+            .add('active');
+    }
+
+    function closeEmployeeModal() {
+
+        document
+            .getElementById('employeeModal')
+            .classList
+            .remove('active');
+    }
+
+</script>

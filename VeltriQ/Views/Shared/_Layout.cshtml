@@ -1,0 +1,1242 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - VeltriQ</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --sidebar-bg: #0d1117;
+            --sidebar-border: rgba(255,255,255,0.05);
+            --sidebar-text: #6b7280;
+            --card-bg: #161b22;
+            --card-shadow: 0 1px 12px rgba(0,0,0,.28);
+            --topbar-bg: #161b22;
+            --text-primary: #f1f5f9;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border: #21262d;
+            --input-bg: #0d1117;
+            --hover-bg: rgba(124,58,237,.1);
+            --purple: #7c3aed;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background: var(--sidebar-bg);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 10px;
+            border-right: 1px solid var(--sidebar-border);
+            scrollbar-width: none;
+        }
+
+            .sidebar::-webkit-scrollbar {
+                display: none;
+            }
+
+        .logo-section {
+            padding: 0 8px 14px;
+            border-bottom: 1px solid var(--sidebar-border);
+            margin-bottom: 6px;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg,#6d28d9,#7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .logo-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -.3px;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--sidebar-text);
+            margin-top: 2px;
+            opacity: .7;
+            line-height: 1.3;
+            padding-left: 1px;
+        }
+
+        .nav-section {
+            flex: 1;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+            .sidebar-menu li {
+                margin-bottom: 1px;
+            }
+
+            .sidebar-menu a {
+                text-decoration: none;
+                color: var(--sidebar-text);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 9px 10px;
+                border-radius: 10px;
+                font-size: 13px;
+                font-weight: 500;
+                transition: .2s ease;
+            }
+
+                .sidebar-menu a:hover {
+                    background: var(--hover-bg);
+                    color: #fff;
+                }
+
+                .sidebar-menu a.active {
+                    background: linear-gradient(90deg,#6d28d9,#7c3aed);
+                    color: #fff;
+                    box-shadow: 0 4px 14px rgba(109,40,217,.3);
+                }
+
+            .sidebar-menu i {
+                font-size: 14px;
+                width: 16px;
+                min-width: 16px;
+            }
+
+        .chevron {
+            margin-left: auto;
+            font-size: 10px;
+            opacity: .4;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #7c3aed;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 20px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .quick-section {
+            padding-top: 10px;
+            border-top: 1px solid var(--sidebar-border);
+            margin-top: 8px;
+        }
+
+        .quick-title {
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            color: var(--sidebar-text);
+            opacity: .5;
+            margin-bottom: 4px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .q-plus {
+            background: rgba(255,255,255,.07);
+            border: none;
+            color: #fff;
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            transition: background .15s,color .15s;
+        }
+
+            .quick-link:hover {
+                background: var(--hover-bg);
+                color: #fff;
+            }
+
+            .quick-link i {
+                font-size: 13px;
+            }
+
+        /* CONTENT */
+
+        .content-area {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+            padding: 16px 20px;
+            min-height: 100vh;
+        }
+
+        /* TOPBAR */
+
+        .topbar {
+            background: var(--topbar-bg);
+            border-radius: 13px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-box {
+            width: 330px;
+            position: relative;
+        }
+
+            .search-box input {
+                width: 100%;
+                border: 1.5px solid var(--border);
+                background: var(--input-bg);
+                border-radius: 10px;
+                padding: 8px 14px 8px 36px;
+                font-size: 13px;
+                color: var(--text-primary);
+                outline: none;
+            }
+
+            .search-box i {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 12px;
+                color: var(--text-muted);
+                font-size: 13px;
+            }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tb-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            position: relative;
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #7c3aed;
+            color: #fff;
+            font-size: 8px;
+            font-weight: 800;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tb-sep {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        .profile-pill {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 4px 9px;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+            .profile-pill img {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #7c3aed;
+            }
+
+        .p-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .p-role {
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        .float-settings {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            z-index: 999;
+        }
+
+        .float-btn {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg,#6d28d9,#7c3aed);
+            border: none;
+            border-radius: 13px;
+            color: #fff;
+            font-size: 19px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(109,40,217,.4);
+        }
+        /* DROPDOWN MENU */
+
+        .menu-dropdown {
+            margin-bottom: 4px;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .dropdown-toggle .dropdown-icon {
+                margin-left: auto;
+            }
+
+        .menu-left {
+            display: contents;
+        }
+
+        .dropdown-icon {
+            font-size: 11px;
+            transition: .25s ease;
+        }
+
+        .menu-dropdown.active .dropdown-icon {
+            transform: rotate(180deg);
+        }
+
+        /* SUBMENU */
+
+        .submenu {
+            list-style: none;
+            padding-left: 18px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .menu-dropdown.active .submenu {
+            display: block;
+        }
+
+        .submenu li {
+            margin-bottom: 2px;
+        }
+
+        .submenu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 12px;
+            transition: .2s ease;
+        }
+
+            .submenu a:hover {
+                background: rgba(124,58,237,.12);
+                color: #fff;
+            }
+
+        .submenu i {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-wrapper">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="logo-section">
+
+                <div class="logo-wrap">
+
+                    <div class="logo-icon">V</div>
+
+                    <div>
+                        <div class="logo-text">VeltriQ</div>
+                        <div class="logo-sub">Powering the Modern Workplace.</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="nav-section">
+
+                <ul class="sidebar-menu">
+
+                    <!-- DASHBOARD -->
+
+                    <li>
+                        <a href="/" class="active">
+                            <i class="bi bi-grid-fill"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- ORGANIZATION -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-building"></i>
+                            <span>Organization</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-buildings"></i>
+                                    Company
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-diagram-3"></i>
+                                    Branch
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-grid"></i>
+                                    Department
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-badge"></i>
+                                    Designation
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-layers"></i>
+                                    Division
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-globe"></i>
+                                    Nationality
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Country City
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    Document Master
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-box-seam"></i>
+                                    Asset Master
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-lines-fill"></i>
+                                    HR Contact
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+                    <!-- EMPLOYEES -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-people"></i>
+                            <span>Employees</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="/Employee/Index">
+                                    <i class="bi bi-person"></i>
+                                    Employee List
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-x"></i>
+                                    Inactive Employees
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-cash-stack"></i>
+                                    Salary Revision
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                    Employee Transfer
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-diagram-3"></i>
+                                    Organization Chart
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    Employee Exit
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                    <!-- ATTENDANCE -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-calendar-check"></i>
+                            <span>Attendance</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-calendar-event"></i>
+                                    Holiday Entry
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-clock-history"></i>
+                                    Shift Management
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-calendar3"></i>
+                                    Shift Schedule
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-clock"></i>
+                                    TimeSheet
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-upload"></i>
+                                    Import Attendance
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                    <!-- LEAVE -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-airplane"></i>
+                            <span>Leave</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="/Leave/LeaveTypes">
+                                    <i class="bi bi-list-check"></i>
+                                    Leave Type
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-calendar2-check"></i>
+                                    Leave Request
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-x-circle"></i>
+                                    Leave Cancellation
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-pie-chart"></i>
+                                    Leave Balance
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                    <!-- PAYROLL -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-cash-stack"></i>
+                            <span>Payroll</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-wallet2"></i>
+                                    Allowance
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-bank2"></i>
+                                    Financial Posting
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-dash-circle"></i>
+                                    Deduction
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-calculator"></i>
+                                    Payroll Generation
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+                    <!-- INSURANCE -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-heart-pulse"></i>
+                            <span>Insurance</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-shield-check"></i>
+                                    Health Insurance
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-hospital"></i>
+                                    Medical Claims
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-file-medical"></i>
+                                    Insurance Plans
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+                    <!-- RECRUITMENT -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-person-workspace"></i>
+                            <span>Recruitment</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="/Recruitment/Index">
+                                    <i class="bi bi-file-earmark-plus"></i>
+                                    Manpower Request
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-vcard"></i>
+                                    Job Profile
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-people-fill"></i>
+                                    Applicants
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-check"></i>
+                                    Hiring
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-envelope-paper"></i>
+                                    Offer Letter
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                    <!-- ONBOARDING -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-person-plus"></i>
+                            <span>Onboarding</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-check"></i>
+                                    Candidate Onboarding
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-file-earmark-medical"></i>
+                                    Document Verification
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-card-checklist"></i>
+                                    Joining Checklist
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-bag-check"></i>
+                                    Asset Allocation
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                    <!-- INDUCTION -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-mortarboard"></i>
+                            <span>Induction</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-journal-bookmark"></i>
+                                    Induction Program
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-calendar-week"></i>
+                                    Training Schedule
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-clipboard-check"></i>
+                                    Assessment
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-video3"></i>
+                                    Orientation Session
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                    <!-- PERFORMANCE -->
+
+                    <li>
+                        <a href="#">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span>Performance</span>
+                            <i class="bi bi-chevron-right chevron"></i>
+                        </a>
+                    </li>
+
+                    <!-- DOCUMENTS -->
+
+                    <li>
+                        <a href="#">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Documents</span>
+                            <i class="bi bi-chevron-right chevron"></i>
+                        </a>
+                    </li>
+
+                    <!-- APPROVALS -->
+
+                    <li>
+                        <a href="#">
+                            <i class="bi bi-check2-square"></i>
+                            <span>Approvals</span>
+
+                            <span class="nav-badge">6</span>
+                        </a>
+                    </li>
+
+                    <!-- REPORTS -->
+
+                    <li>
+                        <a href="/Reports/Index">
+                            <i class="bi bi-bar-chart-line"></i>
+                            <span>Reports & Analytics</span>
+                            <i class="bi bi-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <!-- SYSTEM -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-pc-display"></i>
+                            <span>System</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-circle"></i>
+                                    User
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-key"></i>
+                                    Change Password
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-shield-lock"></i>
+                                    Role
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-phone"></i>
+                                    ESS User
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    Reset Devices
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+                    <!-- SETTINGS -->
+
+                    <li class="menu-dropdown">
+
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+
+                            <i class="bi bi-gear"></i>
+                            <span>Settings</span>
+
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                        </a>
+
+                        <ul class="submenu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-person-circle"></i>
+                                    User
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-key"></i>
+                                    Change Password
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-shield-lock"></i>
+                                    Roles
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-phone"></i>
+                                    Reset Devices
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/Settings/Index">
+                                    <i class="bi bi-sliders"></i>
+                                    Appearance Settings
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            @* <div class="quick-section">
+
+                <div class="quick-title">
+                    <span>Quick Actions</span>
+
+                    <button class="q-plus">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+
+                <a href="#" class="quick-link">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Add Employee</span>
+                </a>
+
+                <a href="#" class="quick-link">
+                    <i class="bi bi-calendar-plus"></i>
+                    <span>Request Leave</span>
+                </a>
+
+                <a href="#" class="quick-link">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Mark Attendance</span>
+                </a>
+
+                <a href="#" class="quick-link">
+                    <i class="bi bi-megaphone"></i>
+                    <span>Add Announcement</span>
+                </a>
+
+            </div> *@
+
+        </aside>
+
+        <!-- CONTENT -->
+
+        <main class="content-area">
+
+            <!-- TOPBAR -->
+
+            <div class="topbar">
+
+                <div class="topbar-left">
+
+                    <button class="menu-btn">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <div class="search-box">
+
+                        <i class="bi bi-search"></i>
+
+                        <input type="text"
+                               placeholder="Search for employees, documents, modules..." />
+
+                    </div>
+
+                </div>
+
+                <div class="topbar-right">
+
+                    <button class="tb-icon">
+                        <i class="bi bi-bell"></i>
+                        <span class="notif-dot">8</span>
+                    </button>
+
+                    <div class="tb-sep"></div>
+
+                    <div class="profile-pill">
+
+                        <img src="https://i.pravatar.cc/100?img=12" />
+
+                        <div>
+                            <div class="p-name">John Doe</div>
+                            <div class="p-role">HR Manager</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            @RenderBody()
+
+        </main>
+
+    </div>
+
+    <div class="float-settings">
+
+        <button class="float-btn">
+            <i class="bi bi-moon-fill"></i>
+        </button>
+
+    </div>
+
+</body>
+
+</html>
+<script>
+
+    document.querySelectorAll('.dropdown-toggle')
+        .forEach(toggle => {
+
+            toggle.addEventListener('click', function () {
+
+                const parent = this.parentElement;
+
+                parent.classList.toggle('active');
+
+            });
+
+        });
+
+</script>

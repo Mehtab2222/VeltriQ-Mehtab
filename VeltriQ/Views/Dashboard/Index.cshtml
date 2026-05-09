@@ -1,0 +1,1305 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VeltriQ Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #f0f2f8;
+            --sidebar-bg: #111827;
+            --sidebar-border: rgba(255,255,255,0.06);
+            --sidebar-text: #9ca3af;
+            --card-bg: #fff;
+            --card-shadow: 0 1px 12px rgba(15,23,42,.07);
+            --topbar-bg: #fff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --input-bg: #f8fafc;
+            --hover-bg: rgba(109,40,217,.07);
+            --purple: #7c3aed;
+            --pu-l: rgba(124,58,237,.13);
+            --blue: #2563eb;
+            --bl-l: rgba(37,99,235,.13);
+            --green: #16a34a;
+            --gr-l: rgba(22,163,74,.13);
+            --orange: #ea580c;
+            --or-l: rgba(234,88,12,.13);
+            --red: #dc2626;
+            --rd-l: rgba(220,38,38,.13);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0d1117;
+            --sidebar-bg: #0d1117;
+            --sidebar-border: rgba(255,255,255,0.05);
+            --sidebar-text: #6b7280;
+            --card-bg: #161b22;
+            --card-shadow: 0 1px 12px rgba(0,0,0,.28);
+            --topbar-bg: #161b22;
+            --text-primary: #f1f5f9;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border: #21262d;
+            --input-bg: #0d1117;
+            --hover-bg: rgba(124,58,237,.1);
+            --pu-l: rgba(124,58,237,.2);
+            --bl-l: rgba(37,99,235,.2);
+            --gr-l: rgba(22,163,74,.2);
+            --or-l: rgba(234,88,12,.2);
+            --rd-l: rgba(220,38,38,.2);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans',sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background .25s,color .25s;
+        }
+
+        /* invisible sidebar scrollbar */
+        .sidebar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+            .sidebar::-webkit-scrollbar {
+                display: none;
+            }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background: var(--sidebar-bg);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 10px;
+            border-right: 1px solid var(--sidebar-border);
+            transition: background .25s;
+        }
+
+        .logo-section {
+            padding: 0 8px 14px;
+            border-bottom: 1px solid var(--sidebar-border);
+            margin-bottom: 6px;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg,#6d28d9,#7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .logo-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -.3px;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--sidebar-text);
+            margin-top: 2px;
+            opacity: .7;
+            line-height: 1.3;
+            padding-left: 1px;
+        }
+
+        .nav-section {
+            flex: 1;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+            .sidebar-menu li {
+                margin-bottom: 1px;
+            }
+
+            .sidebar-menu a {
+                text-decoration: none;
+                color: var(--sidebar-text);
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                padding: 7px 10px;
+                border-radius: 9px;
+                font-size: 13px;
+                font-weight: 500;
+                transition: background .15s,color .15s;
+                white-space: nowrap;
+            }
+
+                .sidebar-menu a:hover {
+                    background: var(--hover-bg);
+                    color: #fff;
+                }
+
+                .sidebar-menu a.active {
+                    background: linear-gradient(90deg,#6d28d9,#7c3aed);
+                    color: #fff;
+                    box-shadow: 0 4px 14px rgba(109,40,217,.3);
+                }
+
+            .sidebar-menu i {
+                font-size: 14px;
+                min-width: 16px;
+            }
+
+        .chevron {
+            margin-left: auto;
+            font-size: 10px;
+            opacity: .4;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #7c3aed;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 20px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-menu a.active .nav-badge {
+            background: rgba(255,255,255,.25);
+        }
+
+        .quick-section {
+            padding-top: 10px;
+            border-top: 1px solid var(--sidebar-border);
+            margin-top: 8px;
+        }
+
+        .quick-title {
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            color: var(--sidebar-text);
+            opacity: .5;
+            margin-bottom: 4px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .q-plus {
+            background: rgba(255,255,255,.07);
+            border: none;
+            color: #fff;
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            transition: background .15s,color .15s;
+        }
+
+            .quick-link:hover {
+                background: var(--hover-bg);
+                color: #fff;
+            }
+
+            .quick-link i {
+                font-size: 13px;
+            }
+
+        /* ── CONTENT ── */
+        .content-area {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+            padding: 16px 20px;
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: var(--topbar-bg);
+            border-radius: 13px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .15s;
+        }
+
+            .menu-btn:hover {
+                background: var(--hover-bg);
+            }
+
+        .search-box {
+            width: 330px;
+            position: relative;
+        }
+
+            .search-box input {
+                width: 100%;
+                border: 1.5px solid var(--border);
+                background: var(--input-bg);
+                border-radius: 10px;
+                padding: 8px 14px 8px 36px;
+                font-size: 13px;
+                font-family: inherit;
+                color: var(--text-primary);
+                outline: none;
+                transition: border .2s;
+            }
+
+                .search-box input:focus {
+                    border-color: #7c3aed;
+                }
+
+                .search-box input::placeholder {
+                    color: var(--text-muted);
+                }
+
+            .search-box i {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 12px;
+                color: var(--text-muted);
+                font-size: 13px;
+            }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tb-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            position: relative;
+            transition: background .15s;
+        }
+
+            .tb-icon:hover {
+                background: var(--hover-bg);
+                color: var(--purple);
+            }
+
+        .notif-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #7c3aed;
+            color: #fff;
+            font-size: 8px;
+            font-weight: 800;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--topbar-bg);
+        }
+
+        .tb-sep {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        .profile-pill {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 4px 9px;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+            .profile-pill:hover {
+                background: var(--hover-bg);
+            }
+
+            .profile-pill img {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #7c3aed;
+            }
+
+        .p-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .p-role {
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        .profile-pill .bi-chevron-down {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* ── GREETING ── */
+        .greeting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .greeting-section h2 {
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .greeting-section p {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+        }
+
+        .date-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+            .date-chip i {
+                color: var(--purple);
+                font-size: 12px;
+            }
+
+        /* ── STATS — ALL 5 IN ONE ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5,1fr);
+            gap: 11px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px 15px 13px;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+            transition: transform .2s,box-shadow .2s;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 22px rgba(15,23,42,.1);
+            }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .ic-pu {
+            background: var(--pu-l);
+            color: var(--purple);
+        }
+
+        .ic-bl {
+            background: var(--bl-l);
+            color: var(--blue);
+        }
+
+        .ic-gr {
+            background: var(--gr-l);
+            color: var(--green);
+        }
+
+        .ic-or {
+            background: var(--or-l);
+            color: var(--orange);
+        }
+
+        .ic-rd {
+            background: var(--rd-l);
+            color: var(--red);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .stat-delta {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .d-up {
+            color: #16a34a;
+        }
+
+        .d-dn {
+            color: #dc2626;
+        }
+
+        /* ── CARD BOX ── */
+        .card-box {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+        }
+
+        .ch-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 13px;
+        }
+
+        .card-title {
+            font-size: 13.5px;
+            font-weight: 700;
+        }
+
+        .view-all {
+            font-size: 11.5px;
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .view-all:hover {
+                text-decoration: underline;
+            }
+
+        .sel-mini {
+            background: var(--input-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--text-secondary);
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* ── GRIDS ── */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 350px;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .grid-last {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        /* ── APPROVALS ── */
+        .appr-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .appr-item:last-child {
+                border-bottom: none;
+            }
+
+        .emp-info {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .emp-ava {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .emp-name {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .emp-type {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .act-grp {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .act-time {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            margin-right: 2px;
+        }
+
+        .appr-btn, .rejt-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all .15s;
+        }
+
+        .appr-btn {
+            background: var(--gr-l);
+            color: var(--green);
+        }
+
+        .rejt-btn {
+            background: var(--rd-l);
+            color: var(--red);
+        }
+
+        .appr-btn:hover {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .rejt-btn:hover {
+            background: #dc2626;
+            color: #fff;
+        }
+
+        /* ── DONUT ── */
+        .donut-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .donut-ctr {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .donut-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+            .donut-label .dl {
+                font-size: 10px;
+                color: var(--text-muted);
+            }
+
+            .donut-label .dv {
+                font-size: 16px;
+                font-weight: 800;
+            }
+
+        .leg-list {
+            list-style: none;
+            flex: 1;
+        }
+
+            .leg-list li {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 3px 0;
+                font-size: 11.5px;
+                color: var(--text-secondary);
+            }
+
+        .leg-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .leg-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .leg-val {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ── ANNOUNCEMENTS ── */
+        .ann-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .ann-item:last-child {
+                border-bottom: none;
+            }
+
+        .ann-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .ann-title {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 1px;
+        }
+
+        .ann-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 210px;
+        }
+
+        .ann-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        /* ── BIRTHDAYS ── */
+        .bday-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .bday-item:last-child {
+                border-bottom: none;
+            }
+
+        .bday-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .bday-ava {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .bday-name {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .bday-role {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .bday-badge {
+            font-size: 10.5px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .b-today {
+            background: var(--pu-l);
+            color: var(--purple);
+        }
+
+        .b-anniv {
+            background: var(--bl-l);
+            color: var(--blue);
+        }
+
+        .b-soon {
+            background: var(--gr-l);
+            color: var(--green);
+        }
+
+        /* ── FLOATING THEME ── */
+        .float-settings {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            z-index: 999;
+        }
+
+        .float-btn {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg,#6d28d9,#7c3aed);
+            border: none;
+            border-radius: 13px;
+            color: #fff;
+            font-size: 19px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(109,40,217,.4);
+            transition: transform .2s,box-shadow .2s;
+        }
+
+            .float-btn:hover {
+                transform: scale(1.08);
+                box-shadow: 0 10px 28px rgba(109,40,217,.5);
+            }
+
+        .appear-panel {
+            position: absolute;
+            bottom: 56px;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 10px;
+            width: 185px;
+            box-shadow: 0 10px 36px rgba(0,0,0,.18);
+            display: none;
+        }
+
+            .appear-panel.open {
+                display: block;
+            }
+
+            .appear-panel h6 {
+                font-size: 9.5px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                margin-bottom: 7px;
+                padding: 0 4px;
+            }
+
+        .theme-opt {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: background .15s;
+            border: 2px solid transparent;
+        }
+
+            .theme-opt:hover {
+                background: var(--hover-bg);
+            }
+
+            .theme-opt.active {
+                border-color: var(--purple);
+                color: var(--purple);
+                background: var(--pu-l);
+            }
+
+            .theme-opt i {
+                font-size: 14px;
+            }
+
+        /* ── RESPONSIVE ── */
+        @@media(max - width:1350px) {
+            .grid-3
+
+        {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid-3 .card-box:last-child {
+            grid-column: span 2;
+        }
+
+        }
+        @@media(max - width:1100px) {
+            .stats-row
+
+        {
+            grid-template-columns: repeat(3,1fr);
+        }
+
+        .grid-2, .grid-last {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+            width: 64px;
+            min-width: 64px;
+        }
+
+        .logo-text, .logo-sub, .sidebar-menu span, .chevron, .nav-badge, .quick-section span, .q-txt, .quick-link span {
+            display: none;
+        }
+
+        .sidebar-menu a {
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .content-area {
+            margin-left: 64px;
+            width: calc(100% - 64px);
+        }
+
+        .search-box {
+            width: 200px;
+        }
+
+        }
+        @@media(max - width:768px) {
+            .sidebar
+
+        {
+            display: none;
+        }
+
+        .content-area {
+            margin-left: 0;
+            width: 100%;
+            padding: 12px;
+        }
+
+        .stats-row {
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo-wrap">
+                    <div class="logo-icon">V</div>
+                    <div class="logo-text">VeltriQ</div>
+                </div>
+                <div class="logo-sub">Powering the Modern Workplace.</div>
+            </div>
+            <div class="nav-section">
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active"><i class="bi bi-grid-fill"></i><span>Dashboard</span></a></li>
+                    <li>
+                        <a href="/Employee/Index">
+                            <i class="bi bi-people"></i>
+                            <span>Employees</span>
+                            <i class="bi bi-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li><a href="#"><i class="bi bi-calendar-check"></i><span>Attendance</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-airplane"></i><span>Leave</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-cash-stack"></i><span>Payroll</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-person-workspace"></i><span>Recruitment</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-person-badge"></i><span>Onboarding</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-bar-chart-line"></i><span>Performance</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-file-earmark-text"></i><span>Documents</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-check2-square"></i><span>Approvals</span><span class="nav-badge">6</span></a></li>
+                    <li><a href="#"><i class="bi bi-graph-up-arrow"></i><span>Reports &amp; Analytics</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                    <li><a href="#"><i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-right chevron"></i></a></li>
+                </ul>
+            </div>
+            <div class="quick-section">
+                <div class="quick-title"><span class="q-txt">Quick Actions</span><button class="q-plus"><i class="bi bi-plus"></i></button></div>
+                <a href="#" class="quick-link"><i class="bi bi-person-plus"></i><span>Add Employee</span></a>
+                <a href="#" class="quick-link"><i class="bi bi-calendar-plus"></i><span>Request Leave</span></a>
+                <a href="#" class="quick-link"><i class="bi bi-clock-history"></i><span>Mark Attendance</span></a>
+                <a href="#" class="quick-link"><i class="bi bi-megaphone"></i><span>Add Announcement</span></a>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="content-area">
+
+            <!-- TOPBAR -->
+            <div class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-btn"><i class="bi bi-list"></i></button>
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Search for employees, documents, modules..." />
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="tb-icon"><i class="bi bi-gift"></i></button>
+                    <button class="tb-icon"><i class="bi bi-bell"></i><span class="notif-dot">8</span></button>
+                    <button class="tb-icon"><i class="bi bi-question-circle"></i></button>
+                    <div class="tb-sep"></div>
+                    <div class="profile-pill">
+                        <img src="https://i.pravatar.cc/100?img=12" alt="John Doe" />
+                        <div><div class="p-name">John Doe</div><div class="p-role">HR Manager</div></div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GREETING -->
+            <div class="greeting-row">
+                <div class="greeting-section">
+                    <h2>Good morning, John! 👋</h2>
+                    <p>Here's what's happening in your organization today.</p>
+                </div>
+                <div class="date-chip">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="todayDate">May 9, 2026</span>
+                    <i class="bi bi-chevron-down" style="font-size:9px;"></i>
+                </div>
+            </div>
+
+            <!-- ALL 5 STATS IN ONE ROW -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon ic-pu"><i class="bi bi-people"></i></div>
+                    <div class="stat-label">Total Employees</div>
+                    <div class="stat-value">1,248</div>
+                    <div class="stat-delta d-up"><i class="bi bi-arrow-up-short"></i> 12 this month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon ic-bl"><i class="bi bi-person-plus"></i></div>
+                    <div class="stat-label">New Hires</div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-delta d-up"><i class="bi bi-arrow-up-short"></i> 6 this month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon ic-gr"><i class="bi bi-calendar-check"></i></div>
+                    <div class="stat-label">On Leave Today</div>
+                    <div class="stat-value">38</div>
+                    <div class="stat-delta d-dn"><i class="bi bi-arrow-down-short"></i> 4% from yesterday</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon ic-or"><i class="bi bi-clock"></i></div>
+                    <div class="stat-label">Late Arrivals</div>
+                    <div class="stat-value">15</div>
+                    <div class="stat-delta d-dn"><i class="bi bi-arrow-down-short"></i> 2% from yesterday</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon ic-rd"><i class="bi bi-cash-stack"></i></div>
+                    <div class="stat-label">Payroll This Month</div>
+                    <div class="stat-value">$312,430</div>
+                    <div class="stat-delta d-up"><i class="bi bi-arrow-up-short"></i> 8% from last month</div>
+                </div>
+            </div>
+
+            <!-- CHART + APPROVALS -->
+            <div class="grid-2">
+                <div class="card-box">
+                    <div class="ch-row">
+                        <span class="card-title">Employee Overview</span>
+                        <select class="sel-mini"><option>This Month</option><option>Last Month</option><option>This Quarter</option></select>
+                    </div>
+                    <canvas id="empChart" height="118"></canvas>
+                </div>
+                <div class="card-box">
+                    <div class="ch-row"><span class="card-title">Pending Approvals</span><a href="#" class="view-all">View all</a></div>
+                    <div class="appr-item">
+                        <div class="emp-info"><img class="emp-ava" src="https://i.pravatar.cc/100?img=32" /><div><div class="emp-name">Sarah Johnson</div><div class="emp-type">Leave Request</div></div></div>
+                        <div class="act-grp"><span class="act-time">2 days ago</span><button class="appr-btn"><i class="bi bi-check-lg"></i></button><button class="rejt-btn"><i class="bi bi-x-lg"></i></button></div>
+                    </div>
+                    <div class="appr-item">
+                        <div class="emp-info"><img class="emp-ava" src="https://i.pravatar.cc/100?img=15" /><div><div class="emp-name">Michael Brown</div><div class="emp-type">Expense Claim</div></div></div>
+                        <div class="act-grp"><span class="act-time">1 day ago</span><button class="appr-btn"><i class="bi bi-check-lg"></i></button><button class="rejt-btn"><i class="bi bi-x-lg"></i></button></div>
+                    </div>
+                    <div class="appr-item">
+                        <div class="emp-info"><img class="emp-ava" src="https://i.pravatar.cc/100?img=21" /><div><div class="emp-name">Emily Davis</div><div class="emp-type">Leave Request</div></div></div>
+                        <div class="act-grp"><span class="act-time">1 day ago</span><button class="appr-btn"><i class="bi bi-check-lg"></i></button><button class="rejt-btn"><i class="bi bi-x-lg"></i></button></div>
+                    </div>
+                    <div class="appr-item">
+                        <div class="emp-info"><img class="emp-ava" src="https://i.pravatar.cc/100?img=50" /><div><div class="emp-name">David Wilson</div><div class="emp-type">Overtime Request</div></div></div>
+                        <div class="act-grp"><span class="act-time">3 days ago</span><button class="appr-btn"><i class="bi bi-check-lg"></i></button><button class="rejt-btn"><i class="bi bi-x-lg"></i></button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEAVE + DEPT + ANNOUNCEMENTS -->
+            <div class="grid-3">
+                <div class="card-box">
+                    <div class="ch-row"><span class="card-title">Leave Summary</span><a href="#" class="view-all">View all</a></div>
+                    <div class="donut-wrap">
+                        <div class="donut-ctr">
+                            <canvas id="leaveChart" width="145" height="145"></canvas>
+                            <div class="donut-label"><div class="dl">Total</div><div class="dv">1,248</div></div>
+                        </div>
+                        <ul class="leg-list">
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#7c3aed"></span>Annual Leave</span><span class="leg-val">512</span></li>
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#3b82f6"></span>Sick Leave</span><span class="leg-val">210</span></li>
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#22c55e"></span>Casual Leave</span><span class="leg-val">180</span></li>
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#f97316"></span>Other Leave</span><span class="leg-val">346</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-box">
+                    <div class="ch-row"><span class="card-title">Department Distribution</span><a href="#" class="view-all">View all</a></div>
+                    <div class="donut-wrap">
+                        <div class="donut-ctr">
+                            <canvas id="deptChart" width="145" height="145"></canvas>
+                            <div class="donut-label"><div class="dl">Total</div><div class="dv">1,248</div></div>
+                        </div>
+                        <ul class="leg-list">
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#7c3aed"></span>Engineering</span><span class="leg-val">462</span></li>
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#3b82f6"></span>Human Resources</span><span class="leg-val">196</span></li>
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#22c55e"></span>Sales &amp; Mktg</span><span class="leg-val">312</span></li>
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#f97316"></span>Finance</span><span class="leg-val">146</span></li>
+                            <li><span class="leg-left"><span class="leg-dot" style="background:#94a3b8"></span>Others</span><span class="leg-val">132</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-box">
+                    <div class="ch-row"><span class="card-title">Recent Announcements</span><a href="#" class="view-all">View all</a></div>
+                    <div class="ann-item">
+                        <div class="ann-icon ic-pu"><i class="bi bi-megaphone-fill"></i></div>
+                        <div><div class="ann-title">Company Offsite 2024</div><div class="ann-desc">Excited to announce our annual company offsite...</div><div class="ann-time">2 hours ago</div></div>
+                    </div>
+                    <div class="ann-item">
+                        <div class="ann-icon ic-gr"><i class="bi bi-people-fill"></i></div>
+                        <div><div class="ann-title">Updated Leave Policy</div><div class="ann-desc">Our leave policy has been updated. Please review...</div><div class="ann-time">1 day ago</div></div>
+                    </div>
+                    <div class="ann-item">
+                        <div class="ann-icon ic-or"><i class="bi bi-currency-dollar"></i></div>
+                        <div><div class="ann-title">Performance Bonus</div><div class="ann-desc">Happy to announce the performance bonus payout...</div><div class="ann-time">2 days ago</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ATTENDANCE + BIRTHDAYS -->
+            <div class="grid-last">
+                <div class="card-box">
+                    <div class="ch-row"><span class="card-title">Attendance Overview</span><select class="sel-mini"><option>This Week</option><option>Last Week</option></select></div>
+                    <canvas id="attendChart" height="110"></canvas>
+                </div>
+                <div class="card-box">
+                    <div class="ch-row"><span class="card-title">Birthdays &amp; Anniversaries</span><a href="#" class="view-all">View all</a></div>
+                    <div class="bday-item">
+                        <div class="bday-left"><img class="bday-ava" src="https://i.pravatar.cc/100?img=44" /><div><div class="bday-name">Lisa Martinez</div><div class="bday-role">UI Designer</div></div></div>
+                        <span class="bday-badge b-today">🎂 Today</span>
+                    </div>
+                    <div class="bday-item">
+                        <div class="bday-left"><img class="bday-ava" src="https://i.pravatar.cc/100?img=60" /><div><div class="bday-name">Robert Chen</div><div class="bday-role">Backend Engineer</div></div></div>
+                        <span class="bday-badge b-anniv">🎉 3 Years</span>
+                    </div>
+                    <div class="bday-item">
+                        <div class="bday-left"><img class="bday-ava" src="https://i.pravatar.cc/100?img=33" /><div><div class="bday-name">Priya Sharma</div><div class="bday-role">Product Manager</div></div></div>
+                        <span class="bday-badge b-soon">🎂 May 12</span>
+                    </div>
+                    <div class="bday-item">
+                        <div class="bday-left"><img class="bday-ava" src="https://i.pravatar.cc/100?img=7" /><div><div class="bday-name">James Kirk</div><div class="bday-role">Sales Lead</div></div></div>
+                        <span class="bday-badge b-soon">🎂 May 15</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- FLOATING THEME TOGGLE -->
+    <div class="float-settings">
+        <div class="appear-panel" id="appearPanel">
+            <h6>Appearance</h6>
+            <div class="theme-opt" id="optLight" onclick="setTheme('light')"><i class="bi bi-sun-fill"></i> Light Mode</div>
+            <div class="theme-opt active" id="optDark" onclick="setTheme('dark')"><i class="bi bi-moon-fill"></i> Dark Mode</div>
+            <div class="theme-opt" id="optSystem" onclick="setTheme('system')"><i class="bi bi-display"></i> System</div>
+        </div>
+        <button class="float-btn" onclick="togglePanel()"><i class="bi bi-moon-fill" id="floatIcon"></i></button>
+    </div>
+
+    <script>
+        // DATE
+        const mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const nd=new Date();
+        document.getElementById('todayDate').textContent=mo[nd.getMonth()]+' '+nd.getDate()+', '+nd.getFullYear();
+
+        // THEME
+        let curT=localStorage.getItem('vqT')||'dark';
+        applyT(curT);
+        function applyT(t){
+          let r=t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;
+          document.documentElement.setAttribute('data-theme',r);
+          document.getElementById('floatIcon').className=r==='dark'?'bi bi-moon-fill':'bi bi-sun-fill';
+          document.querySelectorAll('.theme-opt').forEach(e=>e.classList.remove('active'));
+          const m={light:'optLight',dark:'optDark',system:'optSystem'};
+          document.getElementById(m[t])?.classList.add('active');
+          rCharts();
+        }
+        function setTheme(t){curT=t;localStorage.setItem('vqT',t);applyT(t);}
+        function togglePanel(){document.getElementById('appearPanel').classList.toggle('open');}
+        document.addEventListener('click',e=>{if(!e.target.closest('.float-settings'))document.getElementById('appearPanel').classList.remove('open');});
+
+        // CHARTS
+        let eC,lC,dC,aC;
+        function gc(){const dk=document.documentElement.getAttribute('data-theme')==='dark';return{g:dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.06)',t:dk?'#4b5563':'#94a3b8'};}
+        function buildC(){
+          const c=gc();
+          eC=new Chart(document.getElementById('empChart'),{type:'line',data:{labels:['May 1','May 5','May 10','May 15','May 20','May 25','May 30'],datasets:[{label:'Employees',data:[250,380,560,700,900,1100,1248],borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,.1)',tension:0.45,fill:true,pointRadius:4,pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>' '+x.parsed.y.toLocaleString()+' Employees'}}},scales:{x:{grid:{color:c.g},ticks:{color:c.t,font:{size:11}}},y:{grid:{color:c.g},ticks:{color:c.t,font:{size:11}}}}}});
+          lC=new Chart(document.getElementById('leaveChart'),{type:'doughnut',data:{labels:['Annual','Sick','Casual','Other'],datasets:[{data:[512,210,180,346],backgroundColor:['#7c3aed','#3b82f6','#22c55e','#f97316'],borderWidth:0,hoverOffset:5}]},options:{cutout:'68%',responsive:false,plugins:{legend:{display:false}}}});
+          dC=new Chart(document.getElementById('deptChart'),{type:'doughnut',data:{labels:['Engineering','HR','Sales','Finance','Others'],datasets:[{data:[462,196,312,146,132],backgroundColor:['#7c3aed','#3b82f6','#22c55e','#f97316','#94a3b8'],borderWidth:0,hoverOffset:5}]},options:{cutout:'68%',responsive:false,plugins:{legend:{display:false}}}});
+          aC=new Chart(document.getElementById('attendChart'),{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat'],datasets:[{label:'Present',data:[1100,1180,1050,1200,1140,420],backgroundColor:'#7c3aed',borderRadius:7,borderSkipped:false},{label:'Absent',data:[148,68,198,48,108,28],backgroundColor:'rgba(239,68,68,.6)',borderRadius:7,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{position:'top',labels:{color:c.t,font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{display:false},ticks:{color:c.t}},y:{grid:{color:c.g},ticks:{color:c.t}}}}});
+        }
+        function rCharts(){
+          if(!eC)return;
+          const c=gc();
+          [eC,aC].forEach(ch=>{
+            ch.options.scales.x.grid.color=c.g;ch.options.scales.x.ticks.color=c.t;
+            ch.options.scales.y.grid.color=c.g;ch.options.scales.y.ticks.color=c.t;
+            if(ch.options.plugins?.legend?.labels)ch.options.plugins.legend.labels.color=c.t;
+            ch.update();
+          });
+        }
+        window.addEventListener('load',buildC);
+    </script>
+</body>
+</html>

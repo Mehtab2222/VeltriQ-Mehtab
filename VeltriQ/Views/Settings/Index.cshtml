@@ -1,0 +1,654 @@
+﻿
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<style>
+
+    .settings-page {
+        width: 100%;
+    }
+
+    /* HEADER */
+
+    .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 20px;
+    }
+
+    .settings-title h2 {
+        font-size: 30px;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 4px;
+        line-height: 1;
+    }
+
+    .settings-title p {
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .save-btn {
+        height: 42px;
+        padding: 0 18px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(124,58,237,.25);
+    }
+
+    /* LAYOUT */
+
+    .settings-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* LEFT MENU */
+
+    .settings-sidebar {
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 18px;
+        padding: 14px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .settings-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .settings-menu li {
+            margin-bottom: 6px;
+        }
+
+        .settings-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 600;
+            transition: .2s ease;
+        }
+
+            .settings-menu a:hover {
+                background: rgba(124,58,237,.12);
+                color: #fff;
+            }
+
+            .settings-menu a.active {
+                background: linear-gradient(135deg,#6d28d9,#7c3aed);
+                color: #fff;
+                box-shadow: 0 8px 20px rgba(124,58,237,.22);
+            }
+
+        .settings-menu i {
+            font-size: 16px;
+        }
+
+    /* RIGHT CONTENT */
+
+    .settings-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* CARDS */
+
+    .settings-card {
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 18px;
+        padding: 22px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .card-subtitle {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+
+    /* GRID */
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 18px;
+    }
+
+    /* INPUTS */
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .form-group label {
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+    .form-control {
+        width: 100%;
+        height: 42px;
+        border-radius: 12px;
+        border: 1px solid #2a3441;
+        background: #0d1117;
+        color: #fff;
+        padding: 0 14px;
+        outline: none;
+        font-size: 13px;
+        transition: .2s ease;
+    }
+
+        .form-control:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+        }
+
+    textarea.form-control {
+        height: 110px;
+        padding-top: 12px;
+        resize: none;
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    /* TOGGLES */
+
+    .toggle-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+    .toggle-left h5 {
+        font-size: 14px;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .toggle-left p {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .switch {
+        position: relative;
+        width: 52px;
+        height: 28px;
+    }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #2a3441;
+        transition: .3s;
+        border-radius: 30px;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+    input:checked + .slider {
+        background: #7c3aed;
+    }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+    /* THEME CARDS */
+
+    .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 16px;
+    }
+
+    .theme-card {
+        border: 2px solid #2a3441;
+        border-radius: 16px;
+        padding: 14px;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .theme-card.active {
+            border-color: #7c3aed;
+            background: rgba(124,58,237,.08);
+        }
+
+    .theme-preview {
+        height: 90px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    .theme-dark {
+        background: linear-gradient(135deg,#111827,#0d1117);
+    }
+
+    .theme-light {
+        background: linear-gradient(135deg,#ffffff,#e2e8f0);
+    }
+
+    .theme-purple {
+        background: linear-gradient(135deg,#6d28d9,#a855f7);
+    }
+
+    .theme-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    /* LOGO UPLOAD */
+
+    .logo-upload {
+        border: 2px dashed #2a3441;
+        border-radius: 18px;
+        padding: 30px;
+        text-align: center;
+        background: #0d1117;
+    }
+
+    .upload-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        background: rgba(124,58,237,.14);
+        color: #7c3aed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin: 0 auto 14px;
+    }
+
+    .upload-title {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .upload-subtitle {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    /* RESPONSIVE */
+
+    @@media(max - width: 1100px)
+
+    {
+        .settings-layout
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-sidebar {
+        position: relative;
+        top: 0;
+    }
+
+    }
+
+    @@media(max - width: 768px)
+
+    {
+        .settings-grid, .theme-grid
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-header,
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    }
+</style>
+
+<div class="settings-page">
+
+    <!-- HEADER -->
+
+    <div class="settings-header">
+
+        <div class="settings-title">
+            <h2>Settings</h2>
+            <p>Manage your organization preferences and configurations.</p>
+        </div>
+
+        <button class="save-btn">
+            <i class="bi bi-check2-circle"></i>
+            Save Changes
+        </button>
+
+    </div>
+
+    <!-- LAYOUT -->
+
+    <div class="settings-layout">
+
+        <!-- LEFT MENU -->
+
+        <div class="settings-sidebar">
+
+            <ul class="settings-menu">
+
+                <li>
+                    <a href="#" class="active">
+                        <i class="bi bi-building"></i>
+                        Company Settings
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="bi bi-palette"></i>
+                        Appearance
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="bi bi-people"></i>
+                        Employee Settings
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="bi bi-cash-stack"></i>
+                        Payroll
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="bi bi-bell"></i>
+                        Notifications
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="bi bi-shield-lock"></i>
+                        Security
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="bi bi-person-lock"></i>
+                        Roles & Permissions
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+        <!-- RIGHT CONTENT -->
+
+        <div class="settings-content">
+
+            <!-- COMPANY SETTINGS -->
+
+            <div class="settings-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">Company Information</div>
+                        <div class="card-subtitle">Update your company details and preferences.</div>
+                    </div>
+
+                </div>
+
+                <div class="settings-grid">
+
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" class="form-control" value="VeltriQ Technologies" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Company Email</label>
+                        <input type="email" class="form-control" value="contact@veltriq.com" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" class="form-control" value="+91 9876543210" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Timezone</label>
+                        <select class="form-control">
+                            <option>Asia/Kolkata</option>
+                            <option>UTC</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Company Address</label>
+                        <textarea class="form-control">Pune, Maharashtra, India</textarea>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- APPEARANCE -->
+
+            <div class="settings-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">Appearance</div>
+                        <div class="card-subtitle">Customize dashboard appearance and theme.</div>
+                    </div>
+
+                </div>
+
+                <div class="theme-grid">
+
+                    <div class="theme-card active">
+                        <div class="theme-preview theme-dark"></div>
+                        <div class="theme-title">Dark Theme</div>
+                    </div>
+
+                    <div class="theme-card">
+                        <div class="theme-preview theme-light"></div>
+                        <div class="theme-title">Light Theme</div>
+                    </div>
+
+                    <div class="theme-card">
+                        <div class="theme-preview theme-purple"></div>
+                        <div class="theme-title">Purple Theme</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- NOTIFICATIONS -->
+
+            <div class="settings-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">Notifications</div>
+                        <div class="card-subtitle">Manage email and system notifications.</div>
+                    </div>
+
+                </div>
+
+                <div class="toggle-row">
+
+                    <div class="toggle-left">
+                        <h5>Email Notifications</h5>
+                        <p>Receive important system updates by email.</p>
+                    </div>
+
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+
+                </div>
+
+                <div class="toggle-row">
+
+                    <div class="toggle-left">
+                        <h5>Push Notifications</h5>
+                        <p>Enable browser push notifications.</p>
+                    </div>
+
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+
+                </div>
+
+                <div class="toggle-row">
+
+                    <div class="toggle-left">
+                        <h5>Attendance Alerts</h5>
+                        <p>Notify managers about attendance issues.</p>
+                    </div>
+
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+
+                </div>
+
+            </div>
+
+            <!-- SECURITY -->
+
+            <div class="settings-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">Security</div>
+                        <div class="card-subtitle">Manage security and login settings.</div>
+                    </div>
+
+                </div>
+
+                <div class="settings-grid">
+
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Two-Factor Authentication</label>
+                        <select class="form-control">
+                            <option>Enabled</option>
+                            <option>Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Session Timeout</label>
+                        <select class="form-control">
+                            <option>30 Minutes</option>
+                            <option>1 Hour</option>
+                            <option>2 Hours</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

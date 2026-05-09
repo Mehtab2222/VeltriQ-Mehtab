@@ -1,0 +1,397 @@
+﻿
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="reports-page">
+
+    <!-- HEADER -->
+
+    <div class="reports-header">
+
+        <div>
+            <h1>Reports & Analytics</h1>
+            <p>Generate and manage organizational reports.</p>
+        </div>
+
+    </div>
+
+    <!-- REPORT TREE -->
+
+    <div class="report-tree-wrapper">
+
+        <!-- CATEGORY CARD -->
+
+        <div class="report-card">
+
+            <div class="report-card-header">
+                Report Categories
+            </div>
+
+            <div class="report-list">
+
+                <button onclick="loadReports('employee')">
+                    <i class="bi bi-people"></i>
+                    Employee Reports
+                </button>
+
+                <button onclick="loadReports('company')">
+                    <i class="bi bi-building"></i>
+                    Company Reports
+                </button>
+
+                <button onclick="loadReports('attendance')">
+                    <i class="bi bi-calendar-check"></i>
+                    Attendance Reports
+                </button>
+
+                <button onclick="loadReports('payroll')">
+                    <i class="bi bi-cash-stack"></i>
+                    Payroll Reports
+                </button>
+
+                <button onclick="loadReports('leave')">
+                    <i class="bi bi-airplane"></i>
+                    Leave Reports
+                </button>
+
+                <button onclick="loadReports('recruitment')">
+                    <i class="bi bi-person-workspace"></i>
+                    Recruitment Reports
+                </button>
+
+                <button onclick="loadReports('documents')">
+                    <i class="bi bi-file-earmark-text"></i>
+                    Document Reports
+                </button>
+
+                <button onclick="loadReports('onboarding')">
+                    <i class="bi bi-person-plus"></i>
+                    Onboarding Reports
+                </button>
+
+                <button onclick="loadReports('induction')">
+                    <i class="bi bi-mortarboard"></i>
+                    Induction Reports
+                </button>
+
+                <button onclick="loadReports('training')">
+                    <i class="bi bi-journal-bookmark"></i>
+                    Training Reports
+                </button>
+
+                <button onclick="loadReports('system')">
+                    <i class="bi bi-pc-display"></i>
+                    System Reports
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- DYNAMIC REPORT CARD -->
+
+        <div class="report-card" id="reportTypeCard">
+
+            <div class="empty-state">
+                Select a report category.
+            </div>
+
+        </div>
+
+        <!-- FILTER CARD -->
+
+        <div class="report-card" id="filterCard">
+
+            <div class="empty-state">
+                Select a report.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    .reports-page {
+        width: 100%;
+    }
+
+    .reports-header {
+        margin-bottom: 24px;
+    }
+
+        .reports-header h3 {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .reports-header p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+    .report-tree-wrapper {
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .report-card {
+        min-width: 320px;
+        width: 320px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .report-card-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--border);
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .report-list {
+        padding: 14px;
+    }
+
+        .report-list button {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 4px;
+            transition: .2s ease;
+        }
+
+            .report-list button:hover {
+                background: rgba(124,58,237,.12);
+                color: #7c3aed;
+            }
+
+            .report-list button i {
+                font-size: 15px;
+            }
+
+    .empty-state {
+        padding: 80px 20px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .filter-section {
+        padding: 18px;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+    .filter-input {
+        width: 100%;
+        height: 40px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        outline: none;
+    }
+
+    .report-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .report-btn {
+        flex: 1;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+</style>
+
+<script>
+
+    const reports = {
+
+        employee: [
+            'Dependent Report',
+            'Documents Report',
+            'Salary Report',
+            'Qualification Report',
+            'Transfer Report',
+            'Suspension Report',
+            'Probation Report'
+        ],
+
+        payroll: [
+            'Payroll Summary',
+            'Allowance Report',
+            'Deduction Report',
+            'Salary Sheet'
+        ],
+
+        attendance: [
+            'Attendance Summary',
+            'Late Entry Report',
+            'Shift Report',
+            'Timesheet Report'
+        ],
+
+        recruitment: [
+            'Applicant Report',
+            'Hiring Report',
+            'Offer Letter Report'
+        ]
+    };
+
+    function loadReports(type) {
+
+        const card = document.getElementById('reportTypeCard');
+
+        let html = `
+
+            <div class="report-card-header">
+                ${type.charAt(0).toUpperCase() + type.slice(1)} Reports
+            </div>
+
+            <div class="report-list">
+        `;
+
+        reports[type]?.forEach(report => {
+
+            html += `
+                <button onclick="loadFilters('${report}')">
+                    <i class="bi bi-chevron-right"></i>
+                    ${report}
+                </button>
+            `;
+
+        });
+
+        html += `</div>`;
+
+        card.innerHTML = html;
+    }
+
+    function loadFilters(reportName) {
+
+        const card = document.getElementById('filterCard');
+
+        card.innerHTML = `
+
+            <div class="report-card-header">
+                ${reportName}
+            </div>
+
+            <div class="filter-section">
+
+                <div class="filter-grid">
+
+                    <div class="filter-group">
+                        <label>Company</label>
+                        <select class="filter-input">
+                            <option>All Companies</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Employee No</label>
+                        <input type="text" class="filter-input" />
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Employee Name</label>
+                        <input type="text" class="filter-input" />
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Department</label>
+                        <select class="filter-input">
+                            <option>All Departments</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Designation</label>
+                        <select class="filter-input">
+                            <option>All Designations</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>From Date</label>
+                        <input type="date" class="filter-input" />
+                    </div>
+
+                    <div class="filter-group">
+                        <label>To Date</label>
+                        <input type="date" class="filter-input" />
+                    </div>
+
+                </div>
+
+                <div class="report-actions">
+
+                    <button class="report-btn"
+                            onclick="window.location.href='/Reports/Preview'">
+
+                        Show Report
+
+                    </button>
+
+                    <button class="report-btn"
+                            onclick="window.location.href='/Reports/Print'">
+
+                        Print Report
+
+                    </button>
+
+                </div>
+
+            </div>
+        `
+    }
+
+</script>
