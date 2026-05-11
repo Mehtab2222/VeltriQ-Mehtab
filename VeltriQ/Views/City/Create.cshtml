@@ -1,0 +1,145 @@
+﻿@model VeltriQ.Models.HR.City
+
+@{
+    ViewData["Title"] = "Create City";
+}
+
+<style>
+
+    .city-card {
+        max-width: 900px;
+        background: rgba(30,35,44,.92);
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .city-card-body {
+        padding: 22px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .form-field label {
+        margin-bottom: 7px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .form-input,
+    .form-select {
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.07);
+        background: rgba(15,20,30,.7);
+        color: #fff;
+        padding: 0 14px;
+        outline: none;
+    }
+
+</style>
+
+<form asp-action="Create"
+      method="post">
+
+    <div class="city-card">
+
+        <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.05);">
+
+            <h3 style="color:#fff;font-size:16px;font-weight:700;margin:0;">
+                City Information
+            </h3>
+
+        </div>
+
+        <div class="city-card-body">
+
+            <div class="form-field full-width">
+
+                <label>
+                    Country
+                </label>
+
+                <select asp-for="CountryId"
+                        asp-items="ViewBag.CountryList"
+                        class="form-select">
+
+                    <option value="">
+                        Select Country
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-field">
+
+                <label>
+                    City Name
+                </label>
+
+                <input asp-for="CityName"
+                       class="form-input"
+                       placeholder="Enter city name" />
+
+            </div>
+
+            <div class="form-field">
+
+                <label>
+                    City Code
+                </label>
+
+                <input asp-for="CityCode"
+                       class="form-input"
+                       placeholder="PUN" />
+
+            </div>
+
+            <div class="form-field full-width">
+
+                <label>
+                    State Name
+                </label>
+
+                <input asp-for="StateName"
+                       class="form-input"
+                       placeholder="Maharashtra" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div style="margin-top:18px;display:flex;gap:10px;">
+
+        <button type="submit"
+                class="save-btn">
+
+            Save City
+
+        </button>
+
+        <a href="/City/Index"
+           class="cancel-btn">
+
+            Cancel
+
+        </a>
+
+    </div>
+
+</form>

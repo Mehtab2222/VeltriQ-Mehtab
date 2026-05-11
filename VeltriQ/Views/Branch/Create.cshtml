@@ -1,0 +1,511 @@
+﻿@model VeltriQ.Models.HR.Branch
+
+@{
+    ViewData["Title"] = "Create Branch";
+}
+
+<style>
+
+    .branch-create-page {
+        padding: 4px 0 32px;
+    }
+
+    /* ─────────────────────────────────────
+           TOPBAR
+        ───────────────────────────────────── */
+
+    .branch-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        gap: 20px;
+    }
+
+    .branch-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+    }
+
+        .branch-breadcrumb a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .branch-breadcrumb i {
+            color: #475569;
+            font-size: 10px;
+        }
+
+        .branch-breadcrumb span {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+    .branch-top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cancel-btn {
+        height: 40px;
+        padding: 0 18px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .cancel-btn:hover {
+            border-color: rgba(239,68,68,.2);
+            background: rgba(239,68,68,.08);
+            color: #fca5a5;
+        }
+
+    .save-btn {
+        height: 40px;
+        padding: 0 20px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 8px 22px rgba(124,58,237,.24);
+        transition: .2s ease;
+    }
+
+        .save-btn:hover {
+            transform: translateY(-1px);
+        }
+
+    /* ─────────────────────────────────────
+           ROW LAYOUT
+        ───────────────────────────────────── */
+
+    .branch-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    /* ─────────────────────────────────────
+           CARD
+        ───────────────────────────────────── */
+
+    .branch-card {
+        background: rgba(30,35,44,.92);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .branch-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .branch-card-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: rgba(124,58,237,.12);
+        border: 1px solid rgba(124,58,237,.16);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a78bfa;
+        font-size: 14px;
+    }
+
+    .branch-card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    /* BODY */
+
+    .branch-card-body {
+        padding: 20px 22px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    /* FIELD */
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-field label {
+            margin-bottom: 7px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .7px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+    /* INPUT */
+
+    .form-input,
+    .form-select {
+        width: 100%;
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.07);
+        background: rgba(15,20,30,.7);
+        color: #e2e8f0;
+        padding: 0 14px;
+        font-size: 13px;
+        outline: none;
+        transition: .2s ease;
+    }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: #7c3aed;
+            background: rgba(124,58,237,.06);
+            box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+        }
+
+        .form-input::placeholder {
+            color: #475569;
+        }
+
+    /* FOOTER */
+
+    .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 18px;
+    }
+
+    /* RESPONSIVE */
+
+    @@media(max-width: 900px) {
+
+        .branch-row {
+            grid-template-columns: 1fr;
+        }
+
+        .branch-card-body {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width {
+            grid-column: span 1;
+        }
+    }
+
+    @@media(max-width: 640px) {
+
+        .branch-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .branch-top-actions {
+            width: 100%;
+        }
+
+        .cancel-btn,
+        .save-btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+</style>
+
+<div class="branch-create-page">
+
+    <!-- TOPBAR -->
+
+    <div class="branch-topbar">
+
+        <div class="branch-breadcrumb">
+
+            <a href="/Branch/Index">
+                Branches
+            </a>
+
+            <i class="bi bi-chevron-right"></i>
+
+            <span>Create</span>
+
+        </div>
+
+        <div class="branch-top-actions">
+
+            <a href="/Branch/Index"
+               class="cancel-btn">
+
+                <i class="bi bi-x"></i>
+
+                Cancel
+
+            </a>
+
+            <button type="submit"
+                    form="branchForm"
+                    class="save-btn">
+
+                <i class="bi bi-building-add"></i>
+
+                Save Branch
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <form id="branchForm"
+          asp-action="Create"
+          method="post">
+
+        <!-- ROW -->
+
+        <div class="branch-row">
+
+            <!-- GENERAL -->
+
+            <div class="branch-card">
+
+                <div class="branch-card-header">
+
+                    <div class="branch-card-icon">
+
+                        <i class="bi bi-building"></i>
+
+                    </div>
+
+                    <div class="branch-card-title">
+                        General Information
+                    </div>
+
+                </div>
+
+                <div class="branch-card-body">
+
+                    <!-- COMPANY -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            Company
+                        </label>
+
+                        <select asp-for="CompanyId"
+                                asp-items="ViewBag.CompanyList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Company
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- BRANCH NAME -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            Branch Name
+                        </label>
+
+                        <input asp-for="BranchName"
+                               class="form-input"
+                               placeholder="Enter branch name" />
+
+                    </div>
+
+                    <!-- CODE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Branch Code
+                        </label>
+
+                        <input asp-for="BranchCode"
+                               class="form-input"
+                               placeholder="BR-001" />
+
+                    </div>
+
+                    <!-- EMAIL -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Email Address
+                        </label>
+
+                        <input asp-for="Email"
+                               class="form-input"
+                               placeholder="branch@company.com" />
+
+                    </div>
+
+                    <!-- PHONE -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            Phone Number
+                        </label>
+
+                        <input asp-for="PhoneNumber"
+                               class="form-input"
+                               placeholder="+91 9876543210" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ADDRESS -->
+
+            <div class="branch-card">
+
+                <div class="branch-card-header">
+
+                    <div class="branch-card-icon">
+
+                        <i class="bi bi-geo-alt"></i>
+
+                    </div>
+
+                    <div class="branch-card-title">
+                        Address Information
+                    </div>
+
+                </div>
+
+                <div class="branch-card-body">
+
+                    <!-- ADDRESS 1 -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            Address Line 1
+                        </label>
+
+                        <input asp-for="AddressLine1"
+                               class="form-input"
+                               placeholder="Street, building name" />
+
+                    </div>
+
+                    <!-- ADDRESS 2 -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            Address Line 2
+                        </label>
+
+                        <input asp-for="AddressLine2"
+                               class="form-input"
+                               placeholder="Floor, unit, landmark" />
+
+                    </div>
+
+                    <!-- CITY -->
+
+                    <div class="form-field">
+
+                        <label>
+                            City
+                        </label>
+
+                        <input asp-for="City"
+                               class="form-input"
+                               placeholder="Enter city" />
+
+                    </div>
+
+                    <!-- STATE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            State
+                        </label>
+
+                        <input asp-for="StateName"
+                               class="form-input"
+                               placeholder="Enter state" />
+
+                    </div>
+
+                    <!-- COUNTRY -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Country
+                        </label>
+
+                        <input asp-for="CountryName"
+                               class="form-input"
+                               placeholder="Enter country" />
+
+                    </div>
+
+                    <!-- POSTAL -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Postal Code
+                        </label>
+
+                        <input asp-for="PostalCode"
+                               class="form-input"
+                               placeholder="411001" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>

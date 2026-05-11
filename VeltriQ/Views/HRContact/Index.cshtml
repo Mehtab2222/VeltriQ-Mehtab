@@ -1,0 +1,406 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.HRContact>
+
+@{
+    ViewData["Title"] = "HR Contacts";
+}
+
+<style>
+
+    .hrcontact-page {
+        width: 100%;
+    }
+
+    /* HEADER */
+
+    .hrcontact-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 20px;
+    }
+
+    .hrcontact-header-left h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .hrcontact-header-left p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* BUTTON */
+
+    .hrcontact-add-btn {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: .2s ease;
+        box-shadow: 0 8px 22px rgba(124,58,237,.22);
+    }
+
+        .hrcontact-add-btn:hover {
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+    /* CARD */
+
+    .hrcontact-card {
+        background: rgba(30,35,44,.94);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,.06);
+        overflow: hidden;
+    }
+
+    .hrcontact-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+        gap: 20px;
+    }
+
+    .hrcontact-card-title h3 {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .hrcontact-card-title p {
+        color: #94a3b8;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    /* SEARCH */
+
+    .hrcontact-search {
+        width: 320px;
+        position: relative;
+    }
+
+        .hrcontact-search input {
+            width: 100%;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid #2a3441;
+            background: #0d1117;
+            padding: 0 14px 0 42px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+            .hrcontact-search input:focus {
+                border-color: #7c3aed;
+            }
+
+        .hrcontact-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+    /* TABLE */
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .hrcontact-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .hrcontact-table th {
+            text-align: left;
+            padding: 0 20px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+        }
+
+        .hrcontact-table td {
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255,255,255,.04);
+            color: #fff;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .hrcontact-table tbody tr:hover {
+            background: rgba(255,255,255,.02);
+        }
+
+    /* CONTACT */
+
+    .contact-name {
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+    .contact-code {
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+    /* EMAIL */
+
+    .email-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #c4b5fd;
+        background: rgba(124,58,237,.10);
+        padding: 7px 10px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* BADGES */
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-type {
+        background: rgba(59,130,246,.14);
+        color: #60a5fa;
+    }
+
+    .badge-active {
+        background: rgba(34,197,94,.14);
+        color: #22c55e;
+    }
+
+    /* ACTIONS */
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .action-btn:hover {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+</style>
+
+<div class="hrcontact-page">
+
+    <!-- HEADER -->
+
+    <div class="hrcontact-header">
+
+        <div class="hrcontact-header-left">
+
+            <h2>HR Contacts</h2>
+
+            <p>
+                Manage official HR escalation and support contacts.
+            </p>
+
+        </div>
+
+        <a href="/HRContact/Create"
+           class="hrcontact-add-btn">
+
+            <i class="bi bi-plus-lg"></i>
+
+            Add Contact
+
+        </a>
+
+    </div>
+
+    <!-- CARD -->
+
+    <div class="hrcontact-card">
+
+        <div class="hrcontact-card-top">
+
+            <div class="hrcontact-card-title">
+
+                <h3>Contact Directory</h3>
+
+                <p>
+                    Total Contacts:
+                    @Model.Count()
+                </p>
+
+            </div>
+
+            <div class="hrcontact-search">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       placeholder="Search contacts..." />
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="table-wrapper">
+
+            <table class="hrcontact-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Contact</th>
+                        <th>Contact Type</th>
+                        <th>Email Address</th>
+                        <th>Phone Number</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <!-- CONTACT -->
+
+                            <td>
+
+                                <div class="contact-name">
+                                    @item.ContactName
+                                </div>
+
+                                <div class="contact-code">
+                                    @item.ContactCode
+                                </div>
+
+                            </td>
+
+                            <!-- TYPE -->
+
+                            <td>
+
+                                <span class="badge badge-type">
+                                    @item.ContactType
+                                </span>
+
+                            </td>
+
+                            <!-- EMAIL -->
+
+                            <td>
+
+                                <span class="email-box">
+
+                                    <i class="bi bi-envelope"></i>
+
+                                    @item.EmailAddress
+
+                                </span>
+
+                            </td>
+
+                            <!-- PHONE -->
+
+                            <td>
+                                @item.PhoneNumber
+                            </td>
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <span class="badge badge-active">
+                                    Active
+                                </span>
+
+                            </td>
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="table-actions">
+
+                                    <a href="#"
+                                       class="action-btn">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                    <a href="#"
+                                       class="action-btn">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,522 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.Branch>
+
+@{
+    ViewData["Title"] = "Branches";
+}
+
+<style>
+
+    .branch-page {
+        width: 100%;
+    }
+
+    /* ─────────────────────────────────────
+           PAGE HEADER
+        ───────────────────────────────────── */
+
+    .branch-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 20px;
+    }
+
+    .branch-header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+        line-height: 1;
+        letter-spacing: -.4px;
+    }
+
+    .branch-header-left p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* BUTTON */
+
+    .branch-add-btn {
+        height: 42px;
+        padding: 0 18px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        box-shadow: 0 8px 22px rgba(124,58,237,.22);
+        transition: .2s ease;
+        flex-shrink: 0;
+    }
+
+        .branch-add-btn:hover {
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+    /* ─────────────────────────────────────
+           CARD
+        ───────────────────────────────────── */
+
+    .branch-card {
+        background: rgba(30,35,44,.92);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    /* CARD TOP */
+
+    .branch-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 20px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+        gap: 16px;
+    }
+
+    .branch-card-title h3 {
+        font-size: 17px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 3px;
+    }
+
+    .branch-card-title p {
+        font-size: 13px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* SEARCH */
+
+    .branch-search {
+        width: 280px;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+        .branch-search input {
+            width: 100%;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid #2a3441;
+            background: #0d1117;
+            padding: 0 14px 0 40px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: .2s ease;
+        }
+
+            .branch-search input:focus {
+                border-color: #7c3aed;
+            }
+
+            .branch-search input::placeholder {
+                color: #6b7280;
+            }
+
+        .branch-search i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+    /* ─────────────────────────────────────
+           TABLE
+        ───────────────────────────────────── */
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #2a3441;
+            border-radius: 20px;
+        }
+
+    .branch-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .branch-table thead tr {
+            border-bottom: 1px solid rgba(255,255,255,.05);
+        }
+
+        .branch-table th {
+            text-align: left;
+            padding: 0 20px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+        }
+
+        .branch-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+            color: #fff;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .branch-table tbody tr {
+            transition: .2s ease;
+        }
+
+            .branch-table tbody tr:hover {
+                background: rgba(255,255,255,.02);
+            }
+
+    /* BRANCH INFO */
+
+    .branch-name {
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+    .branch-code {
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+    /* STATUS */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: rgba(34,197,94,.14);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239,68,68,.14);
+        color: #ef4444;
+    }
+
+    /* ACTIONS */
+
+    .table-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 10px;
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: .2s ease;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+        .action-btn:hover {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+        .action-btn.delete-btn {
+            background: rgba(239,68,68,.12);
+            color: #ef4444;
+        }
+
+            .action-btn.delete-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+    /* EMPTY */
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #374151;
+            margin-bottom: 14px;
+        }
+
+        .empty-state h4 {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+    /* RESPONSIVE */
+
+    @@media(max-width: 992px) {
+
+        .branch-header,
+        .branch-card-top {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .branch-search {
+            width: 100%;
+        }
+    }
+
+</style>
+
+<div class="branch-page">
+
+    <!-- HEADER -->
+
+    <div class="branch-header">
+
+        <div class="branch-header-left">
+
+            <h2>Branches</h2>
+
+            <p>
+                Manage organization branches and office locations.
+            </p>
+
+        </div>
+
+        <a href="/Branch/Create"
+           class="branch-add-btn">
+
+            <i class="bi bi-plus-lg"></i>
+
+            <span>Add Branch</span>
+
+        </a>
+
+    </div>
+
+    <!-- CARD -->
+
+    <div class="branch-card">
+
+        <!-- TOP -->
+
+        <div class="branch-card-top">
+
+            <div class="branch-card-title">
+
+                <h3>Branch Directory</h3>
+
+                <p>
+                    Total Branches:
+                    @Model.Count()
+                </p>
+
+            </div>
+
+            <!-- SEARCH -->
+
+            <div class="branch-search">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       placeholder="Search branches..." />
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        @if (Model.Any())
+        {
+            <div class="table-wrapper">
+
+                <table class="branch-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Branch</th>
+                            <th>Company</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>City</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- BRANCH -->
+
+                                <td>
+
+                                    <div class="branch-name">
+                                        @item.BranchName
+                                    </div>
+
+                                    <div class="branch-code">
+                                        @item.BranchCode
+                                    </div>
+
+                                </td>
+
+                                <!-- COMPANY -->
+
+                                <td>
+                                    @item.Company?.CompanyName
+                                </td>
+
+                                <!-- EMAIL -->
+
+                                <td>
+                                    @item.Email
+                                </td>
+
+                                <!-- PHONE -->
+
+                                <td>
+                                    @item.PhoneNumber
+                                </td>
+
+                                <!-- CITY -->
+
+                                <td>
+                                    @item.City
+                                </td>
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="status-badge status-active">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="table-actions">
+
+                                        <a href="#"
+                                           class="action-btn">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </a>
+
+                                        <a href="#"
+                                           class="action-btn">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </a>
+
+                                        <a href="#"
+                                           class="action-btn delete-btn">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <!-- EMPTY -->
+
+            <div class="empty-state">
+
+                <i class="bi bi-building"></i>
+
+                <h4>No Branches Found</h4>
+
+                <p>
+                    Start by creating your first organization branch.
+                </p>
+
+                <a href="/Branch/Create"
+                   class="branch-add-btn">
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    <span>Create Branch</span>
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+</div>

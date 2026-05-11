@@ -1,0 +1,376 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.Nationality>
+
+@{
+    ViewData["Title"] = "Nationalities";
+}
+
+<style>
+
+    .nationality-page {
+        width: 100%;
+    }
+
+    /* HEADER */
+
+    .nationality-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 20px;
+    }
+
+    .nationality-header-left h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .nationality-header-left p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* BUTTON */
+
+    .nationality-add-btn {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: .2s ease;
+        box-shadow: 0 8px 22px rgba(124,58,237,.22);
+    }
+
+        .nationality-add-btn:hover {
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+    /* CARD */
+
+    .nationality-card {
+        background: rgba(30,35,44,.94);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .nationality-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+        gap: 20px;
+    }
+
+    .nationality-card-title h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 3px;
+    }
+
+    .nationality-card-title p {
+        font-size: 13px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* SEARCH */
+
+    .nationality-search {
+        width: 320px;
+        position: relative;
+    }
+
+        .nationality-search input {
+            width: 100%;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid #2a3441;
+            background: #0d1117;
+            padding: 0 14px 0 42px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+            .nationality-search input:focus {
+                border-color: #7c3aed;
+            }
+
+        .nationality-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+    /* TABLE */
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .nationality-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .nationality-table th {
+            text-align: left;
+            padding: 0 20px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .nationality-table td {
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255,255,255,.04);
+            color: #fff;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .nationality-table tbody tr:hover {
+            background: rgba(255,255,255,.02);
+        }
+
+    /* NAME */
+
+    .nationality-name {
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+    .nationality-code {
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+    /* STATUS */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: rgba(34,197,94,.14);
+        color: #22c55e;
+    }
+
+    /* ACTIONS */
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .2s ease;
+        text-decoration: none;
+    }
+
+        .action-btn:hover {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+    .delete-btn {
+        background: rgba(239,68,68,.12);
+        color: #ef4444;
+    }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+</style>
+
+<div class="nationality-page">
+
+    <!-- HEADER -->
+
+    <div class="nationality-header">
+
+        <div class="nationality-header-left">
+
+            <h2>Nationalities</h2>
+
+            <p>
+                Manage employee nationality master records.
+            </p>
+
+        </div>
+
+        <a href="/Nationality/Create"
+           class="nationality-add-btn">
+
+            <i class="bi bi-plus-lg"></i>
+
+            Add Nationality
+
+        </a>
+
+    </div>
+
+    <!-- CARD -->
+
+    <div class="nationality-card">
+
+        <div class="nationality-card-top">
+
+            <div class="nationality-card-title">
+
+                <h3>Nationality Directory</h3>
+
+                <p>
+                    Total Nationalities:
+                    @Model.Count()
+                </p>
+
+            </div>
+
+            <div class="nationality-search">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       placeholder="Search nationalities..." />
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="table-wrapper">
+
+            <table class="nationality-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Nationality</th>
+                        <th>Country Code</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <!-- NATIONALITY -->
+
+                            <td>
+
+                                <div class="nationality-name">
+                                    @item.NationalityName
+                                </div>
+
+                                <div class="nationality-code">
+                                    @item.NationalityCode
+                                </div>
+
+                            </td>
+
+                            <!-- COUNTRY -->
+
+                            <td>
+                                @item.CountryCode
+                            </td>
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <span class="status-badge status-active">
+                                    Active
+                                </span>
+
+                            </td>
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="table-actions">
+
+                                    <a href="#"
+                                       class="action-btn">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                    <a href="#"
+                                       class="action-btn">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+                                    <a href="#"
+                                       class="action-btn delete-btn">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

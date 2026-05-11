@@ -1,0 +1,896 @@
+﻿@model VeltriQ.Models.HR.Employee
+
+@{
+    ViewData["Title"] = "Employee Profile";
+}
+
+<style>
+
+    .employee-profile-page {
+        padding: 8px 0 40px;
+    }
+
+    /* HEADER */
+
+    .profile-header {
+        background: linear-gradient( 135deg, rgba(124,58,237,.20), rgba(15,23,42,.96) );
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 24px;
+        padding: 28px;
+        margin-bottom: 22px;
+    }
+
+    .profile-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    .profile-main {
+        display: flex;
+        gap: 22px;
+        align-items: center;
+    }
+
+    /* AVATAR */
+
+    .employee-avatar {
+        width: 94px;
+        height: 94px;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, #7c3aed, #9333ea );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 800;
+        color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 12px 35px rgba(124,58,237,.32);
+    }
+
+    /* CONTENT */
+
+    .profile-content h2 {
+        color: #fff;
+        font-size: 30px;
+        font-weight: 800;
+        margin-bottom: 5px;
+        letter-spacing: -.5px;
+    }
+
+    .employee-meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .employee-code {
+        background: rgba(255,255,255,.08);
+        color: #cbd5e1;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .employee-status {
+        background: rgba(34,197,94,.16);
+        color: #22c55e;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .employee-role {
+        color: #cbd5e1;
+        font-size: 14px;
+    }
+
+    /* INFO GRID */
+
+    .profile-info-grid {
+        display: flex;
+        gap: 28px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+
+    .profile-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .profile-info-label {
+        color: #64748b;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        font-weight: 700;
+    }
+
+    .profile-info-value {
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    /* ACTIONS */
+
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .profile-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg,#7c3aed,#9333ea);
+        color: #fff;
+        box-shadow: 0 10px 25px rgba(124,58,237,.25);
+    }
+
+    .btn-secondary {
+        background: rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.06);
+        color: #cbd5e1;
+    }
+
+    .profile-btn:hover {
+        transform: translateY(-2px);
+        color: #fff;
+    }
+
+    /* STATS */
+
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .stats-card {
+        background: rgba(30,35,44,.94);
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.06);
+        padding: 20px;
+    }
+
+    .stats-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
+    .stats-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: rgba(124,58,237,.12);
+        color: #a78bfa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stats-value {
+        color: #fff;
+        font-size: 26px;
+        font-weight: 800;
+    }
+
+    .stats-label {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    /* TABS */
+
+    .profile-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+
+    .profile-tab {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.05);
+        background: rgba(30,35,44,.92);
+        color: #94a3b8;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .profile-tab.active {
+            background: linear-gradient(135deg,#7c3aed,#9333ea);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(124,58,237,.20);
+        }
+
+    /* CONTENT */
+
+    .profile-content-card {
+        background: rgba(30,35,44,.94);
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,.06);
+        overflow: hidden;
+    }
+
+    .content-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+        .content-header h3 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .content-header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 0;
+        }
+
+    /* SECTION GRID */
+
+    .profile-section-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        padding: 24px;
+    }
+
+    .info-section {
+        background: rgba(15,20,30,.45);
+        border: 1px solid rgba(255,255,255,.04);
+        border-radius: 18px;
+        padding: 20px;
+    }
+
+        .info-section h4 {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+    /* INFO ROW */
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+    .info-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        min-width: 120px;
+    }
+
+    .info-value {
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: right;
+    }
+
+</style>
+
+<div class="employee-profile-page">
+
+    <!-- PROFILE HEADER -->
+
+    <div class="profile-header">
+
+        <div class="profile-header-top">
+
+            <!-- LEFT -->
+
+            <div class="profile-main">
+
+                <div class="employee-avatar">
+
+                    @(Model.FirstName?.Substring(0, 1))
+                    @(Model.LastName?.Substring(0, 1))
+
+                </div>
+
+                <div class="profile-content">
+
+                    <h2>
+                        @Model.FirstName
+                        @Model.LastName
+                    </h2>
+
+                    <div class="employee-meta">
+
+                        <span class="employee-code">
+                            @Model.EmployeeCode
+                        </span>
+
+                        <span class="employee-status">
+                            @(Model.EmploymentStatus ?? "Active")
+                        </span>
+
+                        <span class="employee-role">
+
+                            @Model.Designation?.DesignationName
+
+                        </span>
+
+                    </div>
+
+                    <!-- INFO GRID -->
+
+                    <div class="profile-info-grid">
+
+                        <div class="profile-info-item">
+
+                            <span class="profile-info-label">
+                                Department
+                            </span>
+
+                            <span class="profile-info-value">
+                                @Model.Department?.DepartmentName
+                            </span>
+
+                        </div>
+
+                        <div class="profile-info-item">
+
+                            <span class="profile-info-label">
+                                Branch
+                            </span>
+
+                            <span class="profile-info-value">
+                                @Model.Branch?.BranchName
+                            </span>
+
+                        </div>
+
+                        <div class="profile-info-item">
+
+                            <span class="profile-info-label">
+                                Official Email
+                            </span>
+
+                            <span class="profile-info-value">
+                                @Model.OfficialEmail
+                            </span>
+
+                        </div>
+
+                        <div class="profile-info-item">
+
+                            <span class="profile-info-label">
+                                Joining Date
+                            </span>
+
+                            <span class="profile-info-value">
+                                @(Model.JoiningDate?.ToString("dd MMM yyyy"))
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="profile-actions">
+
+                <a href="#"
+                   class="profile-btn btn-secondary">
+
+                    <i class="bi bi-download"></i>
+
+                    Export
+
+                </a>
+
+                <a href="#"
+                   class="profile-btn btn-edit">
+
+                    <i class="bi bi-pencil-square"></i>
+
+                    Edit Profile
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+
+    <div class="profile-stats">
+
+        <div class="stats-card">
+
+            <div class="stats-top">
+
+                <div class="stats-icon">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+
+                <div class="stats-value">0</div>
+
+            </div>
+
+            <div class="stats-label">
+                Documents
+            </div>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="stats-top">
+
+                <div class="stats-icon">
+                    <i class="bi bi-laptop"></i>
+                </div>
+
+                <div class="stats-value">0</div>
+
+            </div>
+
+            <div class="stats-label">
+                Assets Assigned
+            </div>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="stats-top">
+
+                <div class="stats-icon">
+                    <i class="bi bi-calendar2-check"></i>
+                </div>
+
+                <div class="stats-value">12</div>
+
+            </div>
+
+            <div class="stats-label">
+                Leave Balance
+            </div>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="stats-top">
+
+                <div class="stats-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div class="stats-value">96%</div>
+
+            </div>
+
+            <div class="stats-label">
+                Attendance
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TABS -->
+
+    <div class="profile-tabs">
+
+        <div class="profile-tab active"
+             onclick="loadProfileTab()">
+
+            <i class="bi bi-person"></i>
+
+            Profile
+
+        </div>
+
+        <div class="profile-tab"
+             onclick="loadDocumentsTab(@Model.EmployeeId,this)">
+
+            <i class="bi bi-file-earmark-text"></i>
+
+            Documents
+
+        </div>
+
+        <div class="profile-tab"
+             onclick="loadAssetsTab(@Model.EmployeeId,this)">
+
+            <i class="bi bi-laptop"></i>
+
+            Assets
+
+        </div>
+
+        <div class="profile-tab"
+             onclick="loadTimelineTab(@Model.EmployeeId,this)">
+
+            <i class="bi bi-clock-history"></i>
+
+            Timeline
+
+        </div>
+
+        <div class="profile-tab">
+
+            <i class="bi bi-calendar2-check"></i>
+
+            Leave
+
+        </div>
+
+        <div class="profile-tab">
+
+            <i class="bi bi-bar-chart"></i>
+
+            Attendance
+
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+
+    <div class="profile-content-card"
+         id="employeeTabContent">
+
+        <div class="content-header">
+
+            <h3>Employee Profile Information</h3>
+
+            <p>
+                Complete employee organization, personal,
+                and employment information.
+            </p>
+
+        </div>
+
+        <!-- GRID -->
+
+        <div class="profile-section-grid">
+
+            <!-- ORGANIZATION -->
+
+            <div class="info-section">
+
+                <h4>Organization Information</h4>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Branch
+                    </div>
+
+                    <div class="info-value">
+                        @Model.Branch?.BranchName
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Department
+                    </div>
+
+                    <div class="info-value">
+                        @Model.Department?.DepartmentName
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Designation
+                    </div>
+
+                    <div class="info-value">
+                        @Model.Designation?.DesignationName
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Division
+                    </div>
+
+                    <div class="info-value">
+                        @Model.Division?.DivisionName
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PERSONAL -->
+
+            <div class="info-section">
+
+                <h4>Personal Information</h4>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Gender
+                    </div>
+
+                    <div class="info-value">
+                        @Model.Gender
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Date Of Birth
+                    </div>
+
+                    <div class="info-value">
+                        @(Model.DateOfBirth?.ToString("dd MMM yyyy"))
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Marital Status
+                    </div>
+
+                    <div class="info-value">
+                        @Model.MaritalStatus
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Blood Group
+                    </div>
+
+                    <div class="info-value">
+                        @Model.BloodGroup
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ADDRESS -->
+
+            <div class="info-section">
+
+                <h4>Address Information</h4>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Country
+                    </div>
+
+                    <div class="info-value">
+                        @Model.Country?.CountryName
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        City
+                    </div>
+
+                    <div class="info-value">
+                        @Model.City?.CityName
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Pincode
+                    </div>
+
+                    <div class="info-value">
+                        @Model.Pincode
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- EMPLOYMENT -->
+
+            <div class="info-section">
+
+                <h4>Employment Information</h4>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Joining Date
+                    </div>
+
+                    <div class="info-value">
+                        @(Model.JoiningDate?.ToString("dd MMM yyyy"))
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Employment Type
+                    </div>
+
+                    <div class="info-value">
+                        @Model.EmploymentType
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Status
+                    </div>
+
+                    <div class="info-value">
+                        @Model.EmploymentStatus
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Confirmation Date
+                    </div>
+
+                    <div class="info-value">
+                        @(Model.ConfirmationDate?.ToString("dd MMM yyyy"))
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+    function clearActiveTabs()
+    {
+        document
+            .querySelectorAll(".profile-tab")
+            .forEach(x =>
+            {
+                x.classList.remove("active");
+            });
+    }
+
+    // DOCUMENTS TAB
+
+    async function loadDocumentsTab(employeeId,element)
+    {
+        clearActiveTabs();
+
+        element.classList.add("active");
+
+        const response =
+            await fetch
+            (
+                `/EmployeeDocument/Index?employeeId=${employeeId}`
+            );
+
+        const html = await response.text();
+
+        document
+            .getElementById("employeeTabContent")
+            .innerHTML = html;
+    }
+        async function loadAssetsTab(employeeId,element)
+    {
+        clearActiveTabs();
+
+        element.classList.add("active");
+
+        const response =
+            await fetch
+            (
+                `/EmployeeAsset/Index?employeeId=${employeeId}`
+            );
+
+        const html = await response.text();
+
+        document
+            .getElementById("employeeTabContent")
+            .innerHTML = html;
+    }
+        async function loadTimelineTab(employeeId,element)
+    {
+        clearActiveTabs();
+
+        element.classList.add("active");
+
+        const response =
+            await fetch
+            (
+                `/EmployeeActivity/Index?employeeId=${employeeId}`
+            );
+
+        const html = await response.text();
+
+        document
+            .getElementById("employeeTabContent")
+            .innerHTML = html;
+    }
+    // PROFILE TAB
+
+    function loadProfileTab()
+    {
+        location.reload();
+    }
+
+</script>

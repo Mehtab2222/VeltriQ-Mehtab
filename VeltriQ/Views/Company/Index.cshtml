@@ -1,0 +1,34 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.Company>
+
+@{
+    ViewData["Title"] = "Company";
+}
+
+<h2>Company Master</h2>
+
+<table class="table">
+
+    <thead>
+        <tr>
+            <th>Company Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>City</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CompanyName</td>
+                <td>@item.Email</td>
+                <td>@item.PhoneNumber</td>
+                <td>@item.City</td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>

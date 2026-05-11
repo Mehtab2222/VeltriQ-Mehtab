@@ -1,0 +1,89 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.EmployeeTransfer>
+
+@{
+    ViewData["Title"] = "Employee Transfers";
+}
+
+<div class="page-header">
+
+    <div>
+        <h2>Employee Transfers</h2>
+
+        <p>
+            Manage employee transfer requests and approvals.
+        </p>
+    </div>
+
+    <a href="/EmployeeTransfer/Create"
+       class="btn btn-primary">
+
+        <i class="bi bi-plus-circle"></i>
+
+        New Transfer
+
+    </a>
+
+</div>
+
+<div class="table-card">
+
+    <table class="table align-middle">
+
+        <thead>
+
+            <tr>
+                <th>Employee</th>
+
+                <th>Current Branch</th>
+
+                <th>New Branch</th>
+
+                <th>Effective Date</th>
+
+                <th>Status</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>
+                        @item.Employee?.FirstName
+                        @item.Employee?.LastName
+                    </td>
+
+                    <td>
+                        @item.CurrentBranch?.BranchName
+                    </td>
+
+                    <td>
+                        @item.NewBranch?.BranchName
+                    </td>
+
+                    <td>
+                        @item.EffectiveDate
+                        .ToString("dd MMM yyyy")
+                    </td>
+
+                    <td>
+
+                        <span class="status-badge status-active">
+
+                            @item.Status
+
+                        </span>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

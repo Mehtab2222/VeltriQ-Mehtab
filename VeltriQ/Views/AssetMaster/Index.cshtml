@@ -1,0 +1,420 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.AssetMaster>
+
+@{
+    ViewData["Title"] = "Asset Master";
+}
+
+<style>
+
+    .asset-page {
+        width: 100%;
+    }
+
+    /* HEADER */
+
+    .asset-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 20px;
+    }
+
+    .asset-header-left h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .asset-header-left p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* BUTTON */
+
+    .asset-add-btn {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: .2s ease;
+        box-shadow: 0 8px 22px rgba(124,58,237,.22);
+    }
+
+        .asset-add-btn:hover {
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+    /* CARD */
+
+    .asset-card {
+        background: rgba(30,35,44,.94);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,.06);
+        overflow: hidden;
+    }
+
+    .asset-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+        gap: 20px;
+    }
+
+    .asset-card-title h3 {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .asset-card-title p {
+        color: #94a3b8;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    /* SEARCH */
+
+    .asset-search {
+        width: 320px;
+        position: relative;
+    }
+
+        .asset-search input {
+            width: 100%;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid #2a3441;
+            background: #0d1117;
+            padding: 0 14px 0 42px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+            .asset-search input:focus {
+                border-color: #7c3aed;
+            }
+
+        .asset-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+    /* TABLE */
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .asset-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .asset-table th {
+            text-align: left;
+            padding: 0 20px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+        }
+
+        .asset-table td {
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255,255,255,.04);
+            color: #fff;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .asset-table tbody tr:hover {
+            background: rgba(255,255,255,.02);
+        }
+
+    /* ASSET */
+
+    .asset-name {
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+    .asset-code {
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+    /* BADGES */
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-category {
+        background: rgba(124,58,237,.12);
+        color: #c4b5fd;
+    }
+
+    .badge-returnable {
+        background: rgba(34,197,94,.14);
+        color: #22c55e;
+    }
+
+    .badge-nonreturnable {
+        background: rgba(239,68,68,.14);
+        color: #ef4444;
+    }
+
+    .badge-serial {
+        background: rgba(59,130,246,.14);
+        color: #60a5fa;
+    }
+
+    /* ACTIONS */
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .action-btn:hover {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+</style>
+
+<div class="asset-page">
+
+    <!-- HEADER -->
+
+    <div class="asset-header">
+
+        <div class="asset-header-left">
+
+            <h2>Asset Master</h2>
+
+            <p>
+                Manage organization assets and inventory configuration.
+            </p>
+
+        </div>
+
+        <a href="/AssetMaster/Create"
+           class="asset-add-btn">
+
+            <i class="bi bi-plus-lg"></i>
+
+            Add Asset
+
+        </a>
+
+    </div>
+
+    <!-- CARD -->
+
+    <div class="asset-card">
+
+        <div class="asset-card-top">
+
+            <div class="asset-card-title">
+
+                <h3>Asset Directory</h3>
+
+                <p>
+                    Total Assets:
+                    @Model.Count()
+                </p>
+
+            </div>
+
+            <div class="asset-search">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       placeholder="Search assets..." />
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="table-wrapper">
+
+            <table class="asset-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Asset</th>
+                        <th>Category</th>
+                        <th>Brand / Model</th>
+                        <th>Serial Required</th>
+                        <th>Returnable</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <!-- ASSET -->
+
+                            <td>
+
+                                <div class="asset-name">
+                                    @item.AssetName
+                                </div>
+
+                                <div class="asset-code">
+                                    @item.AssetCode
+                                </div>
+
+                            </td>
+
+                            <!-- CATEGORY -->
+
+                            <td>
+
+                                <span class="badge badge-category">
+                                    @item.AssetCategory
+                                </span>
+
+                            </td>
+
+                            <!-- BRAND -->
+
+                            <td>
+
+                                @item.BrandName
+                                /
+                                @item.ModelName
+
+                            </td>
+
+                            <!-- SERIAL -->
+
+                            <td>
+
+                                @if (item.SerialNumberRequired)
+                                {
+                                    <span class="badge badge-serial">
+                                        Required
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="color:#6b7280;">
+                                        No
+                                    </span>
+                                }
+
+                            </td>
+
+                            <!-- RETURNABLE -->
+
+                            <td>
+
+                                @if (item.IsReturnable)
+                                {
+                                    <span class="badge badge-returnable">
+                                        Returnable
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-nonreturnable">
+                                        Non Returnable
+                                    </span>
+                                }
+
+                            </td>
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="table-actions">
+
+                                    <a href="#"
+                                       class="action-btn">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                    <a href="#"
+                                       class="action-btn">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

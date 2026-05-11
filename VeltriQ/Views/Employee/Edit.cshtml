@@ -1,0 +1,756 @@
+﻿@model VeltriQ.Models.HR.Employee
+
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<style>
+
+    .employee-create-page {
+        padding: 6px 0 40px;
+    }
+
+    /* PAGE HEADER */
+
+    .employee-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 20px;
+    }
+
+    .employee-page-title h2 {
+        color: #fff;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        letter-spacing: -.4px;
+    }
+
+    .employee-page-title p {
+        color: #94a3b8;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .employee-top-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .cancel-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        color: #94a3b8;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .save-btn {
+        height: 42px;
+        padding: 0 22px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 25px rgba(124,58,237,.25);
+    }
+
+    /* GRID */
+
+    .employee-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* CARD */
+
+    .employee-card {
+        background: rgba(30,35,44,.95);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+        .employee-card.full-width {
+            grid-column: span 2;
+        }
+
+    .employee-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 24px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .employee-card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: rgba(124,58,237,.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a78bfa;
+        font-size: 15px;
+    }
+
+    .employee-card-title {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    /* CARD BODY */
+
+    .employee-card-body {
+        padding: 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .full-field {
+        grid-column: span 2;
+    }
+
+    /* FIELD */
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-field label {
+            margin-bottom: 8px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+    /* INPUT */
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.07);
+        background: rgba(15,20,30,.78);
+        color: #fff;
+        padding: 0 14px;
+        font-size: 13px;
+        outline: none;
+        transition: .2s ease;
+    }
+
+    .form-input,
+    .form-select {
+        height: 44px;
+    }
+
+    .form-textarea {
+        min-height: 100px;
+        padding-top: 12px;
+        resize: none;
+    }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: #7c3aed;
+            background: rgba(124,58,237,.05);
+            box-shadow: 0 0 0 3px rgba(124,58,237,.10);
+        }
+
+    /* PROFILE TOP */
+
+    .employee-profile-box {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 24px;
+        padding: 20px;
+        border-radius: 18px;
+        background: rgba(124,58,237,.06);
+        border: 1px solid rgba(124,58,237,.10);
+    }
+
+    .employee-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#7c3aed,#9333ea);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 22px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .employee-profile-content h3 {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .employee-profile-content p {
+        color: #94a3b8;
+        margin: 0;
+        font-size: 13px;
+    }
+
+</style>
+
+<div class="employee-create-page">
+
+    <!-- HEADER -->
+
+    <div class="employee-page-header">
+
+        <div class="employee-page-title">
+
+            <h2>Edit Employee</h2>
+
+            <p>
+                Update and manage employee workforce information.
+            </p>
+
+        </div>
+
+        <div class="employee-top-actions">
+
+            <a href="/Employee/Index"
+               class="cancel-btn">
+
+                <i class="bi bi-x"></i>
+
+                Cancel
+
+            </a>
+
+            <button type="submit"
+                    form="employeeForm"
+                    class="save-btn">
+
+                <i class="bi bi-check2-circle"></i>
+
+                Update Employee
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <form id="employeeForm"
+          asp-action="Edit"
+          method="post">
+        <input asp-for="EmployeeId" type="hidden" />
+        <!-- PROFILE -->
+
+        <div class="employee-profile-box">
+
+            <div class="employee-avatar">
+                @(Model.FirstName?.Substring(0, 1))
+                @(Model.LastName?.Substring(0, 1))
+            </div>
+
+            <div class="employee-profile-content">
+
+                <h3>Employee Profile</h3>
+
+                <p>
+                    Configure employee organization, personal,
+                    and employment information.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- GRID -->
+
+        <div class="employee-layout">
+
+            <!-- BASIC INFO -->
+
+            <div class="employee-card">
+
+                <div class="employee-card-header">
+
+                    <div class="employee-card-icon">
+
+                        <i class="bi bi-person"></i>
+
+                    </div>
+
+                    <div class="employee-card-title">
+                        Basic Information
+                    </div>
+
+                </div>
+
+                <div class="employee-card-body">
+
+                    <div class="form-field">
+
+                        <label>Employee Code</label>
+
+                        <input asp-for="EmployeeCode"
+                               class="form-input"
+                               placeholder="EMP-001" />
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Official Email</label>
+
+                        <input asp-for="OfficialEmail"
+                               class="form-input"
+                               placeholder="employee@company.com" />
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>First Name</label>
+
+                        <input asp-for="FirstName"
+                               class="form-input"
+                               placeholder="Enter first name" />
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Last Name</label>
+
+                        <input asp-for="LastName"
+                               class="form-input"
+                               placeholder="Enter last name" />
+
+                    </div>
+
+                    <div class="form-field full-field">
+
+                        <label>Phone Number</label>
+
+                        <input asp-for="PhoneNumber"
+                               class="form-input"
+                               placeholder="+91 9876543210" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ORGANIZATION -->
+
+            <div class="employee-card">
+
+                <div class="employee-card-header">
+
+                    <div class="employee-card-icon">
+
+                        <i class="bi bi-diagram-3"></i>
+
+                    </div>
+
+                    <div class="employee-card-title">
+                        Organization Information
+                    </div>
+
+                </div>
+
+                <div class="employee-card-body">
+
+                    <div class="form-field">
+
+                        <label>Branch</label>
+
+                        <select asp-for="BranchId"
+                                asp-items="ViewBag.BranchList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Branch
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Department</label>
+
+                        <select asp-for="DepartmentId"
+                                asp-items="ViewBag.DepartmentList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Department
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Designation</label>
+
+                        <select asp-for="DesignationId"
+                                asp-items="ViewBag.DesignationList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Designation
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Division</label>
+
+                        <select asp-for="DivisionId"
+                                asp-items="ViewBag.DivisionList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Division
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field full-field">
+
+                        <label>Reporting Manager</label>
+
+                        <select asp-for="ReportingManagerId"
+                                asp-items="ViewBag.ReportingManagerList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Reporting Manager
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PERSONAL -->
+
+            <div class="employee-card">
+
+                <div class="employee-card-header">
+
+                    <div class="employee-card-icon">
+
+                        <i class="bi bi-person-vcard"></i>
+
+                    </div>
+
+                    <div class="employee-card-title">
+                        Personal Information
+                    </div>
+
+                </div>
+
+                <div class="employee-card-body">
+
+                    <div class="form-field">
+
+                        <label>Gender</label>
+
+                        <select asp-for="Gender"
+                                class="form-select">
+
+                            <option value="">
+                                Select Gender
+                            </option>
+
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Date Of Birth</label>
+
+                        <input asp-for="DateOfBirth"
+                               type="date"
+                               class="form-input" />
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Marital Status</label>
+
+                        <select asp-for="MaritalStatus"
+                                class="form-select">
+
+                            <option value="">
+                                Select Status
+                            </option>
+
+                            <option>Single</option>
+                            <option>Married</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Blood Group</label>
+
+                        <select asp-for="BloodGroup"
+                                class="form-select">
+
+                            <option value="">
+                                Select Blood Group
+                            </option>
+
+                            <option>A+</option>
+                            <option>A-</option>
+                            <option>B+</option>
+                            <option>O+</option>
+                            <option>AB+</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field full-field">
+
+                        <label>Nationality</label>
+
+                        <select asp-for="NationalityId"
+                                asp-items="ViewBag.NationalityList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Nationality
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- EMPLOYMENT -->
+
+            <div class="employee-card">
+
+                <div class="employee-card-header">
+
+                    <div class="employee-card-icon">
+
+                        <i class="bi bi-briefcase"></i>
+
+                    </div>
+
+                    <div class="employee-card-title">
+                        Employment Information
+                    </div>
+
+                </div>
+
+                <div class="employee-card-body">
+
+                    <div class="form-field">
+
+                        <label>Joining Date</label>
+
+                        <input asp-for="JoiningDate"
+                               type="date"
+                               class="form-input" />
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Confirmation Date</label>
+
+                        <input asp-for="ConfirmationDate"
+                               type="date"
+                               class="form-input" />
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Employment Type</label>
+
+                        <select asp-for="EmploymentType"
+                                class="form-select">
+
+                            <option value="">
+                                Select Type
+                            </option>
+
+                            <option>Permanent</option>
+                            <option>Contract</option>
+                            <option>Intern</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Employment Status</label>
+
+                        <select asp-for="EmploymentStatus"
+                                class="form-select">
+
+                            <option value="">
+                                Select Status
+                            </option>
+
+                            <option>Active</option>
+                            <option>Probation</option>
+                            <option>Notice Period</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ADDRESS -->
+
+            <div class="employee-card full-width">
+
+                <div class="employee-card-header">
+
+                    <div class="employee-card-icon">
+
+                        <i class="bi bi-geo-alt"></i>
+
+                    </div>
+
+                    <div class="employee-card-title">
+                        Address Information
+                    </div>
+
+                </div>
+
+                <div class="employee-card-body">
+
+                    <div class="form-field">
+
+                        <label>Country</label>
+
+                        <select asp-for="CountryId"
+                                asp-items="ViewBag.CountryList"
+                                class="form-select">
+
+                            <option value="">
+                                Select Country
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>City</label>
+
+                        <select asp-for="CityId"
+                                asp-items="ViewBag.CityList"
+                                class="form-select">
+
+                            <option value="">
+                                Select City
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-field full-field">
+
+                        <label>Current Address</label>
+
+                        <textarea asp-for="CurrentAddress"
+                                  class="form-textarea"
+                                  placeholder="Enter current address"></textarea>
+
+                    </div>
+
+                    <div class="form-field full-field">
+
+                        <label>Permanent Address</label>
+
+                        <textarea asp-for="PermanentAddress"
+                                  class="form-textarea"
+                                  placeholder="Enter permanent address"></textarea>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Pincode</label>
+
+                        <input asp-for="Pincode"
+                               class="form-input"
+                               placeholder="411014" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>

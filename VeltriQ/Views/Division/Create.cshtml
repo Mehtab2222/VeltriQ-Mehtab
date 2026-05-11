@@ -1,0 +1,289 @@
+﻿@model VeltriQ.Models.HR.Division
+
+@{
+    ViewData["Title"] = "Create Division";
+}
+
+<style>
+
+    .division-create-page {
+        padding: 4px 0 32px;
+    }
+
+    /* TOPBAR */
+
+    .division-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        gap: 20px;
+    }
+
+    .division-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+    }
+
+        .division-breadcrumb a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .division-breadcrumb span {
+            color: #94a3b8;
+        }
+
+    .division-top-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .cancel-btn {
+        height: 40px;
+        padding: 0 18px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+    }
+
+    .save-btn {
+        height: 40px;
+        padding: 0 20px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 8px 22px rgba(124,58,237,.24);
+    }
+
+    /* CARD */
+
+    .division-card {
+        max-width: 800px;
+        background: rgba(30,35,44,.92);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .division-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .division-card-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: rgba(124,58,237,.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a78bfa;
+    }
+
+    .division-card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    /* BODY */
+
+    .division-card-body {
+        padding: 22px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    /* FIELD */
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-field label {
+            margin-bottom: 7px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+        }
+
+    /* INPUT */
+
+    .form-input {
+        width: 100%;
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.07);
+        background: rgba(15,20,30,.7);
+        color: #e2e8f0;
+        padding: 0 14px;
+        font-size: 13px;
+        outline: none;
+    }
+
+        .form-input:focus {
+            border-color: #7c3aed;
+            background: rgba(124,58,237,.06);
+            box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+        }
+
+</style>
+
+<div class="division-create-page">
+
+    <!-- TOPBAR -->
+
+    <div class="division-topbar">
+
+        <div class="division-breadcrumb">
+
+            <a href="/Division/Index">
+                Divisions
+            </a>
+
+            <i class="bi bi-chevron-right"></i>
+
+            <span>Create</span>
+
+        </div>
+
+        <div class="division-top-actions">
+
+            <a href="/Division/Index"
+               class="cancel-btn">
+
+                <i class="bi bi-x"></i>
+
+                Cancel
+
+            </a>
+
+            <button type="submit"
+                    form="divisionForm"
+                    class="save-btn">
+
+                <i class="bi bi-diagram-3"></i>
+
+                Save Division
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <form id="divisionForm"
+          asp-action="Create"
+          method="post">
+
+        <div class="division-card">
+
+            <div class="division-card-header">
+
+                <div class="division-card-icon">
+
+                    <i class="bi bi-diagram-3"></i>
+
+                </div>
+
+                <div class="division-card-title">
+                    Division Information
+                </div>
+
+            </div>
+
+            <div class="division-card-body">
+
+                <!-- NAME -->
+
+                <div class="form-field full-width">
+
+                    <label>
+                        Division Name
+                    </label>
+
+                    <input asp-for="DivisionName"
+                           class="form-input"
+                           placeholder="Enter division name" />
+
+                </div>
+
+                <!-- CODE -->
+
+                <div class="form-field">
+
+                    <label>
+                        Division Code
+                    </label>
+
+                    <input asp-for="DivisionCode"
+                           class="form-input"
+                           placeholder="DIV-001" />
+
+                </div>
+
+                <!-- STATUS -->
+
+                <div class="form-field">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <input value="Active"
+                           class="form-input"
+                           readonly />
+                </div>
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-field full-width">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <input asp-for="Description"
+                           class="form-input"
+                           placeholder="Enter division description" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>

@@ -1,0 +1,68 @@
+﻿@model List<VeltriQ.ViewModels.MenuViewModel>
+
+<ul class="sidebar-menu">
+
+    @foreach (var menu in Model)
+    {
+        var hasChildren = menu.Children != null && menu.Children.Any();
+
+        if (hasChildren)
+        {
+            <li class="menu-dropdown">
+
+                <a href="javascript:void(0);" class="dropdown-toggle">
+
+                    <i class="@menu.MenuIcon"></i>
+
+                    <span>@menu.MenuName</span>
+
+                    <i class="bi bi-chevron-down dropdown-icon"></i>
+
+                </a>
+
+                <ul class="submenu">
+
+                    @foreach (var child in menu.Children)
+                    {
+                        <li>
+
+                            <a href="@(
+                               !string.IsNullOrEmpty(child.Url)
+                               ? child.Url
+                               : Url.Action(child.ActionName, child.ControllerName)
+                                                        )">
+
+                    <i class="@child.MenuIcon"></i>
+
+                                @child.MenuName
+
+                            </a>
+
+                        </li>
+                        }
+
+                </ul>
+
+            </li>
+        }
+        else
+        {
+            <li>
+
+                <a href="@(
+                   !string.IsNullOrEmpty(menu.Url)
+                   ? menu.Url
+                   : Url.Action(menu.ActionName, menu.ControllerName)
+                                )">
+
+            <i class="@menu.MenuIcon"></i>
+
+                    <span>@menu.MenuName</span>
+
+                </a>
+
+            </li>
+        }
+    }
+
+</ul>

@@ -1,0 +1,332 @@
+﻿@model VeltriQ.Models.HR.EmployeeAsset
+
+@{
+    ViewData["Title"] = "Assign Employee Asset";
+
+    var employeeId = ViewBag.EmployeeId;
+}
+
+<style>
+
+    .asset-create-page {
+        padding: 8px 0 30px;
+    }
+
+    /* HEADER */
+
+    .asset-create-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+        .asset-create-header h2 {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .asset-create-header p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin: 0;
+        }
+
+    /* CARD */
+
+    .asset-create-card {
+        max-width: 1000px;
+        background: rgba(30,35,44,.95);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+    .asset-create-card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+        .asset-create-card-header h3 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    /* BODY */
+
+    .asset-create-card-body {
+        padding: 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .full-field {
+        grid-column: span 2;
+    }
+
+    /* FIELD */
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-field label {
+            margin-bottom: 8px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+    /* INPUT */
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.07);
+        background: rgba(15,20,30,.78);
+        color: #fff;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .form-input,
+    .form-select {
+        height: 44px;
+        padding: 0 14px;
+    }
+
+    .form-textarea {
+        min-height: 100px;
+        padding: 12px 14px;
+        resize: none;
+    }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124,58,237,.10);
+        }
+
+    /* ACTIONS */
+
+    .form-actions {
+        margin-top: 22px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .save-btn {
+        height: 42px;
+        padding: 0 20px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg,#7c3aed,#9333ea);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: 0 10px 25px rgba(124,58,237,.24);
+    }
+
+    .cancel-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.06);
+        background: rgba(255,255,255,.03);
+        color: #cbd5e1;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+
+</style>
+
+<div class="asset-create-page">
+
+    <!-- HEADER -->
+
+    <div class="asset-create-header">
+
+        <div>
+
+            <h2>Assign Employee Asset</h2>
+
+            <p>
+                Allocate and manage organization assets for employees.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <form asp-action="Create"
+          method="post">
+
+        <input type="hidden"
+               asp-for="EmployeeId"
+               value="@employeeId" />
+
+        <!-- CARD -->
+
+        <div class="asset-create-card">
+
+            <div class="asset-create-card-header">
+
+                <h3>Asset Allocation Information</h3>
+
+            </div>
+
+            <div class="asset-create-card-body">
+
+                <!-- ASSET -->
+
+                <div class="form-field">
+
+                    <label>Asset</label>
+
+                    <select asp-for="AssetMasterId"
+                            asp-items="ViewBag.AssetList"
+                            class="form-select">
+
+                        <option value="">
+                            Select Asset
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- ASSET NUMBER -->
+
+                <div class="form-field">
+
+                    <label>Asset Number</label>
+
+                    <input asp-for="AssetNumber"
+                           class="form-input"
+                           placeholder="AST-1001" />
+
+                </div>
+
+                <!-- SERIAL -->
+
+                <div class="form-field">
+
+                    <label>Serial Number</label>
+
+                    <input asp-for="SerialNumber"
+                           class="form-input"
+                           placeholder="Enter serial number" />
+
+                </div>
+
+                <!-- ISSUE DATE -->
+
+                <div class="form-field">
+
+                    <label>Issue Date</label>
+
+                    <input asp-for="IssueDate"
+                           type="date"
+                           class="form-input" />
+
+                </div>
+
+                <!-- RETURN DATE -->
+
+                <div class="form-field">
+
+                    <label>Return Date</label>
+
+                    <input asp-for="ReturnDate"
+                           type="date"
+                           class="form-input" />
+
+                </div>
+
+                <!-- STATUS -->
+
+                <div class="form-field">
+
+                    <label>Asset Status</label>
+
+                    <select asp-for="AssetStatus"
+                            class="form-select">
+
+                        <option>Assigned</option>
+                        <option>Returned</option>
+                        <option>Damaged</option>
+
+                    </select>
+
+                </div>
+
+                <!-- CONDITION -->
+
+                <div class="form-field">
+
+                    <label>Condition Status</label>
+
+                    <select asp-for="ConditionStatus"
+                            class="form-select">
+
+                        <option>Good</option>
+                        <option>Fair</option>
+                        <option>Damaged</option>
+
+                    </select>
+
+                </div>
+
+                <!-- REMARKS -->
+
+                <div class="form-field full-field">
+
+                    <label>Remarks</label>
+
+                    <textarea asp-for="Remarks"
+                              class="form-textarea"
+                              placeholder="Enter remarks"></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="form-actions">
+
+            <button type="submit"
+                    class="save-btn">
+
+                Assign Asset
+
+            </button>
+
+            <a href="/Employee/Profile/@employeeId"
+               class="cancel-btn">
+
+                Cancel
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>

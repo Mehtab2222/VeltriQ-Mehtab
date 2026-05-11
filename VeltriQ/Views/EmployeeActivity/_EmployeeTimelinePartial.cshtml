@@ -1,0 +1,299 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.EmployeeActivity>
+
+<style>
+
+    .timeline-page {
+        padding: 24px;
+    }
+
+    /* HEADER */
+
+    .timeline-header {
+        margin-bottom: 28px;
+    }
+
+        .timeline-header h3 {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .timeline-header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 0;
+        }
+
+    /* TIMELINE */
+
+    .timeline-wrapper {
+        position: relative;
+        padding-left: 34px;
+    }
+
+        /* VERTICAL LINE */
+
+        .timeline-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 14px;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient( to bottom, rgba(124,58,237,.45), rgba(124,58,237,.05) );
+        }
+
+    /* ITEM */
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 26px;
+    }
+
+    /* ICON */
+
+    .timeline-icon {
+        position: absolute;
+        left: -34px;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 13px;
+        z-index: 2;
+        box-shadow: 0 6px 18px rgba(0,0,0,.28);
+    }
+
+    /* COLORS */
+
+    .theme-purple {
+        background: linear-gradient(135deg,#7c3aed,#9333ea);
+    }
+
+    .theme-green {
+        background: linear-gradient(135deg,#22c55e,#16a34a);
+    }
+
+    .theme-blue {
+        background: linear-gradient(135deg,#3b82f6,#2563eb);
+    }
+
+    .theme-red {
+        background: linear-gradient(135deg,#ef4444,#dc2626);
+    }
+
+    .theme-orange {
+        background: linear-gradient(135deg,#f59e0b,#d97706);
+    }
+
+    /* CARD */
+
+    .timeline-card {
+        background: rgba(15,20,30,.55);
+        border: 1px solid rgba(255,255,255,.05);
+        border-radius: 18px;
+        padding: 18px;
+        transition: .2s ease;
+    }
+
+        .timeline-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(124,58,237,.22);
+            background: rgba(20,25,35,.75);
+        }
+
+    /* TOP */
+
+    .timeline-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 10px;
+    }
+
+    .timeline-title {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .timeline-type {
+        color: #a78bfa;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+    }
+
+    .timeline-date {
+        color: #64748b;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    /* DESCRIPTION */
+
+    .timeline-description {
+        color: #cbd5e1;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+    }
+
+    /* FOOTER */
+
+    .timeline-footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* EMPTY */
+
+    .timeline-empty {
+        text-align: center;
+        padding: 70px 20px;
+    }
+
+        .timeline-empty i {
+            font-size: 54px;
+            color: #7c3aed;
+            margin-bottom: 14px;
+        }
+
+        .timeline-empty h4 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .timeline-empty p {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+</style>
+
+<div class="timeline-page">
+
+    <!-- HEADER -->
+
+    <div class="timeline-header">
+
+        <h3>Employee Timeline</h3>
+
+        <p>
+            Employee activities, audit history,
+            and lifecycle tracking.
+        </p>
+
+    </div>
+
+    @if (Model.Any())
+    {
+        <!-- TIMELINE -->
+
+        <div class="timeline-wrapper">
+
+            @foreach (var item in Model)
+            {
+                <div class="timeline-item">
+
+                    <!-- ICON -->
+
+                    <div class="timeline-icon
+                                @(item.ThemeColor == "green" ? "theme-green" :
+                                                   item.ThemeColor == "blue" ? "theme-blue" :
+                                                   item.ThemeColor == "red" ? "theme-red" :
+                                                   item.ThemeColor == "orange" ? "theme-orange" :
+                                                   "theme-purple")">
+
+                <i class="@item.IconClass"></i>
+
+                    </div>
+
+                    <!-- CARD -->
+
+                    <div class="timeline-card">
+
+                        <!-- TOP -->
+
+                        <div class="timeline-top">
+
+                            <div>
+
+                                <div class="timeline-title">
+                                    @item.ActivityTitle
+                                </div>
+
+                                <div class="timeline-type">
+                                    @item.ActivityType
+                                </div>
+
+                            </div>
+
+                            <div class="timeline-date">
+
+                                @item.ActivityDate
+                                .ToString("dd MMM yyyy hh:mm tt")
+
+                            </div>
+
+                        </div>
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="timeline-description">
+
+                            @item.ActivityDescription
+
+                        </div>
+
+                        <!-- FOOTER -->
+
+                        <div class="timeline-footer">
+
+                            <i class="bi bi-person-circle"></i>
+
+                            Performed By:
+                            @item.PerformedBy
+
+                        </div>
+
+                    </div>
+
+                </div>
+                }
+
+        </div>
+    }
+    else
+    {
+        <!-- EMPTY -->
+
+        <div class="timeline-empty">
+
+            <i class="bi bi-clock-history"></i>
+
+            <h4>No Activities Found</h4>
+
+            <p>
+                Employee activities and audit records
+                will appear here.
+            </p>
+
+        </div>
+    }
+
+</div>

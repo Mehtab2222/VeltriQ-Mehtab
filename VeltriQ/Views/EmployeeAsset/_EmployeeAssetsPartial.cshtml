@@ -1,0 +1,346 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.EmployeeAsset>
+
+@{
+    var employeeId = ViewBag.EmployeeId;
+}
+
+<style>
+
+    .asset-partial-page {
+        padding: 0;
+    }
+
+    /* HEADER */
+
+    .asset-partial-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 24px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+        .asset-partial-header h3 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .asset-partial-header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 0;
+        }
+
+    /* BUTTON */
+
+    .add-asset-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 12px;
+        background: linear-gradient(135deg,#7c3aed,#9333ea);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 25px rgba(124,58,237,.24);
+    }
+
+        .add-asset-btn:hover {
+            color: #fff;
+        }
+
+    /* TABLE */
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .asset-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .asset-table th {
+            text-align: left;
+            padding: 0 20px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+        }
+
+        .asset-table td {
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255,255,255,.04);
+            color: #fff;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .asset-table tbody tr:hover {
+            background: rgba(255,255,255,.02);
+        }
+
+    /* ASSET */
+
+    .asset-name {
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .asset-number {
+        color: #64748b;
+        font-size: 11px;
+    }
+
+    /* BADGES */
+
+    .status-badge {
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .status-assigned {
+        background: rgba(34,197,94,.14);
+        color: #22c55e;
+    }
+
+    .status-returned {
+        background: rgba(59,130,246,.14);
+        color: #60a5fa;
+    }
+
+    .status-damaged {
+        background: rgba(239,68,68,.14);
+        color: #ef4444;
+    }
+
+    /* CONDITION */
+
+    .condition-good {
+        color: #22c55e;
+        font-weight: 700;
+    }
+
+    .condition-fair {
+        color: #f59e0b;
+        font-weight: 700;
+    }
+
+    .condition-damaged {
+        color: #ef4444;
+        font-weight: 700;
+    }
+
+    /* ACTIONS */
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: rgba(124,58,237,.10);
+        color: #a78bfa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .action-btn:hover {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+</style>
+
+<div class="asset-partial-page">
+
+    <!-- HEADER -->
+
+    <div class="asset-partial-header">
+
+        <div>
+
+            <h3>Employee Assets</h3>
+
+            <p>
+                Manage employee assigned assets and allocation records.
+            </p>
+
+        </div>
+
+        <a href="/EmployeeAsset/Create?employeeId=@employeeId"
+           class="add-asset-btn">
+
+            <i class="bi bi-plus-lg"></i>
+
+            Assign Asset
+
+        </a>
+
+    </div>
+
+    <!-- TABLE -->
+
+    <div class="table-wrapper">
+
+        <table class="asset-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Asset</th>
+                    <th>Serial Number</th>
+                    <th>Issue Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Condition</th>
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <!-- ASSET -->
+
+                        <td>
+
+                            <div class="asset-name">
+                                @item.AssetMaster?.AssetName
+                            </div>
+
+                            <div class="asset-number">
+                                @item.AssetNumber
+                            </div>
+
+                        </td>
+
+                        <!-- SERIAL -->
+
+                        <td>
+                            @item.SerialNumber
+                        </td>
+
+                        <!-- ISSUE -->
+
+                        <td>
+                            @(item.IssueDate?.ToString("dd MMM yyyy"))
+                        </td>
+
+                        <!-- RETURN -->
+
+                        <td>
+                            @(item.ReturnDate?.ToString("dd MMM yyyy"))
+                        </td>
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            @if (item.AssetStatus == "Returned")
+                            {
+                                <span class="status-badge status-returned">
+                                    Returned
+                                </span>
+                            }
+                            else if (item.AssetStatus == "Damaged")
+                            {
+                                <span class="status-badge status-damaged">
+                                    Damaged
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-assigned">
+                                    Assigned
+                                </span>
+                            }
+
+                        </td>
+
+                        <!-- CONDITION -->
+
+                        <td>
+
+                            @if (item.ConditionStatus == "Damaged")
+                            {
+                                <span class="condition-damaged">
+                                    Damaged
+                                </span>
+                            }
+                            else if (item.ConditionStatus == "Fair")
+                            {
+                                <span class="condition-fair">
+                                    Fair
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="condition-good">
+                                    Good
+                                </span>
+                            }
+
+                        </td>
+
+                        <!-- ACTIONS -->
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <a href="#"
+                                   class="action-btn">
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+                                <a href="#"
+                                   class="action-btn">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

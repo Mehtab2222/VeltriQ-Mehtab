@@ -1,0 +1,437 @@
+﻿@model VeltriQ.Models.HR.Company
+
+@{
+    ViewData["Title"] = "Create Company";
+}
+
+<div class="co-page">
+
+    <!-- ── TOP ACTION BAR ── -->
+    <div class="co-topbar">
+        <nav class="co-breadcrumb">
+            <a href="/Company/Index" class="co-bc-link">Companies</a>
+            <span class="co-bc-sep"><i class="bi bi-chevron-right"></i></span>
+            <span class="co-bc-current">Create</span>
+        </nav>
+        <div class="co-topbar-actions">
+            <a href="/Company/Index" class="co-btn-cancel">
+                <i class="bi bi-x"></i> Cancel
+            </a>
+            <button type="submit" form="companyForm" class="co-btn-save">
+                <i class="bi bi-building-add"></i> Save Organization
+            </button>
+        </div>
+    </div>
+
+    <div class="co-topbar-divider"></div>
+
+    <form id="companyForm" asp-action="Create" method="post">
+
+        <!-- ── ROW 1: General Info + Contact ── -->
+        <div class="co-row">
+
+            <!-- General Information -->
+            <div class="co-card">
+                <div class="co-card-header">
+                    <div class="co-card-header-icon">
+                        <i class="bi bi-building-check"></i>
+                    </div>
+                    <span class="co-card-title">General Information</span>
+                </div>
+
+                <div class="co-card-body">
+
+                    <!-- Company Full Name — full width -->
+                    <div class="co-field co-full">
+                        <label class="co-label">COMPANY FULL NAME</label>
+                        <input asp-for="CompanyName" class="co-input" placeholder="e.g. Acme Corporation" />
+                    </div>
+
+                    <!-- Code + Short Name -->
+                    <div class="co-field">
+                        <label class="co-label">COMPANY CODE</label>
+                        <input asp-for="CompanyCode" class="co-input" placeholder="ACME-01" />
+                    </div>
+
+                    <div class="co-field">
+                        <label class="co-label">DISPLAY NAME</label>
+                        <input asp-for="ShortName" class="co-input" placeholder="Acme" />
+                    </div>
+
+                    <!-- Tax + Reg -->
+                    <div class="co-field">
+                        <label class="co-label">TAX ID / VAT</label>
+                        <input asp-for="TaxNumber" class="co-input" placeholder="" />
+                    </div>
+
+                    <div class="co-field">
+                        <label class="co-label">REG. NUMBER</label>
+                        <input asp-for="RegistrationNumber" class="co-input" placeholder="" />
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Contact & Communication -->
+            <div class="co-card">
+                <div class="co-card-header">
+                    <div class="co-card-header-icon">
+                        <i class="bi bi-envelope-at"></i>
+                    </div>
+                    <span class="co-card-title">Contact &amp; Communication</span>
+                </div>
+
+                <div class="co-card-body">
+
+                    <!-- Email — full width -->
+                    <div class="co-field co-full">
+                        <label class="co-label">OFFICIAL EMAIL</label>
+                        <input asp-for="Email" class="co-input" placeholder="contact@company.com" />
+                    </div>
+
+                    <!-- Phone — full width -->
+                    <div class="co-field co-full">
+                        <label class="co-label">PHONE NUMBER</label>
+                        <input asp-for="PhoneNumber" class="co-input" placeholder="" />
+                    </div>
+
+                    <!-- Website — full width -->
+                    <div class="co-field co-full">
+                        <label class="co-label">CORPORATE WEBSITE</label>
+                        <input asp-for="Website" class="co-input" placeholder="https://" />
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── ROW 2: Office Address ── -->
+        <div class="co-card co-card-full">
+            <div class="co-card-header">
+                <div class="co-card-header-icon">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+                <span class="co-card-title">Office Address</span>
+            </div>
+
+            <div class="co-card-body">
+
+                <div class="co-field co-full">
+                    <label class="co-label">ADDRESS LINE 1</label>
+                    <input asp-for="AddressLine1" class="co-input" placeholder="Street address, building name" />
+                </div>
+
+                <div class="co-field co-full">
+                    <label class="co-label">ADDRESS LINE 2 <span class="co-opt">(OPTIONAL)</span></label>
+                    <input asp-for="AddressLine2" class="co-input" placeholder="Suite, floor, unit" />
+                </div>
+
+                <div class="co-field">
+                    <label class="co-label">CITY</label>
+                    <input asp-for="City" class="co-input" placeholder="" />
+                </div>
+
+                <div class="co-field">
+                    <label class="co-label">STATE / PROVINCE</label>
+                    <input asp-for="StateName" class="co-input" placeholder="" />
+                </div>
+
+                <div class="co-field">
+                    <label class="co-label">COUNTRY</label>
+                    <input asp-for="CountryName" class="co-input" placeholder="" />
+                </div>
+
+                <div class="co-field">
+                    <label class="co-label">POSTAL CODE</label>
+                    <input asp-for="PostalCode" class="co-input" placeholder="" />
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<style>
+
+    /* ─────────────────────────────────────────
+       PAGE
+    ───────────────────────────────────────── */
+    .co-page {
+        padding: 4px 0 32px;
+    }
+
+    /* ─────────────────────────────────────────
+       TOP ACTION BAR
+    ───────────────────────────────────────── */
+    .co-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2px 14px;
+    }
+
+    .co-topbar-divider {
+        height: 1px;
+        background: rgba(255,255,255,0.06);
+        margin-bottom: 22px;
+    }
+
+    /* Breadcrumb */
+    .co-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13.5px;
+    }
+
+    .co-bc-link {
+        color: #7c3aed;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+        .co-bc-link:hover {
+            color: #a78bfa;
+        }
+
+    .co-bc-sep {
+        color: rgba(255,255,255,0.2);
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+    }
+
+    .co-bc-current {
+        color: var(--text-secondary, #94a3b8);
+        font-weight: 500;
+    }
+
+    /* Action Buttons */
+    .co-topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .co-btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 40px;
+        padding: 0 18px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04);
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .co-btn-cancel:hover {
+            background: rgba(239,68,68,0.09);
+            border-color: rgba(239,68,68,0.28);
+            color: #fca5a5;
+        }
+
+    .co-btn-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        padding: 0 22px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 13.5px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 16px rgba(109,40,217,0.38);
+        letter-spacing: 0.1px;
+    }
+
+        .co-btn-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(109,40,217,0.48);
+            background: linear-gradient(135deg, #7c3aed, #9333ea);
+        }
+
+        .co-btn-save:active {
+            transform: translateY(0);
+        }
+
+    /* ─────────────────────────────────────────
+       LAYOUT — side by side row
+    ───────────────────────────────────────── */
+    .co-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    /* ─────────────────────────────────────────
+       CARDS
+    ───────────────────────────────────────── */
+    .co-card {
+        background: rgba(30,35,44,0.9);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .co-card-full {
+        margin-bottom: 0;
+    }
+
+    .co-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 22px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .co-card-header-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: rgba(124,58,237,0.15);
+        border: 1px solid rgba(124,58,237,0.2);
+        color: #a78bfa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .co-card-title {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #a78bfa;
+        letter-spacing: 0.1px;
+    }
+
+    /* ─────────────────────────────────────────
+       CARD BODY / GRID
+    ───────────────────────────────────────── */
+    .co-card-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 16px;
+        padding: 20px 22px;
+    }
+
+    .co-full {
+        grid-column: span 2;
+    }
+
+    /* ─────────────────────────────────────────
+       FIELDS
+    ───────────────────────────────────────── */
+    .co-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .co-label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        color: #64748b;
+    }
+
+    .co-opt {
+        color: #374151;
+        font-size: 9.5px;
+        letter-spacing: 0.5px;
+        margin-left: 3px;
+    }
+
+    /* ─────────────────────────────────────────
+       INPUTS — consistent throughout
+    ───────────────────────────────────────── */
+    .co-input {
+        width: 100%;
+        height: 42px;
+        background: rgba(15,20,30,0.65);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 9px;
+        padding: 0 14px;
+        font-size: 13.5px;
+        font-family: inherit;
+        color: #e2e8f0;
+        outline: none;
+        transition: all 0.2s;
+    }
+
+        .co-input::placeholder {
+            color: #374151;
+            font-size: 13px;
+        }
+
+        .co-input:hover {
+            border-color: rgba(124,58,237,0.3);
+            background: rgba(15,20,30,0.8);
+        }
+
+        .co-input:focus {
+            border-color: #7c3aed;
+            background: rgba(124,58,237,0.07);
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.13);
+            color: #f1f5f9;
+        }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────── */
+    @@media (max-width: 900px) {
+        .co-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .co-card-body {
+            grid-template-columns: 1fr;
+        }
+
+        .co-full {
+            grid-column: span 1;
+        }
+
+        .co-card-header,
+        .co-card-body {
+            padding: 14px 16px;
+        }
+
+        .co-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .co-topbar-actions {
+            width: 100%;
+        }
+
+        .co-btn-cancel,
+        .co-btn-save {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+</style>

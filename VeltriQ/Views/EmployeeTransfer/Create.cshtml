@@ -1,0 +1,218 @@
+﻿@model VeltriQ.Models.HR.EmployeeTransfer
+
+@{
+    ViewData["Title"] = "Employee Transfer";
+}
+
+<div class="page-header">
+
+    <div>
+        <h2>Employee Transfer</h2>
+
+        <p>
+            Create and manage employee transfer requests.
+        </p>
+    </div>
+
+</div>
+
+<div class="card-form">
+
+    <form asp-action="Create" method="post">
+
+        <div class="row">
+
+            <!-- EMPLOYEE -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    Employee
+                </label>
+
+                <select asp-for="EmployeeId"
+                        asp-items="ViewBag.EmployeeList"
+                        class="form-select">
+
+                    <option value="">
+                        Select Employee
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- CURRENT BRANCH -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    Current Branch
+                </label>
+
+                <select asp-for="CurrentBranchId"
+                        asp-items="ViewBag.BranchList"
+                        class="form-select">
+
+                    <option value="">
+                        Select Current Branch
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- NEW BRANCH -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    New Branch
+                </label>
+
+                <select asp-for="NewBranchId"
+                        asp-items="ViewBag.BranchList"
+                        class="form-select">
+
+                    <option value="">
+                        Select New Branch
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- CURRENT DEPARTMENT -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    Current Department
+                </label>
+
+                <select asp-for="CurrentDepartmentId"
+                        asp-items="ViewBag.DepartmentList"
+                        class="form-select">
+
+                    <option value="">
+                        Select Current Department
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- NEW DEPARTMENT -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    New Department
+                </label>
+
+                <select asp-for="NewDepartmentId"
+                        asp-items="ViewBag.DepartmentList"
+                        class="form-select">
+
+                    <option value="">
+                        Select New Department
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- CURRENT DESIGNATION -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    Current Designation
+                </label>
+
+                <select asp-for="CurrentDesignationId"
+                        asp-items="ViewBag.DesignationList"
+                        class="form-select">
+
+                    <option value="">
+                        Select Current Designation
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- NEW DESIGNATION -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    New Designation
+                </label>
+
+                <select asp-for="NewDesignationId"
+                        asp-items="ViewBag.DesignationList"
+                        class="form-select">
+
+                    <option value="">
+                        Select New Designation
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- EFFECTIVE DATE -->
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label">
+                    Effective Date
+                </label>
+
+                <input asp-for="EffectiveDate"
+                       type="date"
+                       class="form-control" />
+
+            </div>
+
+            <!-- REASON -->
+
+            <div class="col-md-12 mb-3">
+
+                <label class="form-label">
+                    Transfer Reason
+                </label>
+
+                <textarea asp-for="TransferReason"
+                          rows="4"
+                          class="form-control">
+                </textarea>
+
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <a href="/EmployeeTransfer/Index"
+               class="btn btn-light">
+
+                Cancel
+
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                <i class="bi bi-arrow-left-right"></i>
+
+                Submit Transfer
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

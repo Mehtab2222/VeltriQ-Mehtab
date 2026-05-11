@@ -1,0 +1,316 @@
+﻿@model VeltriQ.Models.HR.EmployeeDocument
+
+@{
+    ViewData["Title"] = "Upload Employee Document";
+
+    var employeeId = ViewBag.EmployeeId;
+}
+
+<style>
+
+    .upload-page {
+        padding: 8px 0 30px;
+    }
+
+    .upload-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+        .upload-header h2 {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .upload-header p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin: 0;
+        }
+
+    /* CARD */
+
+    .upload-card {
+        max-width: 1000px;
+        background: rgba(30,35,44,.95);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+    .upload-card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+        .upload-card-header h3 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    /* BODY */
+
+    .upload-card-body {
+        padding: 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .full-field {
+        grid-column: span 2;
+    }
+
+    /* FIELD */
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-field label {
+            margin-bottom: 8px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+    /* INPUT */
+
+    .form-input,
+    .form-select,
+    .form-file,
+    .form-textarea {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.07);
+        background: rgba(15,20,30,.78);
+        color: #fff;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .form-input,
+    .form-select,
+    .form-file {
+        height: 44px;
+        padding: 0 14px;
+    }
+
+    .form-textarea {
+        min-height: 100px;
+        padding: 12px 14px;
+        resize: none;
+    }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124,58,237,.10);
+        }
+
+    /* ACTIONS */
+
+    .form-actions {
+        margin-top: 22px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .save-btn {
+        height: 42px;
+        padding: 0 20px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg,#7c3aed,#9333ea);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .cancel-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.06);
+        background: rgba(255,255,255,.03);
+        color: #cbd5e1;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+
+</style>
+
+<div class="upload-page">
+
+    <!-- HEADER -->
+
+    <div class="upload-header">
+
+        <div>
+
+            <h2>Upload Employee Document</h2>
+
+            <p>
+                Upload employee KYC and compliance documents.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <form asp-action="Create"
+          method="post"
+          enctype="multipart/form-data">
+
+        <input type="hidden"
+               asp-for="EmployeeId"
+               value="@employeeId" />
+
+        <!-- CARD -->
+
+        <div class="upload-card">
+
+            <div class="upload-card-header">
+
+                <h3>Document Information</h3>
+
+            </div>
+
+            <div class="upload-card-body">
+
+                <!-- DOCUMENT -->
+
+                <div class="form-field">
+
+                    <label>Document Type</label>
+
+                    <select asp-for="DocumentMasterId"
+                            asp-items="ViewBag.DocumentList"
+                            class="form-select">
+
+                        <option value="">
+                            Select Document
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- DOC NUMBER -->
+
+                <div class="form-field">
+
+                    <label>Document Number</label>
+
+                    <input asp-for="DocumentNumber"
+                           class="form-input"
+                           placeholder="Enter document number" />
+
+                </div>
+
+                <!-- ISSUE DATE -->
+
+                <div class="form-field">
+
+                    <label>Issue Date</label>
+
+                    <input asp-for="IssueDate"
+                           type="date"
+                           class="form-input" />
+
+                </div>
+
+                <!-- EXPIRY DATE -->
+
+                <div class="form-field">
+
+                    <label>Expiry Date</label>
+
+                    <input asp-for="ExpiryDate"
+                           type="date"
+                           class="form-input" />
+
+                </div>
+
+                <!-- STATUS -->
+
+                <div class="form-field">
+
+                    <label>Verification Status</label>
+
+                    <select asp-for="VerificationStatus"
+                            class="form-select">
+
+                        <option>Pending</option>
+                        <option>Verified</option>
+                        <option>Rejected</option>
+                        <option>Expired</option>
+
+                    </select>
+
+                </div>
+
+                <!-- FILE -->
+
+                <div class="form-field">
+
+                    <label>Upload File</label>
+
+                    <input type="file"
+                           name="documentFile"
+                           class="form-file" />
+
+                </div>
+
+                <!-- REMARKS -->
+
+                <div class="form-field full-field">
+
+                    <label>Remarks</label>
+
+                    <textarea asp-for="Remarks"
+                              class="form-textarea"
+                              placeholder="Enter remarks"></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="form-actions">
+
+            <button type="submit"
+                    class="save-btn">
+
+                Upload Document
+
+            </button>
+
+            <a href="/Employee/Profile/@employeeId"
+               class="cancel-btn">
+
+                Cancel
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>

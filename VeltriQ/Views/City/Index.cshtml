@@ -1,0 +1,93 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.City>
+
+@{
+    ViewData["Title"] = "Cities";
+}
+
+<style>
+
+    .city-card {
+        background: rgba(30,35,44,.94);
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .city-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .city-table th,
+        .city-table td {
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255,255,255,.04);
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .city-table th {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+</style>
+
+<div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+
+    <div>
+
+        <h2 style="color:#fff;">Cities</h2>
+
+        <p style="color:#94a3b8;">
+            Manage cities and states.
+        </p>
+
+    </div>
+
+    <a href="/City/Create"
+       class="country-add-btn">
+
+        Add City
+
+    </a>
+
+</div>
+
+<div class="city-card">
+
+    <table class="city-table">
+
+        <thead>
+
+            <tr>
+
+                <th>City</th>
+                <th>Country</th>
+                <th>State</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>@item.CityName</td>
+
+                    <td>@item.Country?.CountryName</td>
+
+                    <td>@item.StateName</td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

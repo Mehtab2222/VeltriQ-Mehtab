@@ -1,0 +1,188 @@
+﻿@model VeltriQ.Models.HR.Country
+
+@{
+    ViewData["Title"] = "Create Country";
+}
+
+<style>
+
+    .country-create-page {
+        padding: 4px 0 32px;
+    }
+
+    .country-card {
+        max-width: 900px;
+        background: rgba(30,35,44,.92);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .country-card-header {
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+        .country-card-header h3 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    .country-card-body {
+        padding: 22px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .form-field label {
+        margin-bottom: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+
+    .form-input {
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.07);
+        background: rgba(15,20,30,.7);
+        color: #fff;
+        padding: 0 14px;
+        outline: none;
+    }
+
+        .form-input:focus {
+            border-color: #7c3aed;
+        }
+
+    .form-actions {
+        margin-top: 18px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .save-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .cancel-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        color: #94a3b8;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+</style>
+
+<div class="country-create-page">
+
+    <form asp-action="Create"
+          method="post">
+
+        <div class="country-card">
+
+            <div class="country-card-header">
+
+                <h3>Country Information</h3>
+
+            </div>
+
+            <div class="country-card-body">
+
+                <div class="form-field full-width">
+
+                    <label>
+                        Country Name
+                    </label>
+
+                    <input asp-for="CountryName"
+                           class="form-input"
+                           placeholder="Enter country name" />
+
+                </div>
+
+                <div class="form-field">
+
+                    <label>
+                        Country Code
+                    </label>
+
+                    <input asp-for="CountryCode"
+                           class="form-input"
+                           placeholder="IN" />
+
+                </div>
+
+                <div class="form-field">
+
+                    <label>
+                        Currency Code
+                    </label>
+
+                    <input asp-for="CurrencyCode"
+                           class="form-input"
+                           placeholder="INR" />
+
+                </div>
+
+                <div class="form-field full-width">
+
+                    <label>
+                        Phone Code
+                    </label>
+
+                    <input asp-for="PhoneCode"
+                           class="form-input"
+                           placeholder="+91" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <button type="submit"
+                    class="save-btn">
+
+                Save Country
+
+            </button>
+
+            <a href="/Country/Index"
+               class="cancel-btn">
+
+                Cancel
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>

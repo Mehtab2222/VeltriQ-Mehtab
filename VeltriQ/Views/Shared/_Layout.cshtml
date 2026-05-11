@@ -1,25 +1,27 @@
-﻿<!DOCTYPE html>
+﻿@using VeltriQ.Services.Interfaces
+@inject IMenuService MenuService
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>@ViewData["Title"] - VeltriQ</title>
-
+    <title>@ViewData["Title"]VeltriQ | HRMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
     <style>
+
+        /* ═══════════════════════════════════════
+                   CSS VARIABLES
+                ═══════════════════════════════════════ */
         :root {
             --bg: #0d1117;
             --sidebar-bg: #0d1117;
             --sidebar-border: rgba(255,255,255,0.05);
             --sidebar-text: #6b7280;
             --card-bg: #161b22;
-            --card-shadow: 0 1px 12px rgba(0,0,0,.28);
-            --topbar-bg: #161b22;
+            --topbar-bg: #0d1117;
             --text-primary: #f1f5f9;
             --text-secondary: #9ca3af;
             --text-muted: #6b7280;
@@ -27,53 +29,71 @@
             --input-bg: #0d1117;
             --hover-bg: rgba(124,58,237,.1);
             --purple: #7c3aed;
+            --topbar-h: 52px;
+            --sidebar-w: 220px;
         }
 
-        * {
+        /* ═══════════════════════════════════════
+                   RESET
+                ═══════════════════════════════════════ */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden; /* prevent body scroll — each zone scrolls independently */
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg);
             color: var(--text-primary);
-            overflow-x: hidden;
         }
 
-        .main-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR */
-
-        .sidebar {
-            width: 220px;
-            min-width: 220px;
-            background: var(--sidebar-bg);
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* ═══════════════════════════════════════
+                   ROOT SHELL — full viewport grid
+                     [sidebar] | [topbar + content stacked]
+                ═══════════════════════════════════════ */
+        .shell {
+            display: grid;
+            grid-template-columns: var(--sidebar-w) 1fr;
+            grid-template-rows: var(--topbar-h) 1fr;
+            grid-template-areas:
+                "sidebar topbar"
+                "sidebar content";
             height: 100vh;
-            overflow-y: auto;
-            z-index: 200;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* ═══════════════════════════════════════
+                   SIDEBAR
+                   — fixed to its grid cell, scrolls internally
+                ═══════════════════════════════════════ */
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
             display: flex;
             flex-direction: column;
-            padding: 16px 10px;
-            border-right: 1px solid var(--sidebar-border);
-            scrollbar-width: none;
+            overflow: hidden; /* clip; children handle scroll */
+            position: sticky;
+            top: 0;
+            height: 100vh;
         }
 
-            .sidebar::-webkit-scrollbar {
-                display: none;
-            }
-
+        /* Logo block — compact, fixed height */
         .logo-section {
-            padding: 0 8px 14px;
+            flex-shrink: 0;
+            height: var(--topbar-h); /* exactly matches topbar height */
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
             border-bottom: 1px solid var(--sidebar-border);
-            margin-bottom: 6px;
+            border-right: none;
         }
 
         .logo-wrap {
@@ -83,39 +103,49 @@
         }
 
         .logo-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
             flex-shrink: 0;
-            background: linear-gradient(135deg,#6d28d9,#7c3aed);
+            background: linear-gradient(135deg, #6d28d9, #7c3aed);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             color: #fff;
         }
 
         .logo-text {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
             color: #fff;
             letter-spacing: -.3px;
+            line-height: 1.2;
         }
 
         .logo-sub {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--sidebar-text);
-            margin-top: 2px;
-            opacity: .7;
+            opacity: .65;
             line-height: 1.3;
-            padding-left: 1px;
         }
 
+        /* Scrollable nav zone */
         .nav-section {
             flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 8px 10px 10px;
+            /* invisible scrollbar */
+            scrollbar-width: none;
         }
 
+            .nav-section::-webkit-scrollbar {
+                display: none;
+            }
+
+        /* ── Sidebar Menu ── */
         .sidebar-menu {
             list-style: none;
             padding: 0;
@@ -131,11 +161,12 @@
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                padding: 9px 10px;
-                border-radius: 10px;
-                font-size: 13px;
+                padding: 8px 10px;
+                border-radius: 9px;
+                font-size: 12.5px;
                 font-weight: 500;
-                transition: .2s ease;
+                transition: background .15s, color .15s;
+                white-space: nowrap;
             }
 
                 .sidebar-menu a:hover {
@@ -144,9 +175,9 @@
                 }
 
                 .sidebar-menu a.active {
-                    background: linear-gradient(90deg,#6d28d9,#7c3aed);
+                    background: linear-gradient(90deg, #6d28d9, #7c3aed);
                     color: #fff;
-                    box-shadow: 0 4px 14px rgba(109,40,217,.3);
+                    box-shadow: 0 4px 12px rgba(109,40,217,.28);
                 }
 
             .sidebar-menu i {
@@ -173,87 +204,94 @@
             text-align: center;
         }
 
-        .quick-section {
-            padding-top: 10px;
-            border-top: 1px solid var(--sidebar-border);
-            margin-top: 8px;
+        /* ── Dropdown menus ── */
+        .menu-dropdown {
+            margin-bottom: 1px;
         }
 
-        .quick-title {
-            font-size: 9.5px;
-            text-transform: uppercase;
-            letter-spacing: 1.1px;
-            color: var(--sidebar-text);
-            opacity: .5;
-            margin-bottom: 4px;
-            padding: 0 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .dropdown-toggle {
+            width: 100%;
+            display: flex !important;
         }
 
-        .q-plus {
-            background: rgba(255,255,255,.07);
-            border: none;
-            color: #fff;
-            width: 18px;
-            height: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
+        .dropdown-icon {
+            margin-left: auto;
+            font-size: 10px;
+            opacity: .4;
+            transition: transform .2s;
         }
 
-        .quick-link {
+        .menu-dropdown.active .dropdown-icon {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            list-style: none;
+            padding-left: 16px;
+            margin-top: 2px;
+            display: none;
+        }
+
+        .menu-dropdown.active .submenu {
+            display: block;
+        }
+
+        .submenu li {
+            margin-bottom: 1px;
+        }
+
+        .submenu a {
             display: flex;
             align-items: center;
-            gap: 9px;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 8px;
             color: var(--sidebar-text);
             text-decoration: none;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            transition: background .15s,color .15s;
+            font-size: 12px;
+            transition: background .15s, color .15s;
         }
 
-            .quick-link:hover {
-                background: var(--hover-bg);
+            .submenu a:hover {
+                background: rgba(124,58,237,.12);
                 color: #fff;
             }
 
-            .quick-link i {
-                font-size: 13px;
-            }
-
-        /* CONTENT */
-
-        .content-area {
-            margin-left: 220px;
-            width: calc(100% - 220px);
-            padding: 16px 20px;
-            min-height: 100vh;
+        .submenu i {
+            font-size: 12px;
+            width: 14px;
+            min-width: 14px;
         }
 
-        /* TOPBAR */
-
+        /* ═══════════════════════════════════════
+                   TOPBAR
+                   — flush to top, zero radius, sticky
+                ═══════════════════════════════════════ */
         .topbar {
+            grid-area: topbar;
             background: var(--topbar-bg);
-            border-radius: 13px;
-            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            height: var(--topbar-h);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
+            justify-content: space-between;
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            /* NO border-radius, NO margin, NO box-shadow top */
         }
 
         .topbar-left {
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .menu-btn {
@@ -268,38 +306,45 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background .15s;
         }
 
+            .menu-btn:hover {
+                background: var(--hover-bg);
+            }
+
         .search-box {
-            width: 330px;
+            width: 320px;
             position: relative;
         }
 
             .search-box input {
                 width: 100%;
-                border: 1.5px solid var(--border);
-                background: var(--input-bg);
-                border-radius: 10px;
-                padding: 8px 14px 8px 36px;
+                border: 1.5px solid transparent;
+                background: transparent;
+                border-radius: 9px;
+                padding: 7px 14px 7px 34px;
                 font-size: 13px;
+                font-family: inherit;
                 color: var(--text-primary);
                 outline: none;
+                transition: border .2s, background .2s;
             }
+
+                .search-box input:hover,
+                .search-box input:focus {
+                    border-color: rgba(124,58,237,0.4);
+                    background: var(--input-bg);
+                }
 
             .search-box i {
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
-                left: 12px;
+                left: 11px;
                 color: var(--text-muted);
                 font-size: 13px;
             }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
 
         .tb-icon {
             background: none;
@@ -314,7 +359,13 @@
             justify-content: center;
             font-size: 16px;
             position: relative;
+            transition: background .15s;
         }
+
+            .tb-icon:hover {
+                background: var(--hover-bg);
+                color: var(--purple);
+            }
 
         .notif-dot {
             position: absolute;
@@ -330,27 +381,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px solid var(--topbar-bg);
         }
 
         .tb-sep {
             width: 1px;
-            height: 24px;
+            height: 22px;
             background: var(--border);
-            margin: 0 4px;
+            margin: 0 5px;
         }
 
         .profile-pill {
             display: flex;
             align-items: center;
-            gap: 9px;
-            padding: 4px 9px;
+            gap: 8px;
+            padding: 4px 10px;
             border-radius: 9px;
             cursor: pointer;
+            transition: background .15s;
         }
 
+            .profile-pill:hover {
+                background: var(--hover-bg);
+            }
+
             .profile-pill img {
-                width: 32px;
-                height: 32px;
+                width: 30px;
+                height: 30px;
                 border-radius: 50%;
                 object-fit: cover;
                 border: 2px solid #7c3aed;
@@ -360,13 +417,49 @@
             font-size: 12px;
             font-weight: 700;
             color: var(--text-primary);
+            line-height: 1.2;
         }
 
         .p-role {
-            font-size: 10.5px;
+            font-size: 10px;
             color: var(--text-muted);
         }
 
+        .profile-pill .bi-chevron-down {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* ═══════════════════════════════════════
+                   CONTENT AREA — scrolls independently
+                ═══════════════════════════════════════ */
+        .content-area {
+            grid-area: content;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px 22px 32px;
+            background: var(--bg);
+            /* invisible scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(124,58,237,.3) transparent;
+        }
+
+            .content-area::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .content-area::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .content-area::-webkit-scrollbar-thumb {
+                background: rgba(124,58,237,.3);
+                border-radius: 4px;
+            }
+
+        /* ═══════════════════════════════════════
+                   FLOATING THEME BUTTON
+                ═══════════════════════════════════════ */
         .float-settings {
             position: fixed;
             bottom: 22px;
@@ -375,606 +468,310 @@
         }
 
         .float-btn {
-            width: 46px;
-            height: 46px;
-            background: linear-gradient(135deg,#6d28d9,#7c3aed);
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6d28d9, #7c3aed);
             border: none;
             border-radius: 13px;
             color: #fff;
-            font-size: 19px;
+            font-size: 18px;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(109,40,217,.4);
-        }
-        /* DROPDOWN MENU */
-
-        .menu-dropdown {
-            margin-bottom: 4px;
-        }
-
-        .dropdown-toggle {
-            width: 100%;
-            display: flex !important;
-            align-items: center;
-            gap: 8px;
-        }
-
-            .dropdown-toggle .dropdown-icon {
-                margin-left: auto;
-            }
-
-        .menu-left {
-            display: contents;
-        }
-
-        .dropdown-icon {
-            font-size: 11px;
-            transition: .25s ease;
-        }
-
-        .menu-dropdown.active .dropdown-icon {
-            transform: rotate(180deg);
-        }
-
-        /* SUBMENU */
-
-        .submenu {
-            list-style: none;
-            padding-left: 18px;
-            margin-top: 4px;
-            display: none;
-        }
-
-        .menu-dropdown.active .submenu {
-            display: block;
-        }
-
-        .submenu li {
-            margin-bottom: 2px;
-        }
-
-        .submenu a {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
-            border-radius: 8px;
-            color: var(--sidebar-text);
-            text-decoration: none;
-            font-size: 12px;
-            transition: .2s ease;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(109,40,217,.4);
+            transition: transform .2s, box-shadow .2s;
         }
 
-            .submenu a:hover {
-                background: rgba(124,58,237,.12);
-                color: #fff;
+            .float-btn:hover {
+                transform: scale(1.08);
+                box-shadow: 0 10px 28px rgba(109,40,217,.5);
             }
 
-        .submenu i {
-            font-size: 12px;
+        .company-switcher {
+            position: relative;
+        }
+
+        .company-switch-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(124,58,237,0.1);
+            border: 1px solid rgba(124,58,237,0.25);
+            border-radius: 9px;
+            padding: 5px 12px;
+            color: #c4b5fd;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+            .company-switch-btn:hover {
+                background: rgba(124,58,237,0.18);
+                border-color: rgba(124,58,237,0.45);
+            }
+
+            .company-switch-btn i {
+                font-size: 14px;
+            }
+
+        .company-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 220px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+            display: none;
+            z-index: 500;
+        }
+
+            .company-dropdown.open {
+                display: block;
+            }
+
+        .company-drop-title {
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4b5563;
+            padding: 2px 8px 8px;
+            font-weight: 700;
+        }
+
+        .company-drop-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+            .company-drop-item:hover {
+                background: rgba(124,58,237,0.1);
+            }
+
+            .company-drop-item.active {
+                background: rgba(124,58,237,0.12);
+            }
+
+        .co-initial {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg,#6d28d9,#7c3aed);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .co-dname {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .co-dcode {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .co-check {
+            margin-left: auto;
+            color: #7c3aed;
+            font-size: 14px;
+            font-weight: 700;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="main-wrapper">
+    <div class="shell">
 
-        <!-- SIDEBAR -->
-
+        <!-- ═══════════ SIDEBAR ═══════════ -->
         <aside class="sidebar">
 
+            <!-- Logo — same height as topbar -->
             <div class="logo-section">
-
                 <div class="logo-wrap">
-
                     <div class="logo-icon">V</div>
-
                     <div>
-                        <div class="logo-text">VeltriQ</div>
+                        <div class="logo-text">VeltriQ HRMS</div>
                         <div class="logo-sub">Powering the Modern Workplace.</div>
                     </div>
-
                 </div>
-
             </div>
 
+            <!-- Scrollable nav -->
             <div class="nav-section">
-
                 <ul class="sidebar-menu">
 
-                    <!-- DASHBOARD -->
-
+                    <!-- Dashboard -->
                     <li>
                         <a href="/" class="active">
                             <i class="bi bi-grid-fill"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    <!-- ORGANIZATION -->
 
+                    <!-- Organization -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-building"></i>
                             <span>Organization</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-buildings"></i>
-                                    Company
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-diagram-3"></i>
-                                    Branch
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-grid"></i>
-                                    Department
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-badge"></i>
-                                    Designation
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-layers"></i>
-                                    Division
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-globe"></i>
-                                    Nationality
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-geo-alt"></i>
-                                    Country City
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-file-earmark-text"></i>
-                                    Document Master
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-box-seam"></i>
-                                    Asset Master
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-lines-fill"></i>
-                                    HR Contact
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-buildings"></i>Company</a></li>
+                            <li><a href="#"><i class="bi bi-diagram-3"></i>Branch</a></li>
+                            <li><a href="#"><i class="bi bi-grid"></i>Department</a></li>
+                            <li><a href="#"><i class="bi bi-person-badge"></i>Designation</a></li>
+                            <li><a href="#"><i class="bi bi-layers"></i>Division</a></li>
+                            <li><a href="#"><i class="bi bi-globe"></i>Nationality</a></li>
+                            <li><a href="#"><i class="bi bi-geo-alt"></i>Country City</a></li>
+                            <li><a href="#"><i class="bi bi-file-earmark-text"></i>Document Master</a></li>
+                            <li><a href="#"><i class="bi bi-box-seam"></i>Asset Master</a></li>
+                            <li><a href="#"><i class="bi bi-person-lines-fill"></i>HR Contact</a></li>
                         </ul>
-
                     </li>
-                    <!-- EMPLOYEES -->
 
+                    <!-- Employees -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-people"></i>
                             <span>Employees</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="/Employee/Index">
-                                    <i class="bi bi-person"></i>
-                                    Employee List
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-x"></i>
-                                    Inactive Employees
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-cash-stack"></i>
-                                    Salary Revision
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-arrow-left-right"></i>
-                                    Employee Transfer
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-diagram-3"></i>
-                                    Organization Chart
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                    Employee Exit
-                                </a>
-                            </li>
-
+                            <li><a href="/Employee/Index"><i class="bi bi-person"></i>Employee List</a></li>
+                            <li><a href="#"><i class="bi bi-person-x"></i>Inactive Employees</a></li>
+                            <li><a href="#"><i class="bi bi-cash-stack"></i>Salary Revision</a></li>
+                            <li><a href="#"><i class="bi bi-arrow-left-right"></i>Employee Transfer</a></li>
+                            <li><a href="#"><i class="bi bi-diagram-3"></i>Organization Chart</a></li>
+                            <li><a href="#"><i class="bi bi-box-arrow-right"></i>Employee Exit</a></li>
                         </ul>
-
                     </li>
 
-                    <!-- ATTENDANCE -->
-
+                    <!-- Attendance -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-calendar-check"></i>
                             <span>Attendance</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-calendar-event"></i>
-                                    Holiday Entry
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-clock-history"></i>
-                                    Shift Management
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-calendar3"></i>
-                                    Shift Schedule
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-clock"></i>
-                                    TimeSheet
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-upload"></i>
-                                    Import Attendance
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-calendar-event"></i>Holiday Entry</a></li>
+                            <li><a href="#"><i class="bi bi-clock-history"></i>Shift Management</a></li>
+                            <li><a href="#"><i class="bi bi-calendar3"></i>Shift Schedule</a></li>
+                            <li><a href="#"><i class="bi bi-clock"></i>TimeSheet</a></li>
+                            <li><a href="#"><i class="bi bi-upload"></i>Import Attendance</a></li>
                         </ul>
-
                     </li>
 
-                    <!-- LEAVE -->
-
+                    <!-- Leave -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-airplane"></i>
                             <span>Leave</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="/Leave/LeaveTypes">
-                                    <i class="bi bi-list-check"></i>
-                                    Leave Type
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-calendar2-check"></i>
-                                    Leave Request
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-x-circle"></i>
-                                    Leave Cancellation
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-pie-chart"></i>
-                                    Leave Balance
-                                </a>
-                            </li>
-
+                            <li><a href="/Leave/LeaveTypes"><i class="bi bi-list-check"></i>Leave Type</a></li>
+                            <li><a href="#"><i class="bi bi-calendar2-check"></i>Leave Request</a></li>
+                            <li><a href="#"><i class="bi bi-x-circle"></i>Leave Cancellation</a></li>
+                            <li><a href="#"><i class="bi bi-pie-chart"></i>Leave Balance</a></li>
                         </ul>
-
                     </li>
 
-                    <!-- PAYROLL -->
-
+                    <!-- Payroll -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-cash-stack"></i>
                             <span>Payroll</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-wallet2"></i>
-                                    Allowance
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-bank2"></i>
-                                    Financial Posting
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-dash-circle"></i>
-                                    Deduction
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-calculator"></i>
-                                    Payroll Generation
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-wallet2"></i>Allowance</a></li>
+                            <li><a href="#"><i class="bi bi-bank2"></i>Financial Posting</a></li>
+                            <li><a href="#"><i class="bi bi-dash-circle"></i>Deduction</a></li>
+                            <li><a href="#"><i class="bi bi-calculator"></i>Payroll Generation</a></li>
                         </ul>
-
                     </li>
-                    <!-- INSURANCE -->
 
+                    <!-- Insurance -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-heart-pulse"></i>
                             <span>Insurance</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-shield-check"></i>
-                                    Health Insurance
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-hospital"></i>
-                                    Medical Claims
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-file-medical"></i>
-                                    Insurance Plans
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-shield-check"></i>Health Insurance</a></li>
+                            <li><a href="#"><i class="bi bi-hospital"></i>Medical Claims</a></li>
+                            <li><a href="#"><i class="bi bi-file-medical"></i>Insurance Plans</a></li>
                         </ul>
-
                     </li>
-                    <!-- RECRUITMENT -->
 
+                    <!-- Recruitment -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-person-workspace"></i>
                             <span>Recruitment</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="/Recruitment/Index">
-                                    <i class="bi bi-file-earmark-plus"></i>
-                                    Manpower Request
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-vcard"></i>
-                                    Job Profile
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-people-fill"></i>
-                                    Applicants
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-check"></i>
-                                    Hiring
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-envelope-paper"></i>
-                                    Offer Letter
-                                </a>
-                            </li>
-
+                            <li><a href="/Recruitment/Index"><i class="bi bi-file-earmark-plus"></i>Manpower Request</a></li>
+                            <li><a href="#"><i class="bi bi-person-vcard"></i>Job Profile</a></li>
+                            <li><a href="#"><i class="bi bi-people-fill"></i>Applicants</a></li>
+                            <li><a href="#"><i class="bi bi-person-check"></i>Hiring</a></li>
+                            <li><a href="#"><i class="bi bi-envelope-paper"></i>Offer Letter</a></li>
                         </ul>
-
                     </li>
 
-                    <!-- ONBOARDING -->
-
+                    <!-- Onboarding -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-person-plus"></i>
                             <span>Onboarding</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-check"></i>
-                                    Candidate Onboarding
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-file-earmark-medical"></i>
-                                    Document Verification
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-card-checklist"></i>
-                                    Joining Checklist
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-bag-check"></i>
-                                    Asset Allocation
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-person-check"></i>Candidate Onboarding</a></li>
+                            <li><a href="#"><i class="bi bi-file-earmark-medical"></i>Document Verification</a></li>
+                            <li><a href="#"><i class="bi bi-card-checklist"></i>Joining Checklist</a></li>
+                            <li><a href="#"><i class="bi bi-bag-check"></i>Asset Allocation</a></li>
                         </ul>
-
                     </li>
 
-                    <!-- INDUCTION -->
-
+                    <!-- Induction -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-mortarboard"></i>
                             <span>Induction</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-journal-bookmark"></i>
-                                    Induction Program
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-calendar-week"></i>
-                                    Training Schedule
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-clipboard-check"></i>
-                                    Assessment
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-video3"></i>
-                                    Orientation Session
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-journal-bookmark"></i>Induction Program</a></li>
+                            <li><a href="#"><i class="bi bi-calendar-week"></i>Training Schedule</a></li>
+                            <li><a href="#"><i class="bi bi-clipboard-check"></i>Assessment</a></li>
+                            <li><a href="#"><i class="bi bi-person-video3"></i>Orientation Session</a></li>
                         </ul>
-
                     </li>
 
-                    <!-- PERFORMANCE -->
-
+                    <!-- Performance -->
                     <li>
                         <a href="#">
                             <i class="bi bi-graph-up-arrow"></i>
@@ -983,8 +780,7 @@
                         </a>
                     </li>
 
-                    <!-- DOCUMENTS -->
-
+                    <!-- Documents -->
                     <li>
                         <a href="#">
                             <i class="bi bi-file-earmark-text"></i>
@@ -993,250 +789,210 @@
                         </a>
                     </li>
 
-                    <!-- APPROVALS -->
-
+                    <!-- Approvals -->
                     <li>
                         <a href="#">
                             <i class="bi bi-check2-square"></i>
                             <span>Approvals</span>
-
                             <span class="nav-badge">6</span>
                         </a>
                     </li>
 
-                    <!-- REPORTS -->
-
+                    <!-- Reports -->
                     <li>
                         <a href="/Reports/Index">
                             <i class="bi bi-bar-chart-line"></i>
-                            <span>Reports & Analytics</span>
+                            <span>Reports &amp; Analytics</span>
                             <i class="bi bi-chevron-right chevron"></i>
                         </a>
                     </li>
-                    <!-- SYSTEM -->
 
+                    <!-- System -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-pc-display"></i>
                             <span>System</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-circle"></i>
-                                    User
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-key"></i>
-                                    Change Password
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-shield-lock"></i>
-                                    Role
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-phone"></i>
-                                    ESS User
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-arrow-repeat"></i>
-                                    Reset Devices
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-person-circle"></i>User</a></li>
+                            <li><a href="#"><i class="bi bi-key"></i>Change Password</a></li>
+                            <li><a href="#"><i class="bi bi-shield-lock"></i>Role</a></li>
+                            <li><a href="#"><i class="bi bi-phone"></i>ESS User</a></li>
+                            <li><a href="#"><i class="bi bi-arrow-repeat"></i>Reset Devices</a></li>
                         </ul>
-
                     </li>
-                    <!-- SETTINGS -->
 
+                    <!-- Settings -->
                     <li class="menu-dropdown">
-
                         <a href="javascript:void(0);" class="dropdown-toggle">
-
                             <i class="bi bi-gear"></i>
                             <span>Settings</span>
-
                             <i class="bi bi-chevron-down dropdown-icon"></i>
-
                         </a>
-
                         <ul class="submenu">
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-person-circle"></i>
-                                    User
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-key"></i>
-                                    Change Password
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-shield-lock"></i>
-                                    Roles
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-phone"></i>
-                                    Reset Devices
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="/Settings/Index">
-                                    <i class="bi bi-sliders"></i>
-                                    Appearance Settings
-                                </a>
-                            </li>
-
+                            <li><a href="#"><i class="bi bi-person-circle"></i>User</a></li>
+                            <li><a href="#"><i class="bi bi-key"></i>Change Password</a></li>
+                            <li><a href="#"><i class="bi bi-shield-lock"></i>Roles</a></li>
+                            <li><a href="#"><i class="bi bi-phone"></i>Reset Devices</a></li>
+                            <li><a href="/Settings/Index"><i class="bi bi-sliders"></i>Appearance Settings</a></li>
                         </ul>
-
                     </li>
 
                 </ul>
-
-            </div>
-
-            @* <div class="quick-section">
-
-                <div class="quick-title">
-                    <span>Quick Actions</span>
-
-                    <button class="q-plus">
-                        <i class="bi bi-plus"></i>
-                    </button>
-                </div>
-
-                <a href="#" class="quick-link">
-                    <i class="bi bi-person-plus"></i>
-                    <span>Add Employee</span>
-                </a>
-
-                <a href="#" class="quick-link">
-                    <i class="bi bi-calendar-plus"></i>
-                    <span>Request Leave</span>
-                </a>
-
-                <a href="#" class="quick-link">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Mark Attendance</span>
-                </a>
-
-                <a href="#" class="quick-link">
-                    <i class="bi bi-megaphone"></i>
-                    <span>Add Announcement</span>
-                </a>
-
-            </div> *@
+            </div><!-- /nav-section -->
 
         </aside>
 
-        <!-- CONTENT -->
-
-        <main class="content-area">
-
-            <!-- TOPBAR -->
-
-            <div class="topbar">
-
-                <div class="topbar-left">
-
-                    <button class="menu-btn">
-                        <i class="bi bi-list"></i>
-                    </button>
-
-                    <div class="search-box">
-
-                        <i class="bi bi-search"></i>
-
-                        <input type="text"
-                               placeholder="Search for employees, documents, modules..." />
-
-                    </div>
-
+        <!-- ═══════════ TOPBAR — flush, sticky, zero radius ═══════════ -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn"><i class="bi bi-list"></i></button>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Search for employees, modules..." />
                 </div>
-
-                <div class="topbar-right">
-
-                    <button class="tb-icon">
-                        <i class="bi bi-bell"></i>
-                        <span class="notif-dot">8</span>
-                    </button>
-
-                    <div class="tb-sep"></div>
-
-                    <div class="profile-pill">
-
-                        <img src="https://i.pravatar.cc/100?img=12" />
-
-                        <div>
-                            <div class="p-name">John Doe</div>
-                            <div class="p-role">HR Manager</div>
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
+            <div class="topbar-right">
+                <button class="tb-icon">
+                    <i class="bi bi-gift"></i>
+                </button>
+                <button class="tb-icon">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-dot">8</span>
+                </button>
+                <button class="tb-icon">
+                    <i class="bi bi-question-circle"></i>
+                </button>
+                <div class="company-switcher">
+                    <button class="company-switch-btn" id="companySwitchBtn">
+                        <i class="bi bi-buildings"></i>
+                        <span id="activeCompanyName">@(ViewBag.CurrentCompanyName ?? "Select Company")</span>
+                        <i class="bi bi-chevron-down" style="font-size:10px;opacity:.5;"></i>
+                    </button>
 
+                    <div class="company-dropdown" id="companyDropdown">
+                        <div class="company-drop-title">Switch Company</div>
+
+                        @if (ViewBag.Companies != null)
+                        {
+                            @foreach (var c in ViewBag.Companies)
+                            {
+                                // Defensive check to prevent "Cannot perform runtime binding on a null reference"
+                                var companyName = c.CompanyName ?? "Unknown";
+                                var isSelected = ViewBag.CurrentCompanyId == c.CompanyId;
+
+                                <div class="company-drop-item @(isSelected ? "active" : "")"
+                                     data-id="@c.CompanyId"
+                                     onclick="switchCompany(@c.CompanyId, '@companyName')">
+
+                                    <span class="co-initial">
+                                        @companyName.Substring(0, 1).ToUpper()
+                                    </span>
+
+                                    <div>
+                                        <div class="co-dname">@companyName</div>
+                                        <div class="co-dcode">@(c.CompanyCode ?? "N/A")</div>
+                                    </div>
+
+                                    @if (isSelected)
+                                    {
+                                        <i class="bi bi-check2 co-check"></i>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="p-2 text-muted" style="font-size: 11px;">No companies available</div>
+                        }
+                    </div>
+                </div>
+                <div class="tb-sep"></div>
+                <div class="profile-wrapper" style="position: relative;">
+                    <div class="profile-pill" id="profileToggle">
+                        <img src="https://i.pravatar.cc/100?img=12" alt="Profile" />
+                        <div>
+                            <div class="p-name">@(ViewBag.CurrentEmployeeName ?? "Employee")</div>
+                            <div class="p-role">@(ViewBag.CurrentDesignation ?? "Designation")</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+
+                    <div id="logoutMenu" style="display:none; position:absolute; top:100%; right:0; background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:8px; min-width:150px; z-index:1000; box-shadow:var(--card-shadow);">
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            <button type="submit" style="background:none; border:none; color:#ff4d4d; width:100%; text-align:left; padding:8px; cursor:pointer; font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px;">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ═══════════ CONTENT — scrolls independently ═══════════ -->
+        <main class="content-area">
             @RenderBody()
-
         </main>
 
     </div>
 
+    <!-- Floating theme toggle -->
     <div class="float-settings">
-
-        <button class="float-btn">
+        <button class="float-btn" title="Appearance">
             <i class="bi bi-moon-fill"></i>
         </button>
-
     </div>
 
-</body>
-
-</html>
-<script>
-
-    document.querySelectorAll('.dropdown-toggle')
-        .forEach(toggle => {
-
-            toggle.addEventListener('click', function () {
-
-                const parent = this.parentElement;
-
-                parent.classList.toggle('active');
-
+    <script>
+        // Dropdown toggles
+        document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                this.parentElement.classList.toggle('active');
             });
-
+        });
+                // Company switcher toggle
+        document.getElementById('companySwitchBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('companyDropdown').classList.toggle('open');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('companyDropdown').classList.remove('open');
         });
 
-</script>
+        // Switch company — posts to your controller
+        function switchCompany(id, name) {
+            document.getElementById('activeCompanyName').textContent = name;
+            document.getElementById('companyDropdown').classList.remove('open');
+            // Update active state visually
+            document.querySelectorAll('.company-drop-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.id == id);
+                const chk = el.querySelector('.co-check');
+                if (chk) chk.remove();
+                if (el.dataset.id == id) {
+                    const icon = document.createElement('i');
+                    icon.className = 'bi bi-check2 co-check';
+                    el.appendChild(icon);
+                }
+            });
+            // POST to your backend to set the active company in session
+            fetch('/Company/SwitchCompany', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || '' },
+                body: JSON.stringify({ companyId: id })
+            }).then(() => window.location.reload());
+        }
+                const toggle = document.getElementById('profileToggle');
+        const menu = document.getElementById('logoutMenu');
+
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Close menu if clicking anywhere else
+        document.addEventListener('click', () => { menu.style.display = 'none'; });
+    </script>
+
+</body>
+</html>
