@@ -1,0 +1,235 @@
+﻿@model VeltriQ.Models.HR.EmployeeExit
+
+@{
+    ViewData["Title"] = "Create Employee Exit";
+}
+
+<style>
+    .exit-page {
+        width: 100%;
+        padding: 10px;
+    }
+
+    /* Header with Top-Right Buttons */
+    .exit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+    }
+
+    .exit-header-text h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .exit-header-text p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    /* Card Styling */
+    .exit-card {
+        background: rgba(30, 35, 44, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        width: 100% !important;
+        height: 44px;
+        background-color: #0d1117 !important;
+        border: 1px solid #2a3441 !important;
+        color: #fff !important;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #7c3aed !important;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+    textarea.form-control {
+        height: auto;
+        padding-top: 12px;
+    }
+
+    /* Section Divider */
+    .section-title {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7c3aed;
+        margin-bottom: 20px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Button Styling */
+    .btn-cancel {
+        height: 42px;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+    .btn-submit {
+        height: 42px;
+        padding: 0 25px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+        transition: transform 0.2s;
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+</style>
+
+<div class="exit-page">
+    <form asp-action="Create" method="post">
+
+        <!-- HEADER WITH ACTIONS -->
+        <div class="exit-header">
+            <div class="exit-header-text">
+                <h2>New Exit Request</h2>
+                <p>Initiate the offboarding process for an employee.</p>
+            </div>
+
+            <div class="header-actions">
+                <a href="/EmployeeExit/Index" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-check2-circle"></i> Submit Exit
+                </button>
+            </div>
+        </div>
+
+        <div class="exit-card">
+            <div class="row">
+                <!-- Section: Basic Information -->
+                <div class="col-12">
+                    <div class="section-title">
+                        <i class="bi bi-person-x"></i> Employee Details
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Employee</label>
+                        <select asp-for="EmployeeId" asp-items="ViewBag.EmployeeList" class="form-select" required>
+                            <option value="">-- Select Employee --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Exit Type</label>
+                        <select asp-for="ExitType" class="form-select" required>
+                            <option value="">Select Exit Type</option>
+                            <option value="Resignation">Resignation</option>
+                            <option value="Termination">Termination</option>
+                            <option value="Absconding">Absconding</option>
+                            <option value="Retirement">Retirement</option>
+                            <option value="Contract End">Contract End</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section: Timeline -->
+                <div class="col-12 mt-3">
+                    <div class="section-title">
+                        <i class="bi bi-calendar-event"></i> Timeline
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Resignation Date</label>
+                        <input asp-for="ResignationDate" type="date" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Last Working Date</label>
+                        <input asp-for="LastWorkingDate" type="date" class="form-control" required />
+                    </div>
+                </div>
+
+                <!-- Section: Remarks -->
+                <div class="col-12 mt-3">
+                    <div class="section-title">
+                        <i class="bi bi-chat-left-text"></i> Separation Details
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Exit Reason</label>
+                        <textarea asp-for="ExitReason" rows="4" class="form-control" placeholder="Describe the reason for separation..."></textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">HR Remarks</label>
+                        <textarea asp-for="HRRemarks" rows="4" class="form-control" placeholder="Enter any internal HR notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

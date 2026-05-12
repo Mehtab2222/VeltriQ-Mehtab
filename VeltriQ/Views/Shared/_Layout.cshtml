@@ -662,6 +662,10 @@
                             <li><a href="#"><i class="bi bi-arrow-left-right"></i>Employee Transfer</a></li>
                             <li><a href="#"><i class="bi bi-diagram-3"></i>Organization Chart</a></li>
                             <li><a href="#"><i class="bi bi-box-arrow-right"></i>Employee Exit</a></li>
+                            <li><a href="/EmployeeSuspension/Index"> <i class="bi bi-slash-circle"></i> Employee Suspension</a></li>
+                            <li><a href="/EndOfService/Index"><i class="bi bi-wallet2"></i>End Of Service</a></li>
+                            <li><a href="/ReportingLevel/Index"><i class="bi bi-diagram-2"></i>Reporting Level</a></li>
+                            <li><a href="/LoanManagement/Index"><i class="bi bi-cash-coin"></i>Loan Management</a></li>
                         </ul>
                     </li>
 
@@ -770,7 +774,20 @@
                             <li><a href="#"><i class="bi bi-person-video3"></i>Orientation Session</a></li>
                         </ul>
                     </li>
-
+                    <!-- Training -->
+                    <li class="menu-dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+                            <i class="bi bi-mortarboard"></i>
+                            <span>Training</span>
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="/TrainingMaster/Index"><i class="bi bi-journal-bookmark"></i>Training Master</a></li>
+                            <li><a href="/TrainingEnrollment/Index"><i class="bi bi-person-check"></i>Enrollment</a></li>
+                            <li><a href="/TrainingEvaluation/Index"><i class="bi bi-clipboard-check"></i>Evaluation</a></li>
+                            <li><a href="/TrainingRequest/Index"><i class="bi bi-file-earmark-plus"></i>Training Requests</a></li>
+                        </ul>
+                    </li>
                     <!-- Performance -->
                     <li>
                         <a href="#">
@@ -993,6 +1010,6 @@
         // Close menu if clicking anywhere else
         document.addEventListener('click', () => { menu.style.display = 'none'; });
     </script>
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

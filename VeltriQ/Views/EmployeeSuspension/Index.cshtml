@@ -1,16 +1,16 @@
-﻿@model IEnumerable<VeltriQ.Models.HR.EmployeeTransfer>
+﻿@model IEnumerable<VeltriQ.Models.HR.EmployeeSuspension>
 
 @{
-    ViewData["Title"] = "Employee Transfers";
+    ViewData["Title"] = "Employee Suspension";
 }
 
 <style>
-    .transfer-page {
+    .suspension-page {
         width: 100%;
     }
 
     /* HEADER */
-    .transfer-header {
+    .suspension-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -18,7 +18,7 @@
         gap: 20px;
     }
 
-    .transfer-header-left h2 {
+    .suspension-header-left h2 {
         font-size: 24px;
         font-weight: 700;
         color: #fff;
@@ -26,14 +26,14 @@
         letter-spacing: -.4px;
     }
 
-    .transfer-header-left p {
+    .suspension-header-left p {
         font-size: 14px;
         color: #94a3b8;
         margin: 0;
     }
 
     /* BUTTON */
-    .transfer-add-btn {
+    .suspension-add-btn {
         height: 44px;
         padding: 0 18px;
         border-radius: 12px;
@@ -50,20 +50,20 @@
         box-shadow: 0 8px 22px rgba(124,58,237,.22);
     }
 
-        .transfer-add-btn:hover {
+        .suspension-add-btn:hover {
             transform: translateY(-2px);
             color: #fff;
         }
 
     /* CARD */
-    .transfer-card {
+    .suspension-card {
         background: rgba(30,35,44,.94);
         border: 1px solid rgba(255,255,255,.06);
         border-radius: 20px;
         overflow: hidden;
     }
 
-    .transfer-card-top {
+    .suspension-card-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -72,26 +72,26 @@
         gap: 20px;
     }
 
-    .transfer-card-title h3 {
+    .suspension-card-title h3 {
         font-size: 18px;
         font-weight: 700;
         color: #fff;
         margin-bottom: 3px;
     }
 
-    .transfer-card-title p {
+    .suspension-card-title p {
         font-size: 13px;
         color: #94a3b8;
         margin: 0;
     }
 
     /* SEARCH */
-    .transfer-search {
+    .suspension-search {
         width: 320px;
         position: relative;
     }
 
-        .transfer-search input {
+        .suspension-search input {
             width: 100%;
             height: 42px;
             border-radius: 12px;
@@ -103,11 +103,11 @@
             outline: none;
         }
 
-            .transfer-search input:focus {
+            .suspension-search input:focus {
                 border-color: #7c3aed;
             }
 
-        .transfer-search i {
+        .suspension-search i {
             position: absolute;
             left: 15px;
             top: 50%;
@@ -120,12 +120,12 @@
         overflow-x: auto;
     }
 
-    .transfer-table {
+    .suspension-table {
         width: 100%;
         border-collapse: collapse;
     }
 
-        .transfer-table th {
+        .suspension-table th {
             text-align: left;
             padding: 0 20px 14px;
             font-size: 10px;
@@ -136,7 +136,7 @@
             white-space: nowrap;
         }
 
-        .transfer-table td {
+        .suspension-table td {
             padding: 18px 20px;
             border-top: 1px solid rgba(255,255,255,.04);
             color: #fff;
@@ -144,11 +144,11 @@
             vertical-align: middle;
         }
 
-        .transfer-table tbody tr:hover {
+        .suspension-table tbody tr:hover {
             background: rgba(255,255,255,.02);
         }
 
-    /* INFO BLOCK */
+    /* INFO */
     .emp-info {
         display: flex;
         align-items: center;
@@ -159,16 +159,17 @@
         width: 38px;
         height: 38px;
         border-radius: 10px;
-        background: rgba(124,58,237,0.15);
-        color: #a78bfa;
+        background: rgba(124, 58, 237, 0.1);
+        color: #7c3aed;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
         font-size: 12px;
+        border: 1px solid rgba(124, 58, 237, 0.2);
     }
 
-    /* STATUS BADGES */
+    /* STATUS */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -180,98 +181,75 @@
         font-weight: 700;
     }
 
-    .status-active {
-        background: rgba(34,197,94,.14);
+    .status-reinstated {
+        background: rgba(34, 197, 94, 0.14);
         color: #22c55e;
     }
 
-    .status-inactive {
-        background: rgba(239,68,68,.14);
+    .status-suspended {
+        background: rgba(239, 68, 68, 0.14);
         color: #ef4444;
     }
 
-    .status-pending {
-        background: rgba(245,158,11,.14);
-        color: #f59e0b;
-    }
-
     /* ACTIONS */
-    .table-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .action-btn {
-        padding: 6px 12px;
+    .btn-reinstate {
+        padding: 6px 14px;
         border-radius: 8px;
-        border: none;
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
         font-size: 11px;
         font-weight: 700;
         text-decoration: none;
         transition: .2s ease;
+        border: 1px solid rgba(34, 197, 94, 0.2);
     }
 
-    .btn-approve {
-        background: rgba(34,197,94,.12);
-        color: #22c55e;
-    }
-
-        .btn-approve:hover {
+        .btn-reinstate:hover {
             background: #22c55e;
-            color: #fff;
-        }
-
-    .btn-reject {
-        background: rgba(239,68,68,.12);
-        color: #ef4444;
-    }
-
-        .btn-reject:hover {
-            background: #ef4444;
             color: #fff;
         }
 </style>
 
-<div class="transfer-page">
+<div class="suspension-page">
 
     <!-- HEADER -->
-    <div class="transfer-header">
-        <div class="transfer-header-left">
-            <h2>Employee Transfers</h2>
-            <p>Manage employee transfer requests and office transitions.</p>
+    <div class="suspension-header">
+        <div class="suspension-header-left">
+            <h2>Employee Suspension</h2>
+            <p>Track disciplinary suspensions and process employee reinstatements.</p>
         </div>
 
-        <a href="/EmployeeTransfer/Create" class="transfer-add-btn">
+        <a href="/EmployeeSuspension/Create" class="suspension-add-btn">
             <i class="bi bi-plus-lg"></i>
-            New Transfer
+            New Suspension
         </a>
     </div>
 
     <!-- CARD -->
-    <div class="transfer-card">
+    <div class="suspension-card">
 
         <!-- TOP CONTROLS -->
-        <div class="transfer-card-top">
-            <div class="transfer-card-title">
-                <h3>Transfer Logs</h3>
-                <p>Total Requests: @Model.Count()</p>
+        <div class="suspension-card-top">
+            <div class="suspension-card-title">
+                <h3>Suspension Records</h3>
+                <p>Active & Past disciplinary cases</p>
             </div>
 
-            <div class="transfer-search">
+            <div class="suspension-search">
                 <i class="bi bi-search"></i>
-                <input type="text" placeholder="Search transfers..." />
+                <input type="text" placeholder="Search employee..." />
             </div>
         </div>
 
         <!-- TABLE -->
         <div class="table-wrapper">
-            <table class="transfer-table">
+            <table class="suspension-table">
                 <thead>
                     <tr>
                         <th>Employee</th>
-                        <th>Current Branch</th>
-                        <th>New Branch</th>
-                        <th>Effective Date</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Type</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -289,46 +267,43 @@
                                         <div style="font-weight: 700;">
                                             @item.Employee?.FirstName @item.Employee?.LastName
                                         </div>
-                                        <div style="font-size: 11px; color: #6b7280;">ID: @item.EmployeeTransferId</div>
+                                        <div style="font-size: 11px; color: #6b7280;">Case ID: #@item.EmployeeSuspensionId</div>
                                     </div>
                                 </div>
                             </td>
 
-                            <td>@item.CurrentBranch?.BranchName</td>
-                            <td>@item.NewBranch?.BranchName</td>
-                            <td>@item.EffectiveDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.SuspensionDate.ToString("dd MMM yyyy")</td>
 
                             <td>
-                                @if (item.Status == "Approved")
+                                @(item.EndDate != null ? item.EndDate.Value.ToString("dd MMM yyyy") : "-")
+                            </td>
+
+                            <td>
+                                <span style="font-weight: 600; color: #94a3b8;">@item.SuspensionType</span>
+                            </td>
+
+                            <td>
+                                @if (item.Status == "Reinstated")
                                 {
-                                    <span class="status-badge status-active">Approved</span>
-                                }
-                                else if (item.Status == "Rejected")
-                                {
-                                    <span class="status-badge status-inactive">Rejected</span>
+                                    <span class="status-badge status-reinstated">Reinstated</span>
                                 }
                                 else
                                 {
-                                    <span class="status-badge status-pending">Pending</span>
+                                    <span class="status-badge status-suspended">Suspended</span>
                                 }
                             </td>
 
                             <td>
-                                <div class="table-actions">
-                                    @if (item.Status == "Pending")
-                                    {
-                                        <a asp-action="Approve" asp-route-id="@item.EmployeeTransferId" class="action-btn btn-approve">
-                                            Approve
-                                        </a>
-                                        <a asp-action="Reject" asp-route-id="@item.EmployeeTransferId" class="action-btn btn-reject">
-                                            Reject
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span style="color: #4b5563; font-size: 11px; font-style: italic;">No actions</span>
-                                    }
-                                </div>
+                                @if (!item.IsReinstated)
+                                {
+                                    <a asp-action="Reinstate" asp-route-id="@item.EmployeeSuspensionId" class="btn-reinstate">
+                                        Reinstate
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span style="color: #4b5563; font-size: 11px; font-style: italic;">Processed</span>
+                                }
                             </td>
                         </tr>
                     }

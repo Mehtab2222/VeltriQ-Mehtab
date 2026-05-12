@@ -125,5 +125,95 @@ namespace VeltriQ.Controllers
                     "DesignationName"
                 );
         }
+        [HttpGet]
+        public IActionResult GetEmployeeDetails(int employeeId)
+        {
+            var employee =
+                _context.Employees
+
+                    .FirstOrDefault(x =>
+                        x.EmployeeId == employeeId);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return Json(new
+            {
+                branchId =
+                    employee.BranchId,
+
+                departmentId =
+                    employee.DepartmentId,
+
+                designationId =
+                    employee.DesignationId
+            });
+        }
+        public async Task<IActionResult> Approve(int id)
+        {
+            var transfer =
+                await _context.EmployeeTransfers
+
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeTransferId == id);
+
+            if (transfer == null)
+            {
+                return NotFound();
+            }
+
+            var employee =
+                await _context.Employees
+
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == transfer.EmployeeId);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            // UPDATE EMPLOYEE MASTER
+
+            employee.BranchId =
+                transfer.NewBranchId;
+
+            employee.DepartmentId =
+                transfer.NewDepartmentId ?? 0;
+
+            employee.DesignationId =
+                transfer.NewDesignationId ?? 0;
+
+            // UPDATE TRANSFER STATUS
+
+            transfer.Status =
+                "Approved";
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Reject(int id)
+        {
+            var transfer =
+                await _context.EmployeeTransfers
+
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeTransferId == id);
+
+            if (transfer == null)
+            {
+                return NotFound();
+            }
+
+            transfer.Status =
+                "Rejected";
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
     }
 }

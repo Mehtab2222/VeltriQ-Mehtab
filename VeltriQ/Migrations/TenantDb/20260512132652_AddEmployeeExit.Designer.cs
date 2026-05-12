@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VeltriQ.Data;
 
@@ -11,9 +12,11 @@ using VeltriQ.Data;
 namespace VeltriQ.Migrations.TenantDb
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512132652_AddEmployeeExit")]
+    partial class AddEmployeeExit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -588,9 +591,6 @@ namespace VeltriQ.Migrations.TenantDb
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsSuspended")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime?>("JoiningDate")
                         .HasColumnType("datetime2");
 
@@ -865,45 +865,6 @@ namespace VeltriQ.Migrations.TenantDb
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("EmployeeExit", "HR");
-                });
-
-            modelBuilder.Entity("VeltriQ.Models.HR.EmployeeSuspension", b =>
-                {
-                    b.Property<int>("EmployeeSuspensionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeSuspensionId"));
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsReinstated")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("SuspensionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SuspensionReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SuspensionType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("EmployeeSuspensionId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("EmployeeSuspension", "HR");
                 });
 
             modelBuilder.Entity("VeltriQ.Models.HR.EmployeeTransfer", b =>
@@ -1203,17 +1164,6 @@ namespace VeltriQ.Migrations.TenantDb
                 });
 
             modelBuilder.Entity("VeltriQ.Models.HR.EmployeeExit", b =>
-                {
-                    b.HasOne("VeltriQ.Models.HR.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("VeltriQ.Models.HR.EmployeeSuspension", b =>
                 {
                     b.HasOne("VeltriQ.Models.HR.Employee", "Employee")
                         .WithMany()

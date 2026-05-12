@@ -46,6 +46,8 @@ namespace VeltriQ.Data
 
         public DbSet<EmployeeActivity> EmployeeActivities { get; set; }
         public DbSet<EmployeeTransfer> EmployeeTransfers{ get; set; }
+        public DbSet<EmployeeExit> EmployeeExits { get; set; }
+        public DbSet<EmployeeSuspension> EmployeeSuspensions{ get; set; }
 
         // =========================
         // MAP SCHEMAS
@@ -101,6 +103,10 @@ namespace VeltriQ.Data
                 .ToTable("EmployeeActivity", "HR");
             modelBuilder.Entity<EmployeeTransfer>()
     .ToTable("EmployeeTransfer", "HR");
+            modelBuilder.Entity<EmployeeExit>()
+    .ToTable("EmployeeExit", "HR");
+            modelBuilder.Entity<EmployeeSuspension>()
+    .ToTable("EmployeeSuspension", "HR");
         }
     }
 }

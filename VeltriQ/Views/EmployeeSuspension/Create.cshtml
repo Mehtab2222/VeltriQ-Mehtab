@@ -1,0 +1,229 @@
+﻿@model VeltriQ.Models.HR.EmployeeSuspension
+
+@{
+    ViewData["Title"] = "Create Employee Suspension";
+}
+
+<style>
+    .suspension-page {
+        width: 100%;
+        padding: 10px;
+    }
+
+    /* Header with Top-Right Buttons */
+    .suspension-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+    }
+
+    .suspension-header-text h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .suspension-header-text p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    /* Card Styling */
+    .suspension-card {
+        background: rgba(30, 35, 44, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        width: 100% !important;
+        height: 44px;
+        background-color: #0d1117 !important;
+        border: 1px solid #2a3441 !important;
+        color: #fff !important;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #ef4444 !important; /* Red focus for suspension action */
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+        }
+
+    textarea.form-control {
+        height: auto;
+        padding-top: 12px;
+    }
+
+    /* Section Divider */
+    .section-title {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #ef4444; /* Alert color */
+        margin-bottom: 20px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Button Styling */
+    .btn-back {
+        height: 42px;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+    .btn-submit-danger {
+        height: 42px;
+        padding: 0 25px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        transition: transform 0.2s;
+    }
+
+        .btn-submit-danger:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+</style>
+
+<div class="suspension-page">
+    <form asp-action="Create" method="post">
+
+        <!-- HEADER WITH ACTIONS -->
+        <div class="suspension-header">
+            <div class="suspension-header-text">
+                <h2>New Suspension Record</h2>
+                <p>Formalize disciplinary suspension and set expected timelines.</p>
+            </div>
+
+            <div class="header-actions">
+                <a href="/EmployeeSuspension/Index" class="btn-back">
+                    Cancel
+                </a>
+                <button type="submit" class="btn-submit-danger">
+                    <i class="bi bi-slash-circle"></i> Suspend Employee
+                </button>
+            </div>
+        </div>
+
+        <div class="suspension-card">
+            <div class="row">
+                <!-- Section: Case Details -->
+                <div class="col-12">
+                    <div class="section-title">
+                        <i class="bi bi-exclamation-triangle"></i> Disciplinary Case Details
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Employee</label>
+                        <select asp-for="EmployeeId" asp-items="ViewBag.EmployeeList" class="form-select" required>
+                            <option value="">-- Select Employee --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Suspension Type</label>
+                        <select asp-for="SuspensionType" class="form-select" required>
+                            <option value="">Select Suspension Type</option>
+                            <option value="Disciplinary">Disciplinary</option>
+                            <option value="Investigation">Investigation</option>
+                            <option value="Policy Violation">Policy Violation</option>
+                            <option value="Misconduct">Misconduct</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section: Timeline -->
+                <div class="col-12 mt-3">
+                    <div class="section-title">
+                        <i class="bi bi-calendar-range"></i> Suspension Timeline
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Suspension Date</label>
+                        <input asp-for="SuspensionDate" type="date" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Expected End Date</label>
+                        <input asp-for="EndDate" type="date" class="form-control" />
+                    </div>
+                </div>
+
+                <!-- Section: Reason -->
+                <div class="col-12 mt-3">
+                    <div class="section-title">
+                        <i class="bi bi-file-earmark-text"></i> Formal Reason
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">Suspension Reason</label>
+                        <textarea asp-for="SuspensionReason" rows="5" class="form-control" placeholder="Provide detailed documentation for the suspension..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

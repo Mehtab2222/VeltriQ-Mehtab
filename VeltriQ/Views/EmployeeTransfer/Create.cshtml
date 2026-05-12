@@ -4,215 +4,266 @@
     ViewData["Title"] = "Employee Transfer";
 }
 
-<div class="page-header">
+<style>
+    .transfer-page {
+        width: 100%;
+        padding: 10px;
+    }
 
-    <div>
-        <h2>Employee Transfer</h2>
+    /* Header with Top-Right Buttons */
+    .transfer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+    }
 
-        <p>
-            Create and manage employee transfer requests.
-        </p>
-    </div>
+    .transfer-header-text h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
 
-</div>
+    .transfer-header-text p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
 
-<div class="card-form">
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
 
+    /* Card Styling */
+    .transfer-card {
+        background: rgba(30, 35, 44, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 10px;
+    }
+
+    .column-header {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7c3aed;
+        margin-bottom: 20px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        width: 100% !important;
+        height: 44px;
+        background-color: #0d1117 !important;
+        border: 1px solid #2a3441 !important;
+        color: #fff !important;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .readonly-col .form-control,
+    .readonly-col .form-select {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+        border: 1px dashed #2a3441 !important;
+        color: #64748b !important;
+        pointer-events: none; /* Crucial for "readonly" feel */
+    }
+
+    .full-width-section {
+        grid-column: span 2;
+        margin-top: 10px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Button Styling */
+    .btn-cancel {
+        height: 42px;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .btn-submit {
+        height: 42px;
+        padding: 0 25px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+        cursor: pointer;
+    }
+</style>
+
+<div class="transfer-page">
+    @* ENSURE FORM ENCAPSULATES THE HEADER BUTTONS *@
     <form asp-action="Create" method="post">
 
-        <div class="row">
-
-            <!-- EMPLOYEE -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Employee
-                </label>
-
-                <select asp-for="EmployeeId"
-                        asp-items="ViewBag.EmployeeList"
-                        class="form-select">
-
-                    <option value="">
-                        Select Employee
-                    </option>
-
-                </select>
-
+        <!-- HEADER WITH ACTIONS -->
+        <div class="transfer-header">
+            <div class="transfer-header-text">
+                <h2>New Transfer Request</h2>
+                <p>Assign employees to new branches or departments.</p>
             </div>
 
-            <!-- CURRENT BRANCH -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Current Branch
-                </label>
-
-                <select asp-for="CurrentBranchId"
-                        asp-items="ViewBag.BranchList"
-                        class="form-select">
-
-                    <option value="">
-                        Select Current Branch
-                    </option>
-
-                </select>
-
+            <div class="header-actions">
+                <a href="/EmployeeTransfer/Index" class="btn-cancel">Cancel</a>
+                @* TYPE MUST BE SUBMIT *@
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-send"></i> Submit Transfer
+                </button>
             </div>
-
-            <!-- NEW BRANCH -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    New Branch
-                </label>
-
-                <select asp-for="NewBranchId"
-                        asp-items="ViewBag.BranchList"
-                        class="form-select">
-
-                    <option value="">
-                        Select New Branch
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- CURRENT DEPARTMENT -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Current Department
-                </label>
-
-                <select asp-for="CurrentDepartmentId"
-                        asp-items="ViewBag.DepartmentList"
-                        class="form-select">
-
-                    <option value="">
-                        Select Current Department
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- NEW DEPARTMENT -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    New Department
-                </label>
-
-                <select asp-for="NewDepartmentId"
-                        asp-items="ViewBag.DepartmentList"
-                        class="form-select">
-
-                    <option value="">
-                        Select New Department
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- CURRENT DESIGNATION -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Current Designation
-                </label>
-
-                <select asp-for="CurrentDesignationId"
-                        asp-items="ViewBag.DesignationList"
-                        class="form-select">
-
-                    <option value="">
-                        Select Current Designation
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- NEW DESIGNATION -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    New Designation
-                </label>
-
-                <select asp-for="NewDesignationId"
-                        asp-items="ViewBag.DesignationList"
-                        class="form-select">
-
-                    <option value="">
-                        Select New Designation
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- EFFECTIVE DATE -->
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Effective Date
-                </label>
-
-                <input asp-for="EffectiveDate"
-                       type="date"
-                       class="form-control" />
-
-            </div>
-
-            <!-- REASON -->
-
-            <div class="col-md-12 mb-3">
-
-                <label class="form-label">
-                    Transfer Reason
-                </label>
-
-                <textarea asp-for="TransferReason"
-                          rows="4"
-                          class="form-control">
-                </textarea>
-
-            </div>
-
         </div>
 
-        <div class="form-actions">
+        <div class="transfer-card">
+            <!-- Employee Search -->
+            <div class="form-group mb-4">
+                <label class="form-label">Search Employee</label>
+                <select asp-for="EmployeeId" id="employeeDropdown" asp-items="ViewBag.EmployeeList" class="form-select" required>
+                    <option value="">-- Select Employee --</option>
+                </select>
+            </div>
 
-            <a href="/EmployeeTransfer/Index"
-               class="btn btn-light">
+            <div class="comparison-grid">
+                <!-- Left: Current (Readonly) -->
+                <div class="readonly-col">
+                    <div class="column-header">
+                        <i class="bi bi-person-badge"></i> Current Position
+                    </div>
 
-                Cancel
+                    @* Added Hidden Inputs to ensure current IDs are posted even if visually disabled *@
+                    <input type="hidden" asp-for="CurrentBranchId" id="currentBranchHidden" />
+                    <input type="hidden" asp-for="CurrentDepartmentId" id="currentDepartmentHidden" />
+                    <input type="hidden" asp-for="CurrentDesignationId" id="currentDesignationHidden" />
 
-            </a>
+                    <div class="form-group">
+                        <label class="form-label">Current Branch</label>
+                        <select id="currentBranch" asp-items="ViewBag.BranchList" class="form-select" disabled>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Current Department</label>
+                        <select id="currentDepartment" asp-items="ViewBag.DepartmentList" class="form-select" disabled>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Current Designation</label>
+                        <select id="currentDesignation" asp-items="ViewBag.DesignationList" class="form-select" disabled>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
 
-            <button type="submit"
-                    class="btn btn-primary">
+                <!-- Right: New Assignment -->
+                <div class="editable-col">
+                    <div class="column-header" style="color: #22c55e; border-bottom-color: rgba(34, 197, 94, 0.2);">
+                        <i class="bi bi-arrow-right-circle"></i> New Assignment
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Branch</label>
+                        <select asp-for="NewBranchId" asp-items="ViewBag.BranchList" class="form-select" required>
+                            <option value="">Select Branch</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Department</label>
+                        <select asp-for="NewDepartmentId" asp-items="ViewBag.DepartmentList" class="form-select" required>
+                            <option value="">Select Department</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Designation</label>
+                        <select asp-for="NewDesignationId" asp-items="ViewBag.DesignationList" class="form-select" required>
+                            <option value="">Select Designation</option>
+                        </select>
+                    </div>
+                </div>
 
-                <i class="bi bi-arrow-left-right"></i>
-
-                Submit Transfer
-
-            </button>
-
+                <!-- Footer Details -->
+                <div class="full-width-section">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Effective Date</label>
+                                <input asp-for="EffectiveDate" type="date" class="form-control" required />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Transfer Reason</label>
+                                <textarea asp-for="TransferReason" rows="3" class="form-control" placeholder="Provide a brief explanation for the change..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
     </form>
-
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const empDrop = document.getElementById("employeeDropdown");
+            empDrop.addEventListener("change", function () {
+                const id = this.value;
+                if (!id) return;
+                fetch('/EmployeeTransfer/GetEmployeeDetails?employeeId=' + id)
+                    .then(r => r.json())
+                    .then(d => {
+                        // Set visible disabled selects
+                        document.getElementById("currentBranch").value = d.branchId;
+                        document.getElementById("currentDepartment").value = d.departmentId;
+                        document.getElementById("currentDesignation").value = d.designationId;
+
+                        // Set hidden inputs (so the data actually submits)
+                        document.getElementById("currentBranchHidden").value = d.branchId;
+                        document.getElementById("currentDepartmentHidden").value = d.departmentId;
+                        document.getElementById("currentDesignationHidden").value = d.designationId;
+                    });
+            });
+        });
+    </script>
+}
