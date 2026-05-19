@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using VeltriQ.Models.HR;
+using VeltriQ.Models.Recruitment;
 
 namespace VeltriQ.Data
 {
@@ -48,6 +49,7 @@ namespace VeltriQ.Data
         public DbSet<EmployeeTransfer> EmployeeTransfers{ get; set; }
         public DbSet<EmployeeExit> EmployeeExits { get; set; }
         public DbSet<EmployeeSuspension> EmployeeSuspensions{ get; set; }
+        public DbSet<ManpowerRequest> ManpowerRequests { get; set; }
 
         // =========================
         // MAP SCHEMAS
@@ -107,6 +109,8 @@ namespace VeltriQ.Data
     .ToTable("EmployeeExit", "HR");
             modelBuilder.Entity<EmployeeSuspension>()
     .ToTable("EmployeeSuspension", "HR");
+            modelBuilder.Entity<ManpowerRequest>()
+    .ToTable("ManpowerRequest", "Recruitment");
         }
     }
 }
