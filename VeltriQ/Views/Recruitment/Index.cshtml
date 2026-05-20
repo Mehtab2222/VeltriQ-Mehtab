@@ -385,7 +385,14 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" style="background-color: #1e232c; border-color: rgba(255,255,255,0.05);">
                                         <li><a class="dropdown-item" href="#">View Details</a></li>
-                                        <li><a class="dropdown-item" href="#">Edit Record</a></li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-controller="Recruitment"
+                                               asp-action="Edit"
+                                               asp-route-id="@item.ManpowerRequestId">
+                                                Edit Record
+                                            </a>
+                                        </li>
                                         <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.05);"></li>
                                         <li><a class="dropdown-item text-danger" href="#">Delete Request</a></li>
                                     </ul>
