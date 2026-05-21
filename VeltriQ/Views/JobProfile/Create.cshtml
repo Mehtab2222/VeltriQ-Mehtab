@@ -1,0 +1,332 @@
+﻿@model VeltriQ.ViewModels.JobProfileViewModel
+
+@{
+    ViewData["Title"] = "Create Job Profile";
+}
+
+<style>
+
+    .jobprofile-container {
+        width: 100%;
+    }
+
+    .jobprofile-header {
+        margin-bottom: 24px;
+    }
+
+        .jobprofile-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .jobprofile-header p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin: 0;
+        }
+
+    .jobprofile-card {
+        background: rgba(30,35,44,.94);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 20px;
+        padding: 28px;
+    }
+
+    .form-section-title {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 22px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+        gap: 22px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-group label {
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+    .form-control {
+        height: 46px;
+        border-radius: 12px;
+        border: 1px solid #2d3748;
+        background: #0f172a;
+        color: #fff;
+        padding: 0 14px;
+        font-size: 13px;
+        outline: none;
+        transition: .2s ease;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        padding-top: 12px;
+        resize: none;
+    }
+
+    .form-control:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124,58,237,.15);
+    }
+
+    .submit-btn {
+        height: 48px;
+        padding: 0 24px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg,#7c3aed,#6d28d9);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 30px;
+        transition: .2s ease;
+        box-shadow: 0 10px 24px rgba(124,58,237,.25);
+    }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+</style>
+
+<div class="jobprofile-container">
+
+    <!-- HEADER -->
+
+    <div class="jobprofile-header">
+
+        <h2>Create Job Profile</h2>
+
+        <p>
+            Fill in the job profile details for recruitment.
+        </p>
+
+    </div>
+
+    <!-- CARD -->
+
+    <div class="jobprofile-card">
+
+        <form asp-action="Create"
+              asp-controller="JobProfile"
+              method="post">
+
+            <div class="form-section-title">
+
+                Job Information
+
+            </div>
+
+            <div class="form-grid">
+
+                <!-- JOB TITLE -->
+
+                <div class="form-group">
+
+                    <label>Job Title</label>
+
+                    <input asp-for="JobTitle"
+                           class="form-control"
+                           placeholder="Enter job title" />
+
+                </div>
+
+                <!-- DEPARTMENT -->
+
+                <div class="form-group">
+
+                    <label>Department</label>
+
+                    <select asp-for="DepartmentId"
+                            asp-items="Model.DepartmentList"
+                            class="form-control">
+
+                        <option value="">
+                            Select Department
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- DESIGNATION -->
+
+                <div class="form-group">
+
+                    <label>Designation</label>
+
+                    <select asp-for="DesignationId"
+                            asp-items="Model.DesignationList"
+                            class="form-control">
+
+                        <option value="">
+                            Select Designation
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- MIN EXPERIENCE -->
+
+                <div class="form-group">
+
+                    <label>Min Experience</label>
+
+                    <input asp-for="MinExperience"
+                           type="number"
+                           class="form-control"
+                           placeholder="Years" />
+
+                </div>
+
+                <!-- MAX EXPERIENCE -->
+
+                <div class="form-group">
+
+                    <label>Max Experience</label>
+
+                    <input asp-for="MaxExperience"
+                           type="number"
+                           class="form-control"
+                           placeholder="Years" />
+
+                </div>
+
+                <!-- MIN SALARY -->
+
+                <div class="form-group">
+
+                    <label>Min Salary</label>
+
+                    <input asp-for="MinSalary"
+                           type="number"
+                           class="form-control"
+                           placeholder="Enter minimum salary" />
+
+                </div>
+
+                <!-- MAX SALARY -->
+
+                <div class="form-group">
+
+                    <label>Max Salary</label>
+
+                    <input asp-for="MaxSalary"
+                           type="number"
+                           class="form-control"
+                           placeholder="Enter maximum salary" />
+
+                </div>
+
+            </div>
+
+            <!-- JOB DESCRIPTION -->
+
+            <div class="form-group mt-4">
+
+                <label>Job Description</label>
+
+                <textarea asp-for="JobDescription"
+                          class="form-control"
+                          placeholder="Enter detailed job description"></textarea>
+
+            </div>
+
+            <!-- REQUIRED SKILLS -->
+            <!-- JOB CATEGORY -->
+
+            <div class="form-group">
+
+                <label>Job Category</label>
+
+                <select asp-for="JobCategoryId"
+                        asp-items="Model.JobCategoryList"
+                        class="form-control"
+                        id="jobCategoryDropdown">
+
+                    <option value="">
+                        Select Category
+                    </option>
+
+                </select>
+
+            </div>
+            <!-- SKILLS -->
+
+            <div class="form-group mt-4">
+
+                <label>Skills</label>
+
+                <select asp-for="SelectedSkillIds"
+                        multiple
+                        class="form-control"
+                        id="skillsDropdown"
+                        style="height:160px;">
+                </select>
+
+            </div>
+            <!-- BUTTON -->
+
+            <button type="submit"
+                    class="submit-btn">
+
+                <i class="bi bi-check-circle"></i>
+
+                Create Job Profile
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+<script>
+
+    $("#jobCategoryDropdown").change(function () {
+
+        var categoryId = $(this).val();
+
+        $("#skillsDropdown").empty();
+
+        if (categoryId != "") {
+
+            $.get('/JobProfile/GetSkillsByCategory',
+
+                { categoryId: categoryId },
+
+                function (data) {
+
+                    $.each(data, function (i, item) {
+
+                        $("#skillsDropdown").append(
+
+                            `<option value="${item.id}">
+                                ${item.text}
+                            </option>`
+
+                        );
+
+                    });
+
+                });
+
+        }
+
+    });
+
+</script>

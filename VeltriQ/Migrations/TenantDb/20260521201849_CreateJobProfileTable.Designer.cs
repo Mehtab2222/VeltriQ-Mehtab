@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VeltriQ.Data;
 
@@ -11,9 +12,11 @@ using VeltriQ.Data;
 namespace VeltriQ.Migrations.TenantDb
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260521201849_CreateJobProfileTable")]
+    partial class CreateJobProfileTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1046,26 +1049,6 @@ namespace VeltriQ.Migrations.TenantDb
                     b.ToTable("Nationality", "HR");
                 });
 
-            modelBuilder.Entity("VeltriQ.Models.Recruitment.JobCategory", b =>
-                {
-                    b.Property<int>("JobCategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobCategoryId"));
-
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("JobCategoryId");
-
-                    b.ToTable("JobCategory", "Recruitment");
-                });
-
             modelBuilder.Entity("VeltriQ.Models.Recruitment.JobProfile", b =>
                 {
                     b.Property<int>("JobProfileId")
@@ -1091,9 +1074,6 @@ namespace VeltriQ.Migrations.TenantDb
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<int>("JobCategoryId")
-                        .HasColumnType("int");
 
                     b.Property<string>("JobDescription")
                         .IsRequired()
@@ -1121,28 +1101,13 @@ namespace VeltriQ.Migrations.TenantDb
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("RequiredSkills")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("JobProfileId");
 
                     b.ToTable("JobProfile", "Recruitment");
-                });
-
-            modelBuilder.Entity("VeltriQ.Models.Recruitment.JobProfileSkill", b =>
-                {
-                    b.Property<int>("JobProfileSkillId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobProfileSkillId"));
-
-                    b.Property<int>("JobProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("int");
-
-                    b.HasKey("JobProfileSkillId");
-
-                    b.ToTable("JobProfileSkill", "Recruitment");
                 });
 
             modelBuilder.Entity("VeltriQ.Models.Recruitment.ManpowerRequest", b =>
@@ -1241,29 +1206,6 @@ namespace VeltriQ.Migrations.TenantDb
                     b.HasKey("ManpowerRequestId");
 
                     b.ToTable("ManpowerRequest", "Recruitment");
-                });
-
-            modelBuilder.Entity("VeltriQ.Models.Recruitment.SkillMaster", b =>
-                {
-                    b.Property<int>("SkillId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkillId"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("JobCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SkillName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SkillId");
-
-                    b.ToTable("SkillMaster", "Recruitment");
                 });
 
             modelBuilder.Entity("VeltriQ.Models.HR.Branch", b =>

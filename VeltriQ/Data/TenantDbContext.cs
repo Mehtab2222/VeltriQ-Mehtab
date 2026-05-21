@@ -50,7 +50,12 @@ namespace VeltriQ.Data
         public DbSet<EmployeeExit> EmployeeExits { get; set; }
         public DbSet<EmployeeSuspension> EmployeeSuspensions{ get; set; }
         public DbSet<ManpowerRequest> ManpowerRequests { get; set; }
+        public DbSet<JobProfile> JobProfiles { get; set; }
+        public DbSet<JobCategory> JobCategories { get; set; }
 
+        public DbSet<SkillMaster> SkillMasters { get; set; }
+
+        public DbSet<JobProfileSkill> JobProfileSkills { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -111,6 +116,16 @@ namespace VeltriQ.Data
     .ToTable("EmployeeSuspension", "HR");
             modelBuilder.Entity<ManpowerRequest>()
     .ToTable("ManpowerRequest", "Recruitment");
+            modelBuilder.Entity<JobProfile>()
+    .ToTable("JobProfile", "Recruitment");
+            modelBuilder.Entity<JobCategory>()
+    .ToTable("JobCategory", "Recruitment");
+
+            modelBuilder.Entity<SkillMaster>()
+                .ToTable("SkillMaster", "Recruitment");
+
+            modelBuilder.Entity<JobProfileSkill>()
+                .ToTable("JobProfileSkill", "Recruitment");
         }
     }
 }
