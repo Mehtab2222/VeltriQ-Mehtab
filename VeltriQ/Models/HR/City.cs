@@ -1,4 +1,6 @@
-﻿namespace VeltriQ.Models.HR
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace VeltriQ.Models.HR
 {
     public class City
     {
@@ -23,5 +25,9 @@
         public int? ModifiedBy { get; set; }
 
         public virtual Country? Country { get; set; }
+        public int? StateId { get; set; }
+
+        [ForeignKey(nameof(StateId))]
+        public virtual State? State { get; set; }
     }
 }

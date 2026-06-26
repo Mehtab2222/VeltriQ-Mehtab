@@ -1,0 +1,91 @@
+﻿@model VeltriQ.ViewModels.OnboardingTemplateSectionDesignerViewModel
+
+<form asp-action="SaveSections" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="OnboardingTemplateId" />
+    <input type="hidden" asp-for="TemplateName" />
+    <input type="hidden" asp-for="TemplateCode" />
+
+    <div class="designer-panel">
+        <div class="table-wrapper">
+            <table class="designer-table">
+                <thead>
+                    <tr>
+                        <th style="width: 90px;">Include</th>
+                        <th style="width: 120px;">Mandatory</th>
+                        <th>Section</th>
+                        <th style="width: 120px;">Display Order</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Sections != null && Model.Sections.Count > 0)
+                    {
+                        @for (int i = 0; i < Model.Sections.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input asp-for="Sections[i].IsSelected" class="custom-check-input section-checkbox" />
+                                    <input asp-for="Sections[i].OnboardingSectionMasterId" type="hidden" />
+                                    <input asp-for="Sections[i].SectionName" type="hidden" />
+                                    <input asp-for="Sections[i].OnboardingTemplateSectionId" type="hidden" />
+                                </td>
+
+                                <td>
+                                    <input asp-for="Sections[i].IsMandatory" class="custom-check-input mandatory-checkbox" />
+                                </td>
+
+                                <td style="font-weight: 600;">
+                                    @Model.Sections[i].SectionName
+                                </td>
+
+                                <td>
+                                    <input asp-for="Sections[i].DisplayOrder" class="custom-form-control order-input" type="number" min="1" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 32px 16px;">
+                                No onboarding master sections mapped to this configuration context.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-footer-actions">
+        <button type="submit" class="form-action-btn btn-submit-theme">
+            <i class="bi bi-floppy"></i> Save Sections
+        </button>
+        <a asp-action="Index" class="form-action-btn btn-cancel-theme">
+            Cancel
+        </a>
+    </div>
+</form>
+
+<script>
+    function toggleRow(includeCheckbox) {
+        const row = includeCheckbox.closest('tr');
+        if (!row) return;
+
+        const mandatory = row.querySelector('.mandatory-checkbox');
+        const order = row.querySelector('.order-input');
+
+        if (mandatory) mandatory.disabled = !includeCheckbox.checked;
+        if (order) order.readOnly = !includeCheckbox.checked;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".section-checkbox").forEach(function (cb) {
+            toggleRow(cb);
+            cb.addEventListener("change", function () {
+                toggleRow(this);
+            });
+        });
+    });
+</script>

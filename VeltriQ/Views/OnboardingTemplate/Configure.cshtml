@@ -1,0 +1,307 @@
+﻿@model VeltriQ.ViewModels.OnboardingTemplateSectionDesignerViewModel
+
+@{
+    ViewData["Title"] = "Configure Onboarding Template";
+}
+
+<style>
+    .template-config-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── CUSTOM ALERT STRIPS & INFO BARS ── */
+    .custom-alert-info {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        padding: 10px 14px;
+        font-size: 12.5px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .custom-alert-info strong {
+            color: var(--purple);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+    /* ── HEADER ACTION STRUCTURING ── */
+    .form-action-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    /* ── COMPACT SYSTEM BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    /* ── COMPACT TAB CONSOLE ── */
+    .custom-nav-tabs {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0 0 16px 0;
+        border-bottom: 1px solid var(--border);
+        gap: 2px;
+    }
+
+    .custom-tab-item {
+        margin-bottom: -1px;
+    }
+
+    .custom-tab-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-secondary);
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+        .custom-tab-btn:hover:not(.disabled) {
+            color: var(--purple);
+        }
+
+        .custom-tab-btn.active {
+            color: var(--purple);
+            background: var(--card-bg);
+            border-color: var(--border) var(--border) transparent var(--border);
+        }
+
+        .custom-tab-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+    /* ── DESIGNER PANEL GLOBAL ALIGNMENT ── */
+    .designer-panel {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 200px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        overflow: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .designer-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .designer-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .designer-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .designer-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .designer-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    .custom-check-input {
+        width: 14px;
+        height: 14px;
+        accent-color: var(--purple);
+        cursor: pointer;
+        display: block;
+    }
+
+        .custom-check-input:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+    .custom-form-control {
+        width: 64px;
+        height: 26px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 8px;
+        font-size: 12px;
+        outline: none;
+        transition: border-color 0.15s, opacity 0.15s;
+    }
+
+        .custom-form-control:focus {
+            border-color: var(--purple);
+        }
+
+        .custom-form-control[readonly] {
+            opacity: 0.4;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+    .panel-footer-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+        justify-content: flex-start;
+    }
+</style>
+
+<div class="template-config-page">
+
+    <div class="form-action-header">
+        <a asp-action="Index" class="form-action-btn btn-cancel-theme">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="custom-alert-info">
+        <strong>Template :</strong> @Model.TemplateName
+        <span>|</span>
+        <strong>Code :</strong> @Model.TemplateCode
+    </div>
+
+    <ul class="custom-nav-tabs">
+        <li class="custom-tab-item">
+            <button class="custom-tab-btn active" type="button" onclick="switchActiveTab('sections', this)">
+                <i class="bi bi-list-check"></i> Sections
+            </button>
+        </li>
+        <li class="custom-tab-item">
+            <button class="custom-tab-btn" type="button" onclick="switchActiveTab('documents', this)">
+                <i class="bi bi-file-earmark-text"></i> Documents
+            </button>
+        </li>
+        <li class="custom-tab-item">
+            <button class="custom-tab-btn" type="button" onclick="switchActiveTab('policies', this)">
+                <i class="bi bi-shield-check"></i> Policies
+            </button>
+        </li>
+        <li class="custom-tab-item">
+            <button class="custom-tab-btn" type="button" onclick="switchActiveTab('activities', this)">
+                <i class="bi bi-calendar-check"></i> Activities
+            </button>
+        </li>
+    </ul>
+
+    <div id="sectionsTabWrapper">
+        <partial name="_SectionsTab" model="Model" />
+    </div>
+
+    <div id="documentsTabWrapper" style="display: none;">
+        <partial name="_DocumentsTab" model="Model" />
+    </div>
+
+    <div id="policiesTabWrapper" style="display: none;">
+        <partial name="_PoliciesTab" model="Model" />
+    </div>
+
+    <div id="activitiesTabWrapper" style="display: none;">
+        <partial name="_ActivitiesTab" model="Model" />
+    </div>
+</div>
+
+<script>
+    function switchActiveTab(targetId, buttonElement) {
+        // Toggle active visual structures inside menu selectors
+        const tabs = buttonElement.closest('.custom-nav-tabs').getElementsByClassName('custom-tab-btn');
+        for (let i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove('active');
+        }
+        buttonElement.classList.add('active');
+
+        // Hide all template content views
+        document.getElementById('sectionsTabWrapper').style.display = 'none';
+        document.getElementById('documentsTabWrapper').style.display = 'none';
+        document.getElementById('policiesTabWrapper').style.display = 'none';
+        document.getElementById('activitiesTabWrapper').style.display = 'none';
+
+        // Display the selected focus lane instantly (Fixed layout bracing script error)
+        if (targetId === 'sections') {
+            document.getElementById('sectionsTabWrapper').style.display = 'block';
+        } else if (targetId === 'documents') {
+            document.getElementById('documentsTabWrapper').style.display = 'block';
+        } else if (targetId === 'policies') {
+            document.getElementById('policiesTabWrapper').style.display = 'block';
+        } else if (targetId === 'activities') {
+            document.getElementById('activitiesTabWrapper').style.display = 'block';
+        }
+    }
+</script>

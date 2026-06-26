@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using VeltriQ.Data.SeedData.HR;
 using VeltriQ.Models.HR;
+using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.Models.Recruitment;
-
+using VeltriQ.SeedData;
 namespace VeltriQ.Data
 {
     public class TenantDbContext : DbContext
@@ -18,7 +19,13 @@ namespace VeltriQ.Data
         // =========================
         // HR MODULE TABLES
         // =========================
+        public DbSet<OnboardingTemplate> OnboardingTemplates { get; set; }
 
+        public DbSet<OnboardingTemplateDocument> OnboardingTemplateDocuments { get; set; }
+
+        public DbSet<OnboardingTemplatePolicy> OnboardingTemplatePolicies { get; set; }
+
+        public DbSet<OnboardingTemplateActivity> OnboardingTemplateActivities { get; set; }
         public DbSet<Employee> Employees { get; set; }
 
         public DbSet<Department> Departments { get; set; }
@@ -56,6 +63,40 @@ namespace VeltriQ.Data
         public DbSet<SkillMaster> SkillMasters { get; set; }
 
         public DbSet<JobProfileSkill> JobProfileSkills { get; set; }
+        //onboarding tables
+        public DbSet<EmploymentTypeMaster> EmploymentTypeMasters { get; set; }
+
+        public DbSet<OnboardingStatusMaster> OnboardingStatusMasters { get; set; }
+
+        public DbSet<OnboardingSectionMaster> OnboardingSectionMasters { get; set; }
+
+        public DbSet<OnboardingDocumentMaster> OnboardingDocumentMasters { get; set; }
+
+        public DbSet<OnboardingPolicyMaster> OnboardingPolicyMasters { get; set; }
+        public DbSet<OnboardingDocumentCategoryMaster> OnboardingDocumentCategoryMasters { get; set; }
+        public DbSet<OnboardingActivityMaster> OnboardingActivityMasters { get; set; }
+        public DbSet<OnboardingPolicyCategoryMaster> OnboardingPolicyCategoryMasters { get; set; }
+        public DbSet<OnboardingActivityCategoryMaster> OnboardingActivityCategoryMasters { get; set; }
+
+        public DbSet<OnboardingEmployeePersonal> OnboardingEmployeePersonals { get; set; }
+        public DbSet<OnboardingEmployeeAddress> OnboardingEmployeeAddresses { get; set; }
+        public DbSet<OnboardingEmployeeEmergencyContact> OnboardingEmployeeEmergencyContacts { get; set; }
+        public DbSet<QualificationTypeMaster> QualificationTypeMasters { get; set; }
+
+        public DbSet<QualificationMaster> QualificationMasters { get; set; }
+        public DbSet<QualificationSpecializationMaster> QualificationSpecializationMasters { get; set; }
+        public DbSet<OnboardingEmployeeQualification> OnboardingEmployeeQualifications { get; set; }
+        public DbSet<IdentityDocumentMaster> IdentityDocumentMasters { get; set; }
+
+        public DbSet<OnboardingEmployeeIdentity> OnboardingEmployeeIdentities { get; set; }
+        public DbSet<OnboardingEmployeeBank> OnboardingEmployeeBanks { get; set; }
+        public DbSet<OnboardingEmployeeDocument> OnboardingEmployeeDocuments { get; set; }
+        public DbSet<OnboardingEmployeePolicyAcceptance> OnboardingEmployeePolicyAcceptances { get; set; }
+        public DbSet<OnboardingEmployeeActivity> OnboardingEmployeeActivities { get; set; }
+        public DbSet<OnboardingTemplateSection> OnboardingTemplateSections { get; set; }
+        public DbSet<EmployeeOnboarding> EmployeeOnboardings { get; set; }
+        public DbSet<OnboardingCandidate> OnboardingCandidates { get; set; }
+
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -67,6 +108,125 @@ namespace VeltriQ.Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+            modelBuilder.ApplyConfiguration(new OnboardingSectionSeedData());
+            modelBuilder.Entity<OnboardingDocumentMaster>()
+    .HasData(OnboardingDocumentSeedData.GetData());
+            modelBuilder.Entity<OnboardingTemplateSection>()
+    .ToTable("OnboardingTemplateSection", "HR");
+            modelBuilder.Entity<OnboardingTemplate>()
+    .HasOne(x => x.EmploymentType)
+    .WithMany()
+    .HasForeignKey(x => x.EmploymentTypeMasterId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OnboardingTemplate>()
+                .HasOne(x => x.Department)
+                .WithMany()
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OnboardingTemplate>()
+                .HasOne(x => x.Designation)
+                .WithMany()
+                .HasForeignKey(x => x.DesignationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OnboardingEmployee>()
+                .HasOne(x => x.OnboardingTemplate)
+                .WithMany()
+                .HasForeignKey(x => x.OnboardingTemplateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OnboardingEmployee>()
+                .HasOne(x => x.EmploymentType)
+                .WithMany()
+                .HasForeignKey(x => x.EmploymentTypeMasterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OnboardingEmployee>()
+                .HasOne(x => x.OnboardingStatus)
+                .WithMany()
+                .HasForeignKey(x => x.OnboardingStatusMasterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OnboardingEmployee>()
+                .HasOne(x => x.Employee)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<EmployeeOnboarding>()
+    .HasOne(x => x.OnboardingCandidate)
+    .WithMany()
+    .HasForeignKey(x => x.OnboardingCandidateId)
+    .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<OnboardingEmployeeActivity>()
+    .ToTable("OnboardingEmployeeActivity", "HR");
+            modelBuilder.Entity<OnboardingEmployeePolicyAcceptance>()
+    .ToTable("OnboardingEmployeePolicyAcceptance", "HR");
+            modelBuilder.Entity<OnboardingEmployeeDocument>()
+    .ToTable("OnboardingEmployeeDocument", "HR");
+            modelBuilder.Entity<OnboardingEmployeeBank>()
+    .ToTable("OnboardingEmployeeBank", "HR");
+            modelBuilder.Entity<OnboardingEmployeeQualification>()
+    .ToTable("OnboardingEmployeeQualification", "HR");
+            modelBuilder.Entity<QualificationTypeMaster>()
+    .ToTable("QualificationTypeMaster", "HR");
+
+            modelBuilder.Entity<IdentityDocumentMaster>()
+    .ToTable("IdentityDocumentMaster", "HR");
+
+            modelBuilder.Entity<OnboardingEmployeeIdentity>()
+                .ToTable("OnboardingEmployeeIdentity", "HR");
+            modelBuilder.Entity<IdentityDocumentMaster>()
+    .HasData(IdentityDocumentSeedData.GetData());
+
+            modelBuilder.Entity<QualificationSpecializationMaster>()
+                .HasData(QualificationSpecializationSeedData.GetData());
+            modelBuilder.Entity<QualificationMaster>()
+                .ToTable("QualificationMaster", "HR");
+            modelBuilder.Entity<QualificationTypeMaster>()
+    .HasData(QualificationTypeSeedData.GetData());
+            modelBuilder.Entity<QualificationSpecializationMaster>()
+    .ToTable("QualificationSpecializationMaster", "HR");
+            modelBuilder.Entity<QualificationMaster>()
+                .HasData(QualificationSeedData.GetData());
+
+            modelBuilder.Entity<OnboardingEmployeeEmergencyContact>()
+    .ToTable("OnboardingEmployeeEmergencyContact", "HR");
+            modelBuilder.Entity<OnboardingEmployeeAddress>()
+    .ToTable("OnboardingEmployeeAddress", "HR");
+            modelBuilder.Entity<OnboardingEmployeePersonal>()
+    .ToTable("OnboardingEmployeePersonal", "HR");
+            modelBuilder.Entity<OnboardingTemplate>()
+    .ToTable("OnboardingTemplate", "HR");
+
+            modelBuilder.Entity<OnboardingTemplateDocument>()
+                .ToTable("OnboardingTemplateDocument", "HR");
+
+            modelBuilder.Entity<OnboardingTemplatePolicy>()
+                .ToTable("OnboardingTemplatePolicy", "HR");
+
+            modelBuilder.Entity<OnboardingTemplateActivity>()
+                .ToTable("OnboardingTemplateActivity", "HR");
+            modelBuilder.Entity<OnboardingActivityCategoryMaster>()
+    .ToTable("OnboardingActivityCategoryMaster", "HR");
+
+
+            modelBuilder.Entity<OnboardingPolicyCategoryMaster>()
+           .ToTable("OnboardingPolicyCategoryMaster", "HR");
+            modelBuilder.Entity<OnboardingActivityCategoryMaster>()
+    .HasData(OnboardingActivityCategorySeedData.GetData());
+
+            modelBuilder.Entity<OnboardingActivityMaster>()
+                .HasData(OnboardingActivitySeedData.GetData());
+            modelBuilder.Entity<OnboardingPolicyMaster>()
+                .ToTable("OnboardingPolicyMaster", "HR");
+            modelBuilder.Entity<OnboardingPolicyCategoryMaster>()
+    .HasData(OnboardingPolicyCategorySeedData.GetData());
+
+            modelBuilder.Entity<OnboardingPolicyMaster>()
+                .HasData(OnboardingPolicySeedData.GetData());
             modelBuilder.Entity<Employee>()
                 .ToTable("Employee", "HR");
 
@@ -109,23 +269,52 @@ namespace VeltriQ.Data
             modelBuilder.Entity<EmployeeActivity>()
                 .ToTable("EmployeeActivity", "HR");
             modelBuilder.Entity<EmployeeTransfer>()
-    .ToTable("EmployeeTransfer", "HR");
+             .ToTable("EmployeeTransfer", "HR");
             modelBuilder.Entity<EmployeeExit>()
-    .ToTable("EmployeeExit", "HR");
+              .ToTable("EmployeeExit", "HR");
             modelBuilder.Entity<EmployeeSuspension>()
-    .ToTable("EmployeeSuspension", "HR");
+             .ToTable("EmployeeSuspension", "HR");
             modelBuilder.Entity<ManpowerRequest>()
-    .ToTable("ManpowerRequest", "Recruitment");
+           .ToTable("ManpowerRequest", "Recruitment");
             modelBuilder.Entity<JobProfile>()
-    .ToTable("JobProfile", "Recruitment");
+             .ToTable("JobProfile", "Recruitment");
             modelBuilder.Entity<JobCategory>()
-    .ToTable("JobCategory", "Recruitment");
+             .ToTable("JobCategory", "Recruitment");
 
             modelBuilder.Entity<SkillMaster>()
                 .ToTable("SkillMaster", "Recruitment");
 
             modelBuilder.Entity<JobProfileSkill>()
                 .ToTable("JobProfileSkill", "Recruitment");
+
+            //onboarding
+            modelBuilder.Entity<EmploymentTypeMaster>()
+            .ToTable("EmploymentTypeMaster", "HR");
+            //seeding the employemnttype data 
+            modelBuilder.Entity<EmploymentTypeMaster>()
+    .HasData(EmploymentTypeSeedData.GetData());
+
+            modelBuilder.Entity<OnboardingStatusMaster>()
+                .ToTable("OnboardingStatusMaster", "HR");
+            modelBuilder.Entity<OnboardingStatusMaster>()
+    .HasData(OnboardingStatusSeedData.GetData());
+
+            modelBuilder.Entity<OnboardingSectionMaster>()
+                .ToTable("OnboardingSectionMaster", "HR");
+
+            modelBuilder.Entity<OnboardingDocumentMaster>()
+                .ToTable("OnboardingDocumentMaster", "HR");
+
+            modelBuilder.Entity<OnboardingPolicyMaster>()
+                .ToTable("OnboardingPolicyMaster", "HR");
+
+            modelBuilder.Entity<OnboardingActivityMaster>()
+                .ToTable("OnboardingActivityMaster", "HR");
+            modelBuilder.Entity<OnboardingDocumentCategoryMaster>()
+    .ToTable("OnboardingDocumentCategoryMaster", "HR");
+
+            modelBuilder.Entity<OnboardingDocumentCategoryMaster>()
+    .HasData(OnboardingDocumentCategorySeedData.GetData());
         }
     }
 }

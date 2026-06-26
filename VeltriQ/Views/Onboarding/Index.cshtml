@@ -1,0 +1,417 @@
+﻿@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDashboardViewModel
+
+@{
+    ViewData["Title"] = "Employee Onboarding";
+}
+
+<style>
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .page-title h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* ── SYSTEM ACTION BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .btn-table-action {
+        height: 26px;
+        padding: 0 10px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border-radius: 4px;
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+        .btn-table-action:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    /* ── HIGH-DENSITY DASHBOARD CARDS ── */
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .dashboard-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 12px 14px;
+        border-radius: 0px; /* Kept sharp and squared */
+    }
+
+        .dashboard-card h6 {
+            margin: 0;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-card h3 {
+            margin: 6px 0 0 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+    /* ── CONSOLIDATED FILTER PANEL ── */
+    .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 12px 16px;
+    }
+
+    .custom-control {
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .custom-control:focus {
+            border-color: var(--purple);
+        }
+
+    .search-input {
+        flex: 1;
+    }
+
+    .select-filter {
+        width: 180px;
+        cursor: pointer;
+    }
+
+    /* ── MAX HEIGHT PANEL GRID WITH MICRO HORIZONTAL OVERFLOW SCROLL ── */
+    .table-panel {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 290px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+        /* Micro-thin custom scrollbars */
+        .table-wrapper::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+            .table-wrapper::-webkit-scrollbar-thumb:hover {
+                background: var(--purple);
+            }
+
+    .designer-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .designer-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .designer-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .designer-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .designer-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── THEMED CUSTOM STATE BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .status-invited {
+        background: rgba(59, 130, 246, 0.12);
+        color: #3b82f6;
+    }
+
+    .status-progress {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    .status-submitted {
+        background: rgba(147, 51, 234, 0.12);
+        color: #a855f7;
+    }
+
+    .status-approved {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .status-default {
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+    }
+</style>
+
+<div class="page-container">
+
+    <!-- HEADER LAYER -->
+    <div class="page-header">
+        <div class="page-title">
+            <h3>Employee Onboarding</h3>
+        </div>
+        <div>
+            <a asp-action="InitiateOnboarding" class="form-action-btn btn-submit-theme">
+                <i class="bi bi-plus-circle"></i> Initiate Onboarding
+            </a>
+        </div>
+    </div>
+
+    <!-- METRICS CONSOLE GRIDS -->
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <h6>Total</h6>
+            <h3>@Model.Total</h3>
+        </div>
+        <div class="dashboard-card">
+            <h6>Invited</h6>
+            <h3>@Model.Invited</h3>
+        </div>
+        <div class="dashboard-card">
+            <h6>In Progress</h6>
+            <h3>@Model.InProgress</h3>
+        </div>
+        <div class="dashboard-card">
+            <h6>Submitted</h6>
+            <h3>@Model.Submitted</h3>
+        </div>
+        <div class="dashboard-card">
+            <h6>Approved</h6>
+            <h3>@Model.Approved</h3>
+        </div>
+    </div>
+
+    <!-- WORKSPACE FILTER ENGINE CONTROLS -->
+    <div class="filter-bar">
+        <input type="text" class="custom-control search-input" id="searchBox" placeholder="Search Candidate..." />
+
+        <select class="custom-control select-filter" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="Invited">Invited</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Approved">Approved</option>
+        </select>
+
+        <select class="custom-control select-filter" id="templateFilter">
+            <option value="">All Templates</option>
+            <!-- Dynamically populated or static template lists can go here -->
+        </select>
+
+        <select class="custom-control select-filter" id="deptFilter">
+            <option value="">All Departments</option>
+            <!-- Dynamically populated department elements -->
+        </select>
+    </div>
+
+    <!-- DATA GRID MATRICES PANEL -->
+    <div class="table-panel">
+        <div class="table-wrapper">
+            <table class="designer-table" id="onboardingDashboardTable">
+                <thead>
+                    <tr>
+                        <th>Candidate Name</th>
+                        <th>Email Address</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Assigned Template</th>
+                        <th>Status</th>
+                        <th>Assigned Date</th>
+                        <th>Progress Status</th>
+                        <th style="width: 80px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            string statusClass = (item.Status ?? "").ToLower() switch
+                            {
+                                "invited" => "status-invited",
+                                "in progress" or "progress" => "status-progress",
+                                "submitted" => "status-submitted",
+                                "approved" => "status-approved",
+                                _ => "status-default"
+                            };
+
+                            <tr>
+                                <td style="font-weight: 600;">@item.CandidateName</td>
+                                <td>@item.Email</td>
+                                <td>@item.Department</td>
+                                <td>@item.Designation</td>
+                                <td>@item.Template</td>
+                                <td>
+                                    <span class="status-badge @statusClass">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>@item.AssignedOn.ToString("dd MMM yyyy")</td>
+                                <td style="font-weight: 600; color: var(--purple);">
+                                    @item.Completion%
+                                </td>
+                                <td style="text-align: right;">
+                                    <a asp-action="Details" asp-route-id="@item.EmployeeOnboardingId" class="btn-table-action">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center py-5" style="border: none;">
+                                <i class="bi bi-people text-muted d-block mb-2" style="font-size: 32px; opacity: 0.4;"></i>
+                                <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">No pipeline records tracked yet.</div>
+                                <div style="color: var(--text-muted); font-size: 11px; margin-top: 2px;">Click "Initiate Onboarding" to assign pipelines to accepted candidates.</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- CLIENT PIPELINE INITATION RUNTIMES -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Enforce client side execution of DataTables if loaded
+        if (typeof $ !== 'undefined' && $.fn.DataTable && document.querySelector('#onboardingDashboardTable tbody tr .btn-table-action')) {
+            const table = $('#onboardingDashboardTable').DataTable({
+                pageLength: 10,
+                responsive: false,
+                ordering: true,
+                searching: true,
+                info: true,
+                lengthChange: false,
+                dom: 'rtip' // Hides standard native search inputs so your styled custom row fields control it instead
+            });
+
+            // Bind global input variables cleanly to dashboard search logic
+            document.getElementById('searchBox').addEventListener('input', function() {
+                table.search(this.value).draw();
+            });
+
+            document.getElementById('statusFilter').addEventListener('change', function() {
+                table.column(5).search(this.value).draw();
+            });
+
+            // Collect drop-down options automatically out of current matrix array nodes if desired
+            // Or add explicit unique search filtering pipelines here!
+        }
+    });
+</script>

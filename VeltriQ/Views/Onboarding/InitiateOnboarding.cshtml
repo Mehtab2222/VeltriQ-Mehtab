@@ -1,0 +1,382 @@
+﻿@model VeltriQ.ViewModels.EmployeeOnboarding.InitiateOnboardingViewModel
+
+@{
+    ViewData["Title"] = "Initiate Onboarding";
+}
+
+<style>
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* ── HEADER & ACTIONS ── */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .page-title h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* ── SUMMARY DATA BAR ── */
+    .custom-alert-info {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        padding: 10px 14px;
+        font-size: 12.5px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+        .custom-alert-info strong {
+            color: var(--purple);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-alert-info span.divider {
+            color: var(--border);
+        }
+
+    /* ── CONTROL CONSOLE ACTION BAR ── */
+    .action-bar {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        margin-bottom: 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 12px 16px;
+    }
+
+    .template-box {
+        width: 320px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+    }
+
+    .custom-select-input {
+        width: 100%;
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+
+        .custom-select-input:focus {
+            border-color: var(--purple);
+        }
+
+    /* ── COMPACT SYSTEM BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover:not(:disabled) {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+        .btn-submit-theme:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--border);
+            color: var(--text-muted);
+        }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    .btn-initiate {
+        min-width: 180px;
+        justify-content: center;
+    }
+
+    /* ── MAX HEIGHT PANEL GRID WITH HORIZONTAL OVERFLOW HANDLING ── */
+    .table-panel {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 220px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+        /* ── 🛠️ NEW MICRO-THIN CLEAN THEMED SCROLLBARS ── */
+        .table-wrapper::-webkit-scrollbar {
+            width: 4px; /* Drastically minimized thin profile height/width */
+            height: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+            .table-wrapper::-webkit-scrollbar-thumb:hover {
+                background: var(--purple);
+            }
+
+    .designer-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .designer-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .designer-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .designer-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .designer-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    .custom-check-input {
+        width: 14px;
+        height: 14px;
+        accent-color: var(--purple);
+        cursor: pointer;
+        display: block;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        color: var(--text-secondary) !important;
+        font-size: 12px;
+        padding: 12px 16px;
+    }
+</style>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <div class="page-title">
+            <h3>Initiate Onboarding</h3>
+        </div>
+        <div>
+            <a asp-action="Index" class="form-action-btn btn-cancel-theme">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="custom-alert-info">
+        <strong>Selected Template :</strong> <span id="infoTemplateName">None</span>
+        <span class="divider">|</span>
+        <strong>Eligible Candidates :</strong> <span>@(Model.Candidates?.Count ?? 0) Found</span>
+    </div>
+
+    <form asp-action="InitiateOnboarding" method="post" id="onboardingLaunchForm">
+        @Html.AntiForgeryToken()
+
+        <div class="action-bar">
+            <div class="template-box">
+                <label class="form-label">Onboarding Template</label>
+                <select asp-for="OnboardingTemplateId" asp-items="Model.Templates" id="templateSelector" class="custom-select-input">
+                    <option value="">Select Template</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" id="btnSubmitInitiate" class="form-action-btn btn-submit-theme btn-initiate" disabled>
+                    <i class="bi bi-send-check"></i> Initiate Onboarding
+                </button>
+            </div>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-wrapper">
+                <table class="designer-table" id="candidateTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="checkAll" class="custom-check-input" />
+                            </th>
+                            <th>Candidate Name</th>
+                            <th>Mobile</th>
+                            <th>Email Address</th>
+                            <th>Nationality</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Employment Type</th>
+                            <th>Job Profile</th>
+                            <th>Reference No.</th>
+                            <th>Joining Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Candidates != null && Model.Candidates.Count > 0)
+                        {
+                            for (int i = 0; i < Model.Candidates.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        <input asp-for="Candidates[i].IsSelected" class="custom-check-input candidate-check" />
+                                        <input type="hidden" asp-for="Candidates[i].OnboardingCandidateId" />
+                                    </td>
+                                    <td style="font-weight: 600;">@Model.Candidates[i].FullName</td>
+                                    <td>@Model.Candidates[i].MobileNumber</td>
+                                    <td>@Model.Candidates[i].Email</td>
+                                    <td>@(string.IsNullOrEmpty(Model.Candidates[i].Nationality) ? "-" : Model.Candidates[i].Nationality)</td>
+                                    <td>@Model.Candidates[i].Department</td>
+                                    <td>@Model.Candidates[i].Designation</td>
+                                    <td>@Model.Candidates[i].EmploymentType</td>
+                                    <td>@(string.IsNullOrEmpty(Model.Candidates[i].JobProfile) ? "-" : Model.Candidates[i].JobProfile)</td>
+                                    <td class="text-muted">@(string.IsNullOrEmpty(Model.Candidates[i].ManpowerRequestCode) ? "-" : Model.Candidates[i].ManpowerRequestCode)</td>
+                                    <td style="font-weight: 600; color: var(--purple);">
+                                        @(Model.Candidates[i].ExpectedJoiningDate?.ToString("dd MMM yyyy") ?? "-")
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="11" class="text-center py-5" style="border: none;">
+                                    <i class="bi bi-person-check text-muted d-block mb-2" style="font-size: 32px; opacity: 0.4;"></i>
+                                    <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">No candidates are currently available for onboarding.</div>
+                                    <div style="color: var(--text-muted); font-size: 11px; margin-top: 2px;">Candidates whose offers have been accepted will appear here.</div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const templateSelector = document.getElementById("templateSelector");
+        const btnSubmitInitiate = document.getElementById("btnSubmitInitiate");
+        const infoTemplateName = document.getElementById("infoTemplateName");
+        const checkAll = document.getElementById("checkAll");
+        const candidateChecks = document.querySelectorAll(".candidate-check");
+
+        function validateTemplateSelection() {
+            if (templateSelector && templateSelector.value !== "") {
+                btnSubmitInitiate.disabled = false;
+                infoTemplateName.textContent = templateSelector.options[templateSelector.selectedIndex].text;
+                infoTemplateName.style.color = "var(--purple)";
+            } else {
+                btnSubmitInitiate.disabled = true;
+                infoTemplateName.textContent = "None";
+                infoTemplateName.style.color = "var(--text-primary)";
+            }
+        }
+
+        if (templateSelector) {
+            templateSelector.addEventListener("change", validateTemplateSelection);
+            validateTemplateSelection();
+        }
+
+        if (checkAll) {
+            checkAll.addEventListener("change", function () {
+                candidateChecks.forEach(cb => {
+                    if(!cb.disabled) {
+                        cb.checked = checkAll.checked;
+                    }
+                });
+            });
+        }
+
+        if (typeof $ !== 'undefined' && $.fn.DataTable && document.querySelector('#candidateTable tbody tr .candidate-check')) {
+            $('#candidateTable').DataTable({
+                pageLength: 10,
+                responsive: false,
+                ordering: true,
+                searching: true,
+                info: true,
+                lengthChange: false
+            });
+        }
+    });
+</script>

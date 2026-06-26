@@ -1,7 +1,7 @@
 ﻿@using VeltriQ.Services.Interfaces
 @inject IMenuService MenuService
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" id="vqRoot">
 
 <head>
     <meta charset="utf-8" />
@@ -13,13 +13,17 @@
     <style>
 
         /* ═══════════════════════════════════════
-                   CSS VARIABLES these are the css variables
+                   CSS VARIABLES
+                   Dark theme (default)
                 ═══════════════════════════════════════ */
         :root {
             --bg: #0d1117;
             --sidebar-bg: #0d1117;
             --sidebar-border: rgba(255,255,255,0.05);
             --sidebar-text: #6b7280;
+            --sidebar-text-hover: #ffffff;
+            --sidebar-active-bg: linear-gradient(90deg, #6d28d9, #7c3aed);
+            --sidebar-active-color: #ffffff;
             --card-bg: #161b22;
             --topbar-bg: #0d1117;
             --text-primary: #f1f5f9;
@@ -29,8 +33,52 @@
             --input-bg: #0d1117;
             --hover-bg: rgba(124,58,237,.1);
             --purple: #7c3aed;
+            --accent: #7c3aed;
+            --accent-hover: rgba(124,58,237,0.18);
+            --accent-border: rgba(124,58,237,0.25);
+            --accent-text: #c4b5fd;
+            --company-btn-bg: rgba(124,58,237,0.1);
+            --company-drop-bg: #161b22;
+            --company-drop-border: #21262d;
+            --logo-text-color: #ffffff;
+            --notif-border: var(--topbar-bg);
+            --scrollbar-thumb: rgba(124,58,237,.3);
             --topbar-h: 52px;
             --sidebar-w: 220px;
+        }
+
+        /* ═══════════════════════════════════════
+                   LIGHT THEME
+                   Sidebar/topbar: #2C0023 (deep burgundy)
+                   Content: clean white
+                ═══════════════════════════════════════ */
+        [data-theme="light"] {
+            --bg: #f5f3f7;
+            --sidebar-bg: #2C0023;
+            --sidebar-border: rgba(255,255,255,0.10);
+            --sidebar-text: rgba(255,255,255,0.55);
+            --sidebar-text-hover: #ffffff;
+            --sidebar-active-bg: rgba(255,255,255,0.15);
+            --sidebar-active-color: #ffffff;
+            --card-bg: #ffffff;
+            --topbar-bg: #2C0023;
+            --text-primary: #1a0f18;
+            --text-secondary: #6b546a;
+            --text-muted: #9e809c;
+            --border: #e4d8e2;
+            --input-bg: #ffffff;
+            --hover-bg: rgba(255,255,255,0.10);
+            --purple: #2C0023;
+            --accent: #2C0023;
+            --accent-hover: rgba(44,0,35,0.12);
+            --accent-border: rgba(44,0,35,0.2);
+            --accent-text: #ffffff;
+            --company-btn-bg: rgba(255,255,255,0.12);
+            --company-drop-bg: #ffffff;
+            --company-drop-border: #e4d8e2;
+            --logo-text-color: #ffffff;
+            --notif-border: #2C0023;
+            --scrollbar-thumb: rgba(44,0,35,0.25);
         }
 
         /* ═══════════════════════════════════════
@@ -119,7 +167,7 @@
         .logo-text {
             font-size: 14px;
             font-weight: 800;
-            color: #fff;
+            color: var(--logo-text-color);
             letter-spacing: -.3px;
             line-height: 1.2;
         }
@@ -171,13 +219,13 @@
 
                 .sidebar-menu a:hover {
                     background: var(--hover-bg);
-                    color: #fff;
+                    color: var(--sidebar-text-hover);
                 }
 
                 .sidebar-menu a.active {
-                    background: linear-gradient(90deg, #6d28d9, #7c3aed);
-                    color: #fff;
-                    box-shadow: 0 4px 12px rgba(109,40,217,.28);
+                    background: var(--sidebar-active-bg);
+                    color: var(--sidebar-active-color);
+                    box-shadow: none;
                 }
 
             .sidebar-menu i {
@@ -253,8 +301,8 @@
         }
 
             .submenu a:hover {
-                background: rgba(124,58,237,.12);
-                color: #fff;
+                background: var(--hover-bg);
+                color: var(--sidebar-text-hover);
             }
 
         .submenu i {
@@ -381,7 +429,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--topbar-bg);
+            border: 2px solid var(--notif-border);
         }
 
         .tb-sep {
@@ -441,7 +489,7 @@
             background: var(--bg);
             /* invisible scrollbar */
             scrollbar-width: thin;
-            scrollbar-color: rgba(124,58,237,.3) transparent;
+            scrollbar-color: var(--scrollbar-thumb) transparent;
         }
 
             .content-area::-webkit-scrollbar {
@@ -453,7 +501,7 @@
             }
 
             .content-area::-webkit-scrollbar-thumb {
-                background: rgba(124,58,237,.3);
+                background: var(--scrollbar-thumb);
                 border-radius: 4px;
             }
 
@@ -483,9 +531,13 @@
             transition: transform .2s, box-shadow .2s;
         }
 
+        [data-theme="light"] .float-btn {
+            background: linear-gradient(135deg, #3d0032, #2C0023);
+            box-shadow: 0 6px 20px rgba(44,0,35,.35);
+        }
+
             .float-btn:hover {
                 transform: scale(1.08);
-                box-shadow: 0 10px 28px rgba(109,40,217,.5);
             }
 
         .company-switcher {
@@ -496,11 +548,11 @@
             display: flex;
             align-items: center;
             gap: 7px;
-            background: rgba(124,58,237,0.1);
-            border: 1px solid rgba(124,58,237,0.25);
+            background: var(--company-btn-bg);
+            border: 1px solid var(--accent-border);
             border-radius: 9px;
             padding: 5px 12px;
-            color: #c4b5fd;
+            color: var(--accent-text);
             font-size: 12.5px;
             font-weight: 600;
             font-family: inherit;
@@ -510,8 +562,8 @@
         }
 
             .company-switch-btn:hover {
-                background: rgba(124,58,237,0.18);
-                border-color: rgba(124,58,237,0.45);
+                background: var(--accent-hover);
+                border-color: var(--accent-border);
             }
 
             .company-switch-btn i {
@@ -522,12 +574,12 @@
             position: absolute;
             top: calc(100% + 8px);
             left: 0;
-            background: #161b22;
-            border: 1px solid #21262d;
+            background: var(--company-drop-bg);
+            border: 1px solid var(--company-drop-border);
             border-radius: 12px;
             padding: 8px;
             min-width: 220px;
-            box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.18);
             display: none;
             z-index: 500;
         }
@@ -556,11 +608,11 @@
         }
 
             .company-drop-item:hover {
-                background: rgba(124,58,237,0.1);
+                background: var(--accent-hover);
             }
 
             .company-drop-item.active {
-                background: rgba(124,58,237,0.12);
+                background: var(--accent-hover);
             }
 
         .co-initial {
@@ -580,17 +632,17 @@
         .co-dname {
             font-size: 12.5px;
             font-weight: 600;
-            color: #f1f5f9;
+            color: var(--text-primary);
         }
 
         .co-dcode {
             font-size: 11px;
-            color: #6b7280;
+            color: var(--text-muted);
         }
 
         .co-check {
             margin-left: auto;
-            color: #7c3aed;
+            color: var(--accent);
             font-size: 14px;
             font-weight: 700;
         }
@@ -752,11 +804,31 @@
                             <span>Onboarding</span>
                             <i class="bi bi-chevron-down dropdown-icon"></i>
                         </a>
+
                         <ul class="submenu">
-                            <li><a href="#"><i class="bi bi-person-check"></i>Candidate Onboarding</a></li>
-                            <li><a href="#"><i class="bi bi-file-earmark-medical"></i>Document Verification</a></li>
-                            <li><a href="#"><i class="bi bi-card-checklist"></i>Joining Checklist</a></li>
-                            <li><a href="#"><i class="bi bi-bag-check"></i>Asset Allocation</a></li>
+                            <li>
+                                <a asp-controller="Onboarding" asp-action="Dashboard">
+                                    <i class="bi bi-speedometer2"></i>Dashboard
+                                </a>
+                            </li>
+
+                            <li>
+                                <a asp-controller="Onboarding" asp-action="Documents">
+                                    <i class="bi bi-folder2-open"></i>Documents
+                                </a>
+                            </li>
+
+                            <li>
+                                <a asp-controller="Onboarding" asp-action="Policies">
+                                    <i class="bi bi-file-earmark-text"></i>Policies
+                                </a>
+                            </li>
+
+                            <li>
+                                <a asp-controller="Onboarding" asp-action="Activities">
+                                    <i class="bi bi-activity"></i>Activities
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
@@ -956,12 +1028,35 @@
 
     <!-- Floating theme toggle -->
     <div class="float-settings">
-        <button class="float-btn" title="Appearance">
-            <i class="bi bi-moon-fill"></i>
+        <button class="float-btn" id="themeToggleBtn" title="Toggle theme" onclick="toggleTheme()">
+            <i class="bi bi-moon-fill" id="themeIcon"></i>
         </button>
     </div>
 
     <script>
+        // ── Theme toggle ──────────────────────────────
+        (function () {
+            var saved = localStorage.getItem('vq-theme') || 'dark';
+            document.getElementById('vqRoot').setAttribute('data-theme', saved);
+            updateThemeIcon(saved);
+        })();
+
+        function toggleTheme() {
+            var root = document.getElementById('vqRoot');
+            var current = root.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('vq-theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            var icon = document.getElementById('themeIcon');
+            if (!icon) return;
+            icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+        }
+        // ── End theme toggle ──────────────────────────
+
         // Dropdown toggles
         document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
             toggle.addEventListener('click', function() {
