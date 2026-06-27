@@ -1,0 +1,70 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
+
+<div id="portal_documents">
+    <div class="responsive-table-holder">
+        <table class="viewport-grid-table">
+            <thead>
+                <tr>
+                    <th>Document</th>
+                    <th style="width: 120px;">Mandatory</th>
+                    <th style="width: 120px;">Uploaded</th>
+                    <th style="width: 120px;">Verified</th>
+                    <th>Uploaded On</th>
+                    <th style="width: 100px; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.DocumentsList != null && Model.DocumentsList.Any())
+                {
+                    foreach (var doc in Model.DocumentsList)
+                    {
+                        <tr>
+                            <td style="font-weight: 600;">@doc.DocumentName</td>
+                            <td class="text-muted">@(doc.IsMandatory ? "Yes" : "No")</td>
+                            <td>
+                                <i class="bi @(doc.IsUploaded ? "bi-check2 text-success" : "bi-dash text-muted")"></i>
+                            </td>
+                            <td>
+                                @if (doc.IsUploaded)
+                                {
+                                    <span class="status-pill @(doc.IsVerified ? "status-approved" : "status-progress")">
+                                        @(doc.IsVerified ? "Verified" : "Pending")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="text-muted">@(doc.UploadedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                            <td style="text-align: right;">
+                                @if (Model.Status == "Submitted")
+                                {
+                                    <a class="btn-action-mini disabled" href="javascript:void(0);">
+                                        <i class="bi bi-lock"></i> Locked
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="btn-action-mini"
+                                       asp-action="UploadDocument"
+                                       asp-route-id="@doc.EmployeeOnboardingDocumentId">
+                                        <i class="bi bi-upload"></i> Upload
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            No document uploads assigned.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

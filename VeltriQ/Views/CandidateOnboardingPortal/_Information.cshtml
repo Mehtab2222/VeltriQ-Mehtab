@@ -1,0 +1,233 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
+
+<style>
+    /* ── UNIFIED HIGH-DENSITY SPLIT-PANEL LAYOUT ── */
+    .information-split-pane {
+        display: flex;
+        gap: 16px;
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    /* Left Sidebar Navigation Controls */
+    .info-panel-sidebar {
+        width: 240px;
+        flex-shrink: 0;
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+    }
+
+    .info-sidebar-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--hover-bg);
+    }
+    .info-sidebar-header h5 {
+        margin: 0;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-list-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+        text-decoration: none;
+        border-bottom: 1px solid var(--border);
+        transition: background-color 0.1s ease, color 0.1s ease;
+    }
+    .info-list-item:last-child {
+        border-bottom: none;
+    }
+    .info-list-item:hover,
+    .info-list-item.active {
+        background: var(--hover-bg);
+        color: var(--purple);
+    }
+
+    .info-item-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Right Main Form Workspace Viewport */
+    .info-panel-workspace {
+        flex: 1;
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        min-height: 380px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-workspace-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--hover-bg);
+    }
+    .info-workspace-header h5 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .info-workspace-body {
+        padding: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Empty State Displays */
+    .info-empty-placeholder {
+        margin: auto;
+        text-align: center;
+        color: var(--text-secondary);
+        max-width: 280px;
+        padding: 32px 16px;
+    }
+    .info-empty-placeholder i {
+        font-size: 24px;
+        opacity: 0.4;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--purple);
+    }
+    .info-empty-placeholder h6 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    /* Mini Themed Status Badges */
+    .status-badge-mini {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+    .badge-mini-success {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+    .badge-mini-pending {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    /* ── 📱 RESPONSIVE BREAKPOINTS ── */
+    @@media (max-width: 768px) {
+        .information-split-pane {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        .info-panel-sidebar {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="information-split-pane">
+
+    <!-- LEFT SIDEBAR TRACK NAVIGATOR -->
+    <div class="info-panel-sidebar">
+        <div class="info-sidebar-header">
+            <h5>Sections</h5>
+        </div>
+        <div class="info-list-group">
+            @foreach (var item in Model.Sections.OrderBy(x => x.DisplayOrder))
+            {
+                <a href="#"
+                   class="info-list-item onboarding-section"
+                   data-section="@item.SectionName">
+
+                    <span class="info-item-label">@item.SectionName</span>
+
+                    @if (item.IsCompleted)
+                    {
+                        <span class="status-badge-mini badge-mini-success">
+                            <i class="bi bi-check-lg"></i>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="status-badge-mini badge-mini-pending">
+                            Pending
+                        </span>
+                    }
+                </a>
+            }
+            else
+            {
+                <div class="text-muted p-3 text-center" style="font-size: 12px; font-style: italic;">
+                    No operational sections configured.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- RIGHT WORKSPACE DECK VIEWPORT -->
+    <div class="info-panel-workspace">
+        <div class="info-workspace-header">
+            <h5 id="workspaceTitle">Personal Information</h5>
+        </div>
+        <div class="info-workspace-body" id="workspace">
+            
+            <!-- Default Content Viewport Layout -->
+            <div class="info-empty-placeholder">
+                <i class="bi bi-person-vcard"></i>
+                <h6>Select a section to begin onboarding.</h6>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- HIGH-PERFORMANCE INTERACTIVE PREDEFINED WORKSPACE LOADER -->
+<script>
+    $(document).ready(function () {
+        $(".onboarding-section").click(function (e) {
+            e.preventDefault();
+
+            // Handle UI active status highlight cleanly
+            $(".onboarding-section").removeClass("active");
+            $(this).addClass("active");
+
+            var section = $(this).data("section");
+            $("#workspaceTitle").text(section);
+
+            // Display loading indicator inside layout container
+            $("#workspace").html(`
+                <div style="margin: auto; text-align: center; color: var(--text-secondary); font-size: 12.5px; padding: 32px 0;">
+                    <span class="spinner-border spinner-border-sm text-purple me-2" role="status" style="border-width: 1.5px; width: 14px; height: 14px; color: var(--purple);"></span>
+                    Retrieving form options...
+                </div>
+            `);
+
+            // Execute asynchronous jQuery route injection parameters
+            $("#workspace").load(
+                "/CandidateOnboardingPortal/LoadInformationSection?section=" +
+                encodeURIComponent(section)
+            );
+        });
+    });
+</script>

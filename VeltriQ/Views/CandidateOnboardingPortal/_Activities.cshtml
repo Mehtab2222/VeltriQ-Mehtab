@@ -1,0 +1,38 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
+
+<div id="portal_activities">
+    <div class="responsive-table-holder">
+        <table class="viewport-grid-table">
+            <thead>
+                <tr>
+                    <th>Activity Name</th>
+                    <th style="width: 120px;">Completed</th>
+                    <th>Completed On</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ActivitiesList != null && Model.ActivitiesList.Any())
+                {
+                    foreach (var act in Model.ActivitiesList)
+                    {
+                        <tr>
+                            <td style="font-weight: 600;">@act.ActivityName</td>
+                            <td>
+                                <i class="bi @(act.IsCompleted ? "bi-check2 text-success" : "bi-dash text-muted")"></i>
+                            </td>
+                            <td class="text-muted">@(act.CompletedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            No operational action items assigned.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

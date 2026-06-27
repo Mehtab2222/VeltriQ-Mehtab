@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VeltriQ.Data;
 using VeltriQ.Models.Core;
+using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.ViewModels.EmployeeOnboarding;
 
 namespace VeltriQ.Controllers
@@ -97,9 +98,6 @@ namespace VeltriQ.Controllers
 
         #region Initiate Onboarding
 
-        //============================================================
-        // INDEX
-        //============================================================
 
         [HttpGet]
         public async Task<IActionResult> InitiateOnboarding()
@@ -112,41 +110,297 @@ namespace VeltriQ.Controllers
 
             return View(model);
         }
+        private async Task CopySections
+(
+    int employeeOnboardingId,
+    int onboardingTemplateId
+)
+        {
+            var templateSections = await _context.OnboardingTemplateSections
 
-        //============================================================
-        // POST
-        //============================================================
+                .Where(x =>
+                    x.OnboardingTemplateId == onboardingTemplateId &&
+                    x.IsActive)
 
+                .OrderBy(x => x.DisplayOrder)
+
+                .ToListAsync();
+
+            if (!templateSections.Any())
+                return;
+
+            var employeeSections = templateSections.Select(x =>
+                new EmployeeOnboardingSection
+                {
+                    EmployeeOnboardingId = employeeOnboardingId,
+
+                    OnboardingSectionMasterId = x.OnboardingSectionMasterId,
+
+                    IsMandatory = x.IsMandatory,
+
+                    DisplayOrder = x.DisplayOrder,
+
+                    IsCompleted = false,
+
+                    IsActive = true,
+
+                    CreatedOn = DateTime.Now
+                });
+
+            await _context.EmployeeOnboardingSections.AddRangeAsync(employeeSections);
+        }
+        private async Task CopyDocuments
+(
+    int employeeOnboardingId,
+    int onboardingTemplateId
+)
+        {
+            var templateDocuments = await _context.OnboardingTemplateDocuments
+
+                .Where(x =>
+                    x.OnboardingTemplateId == onboardingTemplateId &&
+                    x.IsActive)
+
+                .OrderBy(x => x.DisplayOrder)
+
+                .ToListAsync();
+
+            if (!templateDocuments.Any())
+                return;
+
+            var employeeDocuments = templateDocuments.Select(x =>
+                new EmployeeOnboardingDocument
+                {
+                    EmployeeOnboardingId = employeeOnboardingId,
+
+                    OnboardingDocumentMasterId = x.OnboardingDocumentMasterId,
+
+                    IsMandatory = x.IsMandatory,
+
+                    DisplayOrder = x.DisplayOrder,
+
+                    IsUploaded = false,
+
+                    IsVerified = false,
+
+                    IsActive = true,
+
+                    CreatedOn = DateTime.Now
+                });
+
+            await _context.EmployeeOnboardingDocuments.AddRangeAsync(employeeDocuments);
+        }
+        private async Task CopyPolicies
+(
+    int employeeOnboardingId,
+    int onboardingTemplateId
+)
+        {
+            var templatePolicies = await _context.OnboardingTemplatePolicies
+
+                .Where(x =>
+                    x.OnboardingTemplateId == onboardingTemplateId &&
+                    x.IsActive)
+
+                .OrderBy(x => x.DisplayOrder)
+
+                .ToListAsync();
+
+            if (!templatePolicies.Any())
+                return;
+
+            var employeePolicies = templatePolicies.Select(x =>
+                new EmployeeOnboardingPolicy
+                {
+                    EmployeeOnboardingId = employeeOnboardingId,
+
+                    OnboardingPolicyMasterId = x.OnboardingPolicyMasterId,
+
+                    IsMandatory = x.IsMandatory,
+
+                    DisplayOrder = x.DisplayOrder,
+
+                    IsAccepted = false,
+
+                    IsActive = true,
+
+                    CreatedOn = DateTime.Now
+                });
+
+            await _context.EmployeeOnboardingPolicies.AddRangeAsync(employeePolicies);
+        }
+        private async Task CopyActivities
+            (
+                int employeeOnboardingId,
+                int onboardingTemplateId
+            )
+        {
+            var templateActivities = await _context.OnboardingTemplateActivities
+
+                .Where(x =>
+                    x.OnboardingTemplateId == onboardingTemplateId &&
+                    x.IsActive)
+
+                .OrderBy(x => x.DisplayOrder)
+
+                .ToListAsync();
+
+            if (!templateActivities.Any())
+                return;
+
+            var employeeActivities = templateActivities.Select(x =>
+                new EmployeeOnboardingActivity
+                {
+                    EmployeeOnboardingId = employeeOnboardingId,
+
+                    OnboardingActivityMasterId = x.OnboardingActivityMasterId,
+
+                    DisplayOrder = x.DisplayOrder,
+
+                    IsCompleted = false,
+
+                    IsActive = true,
+
+                    CreatedOn = DateTime.Now
+                });
+
+            await _context.EmployeeOnboardingActivities.AddRangeAsync(employeeActivities);
+        }
+        private async Task GenerateOnboardingPipeline(EmployeeOnboarding onboarding)
+        {
+            await CopySections(
+                onboarding.EmployeeOnboardingId,
+                onboarding.OnboardingTemplateId);
+
+            await CopyDocuments(
+                onboarding.EmployeeOnboardingId,
+                onboarding.OnboardingTemplateId);
+
+            await CopyPolicies(
+                onboarding.EmployeeOnboardingId,
+                onboarding.OnboardingTemplateId);
+
+            await CopyActivities(
+                onboarding.EmployeeOnboardingId,
+                onboarding.OnboardingTemplateId);
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> InitiateOnboarding
-        (
-            InitiateOnboardingViewModel model
-        )
+        public async Task<IActionResult> InitiateOnboarding(InitiateOnboardingViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 await LoadDropdowns(model);
+                await LoadCandidates(model);
+                return View(model);
+            }
 
+            var selectedCandidates = model.Candidates
+                .Where(x => x.IsSelected)
+                .ToList();
+
+            if (!selectedCandidates.Any())
+            {
+                ModelState.AddModelError("", "Please select at least one candidate.");
+
+                await LoadDropdowns(model);
                 await LoadCandidates(model);
 
                 return View(model);
             }
 
-            // We will implement the onboarding generation logic next.
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            TempData["Success"] = "Selected candidates have been initiated successfully.";
+            try
+            {
+                foreach (var candidate in selectedCandidates)
+                {
+                    bool alreadyExists = await _context.EmployeeOnboardings
+                        .AnyAsync(x =>
+                            x.OnboardingCandidateId == candidate.OnboardingCandidateId &&
+                            x.IsActive);
 
-            return RedirectToAction(nameof(InitiateOnboarding));
+                    if (alreadyExists)
+                        continue;
+
+                    var onboarding = new EmployeeOnboarding
+                    {
+                        OnboardingCandidateId = candidate.OnboardingCandidateId,
+                        OnboardingTemplateId = model.OnboardingTemplateId,
+                        OnboardingStatusMasterId = 2, // INVITED
+                        AssignedOn = DateTime.Now,
+                        CompletionPercentage = 0,
+                        IsActive = true,
+                        CreatedOn = DateTime.Now
+                    };
+
+                    // Create parent record
+                    _context.EmployeeOnboardings.Add(onboarding);
+
+                    // Save immediately to generate EmployeeOnboardingId
+                    await _context.SaveChangesAsync();
+
+                    // Copy template sections
+                    await GenerateOnboardingPipeline(onboarding);
+                    //============================================================
+                    // Create Candidate Portal Invitation
+                    //============================================================
+
+                    var invitation = new OnboardingCandidateInvitation
+                    {
+                        OnboardingCandidateId = onboarding.OnboardingCandidateId,
+
+                        EmployeeOnboardingId = onboarding.EmployeeOnboardingId,
+
+                        InvitationToken = Guid.NewGuid().ToString(),
+
+                        InvitedOn = DateTime.Now,
+
+                        ExpiryDate = DateTime.Now.AddDays(7),
+
+                        InvitationCount = 1,
+
+                        IsInvitationAccepted = false,
+
+                        IsPortalAccessEnabled = true,
+
+                        IsActive = true,
+
+                        CreatedOn = DateTime.Now
+                    };
+
+                    _context.OnboardingCandidateInvitations.Add(invitation);
+
+                    // Update candidate status
+                    var onboardingCandidate = await _context.OnboardingCandidates
+                        .FirstOrDefaultAsync(x =>
+                            x.OnboardingCandidateId == candidate.OnboardingCandidateId);
+
+                    if (onboardingCandidate != null)
+                    {
+                        onboardingCandidate.OnboardingStatusMasterId = 2; // INVITED
+                    }
+                }
+
+                // Save copied sections and candidate status changes
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                TempData["Success"] = "Onboarding initiated successfully.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         #endregion
 
         #region Private Methods
-
-        //------------------------------------------------------------
-        // Load Templates
-        //------------------------------------------------------------
 
         private async Task LoadDropdowns
         (
@@ -165,10 +419,6 @@ namespace VeltriQ.Controllers
                 })
                 .ToListAsync();
         }
-
-        //------------------------------------------------------------
-        // Load Candidates
-        //------------------------------------------------------------
 
         private async Task LoadCandidates
 (
@@ -222,6 +472,94 @@ namespace VeltriQ.Controllers
                 })
 
                 .ToListAsync();
+        }
+        public async Task<IActionResult> Details(int id)
+        {
+            var onboarding = await _context.EmployeeOnboardings
+
+                .Include(x => x.OnboardingCandidate)
+                    .ThenInclude(x => x.Department)
+
+                .Include(x => x.OnboardingCandidate)
+                    .ThenInclude(x => x.Designation)
+
+                .Include(x => x.OnboardingCandidate)
+                    .ThenInclude(x => x.EmploymentType)
+
+                .Include(x => x.OnboardingTemplate)
+
+                .Include(x => x.OnboardingStatus)
+
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingId == id);
+
+            if (onboarding == null)
+                return NotFound();
+
+            var model = new EmployeeOnboardingDetailsViewModel
+            {
+                EmployeeOnboardingId = onboarding.EmployeeOnboardingId,
+
+                OnboardingCandidateId = onboarding.OnboardingCandidateId,
+
+                CandidateCode = onboarding.OnboardingCandidate.CandidateCode,
+
+                CandidateName = onboarding.OnboardingCandidate.FullName,
+
+                Email = onboarding.OnboardingCandidate.Email,
+
+                MobileNumber = onboarding.OnboardingCandidate.MobileNumber ?? "",
+
+                Department = onboarding.OnboardingCandidate.Department.DepartmentName,
+
+                Designation = onboarding.OnboardingCandidate.Designation.DesignationName,
+
+                EmploymentType = onboarding.OnboardingCandidate.EmploymentType.EmploymentTypeName,
+
+                TemplateName = onboarding.OnboardingTemplate.TemplateName,
+
+                Status = onboarding.OnboardingStatus.StatusName,
+
+                CompletionPercentage = onboarding.CompletionPercentage,
+
+                AssignedOn = onboarding.AssignedOn,
+
+                ExpectedJoiningDate = onboarding.OnboardingCandidate.ExpectedJoiningDate,
+
+                TotalSections = await _context.EmployeeOnboardingSections
+                    .CountAsync(x => x.EmployeeOnboardingId == id),
+
+                CompletedSections = await _context.EmployeeOnboardingSections
+                    .CountAsync(x =>
+                        x.EmployeeOnboardingId == id &&
+                        x.IsCompleted),
+
+                TotalDocuments = await _context.EmployeeOnboardingDocuments
+                    .CountAsync(x => x.EmployeeOnboardingId == id),
+
+                UploadedDocuments = await _context.EmployeeOnboardingDocuments
+                    .CountAsync(x =>
+                        x.EmployeeOnboardingId == id &&
+                        x.IsUploaded),
+
+                TotalPolicies = await _context.EmployeeOnboardingPolicies
+                    .CountAsync(x => x.EmployeeOnboardingId == id),
+
+                AcceptedPolicies = await _context.EmployeeOnboardingPolicies
+                    .CountAsync(x =>
+                        x.EmployeeOnboardingId == id &&
+                        x.IsAccepted),
+
+                TotalActivities = await _context.EmployeeOnboardingActivities
+                    .CountAsync(x => x.EmployeeOnboardingId == id),
+
+                CompletedActivities = await _context.EmployeeOnboardingActivities
+                    .CountAsync(x =>
+                        x.EmployeeOnboardingId == id &&
+                        x.IsCompleted)
+            };
+
+            return View(model);
         }
 
         #endregion

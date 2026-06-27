@@ -1,0 +1,63 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
+
+<div id="portal_policies">
+    <div class="responsive-table-holder">
+        <table class="viewport-grid-table">
+            <thead>
+                <tr>
+                    <th>Policy Name</th>
+                    <th style="width: 120px;">Mandatory</th>
+                    <th style="width: 120px;">Accepted</th>
+                    <th>Accepted On</th>
+                    <th style="width: 100px; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.PoliciesList != null && Model.PoliciesList.Any())
+                {
+                    foreach (var policy in Model.PoliciesList)
+                    {
+                        <tr>
+                            <td style="font-weight: 600;">@policy.PolicyName</td>
+                            <td class="text-muted">@(policy.IsMandatory ? "Yes" : "No")</td>
+                            <td>
+                                <i class="bi @(policy.IsAccepted ? "bi-check2 text-success" : "bi-hourglass-split text-warning")"></i>
+                            </td>
+                            <td class="text-muted">@(policy.AcceptedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                            <td style="text-align: right;">
+                                @if (policy.IsAccepted)
+                                {
+                                    <span class="status-pill status-approved">
+                                        <i class="bi bi-check-all"></i> Signed
+                                    </span>
+                                }
+                                else if (Model.Status == "Submitted")
+                                {
+                                    <a class="btn-action-mini disabled" href="javascript:void(0);">
+                                        <i class="bi bi-lock"></i> Locked
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="btn-action-mini"
+                                       asp-action="ReviewPolicy"
+                                       asp-route-id="@policy.EmployeeOnboardingPolicyId">
+                                        <i class="bi bi-file-earmark-ruled"></i> Review & Sign
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            No system policies require signature tracking at this time.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

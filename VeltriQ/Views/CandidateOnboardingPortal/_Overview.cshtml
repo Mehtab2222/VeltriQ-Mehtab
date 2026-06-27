@@ -1,0 +1,20 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
+
+<div id="portal_overview">
+    <div class="overview-summary-row">
+        <span class="overview-summary-label">Profile Information Sections Completed</span>
+        <span class="overview-summary-value">@Model.CompletedSections / @Model.TotalSections</span>
+    </div>
+    <div class="overview-summary-row">
+        <span class="overview-summary-label">Mandatory Documents Uploaded</span>
+        <span class="overview-summary-value">@Model.UploadedDocuments / @Model.TotalDocuments</span>
+    </div>
+    <div class="overview-summary-row">
+        <span class="overview-summary-label">Company Policies Accepted</span>
+        <span class="overview-summary-value">@Model.AcceptedPolicies / @Model.TotalPolicies</span>
+    </div>
+    <div class="overview-summary-row">
+        <span class="overview-summary-label">Pending Activities Completed</span>
+        <span class="overview-summary-value">@Model.CompletedActivities / @Model.TotalActivities</span>
+    </div>
+</div>

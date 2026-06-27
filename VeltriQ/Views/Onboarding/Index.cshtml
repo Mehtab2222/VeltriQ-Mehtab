@@ -1,4 +1,5 @@
-﻿@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDashboardViewModel
+﻿
+@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDashboardViewModel
 
 @{
     ViewData["Title"] = "Employee Onboarding";
@@ -17,7 +18,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
     }
 
     .page-title h3 {
@@ -64,6 +65,7 @@
         font-weight: 600;
         display: inline-flex;
         align-items: center;
+        gap: 4px;
         text-decoration: none;
         transition: all 0.15s ease;
     }
@@ -86,7 +88,7 @@
         background: var(--card-bg);
         border: 1px solid var(--border);
         padding: 12px 14px;
-        border-radius: 0px; /* Kept sharp and squared */
+        border-radius: 0px;
     }
 
         .dashboard-card h6 {
@@ -105,14 +107,24 @@
             color: var(--text-primary);
         }
 
-    /* ── CONSOLIDATED FILTER PANEL ── */
-    .filter-bar {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 16px;
+    /* ── UNIFIED WORKSPACE PANEL ── */
+    .unified-workspace-panel {
         background: var(--card-bg);
         border: 1px solid var(--border);
-        padding: 12px 16px;
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 240px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .filter-control-deck {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        flex-shrink: 0;
     }
 
     .custom-control {
@@ -124,7 +136,7 @@
         padding: 0 12px;
         font-size: 12.5px;
         outline: none;
-        transition: border-color 0.2s;
+        transition: border-color 0.1s ease;
     }
 
         .custom-control:focus {
@@ -136,21 +148,11 @@
     }
 
     .select-filter {
-        width: 180px;
+        width: 170px;
         cursor: pointer;
     }
 
-    /* ── MAX HEIGHT PANEL GRID WITH MICRO HORIZONTAL OVERFLOW SCROLL ── */
-    .table-panel {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 0px;
-        max-height: calc(100vh - var(--topbar-h) - 290px);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
+    /* Scroll container handles dynamic overflow columns internally */
     .table-wrapper {
         overflow-x: auto;
         overflow-y: auto;
@@ -215,7 +217,7 @@
                 background: var(--hover-bg);
             }
 
-    /* ── THEMED CUSTOM STATE BADGES ── */
+    /* ── STATE VALUE BADGES ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -253,11 +255,16 @@
         background: var(--hover-bg);
         color: var(--text-secondary);
     }
+
+    .dataTables_wrapper .dataTables_info {
+        color: var(--text-secondary) !important;
+        font-size: 12px;
+        padding: 12px 16px;
+    }
 </style>
 
 <div class="page-container">
 
-    <!-- HEADER LAYER -->
     <div class="page-header">
         <div class="page-title">
             <h3>Employee Onboarding</h3>
@@ -269,7 +276,6 @@
         </div>
     </div>
 
-    <!-- METRICS CONSOLE GRIDS -->
     <div class="dashboard-cards">
         <div class="dashboard-card">
             <h6>Total</h6>
@@ -293,31 +299,28 @@
         </div>
     </div>
 
-    <!-- WORKSPACE FILTER ENGINE CONTROLS -->
-    <div class="filter-bar">
-        <input type="text" class="custom-control search-input" id="searchBox" placeholder="Search Candidate..." />
+    <div class="unified-workspace-panel">
 
-        <select class="custom-control select-filter" id="statusFilter">
-            <option value="">All Statuses</option>
-            <option value="Invited">Invited</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Submitted">Submitted</option>
-            <option value="Approved">Approved</option>
-        </select>
+        <div class="filter-control-deck">
+            <input type="text" class="custom-control search-input" id="searchBox" placeholder="Search Candidate..." autocomplete="off" />
 
-        <select class="custom-control select-filter" id="templateFilter">
-            <option value="">All Templates</option>
-            <!-- Dynamically populated or static template lists can go here -->
-        </select>
+            <select class="custom-control select-filter" id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="Invited">Invited</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Submitted">Submitted</option>
+                <option value="Approved">Approved</option>
+            </select>
 
-        <select class="custom-control select-filter" id="deptFilter">
-            <option value="">All Departments</option>
-            <!-- Dynamically populated department elements -->
-        </select>
-    </div>
+            <select class="custom-control select-filter" id="templateFilter">
+                <option value="">All Templates</option>
+            </select>
 
-    <!-- DATA GRID MATRICES PANEL -->
-    <div class="table-panel">
+            <select class="custom-control select-filter" id="deptFilter">
+                <option value="">All Departments</option>
+            </select>
+        </div>
+
         <div class="table-wrapper">
             <table class="designer-table" id="onboardingDashboardTable">
                 <thead>
@@ -329,8 +332,8 @@
                         <th>Assigned Template</th>
                         <th>Status</th>
                         <th>Assigned Date</th>
-                        <th>Progress Status</th>
-                        <th style="width: 80px; text-align: right;">Action</th>
+                        <th>Progress</th>
+                        <th style="width: 80px; text-align: right; padding-right: 16px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -362,9 +365,9 @@
                                 <td style="font-weight: 600; color: var(--purple);">
                                     @item.Completion%
                                 </td>
-                                <td style="text-align: right;">
+                                <td style="text-align: right; padding-right: 16px;">
                                     <a asp-action="Details" asp-route-id="@item.EmployeeOnboardingId" class="btn-table-action">
-                                        View
+                                        <i class="bi bi-eye"></i> View
                                     </a>
                                 </td>
                             </tr>
@@ -376,20 +379,19 @@
                             <td colspan="9" class="text-center py-5" style="border: none;">
                                 <i class="bi bi-people text-muted d-block mb-2" style="font-size: 32px; opacity: 0.4;"></i>
                                 <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">No pipeline records tracked yet.</div>
-                                <div style="color: var(--text-muted); font-size: 11px; margin-top: 2px;">Click "Initiate Onboarding" to assign pipelines to accepted candidates.</div>
+                                <div style="color: var(--text-muted); font-size: 11px; margin-top: 2px;">Click "Initiate Onboarding" to assign workflows to accepted candidates.</div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
+
     </div>
 </div>
 
-<!-- CLIENT PIPELINE INITATION RUNTIMES -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Enforce client side execution of DataTables if loaded
         if (typeof $ !== 'undefined' && $.fn.DataTable && document.querySelector('#onboardingDashboardTable tbody tr .btn-table-action')) {
             const table = $('#onboardingDashboardTable').DataTable({
                 pageLength: 10,
@@ -398,10 +400,9 @@
                 searching: true,
                 info: true,
                 lengthChange: false,
-                dom: 'rtip' // Hides standard native search inputs so your styled custom row fields control it instead
+                dom: 'rtip'
             });
 
-            // Bind global input variables cleanly to dashboard search logic
             document.getElementById('searchBox').addEventListener('input', function() {
                 table.search(this.value).draw();
             });
@@ -409,9 +410,7 @@
             document.getElementById('statusFilter').addEventListener('change', function() {
                 table.column(5).search(this.value).draw();
             });
-
-            // Collect drop-down options automatically out of current matrix array nodes if desired
-            // Or add explicit unique search filtering pipelines here!
         }
     });
 </script>
+

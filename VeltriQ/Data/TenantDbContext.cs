@@ -96,6 +96,15 @@ namespace VeltriQ.Data
         public DbSet<OnboardingTemplateSection> OnboardingTemplateSections { get; set; }
         public DbSet<EmployeeOnboarding> EmployeeOnboardings { get; set; }
         public DbSet<OnboardingCandidate> OnboardingCandidates { get; set; }
+        public DbSet<EmployeeOnboardingSection> EmployeeOnboardingSections { get; set; }
+        public DbSet<EmployeeOnboardingDocument> EmployeeOnboardingDocuments { get; set; }
+        public DbSet<EmployeeOnboardingPolicy> EmployeeOnboardingPolicies { get; set; }
+        public DbSet<EmployeeOnboardingActivity> EmployeeOnboardingActivities { get; set; }
+        public DbSet<EmployeeOnboardingPersonalInformation> EmployeeOnboardingPersonalInformations { get; set; }
+        public DbSet<EmployeeOnboardingAddress> EmployeeOnboardingAddresses { get; set; }
+        public DbSet<EmployeeOnboardingEducation> EmployeeOnboardingEducations { get; set; }
+        public DbSet<EmployeeOnboardingExperience> EmployeeOnboardingExperiences { get; set; }
+        public DbSet<OnboardingCandidateInvitation> OnboardingCandidateInvitations { get; set; }
 
         // =========================
         // MAP SCHEMAS
@@ -107,11 +116,69 @@ namespace VeltriQ.Data
         )
         {
             base.OnModelCreating(modelBuilder);
+            //============================================================
+            // Candidate Invitation
+            //============================================================
 
+            modelBuilder.Entity<OnboardingCandidateInvitation>()
+                .HasOne(x => x.OnboardingCandidate)
+                .WithMany()
+                .HasForeignKey(x => x.OnboardingCandidateId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<OnboardingCandidateInvitation>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<OnboardingCandidateInvitation>()
+                .HasIndex(x => x.InvitationToken)
+                .IsUnique();
+            //============================================================
+            // Employee Onboarding Runtime
+            //============================================================
+
+            modelBuilder.Entity<EmployeeOnboardingPersonalInformation>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingPersonalInformation>()
+                .HasIndex(x => x.EmployeeOnboardingId)
+                .IsUnique();
+
+            modelBuilder.Entity<EmployeeOnboardingAddress>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingAddress>()
+                .HasIndex(x => x.EmployeeOnboardingId)
+                .IsUnique();
+
+            modelBuilder.Entity<EmployeeOnboardingEducation>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingExperience>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            //============================================================
+            // Seed Data
+            //============================================================
 
             modelBuilder.ApplyConfiguration(new OnboardingSectionSeedData());
+
             modelBuilder.Entity<OnboardingDocumentMaster>()
-    .HasData(OnboardingDocumentSeedData.GetData());
+                .HasData(OnboardingDocumentSeedData.GetData());
             modelBuilder.Entity<OnboardingTemplateSection>()
     .ToTable("OnboardingTemplateSection", "HR");
             modelBuilder.Entity<OnboardingTemplate>()
@@ -315,6 +382,66 @@ namespace VeltriQ.Data
 
             modelBuilder.Entity<OnboardingDocumentCategoryMaster>()
     .HasData(OnboardingDocumentCategorySeedData.GetData());
+
+            modelBuilder.Entity<EmployeeOnboardingSection>()
+    .ToTable("EmployeeOnboardingSection", "HR");
+
+            modelBuilder.Entity<EmployeeOnboardingSection>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingSection>()
+                .HasOne(x => x.Section)
+                .WithMany()
+                .HasForeignKey(x => x.OnboardingSectionMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingDocument>()
+    .ToTable("EmployeeOnboardingDocument", "HR");
+
+            modelBuilder.Entity<EmployeeOnboardingDocument>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingDocument>()
+                .HasOne(x => x.Document)
+                .WithMany()
+                .HasForeignKey(x => x.OnboardingDocumentMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingPolicy>()
+    .ToTable("EmployeeOnboardingPolicy", "HR");
+
+            modelBuilder.Entity<EmployeeOnboardingPolicy>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingPolicy>()
+                .HasOne(x => x.Policy)
+                .WithMany()
+                .HasForeignKey(x => x.OnboardingPolicyMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingActivity>()
+    .ToTable("EmployeeOnboardingActivity", "HR");
+
+            modelBuilder.Entity<EmployeeOnboardingActivity>()
+                .HasOne(x => x.EmployeeOnboarding)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeOnboardingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeOnboardingActivity>()
+                .HasOne(x => x.Activity)
+                .WithMany()
+                .HasForeignKey(x => x.OnboardingActivityMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

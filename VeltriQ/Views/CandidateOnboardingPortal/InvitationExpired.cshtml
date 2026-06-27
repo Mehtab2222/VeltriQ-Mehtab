@@ -1,0 +1,114 @@
+﻿
+@{
+    ViewData["Title"] = "Invitation Expired";
+}
+
+<style>
+    .portal-error-workspace {
+        width: 100%;
+        min-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    /* ── UNIFIED SQUARED ERROR WRAPPER CARD ── */
+    .error-display-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Aligned with sharp, squared blueprint system */
+        max-width: 420px;
+        width: 100%;
+        padding: 32px 24px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    /* ── COMPACT GRAPHIC WARNING ELEMENTS ── */
+    .error-icon-section {
+        margin-bottom: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.08); /* Soft orange-red overlay tint */
+        color: #ef4444; /* Core alert status crimson */
+    }
+
+        .error-icon-section i {
+            font-size: 22px;
+        }
+
+    .error-display-card h2 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .error-display-card p {
+        margin: 0 0 20px 0;
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+
+    /* ── SYSTEM HIGH DENSITY ACTION BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+        justify-content: center;
+    }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        width: 100%;
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.12);
+            color: var(--purple);
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+</style>
+
+<div class="portal-error-workspace">
+
+    <div class="error-display-card">
+
+        <div class="error-icon-section">
+            <i class="bi bi-calendar-x-fill"></i>
+        </div>
+
+        <h2>Invitation Expired</h2>
+
+        <p>
+            Your dynamic onboarding invitation security window has lapsed or expired. Please contact the Human Resources configuration desk directly to issue a renewed verification token.
+        </p>
+
+        <div>
+            <a href="/" class="form-action-btn btn-cancel-theme">
+                <i class="bi bi-house-door"></i> Return to Portal Login
+            </a>
+        </div>
+
+    </div>
+
+</div>
