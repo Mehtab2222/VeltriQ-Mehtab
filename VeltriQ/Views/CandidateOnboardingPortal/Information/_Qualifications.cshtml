@@ -1,0 +1,305 @@
+﻿
+@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingQualificationsViewModel
+
+        <style>
+            /* ── HIGH-DENSITY THEMED CARD CONSOLES ── */
+            .vq-form-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 0px; /* Fully squared sharp border guidelines */
+                margin-bottom: 16px;
+                position: relative;
+            }
+
+            .vq-form-card-header {
+                background: var(--hover-bg);
+                border-bottom: 1px solid var(--border);
+                padding: 10px 14px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+                .vq-form-card-header h5 {
+                    margin: 0;
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: var(--text-secondary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                    .vq-form-card-header h5 i {
+                        font-size: 13px;
+                        color: var(--purple);
+                    }
+
+            .vq-form-card-body {
+                padding: 0; /* High-density grid overlay alignment */
+            }
+
+            /* ── PREMIUM SYSTEM DATA TABLES ── */
+            .vq-dense-table {
+                width: 100%;
+                margin: 0;
+                border-collapse: collapse;
+                font-size: 12.5px;
+            }
+
+                .vq-dense-table th {
+                    background: var(--hover-bg);
+                    color: var(--text-secondary);
+                    font-size: 10.5px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    padding: 10px 14px;
+                    border-bottom: 1px solid var(--border);
+                    text-align: left;
+                }
+
+                .vq-dense-table td {
+                    padding: 10px 14px;
+                    border-bottom: 1px solid var(--border);
+                    color: var(--text-primary);
+                }
+
+                .vq-dense-table tr:last-child td {
+                    border-bottom: none;
+                }
+
+            /* ── COMPACT REFINED FORM CONTROL INPUTS ── */
+            .vq-field-wrap {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+                .vq-field-wrap label {
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    color: var(--text-secondary);
+                }
+
+            .vq-input-ctrl {
+                width: 100%;
+                height: 34px;
+                border-radius: 6px;
+                border: 1px solid var(--border);
+                background: var(--input-bg);
+                color: var(--text-primary);
+                padding: 0 12px;
+                font-size: 12.5px;
+                outline: none;
+                font-family: inherit;
+                transition: border-color 0.15s ease;
+            }
+
+                .vq-input-ctrl:focus {
+                    border-color: var(--purple);
+                }
+
+            /* ── TOGGLEABLE INLINE FORM BOX ── */
+            .vq-inline-drawer {
+                background: var(--card-bg);
+                border-bottom: 1px solid var(--border);
+                padding: 16px;
+                display: none; /* Controlled via internal JS runtime toggle */
+            }
+
+            /* ── SYSTEM HIGH DENSITY BUTTONS ── */
+            .form-action-btn {
+                height: 30px;
+                padding: 0 14px;
+                border-radius: 4px;
+                border: none;
+                font-size: 11px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                text-decoration: none;
+                transition: .15s ease-in-out;
+                cursor: pointer;
+            }
+
+            .btn-submit-theme {
+                background: linear-gradient(135deg, #6d28d9, #7c3aed);
+                color: #fff;
+            }
+
+                .btn-submit-theme:hover {
+                    transform: translateY(-1px);
+                    color: #fff;
+                }
+
+            .btn-secondary-theme {
+                background: var(--hover-bg);
+                border: 1px solid var(--border);
+                color: var(--text-primary);
+            }
+
+                .btn-secondary-theme:hover {
+                    background: var(--border);
+                }
+        </style>
+
+        <div class="vq-form-card">
+            <div class="vq-form-card-header">
+                <h5><i class="bi bi-mortarboard"></i> Educational Qualifications</h5>
+                <button type="button" class="form-action-btn btn-submit-theme" id="btnToggleQualificationForm">
+                    <i class="bi bi-plus-lg"></i> Add Qualification
+                </button>
+            </div>
+
+            <!-- INLINE TRANSACTIONAL ENTRY DRAWER -->
+            <div class="vq-inline-drawer" id="qualificationFormDrawer">
+                <!-- The form action targets the batch endpoint to match your collection setup -->
+                <form id="qualificationForm" asp-action="SaveQualifications" asp-controller="CandidateOnboardingPortal" method="post" autocomplete="off">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="EmployeeOnboardingId" type="hidden" />
+
+                    <!-- Hidden inputs container mimicking index 0 layout variables to generate a safe view payload -->
+                    <input type="hidden" name="Qualifications[0].EmployeeOnboardingQualificationId" value="0" />
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="vq-field-wrap">
+                                <label>Qualification / Degree</label>
+                                <input name="Qualifications[0].QualificationName" required class="vq-input-ctrl" placeholder="e.g. B.Tech CSE, Class 12" />
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="vq-field-wrap">
+                                <label>Institute / School / University</label>
+                                <input name="Qualifications[0].Institute" required class="vq-input-ctrl" placeholder="Enter institution name" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="vq-field-wrap">
+                                <label>Passing Year</label>
+                                <input name="Qualifications[0].PassingYear" type="number" min="1950" max="2035" required class="vq-input-ctrl" placeholder="YYYY" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="vq-field-wrap">
+                                <label>Percentage / CGPA</label>
+                                <input name="Qualifications[0].Percentage" type="number" step="0.01" min="0" max="100" required class="vq-input-ctrl" placeholder="00.00" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3 d-flex justify-content-end gap-2">
+                        <button type="button" class="form-action-btn btn-secondary-theme" id="btnCancelQualification">Cancel</button>
+                        <button type="submit" class="form-action-btn btn-submit-theme" id="btnSaveQualification">
+                            <i class="bi bi-check-lg"></i> Save Qualification
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- HIGH DENSITY DATA READ GRID -->
+            <div class="vq-form-card-body">
+                <table class="vq-dense-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Qualification</th>
+                            <th style="width: 45%;">Institute</th>
+                            <th style="width: 15%;">Year</th>
+                            <th style="width: 15%;">Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Qualifications != null && Model.Qualifications.Any())
+                        {
+                            foreach (var item in Model.Qualifications)
+                            {
+                                <tr>
+                                    <td><strong>@item.QualificationName</strong></td>
+                                    <td>@item.Institute</td>
+                                    <td>@(item.PassingYear?.ToString() ?? "—")</td>
+                                    <td>@(item.Percentage != null ? $"{item.Percentage:F2}%" : "—")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="bi bi-folder-x d-block mb-1" style="font-size: 18px; color: var(--text-muted);"></i>
+                                    No qualifications added.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                const toggleBtn = document.getElementById('btnToggleQualificationForm');
+                const cancelBtn = document.getElementById('btnCancelQualification');
+                const drawer = document.getElementById('qualificationFormDrawer');
+                const qualForm = document.getElementById('qualificationForm');
+
+                if (toggleBtn && drawer) {
+                    toggleBtn.addEventListener('click', () => {
+                        drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+                    });
+                }
+
+                if (cancelBtn && drawer) {
+                    cancelBtn.addEventListener('click', () => {
+                        drawer.style.display = 'none';
+                        if(qualForm) qualForm.reset();
+                    });
+                }
+
+                if (qualForm) {
+                    qualForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const submitBtn = document.getElementById('btnSaveQualification');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" style="width: 11px; height: 11px; border-width: 1.5px;"></span>`;
+
+                        const formData = new FormData(qualForm);
+
+                        fetch($(this).attr('action'), {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                if (typeof refreshCandidateWorkspace === "function") {
+                                    refreshCandidateWorkspace();
+                                } else {
+                                    window.location.reload();
+                                }
+                            } else {
+                                alert(data.message || 'Operation failed handling verification constraints.');
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = `<i class="bi bi-check-lg"></i> Save Qualification`;
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert("Something went wrong during submission.");
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = `<i class="bi bi-check-lg"></i> Save Qualification`;
+                        });
+                    });
+                }
+            })();
+        </script>
+
+

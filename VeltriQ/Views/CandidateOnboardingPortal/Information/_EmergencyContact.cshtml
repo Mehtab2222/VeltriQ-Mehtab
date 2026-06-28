@@ -1,0 +1,209 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingEmergencyContactViewModel
+
+<style>
+    /* ── HIGH-DENSITY THEMED CARD CONSOLES ── */
+    .vq-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared sharp border guidelines */
+        margin-bottom: 16px;
+    }
+
+    .vq-form-card-header {
+        background: var(--hover-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .vq-form-card-header h5 {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+            .vq-form-card-header h5 i {
+                font-size: 13px;
+                color: var(--purple);
+            }
+
+    .vq-form-card-body {
+        padding: 16px;
+    }
+
+    /* ── COMPACT REFINED FORM CONTROL INPUTS ── */
+    .vq-field-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .vq-field-wrap label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+    .vq-input-ctrl {
+        width: 100%;
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.15s ease;
+    }
+
+    textarea.vq-input-ctrl {
+        height: auto;
+        padding: 8px 12px;
+        resize: vertical;
+    }
+
+    .vq-input-ctrl:focus {
+        border-color: var(--purple);
+    }
+
+    /* ── SYSTEM HIGH DENSITY BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+</style>
+
+<form id="emergencyContactForm" asp-action="SaveEmergencyContact" asp-controller="CandidateOnboardingPortal" method="post" autocomplete="off">
+    @Html.AntiForgeryToken()
+
+    @* Context mapping primary keys required to bind the entity relation safely during AJAX persistence *@
+    <input asp-for="EmployeeOnboardingId" type="hidden" />
+    <input asp-for="EmployeeOnboardingEmergencyContactId" type="hidden" />
+
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-telephone-outbound"></i> Emergency Contact</h5>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="ContactPersonName">Contact Person</label>
+                        <input asp-for="ContactPersonName" class="vq-input-ctrl" placeholder="Enter full name of emergency contact" />
+                        <span asp-validation-for="ContactPersonName" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="Relationship">Relationship</label>
+                        <input asp-for="Relationship" class="vq-input-ctrl" placeholder="e.g. Spouse, Father, Friend" />
+                        <span asp-validation-for="Relationship" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="MobileNumber">Mobile Number</label>
+                        <input asp-for="MobileNumber" class="vq-input-ctrl" placeholder="Enter primary contact number" />
+                        <span asp-validation-for="MobileNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="AlternateMobileNumber">Alternate Mobile</label>
+                        <input asp-for="AlternateMobileNumber" class="vq-input-ctrl" placeholder="Optional secondary contact number" />
+                        <span asp-validation-for="AlternateMobileNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="vq-field-wrap">
+                        <label asp-for="Address">Full Address</label>
+                        <textarea asp-for="Address" rows="3" class="vq-input-ctrl" placeholder="Enter full residential address of contact person"></textarea>
+                        <span asp-validation-for="Address" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="form-action-btn btn-submit-theme" id="btnSaveEmergencyContact">
+            <i class="bi bi-check-circle"></i> Save Emergency Contact
+        </button>
+    </div>
+</form>
+
+<script>
+    (function () {
+        const contactForm = document.getElementById('emergencyContactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('btnSaveEmergencyContact');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" style="width: 12px; height: 12px; border-width: 1.5px;"></span> Saving...`;
+
+                const formData = new FormData(contactForm);
+
+                fetch($(this).attr('action'), {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        if (typeof refreshCandidateWorkspace === "function") {
+                            refreshCandidateWorkspace();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.message || 'Validation error while executing save operations.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Emergency Contact`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong during submission.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Emergency Contact`;
+                });
+            });
+        }
+    })();
+</script>

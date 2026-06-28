@@ -1,0 +1,345 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingDependentsViewModel
+
+<style>
+    /* ── HIGH-DENSITY THEMED CARD CONSOLES ── */
+    .vq-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared sharp border guidelines */
+        margin-bottom: 16px;
+        position: relative;
+    }
+
+    .vq-form-card-header {
+        background: var(--hover-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+        .vq-form-card-header h5 {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .vq-form-card-header h5 i {
+                font-size: 13px;
+                color: var(--purple);
+            }
+
+    .vq-form-card-body {
+        padding: 0; /* High-density grid overlay alignment */
+    }
+
+    /* ── PREMIUM SYSTEM DATA TABLES ── */
+    .vq-dense-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+        font-size: 12.5px;
+    }
+
+        .vq-dense-table th {
+            background: var(--hover-bg);
+            color: var(--text-secondary);
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .vq-dense-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .vq-dense-table tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* ── COMPACT REFINED FORM CONTROL INPUTS ── */
+    .vq-field-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .vq-field-wrap label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+    .vq-input-ctrl {
+        width: 100%;
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.15s ease;
+    }
+
+        .vq-input-ctrl:focus {
+            border-color: var(--purple);
+        }
+
+    select.vq-input-ctrl {
+        padding-right: 24px;
+    }
+
+    /* ── TOGGLEABLE INLINE FORM BOX ── */
+    .vq-inline-drawer {
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 16px;
+        display: none; /* Controlled via internal JS runtime toggle */
+    }
+
+    /* ── SYSTEM HIGH DENSITY BUTTONS ── */
+    .form-action-btn {
+        height: 30px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: none;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .btn-secondary-theme {
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+        .btn-secondary-theme:hover {
+            background: var(--border);
+        }
+
+    /* Custom high density checkbox layout */
+    .vq-check-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 34px;
+        cursor: pointer;
+    }
+
+        .vq-check-wrap input {
+            accent-color: #7c3aed;
+            width: 15px;
+            height: 15px;
+        }
+
+        .vq-check-wrap span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+</style>
+
+<div class="vq-form-card">
+    <div class="vq-form-card-header">
+        <h5><i class="bi bi-people"></i> Dependents Registry</h5>
+        <button type="button" class="form-action-btn btn-submit-theme" id="btnToggleDependentForm">
+            <i class="bi bi-plus-lg"></i> Add Dependent
+        </button>
+    </div>
+
+    <!-- INLINE TRANSACTIONAL ENTRY FORM -->
+    <div class="vq-inline-drawer" id="dependentFormDrawer">
+        <form id="dependentForm" asp-action="SaveDependent" asp-controller="CandidateOnboardingPortal" method="post" autocomplete="off">
+            @Html.AntiForgeryToken()
+            <input asp-for="EmployeeOnboardingId" type="hidden" />
+
+            <!-- Context key placeholder to verify signature parameters securely -->
+            <input type="hidden" name="Dependents[0].EmployeeOnboardingDependentId" value="0" />
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label>Full Name</label>
+                        <input name="Dependents[0].FullName" required class="vq-input-ctrl" placeholder="Enter full name" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="vq-field-wrap">
+                        <label>Relationship</label>
+                        <select name="Dependents[0].Relationship" required class="vq-input-ctrl">
+                            <option value="">Select Relation</option>
+                            <option value="Spouse">Spouse</option>
+                            <option value="Child">Child</option>
+                            <option value="Father">Father</option>
+                            <option value="Mother">Mother</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="vq-field-wrap">
+                        <label>Date of Birth</label>
+                        <input name="Dependents[0].DateOfBirth" type="date" required class="vq-input-ctrl" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="vq-field-wrap">
+                        <label>&nbsp;</label>
+                        <label class="vq-check-wrap">
+                            <input type="checkbox" name="Dependents[0].IsNominee" value="true" />
+                            <span>Nominee</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-end mt-3 d-flex justify-content-end gap-2">
+                <button type="button" class="form-action-btn btn-secondary-theme" id="btnCancelDependent">Cancel</button>
+                <button type="submit" class="form-action-btn btn-submit-theme" id="btnSaveDependent">
+                    <i class="bi bi-check-lg"></i> Save Record
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- HIGH DENSITY DATA READ GRID -->
+    <div class="vq-form-card-body">
+        <table class="vq-dense-table">
+            <thead>
+                <tr>
+                    <th>Dependent Name</th>
+                    <th>Relationship</th>
+                    <th>Date of Birth</th>
+                    <th style="width: 120px; text-align: center;">Nominee Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Dependents != null && Model.Dependents.Any())
+                {
+                    foreach (var item in Model.Dependents)
+                    {
+                        <tr>
+                            <td><strong>@item.FullName</strong></td>
+                            <td>@item.Relationship</td>
+                            <td>@(item.DateOfBirth?.ToString("dd MMM yyyy") ?? "—")</td>
+                            <td style="text-align: center;">
+                                @if (item.IsNominee)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill" style="font-size: 10px;">Active Nominee</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            <i class="bi bi-folder-x d-block mb-1" style="font-size: 18px; color: var(--text-muted);"></i>
+                            No dependent configurations loaded.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const toggleBtn = document.getElementById('btnToggleDependentForm');
+        const cancelBtn = document.getElementById('btnCancelDependent');
+        const drawer = document.getElementById('dependentFormDrawer');
+        const depForm = document.getElementById('dependentForm');
+
+        if (toggleBtn && drawer) {
+            toggleBtn.addEventListener('click', () => {
+                drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+            });
+        }
+
+        if (cancelBtn && drawer) {
+            cancelBtn.addEventListener('click', () => {
+                drawer.style.display = 'none';
+                if(depForm) depForm.reset();
+            });
+        }
+
+        if (depForm) {
+            depForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('btnSaveDependent');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" style="width: 11px; height: 11px; border-width: 1.5px;"></span>`;
+
+                const formData = new FormData(depForm);
+
+                fetch($(this).attr('action'), {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        if (typeof refreshCandidateWorkspace === "function") {
+                            refreshCandidateWorkspace();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.message || 'Operation failed handling verification constraints.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="bi bi-check-lg"></i> Save Record`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong during submission.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="bi bi-check-lg"></i> Save Record`;
+                });
+            });
+        }
+    })();
+</script>

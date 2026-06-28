@@ -1,7 +1,8 @@
 ﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
 
 @{
-    ViewData["Title"] = "Onboarding Profile Details";
+    ViewData["Title"] = "Onboarding Workspace";
+    Layout = "_CandidateOnboardingLayout"; // Explicitly linked to your isolated candidate portal layout shell
 }
 
 <style>
@@ -12,83 +13,7 @@
         gap: 12px;
     }
 
-    /* ── TOP HERO PROFILE BANNER ── */
-    .profile-hero-banner {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        padding: 14px 16px;
-        position: relative;
-    }
-
-    .hero-top-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 8px;
-    }
-
-    .hero-identity-block {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .hero-name-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 4px;
-    }
-
-        .hero-name-row i {
-            font-size: 18px;
-            color: var(--purple);
-        }
-
-        .hero-name-row h2 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-    .hero-meta-subtitle {
-        font-size: 12px;
-        color: var(--text-secondary);
-        margin: 2px 0 6px 0;
-        font-weight: 600;
-    }
-
-    /* ── METADATA STRIP ── */
-    .hero-metadata-strip {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-        padding-top: 8px;
-        border-top: 1px dashed var(--border);
-        font-size: 11.5px;
-        color: var(--text-secondary);
-    }
-
-        .hero-metadata-strip span strong {
-            color: var(--text-primary);
-        }
-
-    .hero-status-block {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 4px;
-    }
-
-    .status-label-caption {
-        font-size: 9.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--text-secondary);
-        letter-spacing: 0.5px;
-    }
-
-    /* ── NAVIGATION TAB BAR ── */
+    /* ── COMPACT NAVIGATION SUB-TAB STRIP ── */
     .details-nav-tabs {
         display: flex;
         list-style: none;
@@ -96,10 +21,18 @@
         margin: 4px 0 0 0;
         border-bottom: 1px solid var(--border);
         gap: 2px;
+        overflow-x: auto; /* Fluid horizontal scroll swipe touch support for mobile screens */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
+
+        .details-nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
 
     .details-tab-item {
         margin-bottom: -1px;
+        flex-shrink: 0;
     }
 
     .details-tab-btn {
@@ -114,6 +47,7 @@
         gap: 6px;
         cursor: pointer;
         transition: all 0.15s ease;
+        white-space: nowrap;
     }
 
         .details-tab-btn:hover {
@@ -126,7 +60,7 @@
             border-color: var(--border) var(--border) transparent var(--border);
         }
 
-    /* ── WORKSPACE TAB VIEWPORT ── */
+    /* ── WORKSPACE VIEWPORT LAYOUT PANEL ── */
     .workspace-tab-viewport {
         background: var(--card-bg);
         border: 1px solid var(--border);
@@ -134,7 +68,23 @@
         min-height: 350px;
     }
 
-    /* ── CONCISE DATA GRID TABLES ── */
+    /* ── COMPACT MICRO OVERFLOW HOVER SCROLL PANELS ── */
+    .responsive-table-holder {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+    }
+
+        .responsive-table-holder::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .responsive-table-holder::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
     .viewport-grid-table {
         width: 100%;
         border-collapse: collapse;
@@ -151,6 +101,7 @@
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--border);
             background: var(--hover-bg);
+            white-space: nowrap;
         }
 
         .viewport-grid-table td {
@@ -159,63 +110,21 @@
             color: var(--text-primary);
             font-size: 12.5px;
             vertical-align: middle;
+            white-space: nowrap;
         }
 
         .viewport-grid-table tbody tr:hover {
             background: var(--hover-bg);
         }
 
-    /* ── HIGH-DENSITY WORKSPACE LISTS ── */
-    .section-workspace-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .section-workspace-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        transition: background-color 0.15s ease;
-    }
-
-        .section-workspace-item:hover {
-            background: var(--hover-bg);
-        }
-
-    .section-item-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .section-item-icon {
-        font-size: 16px;
-    }
-
-    .section-item-info h4 {
-        margin: 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-
-    .section-item-info p {
-        margin: 2px 0 0 0;
-        font-size: 11px;
-        color: var(--text-secondary);
-    }
-
-    /* ── OVERVIEW SUMMARY ROWS ── */
+    /* ── METRIC ALIGNMENT PARAMS ── */
     .overview-summary-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px 12px;
         border-bottom: 1px solid var(--border);
+        gap: 16px;
     }
 
         .overview-summary-row:last-child {
@@ -234,7 +143,6 @@
         color: var(--purple);
     }
 
-    /* ── TIMELINE WORKSPACE ── */
     .timeline-empty-placeholder {
         display: flex;
         flex-direction: column;
@@ -250,130 +158,11 @@
             opacity: 0.4;
             margin-bottom: 8px;
         }
-
-    /* ── BADGES & ACTION LINKS ── */
-    .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        height: 20px;
-        padding: 0 8px;
-        border-radius: 4px;
-        font-size: 10.5px;
-        font-weight: 700;
-    }
-
-    .status-invited {
-        background: rgba(59, 130, 246, 0.12);
-        color: #3b82f6;
-    }
-
-    .status-progress {
-        background: rgba(234, 179, 8, 0.12);
-        color: #eab308;
-    }
-
-    .status-submitted {
-        background: rgba(147, 51, 234, 0.12);
-        color: #a855f7;
-    }
-
-    .status-approved {
-        background: rgba(34, 197, 94, 0.12);
-        color: #22c55e;
-    }
-
-    .status-default {
-        background: var(--hover-bg);
-        color: var(--text-secondary);
-    }
-
-    .progress-percent-large {
-        font-size: 22px;
-        font-weight: 800;
-        color: var(--purple);
-        line-height: 1;
-    }
-
-    .form-action-btn {
-        height: 30px;
-        padding: 0 12px;
-        border-radius: 6px;
-        border: none;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        text-decoration: none;
-        transition: .15s ease-in-out;
-        cursor: pointer;
-    }
-
-    .btn-cancel-theme {
-        background: var(--hover-bg);
-        color: var(--text-primary);
-        border: 1px solid var(--border);
-    }
-
-        .btn-cancel-theme:hover {
-            background: rgba(124, 58, 237, 0.15);
-            color: var(--purple);
-        }
 </style>
 
 <div class="profile-details-page">
 
-    <div class="profile-hero-banner">
-        <div class="hero-top-row">
-            <div>
-                <a asp-action="Index" class="form-action-btn btn-cancel-theme">
-                    <i class="bi bi-arrow-left"></i> Back
-                </a>
-            </div>
-            <div class="hero-status-block">
-                <span class="status-label-caption">Current Lifecycle Status</span>
-                @{
-                    string statusLower = (Model.Status ?? "").ToLower();
-                    string statusClass = statusLower switch
-                    {
-                        "invited" => "status-invited",
-                        "in progress" or "progress" => "status-progress",
-                        "submitted" => "status-submitted",
-                        "approved" => "status-approved",
-                        _ => "status-default"
-                    };
-                }
-                <span class="status-pill @statusClass">
-                    <i class="bi bi-circle-fill" style="font-size: 5px;"></i> @Model.Status
-                </span>
-            </div>
-        </div>
-
-        <div class="hero-top-row" style="margin-bottom: 8px;">
-            <div class="hero-identity-block">
-                <div class="hero-name-row">
-                    <i class="bi bi-person-badge"></i>
-                    <h2>@Model.CandidateName</h2>
-                </div>
-                <div class="hero-meta-subtitle">
-                    @Model.Designation <span style="color: var(--border); margin: 0 4px;">•</span> @Model.Department
-                </div>
-            </div>
-            <div style="text-align: right; align-self: flex-end;">
-                <div class="progress-percent-large">@Model.CompletionPercentage%</div>
-                <span class="status-label-caption">Overall Progress</span>
-            </div>
-        </div>
-
-        <div class="hero-metadata-strip">
-            <span>Candidate Code: <strong>@Model.CandidateCode</strong></span>
-            <span>Email: <strong>@Model.Email</strong></span>
-            <span>Mobile: <strong>@Model.MobileNumber</strong></span>
-            <span>Template: <strong>@Model.TemplateName</strong></span>
-            <span>Expected Joining: <strong style="color: var(--purple);">@(Model.ExpectedJoiningDate?.ToString("dd MMM yyyy") ?? "-")</strong></span>
-        </div>
-    </div>
+    @await Html.PartialAsync("_Header", Model)
 
     <ul class="details-nav-tabs">
         <li class="details-tab-item">
@@ -411,215 +200,54 @@
     <div class="workspace-tab-viewport">
 
         <div id="view_overview">
-            <div class="overview-summary-row">
-                <span class="overview-summary-label">Information Sections Completed</span>
-                <span class="overview-summary-value">@Model.CompletedSections / @Model.TotalSections</span>
-            </div>
-            <div class="overview-summary-row">
-                <span class="overview-summary-label">Documents Uploaded</span>
-                <span class="overview-summary-value">@Model.UploadedDocuments / @Model.TotalDocuments</span>
-            </div>
-            <div class="overview-summary-row">
-                <span class="overview-summary-label">Policies Accepted</span>
-                <span class="overview-summary-value">@Model.AcceptedPolicies / @Model.TotalPolicies</span>
-            </div>
-            <div class="overview-summary-row">
-                <span class="overview-summary-label">Activities Completed</span>
-                <span class="overview-summary-value">@Model.CompletedActivities / @Model.TotalActivities</span>
-            </div>
+            @await Html.PartialAsync("_Overview", Model)
         </div>
 
         <div id="view_information" style="display: none;">
-            <div class="section-workspace-list">
-                @if (Model.Sections != null && Model.Sections.Any())
-                {
-                    foreach (var item in Model.Sections)
-                    {
-                        <div class="section-workspace-item">
-                            <div class="section-item-left">
-                                <div class="section-item-icon">
-                                    @if (item.IsCompleted)
-                                    {
-                                        <i class="bi bi-check-circle-fill text-success"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-circle text-muted"></i>
-                                    }
-                                </div>
-
-                                <div class="section-item-info">
-                                    <h4>@item.SectionName</h4>
-                                    <p>No information layout sections mapped to this configuration profile.</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <span class="status-pill @(item.IsCompleted ? "status-approved" : "status-progress")">
-                                    @(item.IsCompleted ? "Completed" : "Pending")
-                                </span>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                        No information layout sections mapped to this configuration profile.
-                    </div>
-                }
-            </div>
+            @await Html.PartialAsync("_Information", Model)
         </div>
 
         <div id="view_documents" style="display: none;">
-            <table class="viewport-grid-table">
-                <thead>
-                    <tr>
-                        <th>Document Name</th>
-                        <th style="width: 120px;">Mandatory</th>
-                        <th style="width: 120px;">Uploaded</th>
-                        <th style="width: 120px;">Verified</th>
-                        <th>Uploaded On</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.DocumentsList != null && Model.DocumentsList.Any())
-                    {
-                        foreach (var doc in Model.DocumentsList)
-                        {
-                            <tr>
-                                <td style="font-weight: 600;">@doc.DocumentName</td>
-                                <td class="text-muted">@(doc.IsMandatory ? "Yes" : "No")</td>
-                                <td>
-                                    <i class="bi @(doc.IsUploaded ? "bi-check2 text-success" : "bi-dash text-muted")"></i>
-                                </td>
-                                <td>
-                                    @if (doc.IsUploaded)
-                                    {
-                                        <span class="status-pill @(doc.IsVerified ? "status-approved" : "status-progress")">
-                                            @(doc.IsVerified ? "Verified" : "Pending")
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                                <td class="text-muted">@(doc.UploadedOn?.ToString("dd MMM yyyy") ?? "-")</td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                                No templates documents mapped to this workflow.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            @await Html.PartialAsync("_Documents", Model)
         </div>
 
         <div id="view_policies" style="display: none;">
-            <table class="viewport-grid-table">
-                <thead>
-                    <tr>
-                        <th>Policy Name</th>
-                        <th style="width: 120px;">Mandatory</th>
-                        <th style="width: 120px;">Accepted</th>
-                        <th>Accepted On</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.PoliciesList != null && Model.PoliciesList.Any())
-                    {
-                        foreach (var policy in Model.PoliciesList)
-                        {
-                            <tr>
-                                <td style="font-weight: 600;">@policy.PolicyName</td>
-                                <td class="text-muted">@(policy.IsMandatory ? "Yes" : "No")</td>
-                                <td>
-                                    <i class="bi @(policy.IsAccepted ? "bi-check2 text-success" : "bi-hourglass-split text-warning")"></i>
-                                </td>
-                                <td class="text-muted">@(policy.AcceptedOn?.ToString("dd MMM yyyy") ?? "-")</td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                                No system regulatory policies assigned.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            @await Html.PartialAsync("_Policies", Model)
         </div>
 
         <div id="view_activities" style="display: none;">
-            <table class="viewport-grid-table">
-                <thead>
-                    <tr>
-                        <th>Activity Name</th>
-                        <th style="width: 120px;">Completed</th>
-                        <th>Completed On</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.ActivitiesList != null && Model.ActivitiesList.Any())
-                    {
-                        foreach (var act in Model.ActivitiesList)
-                        {
-                            <tr>
-                                <td style="font-weight: 600;">@act.ActivityName</td>
-                                <td>
-                                    <i class="bi @(act.IsCompleted ? "bi-check2 text-success" : "bi-dash text-muted")"></i>
-                                </td>
-                                <td class="text-muted">@(act.CompletedOn?.ToString("dd MMM yyyy") ?? "-")</td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="3" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                                No operational task activities linked.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            @await Html.PartialAsync("_Activities", Model)
         </div>
 
         <div id="view_timeline" style="display: none;">
-            <div class="timeline-empty-placeholder">
-                <i class="bi bi-clock-history"></i>
-                <div>No onboarding activity available.</div>
-            </div>
+            @await Html.PartialAsync("_Timeline", Model)
         </div>
 
     </div>
 </div>
 
-<script>
-    function toggleDetailsTab(targetViewId, buttonElement) {
-        const tabs = buttonElement.closest('.details-nav-tabs').getElementsByClassName('details-tab-btn');
-        for (let i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove('active');
+@section Scripts {
+    <script>
+        function toggleDetailsTab(targetViewId, buttonElement) {
+            // Unset current focus attributes cleanly
+            const tabs = buttonElement.closest('.details-nav-tabs').getElementsByClassName('details-tab-btn');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+
+            // Register focal destination target active
+            buttonElement.classList.add('active');
+
+            // Collapse view instances instantly
+            const targets = ['overview', 'information', 'documents', 'policies', 'activities', 'timeline'];
+            targets.forEach(view => {
+                const el = document.getElementById('view_' + view);
+                if (el) el.style.display = 'none';
+            });
+
+            // Deploy focal layer panel screen
+            const targetView = document.getElementById('view_' + targetViewId);
+            if (targetView) targetView.style.display = 'block';
         }
-
-        buttonElement.classList.add('active');
-
-        const targets = ['overview', 'information', 'documents', 'policies', 'activities', 'timeline'];
-        targets.forEach(view => {
-            const el = document.getElementById('view_' + view);
-            if (el) el.style.display = 'none';
-        });
-
-        const targetView = document.getElementById('view_' + targetViewId);
-        if (targetView) targetView.style.display = 'block';
-    }
-</script>
-
+    </script>
+}

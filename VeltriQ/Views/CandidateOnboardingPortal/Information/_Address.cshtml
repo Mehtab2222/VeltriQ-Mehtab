@@ -1,5 +1,351 @@
-﻿<h4>Address</h4>
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingAddressViewModel
 
-<hr />
+<style>
+    /* ── HIGH-DENSITY THEMED CARD CONSOLES ── */
+    .vq-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared sharp border guidelines */
+        margin-bottom: 16px;
+    }
 
-<p>Address Form will be displayed here.</p>
+    .vq-form-card-header {
+        background: var(--hover-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+        .vq-form-card-header h5 {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .vq-form-card-header h5 i {
+                font-size: 13px;
+                color: var(--purple);
+            }
+
+    .vq-form-card-body {
+        padding: 16px;
+    }
+
+    /* ── COMPACT REFINED FORM CONTROL INPUTS ── */
+    .vq-field-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .vq-field-wrap label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+    .vq-input-ctrl {
+        width: 100%;
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+        font-family: inherit;
+        transition: all 0.15s ease;
+    }
+
+        .vq-input-ctrl:focus {
+            border-color: var(--purple);
+        }
+
+        .vq-input-ctrl:disabled {
+            background: var(--hover-bg);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+    /* Custom high density checkbox layout */
+    .vq-check-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+        .vq-check-wrap input {
+            accent-color: #7c3aed;
+            width: 14px;
+            height: 14px;
+        }
+
+        .vq-check-wrap span {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+    /* ── SYSTEM HIGH DENSITY BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+</style>
+
+<form id="addressForm" asp-action="SaveAddress" asp-controller="CandidateOnboardingPortal" method="post" autocomplete="off">
+    @Html.AntiForgeryToken()
+
+    <input asp-for="EmployeeOnboardingId" type="hidden" />
+    <input asp-for="EmployeeOnboardingAddressId" type="hidden" />
+
+    <!-- ── SECTION 1: CURRENT ADDRESS ── -->
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-geo-alt"></i> Current Address</h5>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="CurrentAddressLine1">Address Line 1</label>
+                        <input asp-for="CurrentAddressLine1" class="vq-input-ctrl sync-addr" placeholder="Building, Street, or Apartment details" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="CurrentAddressLine2">Address Line 2</label>
+                        <input asp-for="CurrentAddressLine2" class="vq-input-ctrl sync-addr" placeholder="Locality, Sector, or Area details" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="CurrentLandmark">Landmark</label>
+                        <input asp-for="CurrentLandmark" class="vq-input-ctrl sync-addr" placeholder="e.g. Near Metro Station" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="CurrentCity">City</label>
+                        <input asp-for="CurrentCity" class="vq-input-ctrl sync-addr" placeholder="Enter city" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="CurrentState">State</label>
+                        <input asp-for="CurrentState" class="vq-input-ctrl sync-addr" placeholder="Enter state" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="CurrentCountry">Country</label>
+                        <input asp-for="CurrentCountry" class="vq-input-ctrl sync-addr" placeholder="Enter country" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="CurrentPostalCode">Postal Code</label>
+                        <input asp-for="CurrentPostalCode" class="vq-input-ctrl sync-addr" placeholder="ZIP / PIN code" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── SECTION 2: PERMANENT ADDRESS ── -->
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-house-door"></i> Permanent Address</h5>
+            <label class="vq-check-wrap">
+                <input type="checkbox" asp-for="IsPermanentAddressSame" id="chkSameAsCurrent" />
+                <span>Same as Current Address</span>
+            </label>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="PermanentAddressLine1">Address Line 1</label>
+                        <input asp-for="PermanentAddressLine1" class="vq-input-ctrl perm-addr" placeholder="Building, Street, or Apartment details" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="PermanentAddressLine2">Address Line 2</label>
+                        <input asp-for="PermanentAddressLine2" class="vq-input-ctrl perm-addr" placeholder="Locality, Sector, or Area details" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="PermanentLandmark">Landmark</label>
+                        <input asp-for="PermanentLandmark" class="vq-input-ctrl perm-addr" placeholder="e.g. Near Metro Station" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="PermanentCity">City</label>
+                        <input asp-for="PermanentCity" class="vq-input-ctrl perm-addr" placeholder="Enter city" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="PermanentState">State</label>
+                        <input asp-for="PermanentState" class="vq-input-ctrl perm-addr" placeholder="Enter state" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="PermanentCountry">Country</label>
+                        <input asp-for="PermanentCountry" class="vq-input-ctrl perm-addr" placeholder="Enter country" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="PermanentPostalCode">Postal Code</label>
+                        <input asp-for="PermanentPostalCode" class="vq-input-ctrl perm-addr" placeholder="ZIP / PIN code" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="form-action-btn btn-submit-theme" id="btnSaveAddressInfo">
+            <i class="bi bi-check-circle"></i> Save Address Details
+        </button>
+    </div>
+</form>
+
+<script>
+    (function () {
+        const addrForm = document.getElementById('addressForm');
+        const sameCheckbox = document.getElementById('chkSameAsCurrent');
+
+        // Address synchronization maps
+        const fieldMappings = [
+            { src: 'CurrentAddressLine1', dest: 'PermanentAddressLine1' },
+            { src: 'CurrentAddressLine2', dest: 'PermanentAddressLine2' },
+            { src: 'CurrentLandmark', dest: 'PermanentLandmark' },
+            { src: 'CurrentCity', dest: 'PermanentCity' },
+            { src: 'CurrentState', dest: 'PermanentState' },
+            { src: 'CurrentCountry', dest: 'PermanentCountry' },
+            { src: 'CurrentPostalCode', dest: 'PermanentPostalCode' }
+        ];
+
+        function handleAddressSync() {
+            const isSame = sameCheckbox.checked;
+
+            fieldMappings.forEach(map => {
+                const srcInput = document.getElementById(map.src);
+                const destInput = document.getElementById(map.dest);
+
+                if (srcInput && destInput) {
+                    if (isSame) {
+                        destInput.value = srcInput.value;
+                        destInput.disabled = true;
+                    } else {
+                        destInput.disabled = false;
+                    }
+                }
+            });
+        }
+
+        // Trigger synchronization listener events
+        if (sameCheckbox) {
+            sameCheckbox.addEventListener('change', handleAddressSync);
+
+            // Sync current modifications in real-time if checked
+            document.querySelectorAll('.sync-addr').forEach(input => {
+                input.addEventListener('input', () => {
+                    if (sameCheckbox.checked) handleAddressSync();
+                });
+            });
+
+            // Initialize correct state on partial view load
+            handleAddressSync();
+        }
+
+        // Process submission handling via modern Fetch API execution
+        if (addrForm) {
+            addrForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('btnSaveAddressInfo');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" style="width: 12px; height: 12px; border-width: 1.5px;"></span> Saving...`;
+
+                // Temporarily enable inputs during serialization so disabled fields aren't dropped from the form post data
+                const disabledFields = addrForm.querySelectorAll(':disabled');
+                disabledFields.forEach(f => f.disabled = false);
+
+                const formData = new FormData(addrForm);
+
+                // Re-lock fields immediately after reading form data
+                if (sameCheckbox.checked) {
+                    disabledFields.forEach(f => f.disabled = true);
+                }
+
+                fetch($(this).attr('action'), {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        if (typeof refreshCandidateWorkspace === "function") {
+                            refreshCandidateWorkspace();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.message || 'Validation error while executing save operations.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Address Details`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong during submission.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Address Details`;
+                });
+            });
+        }
+    })();
+</script>

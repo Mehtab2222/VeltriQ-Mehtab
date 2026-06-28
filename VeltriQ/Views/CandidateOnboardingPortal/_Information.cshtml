@@ -9,7 +9,6 @@
         align-items: flex-start;
     }
 
-    /* Left Sidebar Navigation Controls */
     .info-panel-sidebar {
         width: 240px;
         flex-shrink: 0;
@@ -63,7 +62,6 @@
         text-overflow: ellipsis;
     }
 
-    /* Right Main Form Workspace Viewport */
     .info-panel-workspace {
         flex: 1;
         border: 1px solid var(--border);
@@ -92,7 +90,6 @@
         flex-direction: column;
     }
 
-    /* Empty State Displays */
     .info-empty-placeholder {
         margin: auto;
         text-align: center;
@@ -114,7 +111,6 @@
         color: var(--text-primary);
     }
 
-    /* Mini Themed Status Badges */
     .status-badge-mini {
         font-size: 10px;
         font-weight: 700;
@@ -132,7 +128,6 @@
         color: #eab308;
     }
 
-    /* ── 📱 RESPONSIVE BREAKPOINTS ── */
     @@media (max-width: 768px) {
         .information-split-pane {
             flex-direction: column;
@@ -146,34 +141,32 @@
 </style>
 
 <div class="information-split-pane">
-
-    <!-- LEFT SIDEBAR TRACK NAVIGATOR -->
     <div class="info-panel-sidebar">
         <div class="info-sidebar-header">
             <h5>Sections</h5>
         </div>
         <div class="info-list-group">
-            @foreach (var item in Model.Sections.OrderBy(x => x.DisplayOrder))
+            @if (Model.Sections != null && Model.Sections.Any())
             {
-                <a href="#"
-                   class="info-list-item onboarding-section"
-                   data-section="@item.SectionName">
+                foreach (var item in Model.Sections.OrderBy(x => x.DisplayOrder))
+                {
+                    <a href="#" class="info-list-item onboarding-section" data-section="@item.SectionName">
+                        <span class="info-item-label">@item.SectionName</span>
 
-                    <span class="info-item-label">@item.SectionName</span>
-
-                    @if (item.IsCompleted)
-                    {
-                        <span class="status-badge-mini badge-mini-success">
-                            <i class="bi bi-check-lg"></i>
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="status-badge-mini badge-mini-pending">
-                            Pending
-                        </span>
-                    }
-                </a>
+                        @if (item.IsCompleted)
+                        {
+                            <span class="status-badge-mini badge-mini-success">
+                                <i class="bi bi-check-lg"></i>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="status-badge-mini badge-mini-pending">
+                                Pending
+                            </span>
+                        }
+                    </a>
+                }
             }
             else
             {
@@ -184,38 +177,33 @@
         </div>
     </div>
 
-    <!-- RIGHT WORKSPACE DECK VIEWPORT -->
     <div class="info-panel-workspace">
         <div class="info-workspace-header">
             <h5 id="workspaceTitle">Personal Information</h5>
         </div>
         <div class="info-workspace-body" id="workspace">
-            
-            <!-- Default Content Viewport Layout -->
             <div class="info-empty-placeholder">
                 <i class="bi bi-person-vcard"></i>
                 <h6>Select a section to begin onboarding.</h6>
             </div>
-
         </div>
     </div>
-
 </div>
 
-<!-- HIGH-PERFORMANCE INTERACTIVE PREDEFINED WORKSPACE LOADER -->
 <script>
     $(document).ready(function () {
+
+        alert("Information script loaded");
+
         $(".onboarding-section").click(function (e) {
             e.preventDefault();
 
-            // Handle UI active status highlight cleanly
             $(".onboarding-section").removeClass("active");
             $(this).addClass("active");
 
             var section = $(this).data("section");
             $("#workspaceTitle").text(section);
 
-            // Display loading indicator inside layout container
             $("#workspace").html(`
                 <div style="margin: auto; text-align: center; color: var(--text-secondary); font-size: 12.5px; padding: 32px 0;">
                     <span class="spinner-border spinner-border-sm text-purple me-2" role="status" style="border-width: 1.5px; width: 14px; height: 14px; color: var(--purple);"></span>
@@ -223,7 +211,6 @@
                 </div>
             `);
 
-            // Execute asynchronous jQuery route injection parameters
             $("#workspace").load(
                 "/CandidateOnboardingPortal/LoadInformationSection?section=" +
                 encodeURIComponent(section)

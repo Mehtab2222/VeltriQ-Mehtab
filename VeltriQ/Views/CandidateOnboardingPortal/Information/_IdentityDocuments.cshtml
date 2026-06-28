@@ -1,0 +1,349 @@
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIdentityDocumentsViewModel
+
+<style>
+    /* ── HIGH-DENSITY THEMED CARD CONSOLES ── */
+    .vq-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared sharp border guidelines */
+        margin-bottom: 16px;
+    }
+
+    .vq-form-card-header {
+        background: var(--hover-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+        .vq-form-card-header h5 {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .vq-form-card-header h5 i {
+                font-size: 13px;
+                color: var(--purple);
+            }
+
+    .vq-form-card-body {
+        padding: 0; /* Clear matrix framing containment boundary */
+    }
+
+    /* ── SYSTEM RECORD MATRIX TABLES ── */
+    .vq-dense-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+        font-size: 12.5px;
+    }
+
+        .vq-dense-table th {
+            background: var(--hover-bg);
+            color: var(--text-secondary);
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .vq-dense-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        .vq-dense-table tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* ── COMPACT DATA INPUT CONTROL FIELDS ── */
+    .vq-matrix-input {
+        width: 100%;
+        height: 30px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.15s ease;
+    }
+
+        .vq-matrix-input:focus {
+            border-color: var(--purple);
+        }
+
+    /* ── HIGH-DENSITY MINI INLINE FILE SLOTS ── */
+    .vq-mini-upload-zone {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px dashed var(--border);
+        background: var(--hover-bg);
+        border-radius: 4px;
+        padding: 4px 10px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition: all 0.15s ease;
+        max-width: 240px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .vq-mini-upload-zone:hover, .vq-mini-upload-zone.dragover {
+            border-color: var(--purple);
+            color: var(--text-primary);
+            background: var(--card-bg);
+        }
+
+    /* ── SYSTEM CONSOLE STATUS BADGES ── */
+    .vq-status-badge {
+        font-size: 10.5px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .status-uploaded {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* ── SYSTEM HIGH DENSITY BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+</style>
+
+<form id="identityDocumentsForm" asp-action="SaveIdentityDocuments" asp-controller="CandidateOnboardingPortal" method="post" enctype="multipart/form-data" autocomplete="off">
+    @Html.AntiForgeryToken()
+
+    <input asp-for="EmployeeOnboardingId" type="hidden" />
+
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-shield-check"></i> Identity & Verification Documents</h5>
+        </div>
+
+        <div class="vq-form-card-body">
+            <table class="vq-dense-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Document Type</th>
+                        <th style="width: 35%;">Document / Identification Number</th>
+                        <th style="width: 15%;">Status</th>
+                        <th style="width: 20%;">File Attachment (PDF, PNG, JPG)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Documents != null && Model.Documents.Any())
+                    {
+                        for (int i = 0; i < Model.Documents.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="Documents[@i].EmployeeOnboardingIdentityDocumentId" value="@Model.Documents[i].EmployeeOnboardingIdentityDocumentId" />
+                                    <input type="hidden" name="Documents[@i].DocumentName" value="@Model.Documents[i].DocumentName" />
+                                    <input type="hidden" name="Documents[@i].Uploaded" value="@Model.Documents[i].Uploaded.ToString().ToLower()" />
+                                    <strong>@Model.Documents[i].DocumentName</strong>
+                                </td>
+                                <td>
+                                    <input name="Documents[@i].DocumentNumber" value="@Model.Documents[i].DocumentNumber" required class="vq-matrix-input" placeholder="Enter @Model.Documents[i].DocumentName number" />
+                                </td>
+                                <td>
+                                    @if (Model.Documents[i].Uploaded)
+                                    {
+                                        <span class="vq-status-badge status-uploaded"><i class="bi bi-file-earmark-check"></i> Uploaded</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="vq-status-badge status-pending"><i class="bi bi-exclamation-circle"></i> Missing File</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <!-- Custom mini file target wrapper slot -->
+                                        <div class="vq-mini-upload-zone" id="uploadZone_@i" onclick="document.getElementById('fileInput_@i').click()">
+                                            <i class="bi bi-cloud-arrow-up" id="uploadIcon_@i"></i>
+                                            <span id="uploadLabel_@i">@(Model.Documents[i].Uploaded ? "Replace attached file..." : "Choose or drag file...")</span>
+                                        </div>
+                                        <input type="file" id="fileInput_@i" name="Documents[@i].DocumentFile" class="d-none vq-doc-file-input" data-index="@i" accept=".pdf,.jpg,.jpeg,.png" />
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <i class="bi bi-folder-x d-block mb-1" style="font-size: 18px; color: var(--text-muted);"></i>
+                                No document requirements assigned to this profile context.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="form-action-btn btn-submit-theme" id="btnSaveIdentityDocuments">
+            <i class="bi bi-check-circle"></i> Save Verification Documents
+        </button>
+    </div>
+</form>
+
+<script>
+    (function () {
+        const docForm = document.getElementById('identityDocumentsForm');
+
+        // Dynamic interaction logic handling file changes on row components
+        document.querySelectorAll('.vq-doc-file-input').forEach(input => {
+            input.addEventListener('change', function () {
+                const index = this.getAttribute('data-index');
+                const label = document.getElementById(`uploadLabel_${index}`);
+                const icon = document.getElementById(`uploadIcon_${index}`);
+
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    label.textContent = file.name;
+                    label.style.color = 'var(--purple)';
+                    icon.className = 'bi bi-file-earmark-text-fill';
+                }
+            });
+        });
+
+        // Setup Drag & Drop listeners for mini upload boxes
+        @if (Model.Documents != null)
+        {
+                for (int i = 0; i < Model.Documents.Count; i++)
+                {
+                        <text>
+                        (function() {
+                            const idx = "@i";
+                            const zone = document.getElementById(`uploadZone_${idx}`);
+                            const fileInp = document.getElementById(`fileInput_${idx}`);
+                            const lbl = document.getElementById(`uploadLabel_${idx}`);
+                            const icn = document.getElementById(`uploadIcon_${idx}`);
+
+                            if(zone && fileInp) {
+                                ['dragenter', 'dragover'].forEach(evt => {
+                                    zone.addEventListener(evt, (e) => {
+                                        e.preventDefault();
+                                        zone.classList.add('dragover');
+                                    }, false);
+                                });
+
+                                ['dragleave', 'drop'].forEach(evt => {
+                                    zone.addEventListener(evt, (e) => {
+                                        e.preventDefault();
+                                        zone.classList.remove('dragover');
+                                    }, false);
+                                });
+
+                                zone.addEventListener('drop', (e) => {
+                                    const dt = e.dataTransfer;
+                                    const files = dt.files;
+                                    if(files && files.length) {
+                                        fileInp.files = files;
+                                        lbl.textContent = files[0].name;
+                                        lbl.style.color = 'var(--purple)';
+                                        icn.className = 'bi bi-file-earmark-text-fill';
+                                    }
+                                }, false);
+                            }
+                        })();
+                        </text>
+                }
+        }
+
+        // Process unified payload transmission safely via Ajax
+        if (docForm) {
+            docForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('btnSaveIdentityDocuments');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" style="width: 12px; height: 12px; border-width: 1.5px;"></span> Saving Changes...`;
+
+                const formData = new FormData(docForm);
+
+                fetch($(this).attr('action'), {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        if (typeof refreshCandidateWorkspace === "function") {
+                            refreshCandidateWorkspace();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.message || 'Operation failed during upload handling verification.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Verification Documents`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong during data transmission.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Verification Documents`;
+                });
+            });
+        }
+    })();
+</script>

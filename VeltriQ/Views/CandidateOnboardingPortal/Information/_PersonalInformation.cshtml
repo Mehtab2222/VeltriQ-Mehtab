@@ -1,5 +1,464 @@
-﻿<h4>Personal Information</h4>
+﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingPersonalInformationViewModel
+@if (Model == null)
+{
+    <h2 style="color:red">
+        MODEL IS NULL
+    </h2>
 
-<hr />
+    return;
+}
+<style>
+    /* ── HIGH-DENSITY THEMED CARD CONSOLES ── */
+    .vq-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared sharp border guidelines */
+        margin-bottom: 16px;
+    }
 
-<p>Personal Information Form will be displayed here.</p>
+    .vq-form-card-header {
+        background: var(--hover-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .vq-form-card-header h5 {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+            .vq-form-card-header h5 i {
+                font-size: 13px;
+                color: var(--purple);
+            }
+
+    .vq-form-card-body {
+        padding: 16px;
+    }
+
+    /* ── COMPACT REFINED FORM CONTROL INPUTS ── */
+    .vq-field-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .vq-field-wrap label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+    .vq-input-ctrl {
+        width: 100%;
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.15s ease;
+    }
+
+        .vq-input-ctrl:focus {
+            border-color: var(--purple);
+        }
+
+    select.vq-input-ctrl {
+        padding-right: 24px;
+    }
+
+    /* ── PREMIUM DRAG & DROP PHOTO CONSOLE ── */
+    .photo-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 8px 0;
+    }
+
+    .photo-preview-circle {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        background: var(--hover-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+        .photo-preview-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview-circle i {
+            font-size: 24px;
+            color: var(--text-muted);
+        }
+
+    .photo-dropzone-box {
+        flex: 1;
+        border: 1.5px dashed var(--border);
+        background: var(--hover-bg);
+        border-radius: 6px;
+        padding: 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.15s ease;
+    }
+
+        .photo-dropzone-box:hover, .photo-dropzone-box.dragover {
+            border-color: var(--purple);
+        }
+
+        .photo-dropzone-box p {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .photo-dropzone-box span {
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+    /* ── SYSTEM HIGH DENSITY BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+</style>
+
+<form id="personalInformationForm" asp-action="SavePersonalInformation" asp-controller="CandidateOnboardingPortal" method="post" autocomplete="off" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <input asp-for="EmployeeOnboardingId" type="hidden" />
+    <input asp-for="EmployeeOnboardingPersonalInformationId" type="hidden" />
+
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-person-vcard"></i> Basic Information</h5>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="FirstName">First Name</label>
+                        <input asp-for="FirstName" class="vq-input-ctrl" placeholder="Enter first name" />
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="MiddleName">Middle Name</label>
+                        <input asp-for="MiddleName" class="vq-input-ctrl" placeholder="Enter middle name" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="LastName">Last Name</label>
+                        <input asp-for="LastName" class="vq-input-ctrl" placeholder="Enter last name" />
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="DateOfBirth">Date of Birth</label>
+                        <input asp-for="DateOfBirth" type="date" class="vq-input-ctrl" value="@(Model.DateOfBirth?.ToString("yyyy-MM-dd"))" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="Gender">Gender</label>
+                        <select asp-for="Gender" class="vq-input-ctrl">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-card-checklist"></i> Personal Details</h5>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="Nationality">Nationality</label>
+                        <input asp-for="Nationality" class="vq-input-ctrl" placeholder="e.g. Indian" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="Religion">Religion</label>
+                        <select asp-for="Religion" class="vq-input-ctrl">
+                            <option value="">Select Religion</option>
+                            <option value="Buddhism">Buddhism</option>
+                            <option value="Christianity">Christianity</option>
+                            <option value="Hinduism">Hinduism</option>
+                            <option value="Islam">Islam</option>
+                            <option value="Sikhism">Sikhism</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="BloodGroup">Blood Group</label>
+                        <select asp-for="BloodGroup" class="vq-input-ctrl">
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="MaritalStatus">Marital Status</label>
+                        <select asp-for="MaritalStatus" class="vq-input-ctrl">
+                            <option value="">Select Status</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-people"></i> Family Information</h5>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="FatherName">Father's Full Name</label>
+                        <input asp-for="FatherName" class="vq-input-ctrl" placeholder="Enter father's name" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="vq-field-wrap">
+                        <label asp-for="MotherName">Mother's Full Name</label>
+                        <input asp-for="MotherName" class="vq-input-ctrl" placeholder="Enter mother's name" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-telephone"></i> Contact Information</h5>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="Email">Email Address</label>
+                        <input asp-for="Email" type="email" class="vq-input-ctrl" placeholder="name@example.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="MobileNumber">Mobile Number</label>
+                        <input asp-for="MobileNumber" class="vq-input-ctrl" placeholder="Enter mobile number" />
+                        <span asp-validation-for="MobileNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="vq-field-wrap">
+                        <label asp-for="AlternateMobileNumber">Alternate Mobile</label>
+                        <input asp-for="AlternateMobileNumber" class="vq-input-ctrl" placeholder="Optional alternate number" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="vq-form-card">
+        <div class="vq-form-card-header">
+            <h5><i class="bi bi-camera"></i> Profile Image</h5>
+        </div>
+        <div class="vq-form-card-body">
+            <div class="photo-upload-container">
+                <div class="photo-preview-circle" id="avatarPreviewContainer">
+                    @if (!string.IsNullOrEmpty(Model.ProfilePhotoPath))
+                    {
+                        <i class="bi bi-person-fill" id="avatarFallbackIcon" style="display: none;"></i>
+                        <img id="avatarImgElement" src="@Model.ProfilePhotoPath" style="display: block;" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-person-fill" id="avatarFallbackIcon" style="display: block;"></i>
+                        <img id="avatarImgElement" src="" style="display: none;" />
+                    }
+                </div>
+                <div class="photo-dropzone-box" id="dropzoneBox" onclick="document.getElementById('hiddenPhotoInput').click()">
+                    <p>Click or drag image file here to change</p>
+                    <span>Supports JPG, JPEG, or PNG format sizes</span>
+                    <input type="file" id="hiddenPhotoInput" name="ProfilePhotoFile" class="d-none" accept=".jpg,.jpeg,.png" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="form-action-btn btn-submit-theme" id="btnSavePersonalInfo">
+            <i class="bi bi-check-circle"></i> Save Information
+        </button>
+    </div>
+</form>
+
+<script>
+    (function () {
+        const fileInput = document.getElementById('hiddenPhotoInput');
+        const previewImg = document.getElementById('avatarImgElement');
+        const fallbackIcon = document.getElementById('avatarFallbackIcon');
+        const dropzone = document.getElementById('dropzoneBox');
+
+        function handleFileSelect(file) {
+            if (!file) return;
+
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a valid image file (JPG, JPEG, or PNG).');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                fallbackIcon.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                handleFileSelect(this.files[0]);
+            });
+        }
+
+        if (dropzone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const file = dt.files[0];
+                if (file && fileInput) {
+                    fileInput.files = dt.files;
+                    handleFileSelect(file);
+                }
+            }, false);
+        }
+
+        const infoForm = document.getElementById('personalInformationForm');
+        if (infoForm) {
+            infoForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('btnSavePersonalInfo');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" style="width: 12px; height: 12px; border-width: 1.5px;"></span> Saving...`;
+
+                const formData = new FormData(infoForm);
+
+                fetch($(this).attr('action'), {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        if(typeof refreshCandidateWorkspace === "function"){
+                            refreshCandidateWorkspace();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.message || 'Validation error while executing save operations.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Information`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong during submission.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Save Information`;
+                });
+            });
+        }
+    })();
+</script>

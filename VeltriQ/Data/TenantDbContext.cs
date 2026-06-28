@@ -105,6 +105,13 @@ namespace VeltriQ.Data
         public DbSet<EmployeeOnboardingEducation> EmployeeOnboardingEducations { get; set; }
         public DbSet<EmployeeOnboardingExperience> EmployeeOnboardingExperiences { get; set; }
         public DbSet<OnboardingCandidateInvitation> OnboardingCandidateInvitations { get; set; }
+        public DbSet<EmployeeOnboardingEmergencyContact> EmployeeOnboardingEmergencyContacts { get; set; }
+
+        public DbSet<EmployeeOnboardingDependent> EmployeeOnboardingDependents { get; set; }
+
+        public DbSet<EmployeeOnboardingQualification> EmployeeOnboardingQualifications { get; set; }
+
+        public DbSet<EmployeeOnboardingIdentity> EmployeeOnboardingIdentities { get; set; }
 
         // =========================
         // MAP SCHEMAS

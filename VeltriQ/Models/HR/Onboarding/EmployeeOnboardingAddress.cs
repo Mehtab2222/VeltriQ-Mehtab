@@ -39,6 +39,8 @@ namespace VeltriQ.Models.HR.Onboarding
 
         [StringLength(20)]
         public string? CurrentPincode { get; set; }
+        [StringLength(150)]
+        public string? CurrentLandmark { get; set; }
 
         //====================================================
         // PERMANENT ADDRESS
@@ -63,10 +65,8 @@ namespace VeltriQ.Models.HR.Onboarding
 
         [StringLength(20)]
         public string? PermanentPincode { get; set; }
-
-        //====================================================
-        // WORKFLOW
-        //====================================================
+        [StringLength(150)]
+        public string? PermanentLandmark { get; set; }
 
 
 

@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html lang="en" id="vqRoot" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - VeltriQ Portal</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+
+    <style>
+        /* ── THEME VARIABLE ARCHITECTURE MATRIX ── */
+        :root {
+            --topbar-h: 60px;
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f3f7;
+            --card-bg: #ffffff;
+            --topbar-bg: #2C0023; /* Deep burgundy brand theme identity */
+            --text-primary: #1a0f18;
+            --text-secondary: #6b546a;
+            --text-muted: #9e809c;
+            --border: #e4d8e2;
+            --input-bg: #ffffff;
+            --hover-bg: rgba(255, 255, 255, 0.10);
+            --purple: #2C0023;
+            --logo-text-color: #ffffff;
+            --scrollbar-thumb: rgba(44, 0, 35, 0.25);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f0813;
+            --card-bg: #1a101d;
+            --topbar-bg: #14030f;
+            --text-primary: #f3eff6;
+            --text-secondary: #aa95a9;
+            --text-muted: #7d657b;
+            --border: #331f31;
+            --input-bg: #221424;
+            --hover-bg: rgba(255, 255, 255, 0.05);
+            --purple: #9d5ba0;
+            --logo-text-color: #f3eff6;
+            --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ── INDEPENDENT VIEWPORT MANAGEMENT ── */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        /* Full Screen Portal Framework */
+        .portal-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* ── DEDICATED TOP BAR CONSOLE ── */
+        .portal-topbar {
+            background: var(--topbar-bg);
+            border-bottom: 1px solid var(--border);
+            height: var(--topbar-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        /* Left Branding Container */
+        .portal-branding {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #6d28d9, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .brand-text {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--logo-text-color);
+            letter-spacing: -.3px;
+            line-height: 1.2;
+        }
+        .brand-sub {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.3;
+        }
+
+        /* Right Profile Navigation Actions */
+        .portal-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 9px;
+            background: var(--hover-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .profile-avatar-mini {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #7c3aed;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .p-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        .p-role {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Compact Sign Out Link Trigger */
+        .btn-portal-logout {
+            height: 32px;
+            padding: 0 12px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .btn-portal-logout:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+
+        /* ── CENTRALIZED WORKSPACE DECK ── */
+        .portal-workspace-deck {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 20px 24px;
+            background: var(--bg);
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) transparent;
+        }
+
+        .portal-workspace-deck::-webkit-scrollbar {
+            width: 4px;
+        }
+        .portal-workspace-deck::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .portal-workspace-deck::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+    <div class="portal-shell">
+
+        <header class="portal-topbar">
+
+            <div class="portal-branding">
+                <div class="brand-icon">V</div>
+                <div class="brand-text">
+                    VeltriQ HRMS
+                    <div class="brand-sub">Onboarding Portal</div>
+                </div>
+            </div>
+
+            <div class="portal-actions">
+                <div class="profile-pill">
+                    <div class="profile-avatar-mini">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="profile-info">
+                        <span class="p-name">@(ViewBag.CandidateName ?? "Candidate Portal")</span>
+                        <span class="p-role">Workspace Account</span>
+                    </div>
+                </div>
+
+                <a href="/Account/Logout" class="btn-portal-logout">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                </a>
+            </div>
+
+        </header>
+
+        <main class="portal-workspace-deck">
+            @RenderBody()
+        </main>
+
+    </div>
+
+
+    <script>
+        // Automatic runtime validation syncing user theme selections matching system storage values
+        (function () {
+            var storedTheme = localStorage.getItem('vq-theme') || 'light';
+            document.getElementById('vqRoot').setAttribute('data-theme', storedTheme);
+        })();
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
