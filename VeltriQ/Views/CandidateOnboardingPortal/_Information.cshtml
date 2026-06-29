@@ -21,14 +21,15 @@
         border-bottom: 1px solid var(--border);
         background: var(--hover-bg);
     }
-    .info-sidebar-header h5 {
-        margin: 0;
-        font-size: 11px;
-        font-weight: 700;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+
+        .info-sidebar-header h5 {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
     .info-list-group {
         display: flex;
@@ -47,14 +48,16 @@
         border-bottom: 1px solid var(--border);
         transition: background-color 0.1s ease, color 0.1s ease;
     }
-    .info-list-item:last-child {
-        border-bottom: none;
-    }
-    .info-list-item:hover,
-    .info-list-item.active {
-        background: var(--hover-bg);
-        color: var(--purple);
-    }
+
+        .info-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-list-item:hover,
+        .info-list-item.active {
+            background: var(--hover-bg);
+            color: var(--purple);
+        }
 
     .info-item-label {
         white-space: nowrap;
@@ -76,12 +79,13 @@
         border-bottom: 1px solid var(--border);
         background: var(--hover-bg);
     }
-    .info-workspace-header h5 {
-        margin: 0;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
+
+        .info-workspace-header h5 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
 
     .info-workspace-body {
         padding: 16px;
@@ -97,19 +101,21 @@
         max-width: 280px;
         padding: 32px 16px;
     }
-    .info-empty-placeholder i {
-        font-size: 24px;
-        opacity: 0.4;
-        display: block;
-        margin-bottom: 8px;
-        color: var(--purple);
-    }
-    .info-empty-placeholder h6 {
-        margin: 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
+
+        .info-empty-placeholder i {
+            font-size: 24px;
+            opacity: 0.4;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--purple);
+        }
+
+        .info-empty-placeholder h6 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
 
     .status-badge-mini {
         font-size: 10px;
@@ -119,24 +125,30 @@
         padding: 2px 6px;
         border-radius: 4px;
     }
+
     .badge-mini-success {
         background: rgba(34, 197, 94, 0.12);
         color: #22c55e;
     }
+
     .badge-mini-pending {
         background: rgba(234, 179, 8, 0.12);
         color: #eab308;
     }
 
     @@media (max-width: 768px) {
-        .information-split-pane {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
-        }
-        .info-panel-sidebar {
-            width: 100%;
-        }
+        .information-split-pane
+
+    {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .info-panel-sidebar {
+        width: 100%;
+    }
+
     }
 </style>
 
@@ -150,6 +162,12 @@
             {
                 foreach (var item in Model.Sections.OrderBy(x => x.DisplayOrder))
                 {
+                    @* Pure string sanitization filter: Ignore Identity Documents matching your separate Documents tab strategy *@
+                    if (item.SectionName == "Identity Documents" || item.SectionName == "Identity Document")
+                    {
+                        continue;
+                    }
+
                     <a href="#" class="info-list-item onboarding-section" data-section="@item.SectionName">
                         <span class="info-item-label">@item.SectionName</span>
 
@@ -192,9 +210,6 @@
 
 <script>
     $(document).ready(function () {
-
-        alert("Information script loaded");
-
         $(".onboarding-section").click(function (e) {
             e.preventDefault();
 

@@ -35,7 +35,11 @@ namespace VeltriQ.Models.HR.Onboarding
         public bool RequiresAcceptance { get; set; } = true;
 
         public bool AllowDownload { get; set; } = true;
+        [StringLength(255)]
+        public string? FileName { get; set; }
 
+        [StringLength(500)]
+        public string? FilePath { get; set; }
         public int DisplayOrder { get; set; }
 
         public bool IsActive { get; set; } = true;

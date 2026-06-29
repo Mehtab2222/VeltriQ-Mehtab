@@ -14,7 +14,7 @@
     .hero-top-row {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: center;
         gap: 16px;
     }
 
@@ -136,6 +136,11 @@
         color: var(--text-secondary);
     }
 
+    /* Fixed Theme Typography Classes */
+    .vq-txt-primary {
+        color: var(--text-primary) !important;
+    }
+
     /* ── SYSTEM WORKFLOW ACTIONS ── */
     .form-action-btn {
         height: 32px;
@@ -196,15 +201,24 @@
 </style>
 
 <div class="profile-hero-banner">
-    <!-- TOP ROW CONTROL STRUCTURE -->
     <div class="hero-top-row">
         <div>
-            <form asp-action="FinalSubmit" method="post" id="finalSubmitForm" onsubmit="return confirm('Are you sure you want to execute final submission? Profiles turn read-only post confirmation.');">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="form-action-btn btn-submit-theme" id="btnFinalSubmit" @(Model.UploadedDocuments < Model.TotalDocuments ? "disabled" : "")>
-                    <i class="bi bi-cloud-arrow-up"></i> Final Submit Onboarding
-                </button>
-            </form>
+            @if (Model.Status == "Submitted" || Model.Status == "Approved")
+            {
+                <div style="background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.2); padding: 8px 14px; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-shield-check text-success" style="font-size: 16px;"></i>
+                    <span class="vq-txt-primary" style="font-size: 12.5px; font-weight: 600;">Your onboarding has been submitted successfully and is under HR review.</span>
+                </div>
+            }
+            else if (Model.CanSubmit == true)
+            {
+                <form asp-action="FinalSubmit" method="post" id="finalSubmitForm" onsubmit="return confirm('Are you sure you want to execute final submission? Profiles turn read-only post confirmation.');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="form-action-btn btn-submit-theme" id="btnFinalSubmit" @(Model.UploadedDocuments < Model.TotalDocuments ? "disabled" : "")>
+                        <i class="bi bi-cloud-arrow-up"></i> Final Submit Onboarding
+                    </button>
+                </form>
+            }
         </div>
 
         <div class="hero-status-block">
@@ -226,7 +240,6 @@
         </div>
     </div>
 
-    <!-- MAIN IDENTITY PROFILE CONTAINER -->
     <div class="hero-top-row" style="align-items: flex-end; margin-bottom: 4px;">
         <div class="hero-profile-core">
             <div class="hero-avatar-wrapper">
@@ -248,7 +261,6 @@
         </div>
     </div>
 
-    <!-- CONCISE METADATA METRIC FIELDS -->
     <div class="hero-metadata-strip">
         <span>Candidate Code: <strong>@Model.CandidateCode</strong></span>
         <span>Employment Type: <strong>@Model.EmploymentType</strong></span>

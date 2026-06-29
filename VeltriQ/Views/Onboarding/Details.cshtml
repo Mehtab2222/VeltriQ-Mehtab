@@ -39,16 +39,18 @@
         gap: 8px;
         margin-top: 4px;
     }
-    .hero-name-row i {
-        font-size: 18px;
-        color: var(--purple);
-    }
-    .hero-name-row h2 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
+
+        .hero-name-row i {
+            font-size: 18px;
+            color: var(--purple);
+        }
+
+        .hero-name-row h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
 
     .hero-meta-subtitle {
         font-size: 12px;
@@ -67,9 +69,10 @@
         font-size: 11.5px;
         color: var(--text-secondary);
     }
-    .hero-metadata-strip span strong {
-        color: var(--text-primary);
-    }
+
+        .hero-metadata-strip span strong {
+            color: var(--text-primary);
+        }
 
     .hero-status-block {
         display: flex;
@@ -113,14 +116,16 @@
         cursor: pointer;
         transition: all 0.15s ease;
     }
-    .details-tab-btn:hover {
-        color: var(--purple);
-    }
-    .details-tab-btn.active {
-        color: var(--purple);
-        background: var(--card-bg);
-        border-color: var(--border) var(--border) transparent var(--border);
-    }
+
+        .details-tab-btn:hover {
+            color: var(--purple);
+        }
+
+        .details-tab-btn.active {
+            color: var(--purple);
+            background: var(--card-bg);
+            border-color: var(--border) var(--border) transparent var(--border);
+        }
 
     /* ── WORKSPACE TAB VIEWPORT ── */
     .workspace-tab-viewport {
@@ -136,27 +141,30 @@
         border-collapse: collapse;
         margin-top: 4px;
     }
-    .viewport-grid-table th {
-        text-align: left;
-        padding: 8px 12px;
-        font-size: 10px;
-        font-weight: 700;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid var(--border);
-        background: var(--hover-bg);
-    }
-    .viewport-grid-table td {
-        padding: 8px 12px;
-        border-bottom: 1px solid var(--border);
-        color: var(--text-primary);
-        font-size: 12.5px;
-        vertical-align: middle;
-    }
-    .viewport-grid-table tbody tr:hover {
-        background: var(--hover-bg);
-    }
+
+        .viewport-grid-table th {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--hover-bg);
+        }
+
+        .viewport-grid-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .viewport-grid-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
 
     /* ── HIGH-DENSITY WORKSPACE LISTS ── */
     .section-workspace-list {
@@ -164,6 +172,7 @@
         flex-direction: column;
         gap: 8px;
     }
+
     .section-workspace-item {
         display: flex;
         justify-content: space-between;
@@ -173,23 +182,28 @@
         border: 1px solid var(--border);
         transition: background-color 0.15s ease;
     }
-    .section-workspace-item:hover {
-        background: var(--hover-bg);
-    }
+
+        .section-workspace-item:hover {
+            background: var(--hover-bg);
+        }
+
     .section-item-left {
         display: flex;
         align-items: center;
         gap: 12px;
     }
+
     .section-item-icon {
         font-size: 16px;
     }
+
     .section-item-info h4 {
         margin: 0;
         font-size: 13px;
         font-weight: 600;
         color: var(--text-primary);
     }
+
     .section-item-info p {
         margin: 2px 0 0 0;
         font-size: 11px;
@@ -204,14 +218,17 @@
         padding: 10px 12px;
         border-bottom: 1px solid var(--border);
     }
-    .overview-summary-row:last-child {
-        border-bottom: none;
-    }
+
+        .overview-summary-row:last-child {
+            border-bottom: none;
+        }
+
     .overview-summary-label {
         font-size: 13px;
         font-weight: 600;
         color: var(--text-primary);
     }
+
     .overview-summary-value {
         font-size: 12px;
         font-weight: 700;
@@ -228,11 +245,12 @@
         text-align: center;
         color: var(--text-secondary);
     }
-    .timeline-empty-placeholder i {
-        font-size: 28px;
-        opacity: 0.4;
-        margin-bottom: 8px;
-    }
+
+        .timeline-empty-placeholder i {
+            font-size: 28px;
+            opacity: 0.4;
+            margin-bottom: 8px;
+        }
 
     /* ── BADGES & ACTION LINKS ── */
     .status-pill {
@@ -245,11 +263,31 @@
         font-size: 10.5px;
         font-weight: 700;
     }
-    .status-invited { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
-    .status-progress { background: rgba(234, 179, 8, 0.12); color: #eab308; }
-    .status-submitted { background: rgba(147, 51, 234, 0.12); color: #a855f7; }
-    .status-approved { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-    .status-default { background: var(--hover-bg); color: var(--text-secondary); }
+
+    .status-invited {
+        background: rgba(59, 130, 246, 0.12);
+        color: #3b82f6;
+    }
+
+    .status-progress {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    .status-submitted {
+        background: rgba(147, 51, 234, 0.12);
+        color: #a855f7;
+    }
+
+    .status-approved {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .status-default {
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+    }
 
     .progress-percent-large {
         font-size: 22px;
@@ -272,15 +310,17 @@
         transition: .15s ease-in-out;
         cursor: pointer;
     }
+
     .btn-cancel-theme {
         background: var(--hover-bg);
         color: var(--text-primary);
         border: 1px solid var(--border);
     }
-    .btn-cancel-theme:hover {
-        background: rgba(124, 58, 237, 0.15);
-        color: var(--purple);
-    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
 </style>
 
 <div class="profile-details-page">
@@ -296,7 +336,8 @@
                 <span class="status-label-caption">Current Lifecycle Status</span>
                 @{
                     string statusLower = (Model.Status ?? "").ToLower();
-                    string statusClass = statusLower switch {
+                    string statusClass = statusLower switch
+                    {
                         "invited" => "status-invited",
                         "in progress" or "progress" => "status-progress",
                         "submitted" => "status-submitted",
@@ -369,7 +410,7 @@
     </ul>
 
     <div class="workspace-tab-viewport">
-        
+
         <div id="view_overview">
             <div class="overview-summary-row">
                 <span class="overview-summary-label">Information Sections Completed</span>
@@ -395,6 +436,12 @@
                 {
                     foreach (var item in Model.Sections)
                     {
+                        @* Pure string sanitization filter matching the _Information sidebar strategy *@
+                        if (item.SectionName == "Identity Documents" || item.SectionName == "Identity Document")
+                        {
+                            continue;
+                        }
+
                         <div class="section-workspace-item">
                             <div class="section-item-left">
                                 <div class="section-item-icon">
@@ -569,7 +616,7 @@
         for (let i = 0; i < tabs.length; i++) {
             tabs[i].classList.remove('active');
         }
-        
+
         buttonElement.classList.add('active');
 
         const targets = ['overview', 'information', 'documents', 'policies', 'activities', 'timeline'];

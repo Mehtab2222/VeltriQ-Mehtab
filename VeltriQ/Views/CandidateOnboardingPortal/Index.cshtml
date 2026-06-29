@@ -185,16 +185,7 @@
                 <i class="bi bi-shield-check"></i> Policies
             </button>
         </li>
-        <li class="details-tab-item">
-            <button class="details-tab-btn" onclick="toggleDetailsTab('activities', this)">
-                <i class="bi bi-calendar-check"></i> Activities
-            </button>
-        </li>
-        <li class="details-tab-item">
-            <button class="details-tab-btn" onclick="toggleDetailsTab('timeline', this)">
-                <i class="bi bi-clock-history"></i> Timeline
-            </button>
-        </li>
+
     </ul>
 
     <div class="workspace-tab-viewport">
@@ -212,15 +203,7 @@
         </div>
 
         <div id="view_policies" style="display: none;">
-            @await Html.PartialAsync("_Policies", Model)
-        </div>
-
-        <div id="view_activities" style="display: none;">
-            @await Html.PartialAsync("_Activities", Model)
-        </div>
-
-        <div id="view_timeline" style="display: none;">
-            @await Html.PartialAsync("_Timeline", Model)
+            @await Html.PartialAsync("_Policies", Model.Policies)
         </div>
 
     </div>
@@ -239,7 +222,7 @@
             buttonElement.classList.add('active');
 
             // Collapse view instances instantly
-            const targets = ['overview', 'information', 'documents', 'policies', 'activities', 'timeline'];
+            const targets = ['overview', 'information', 'documents', 'policies'];
             targets.forEach(view => {
                 const el = document.getElementById('view_' + view);
                 if (el) el.style.display = 'none';

@@ -1,63 +1,260 @@
-﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
+﻿
+@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingPoliciesViewModel
 
-<div id="portal_policies">
-    <div class="responsive-table-holder">
-        <table class="viewport-grid-table">
-            <thead>
-                <tr>
-                    <th>Policy Name</th>
-                    <th style="width: 120px;">Mandatory</th>
-                    <th style="width: 120px;">Accepted</th>
-                    <th>Accepted On</th>
-                    <th style="width: 100px; text-align: right;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.PoliciesList != null && Model.PoliciesList.Any())
-                {
-                    foreach (var policy in Model.PoliciesList)
-                    {
-                        <tr>
-                            <td style="font-weight: 600;">@policy.PolicyName</td>
-                            <td class="text-muted">@(policy.IsMandatory ? "Yes" : "No")</td>
-                            <td>
-                                <i class="bi @(policy.IsAccepted ? "bi-check2 text-success" : "bi-hourglass-split text-warning")"></i>
-                            </td>
-                            <td class="text-muted">@(policy.AcceptedOn?.ToString("dd MMM yyyy") ?? "-")</td>
-                            <td style="text-align: right;">
-                                @if (policy.IsAccepted)
-                                {
-                                    <span class="status-pill status-approved">
-                                        <i class="bi bi-check-all"></i> Signed
-                                    </span>
-                                }
-                                else if (Model.Status == "Submitted")
-                                {
-                                    <a class="btn-action-mini disabled" href="javascript:void(0);">
-                                        <i class="bi bi-lock"></i> Locked
-                                    </a>
-                                }
-                                else
-                                {
-                                    <a class="btn-action-mini"
-                                       asp-action="ReviewPolicy"
-                                       asp-route-id="@policy.EmployeeOnboardingPolicyId">
-                                        <i class="bi bi-file-earmark-ruled"></i> Review & Sign
-                                    </a>
-                                }
-                            </td>
-                        </tr>
-                    }
-                }
-                else
+<style>
+    /* ── PREMIUM SYSTEM RECORD GRID TABLES ── */
+    .responsive-table-holder {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+    }
+
+    .viewport-grid-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+        font-size: 12.5px;
+    }
+
+        .viewport-grid-table th {
+            background: var(--hover-bg);
+            color: var(--text-secondary);
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .viewport-grid-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        .viewport-grid-table tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* Fixed Theme Typography Classes preventing visibility collisions */
+    .vq-txt-primary {
+        color: var(--text-primary) !important;
+    }
+
+    .vq-txt-secondary {
+        color: var(--text-secondary) !important;
+    }
+
+    /* ── SYSTEM CONSOLE ACTION CHIPS ── */
+    .btn-action-mini {
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer;
+        border: 1px solid transparent;
+        background: transparent;
+    }
+
+    .btn-download-theme {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-download-theme:hover {
+            color: var(--purple);
+            background: var(--hover-bg);
+            border-color: rgba(109, 40, 217, 0.3);
+        }
+
+    .btn-accept-theme {
+        background: rgba(109, 40, 217, 0.1);
+        color: var(--purple);
+        border: 1px solid rgba(109, 40, 217, 0.2);
+    }
+
+        .btn-accept-theme:hover {
+            background: linear-gradient(135deg, #6d28d9, #7c3aed);
+            color: #fff;
+        }
+
+    /* ── SYSTEM STATUS PILLS ── */
+    .status-pill {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: inline-block;
+    }
+
+    .status-approved {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .status-progress {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+</style>
+
+<div class="responsive-table-holder">
+    <table class="viewport-grid-table">
+        <thead>
+            <tr>
+                <th>Policy Statement</th>
+                <th style="width: 120px;">Mandatory</th>
+                <th style="width: 120px;">Accepted Status</th>
+                <th style="width: 160px;">Accepted On</th>
+                <th style="width: 240px; text-align: right;">Action Control Deck</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Policies != null && Model.Policies.Any())
+            {
+                foreach (var item in Model.Policies)
                 {
                     <tr>
-                        <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                            No system policies require signature tracking at this time.
+                        <td class="vq-txt-primary">
+                            <strong>@item.PolicyName</strong>
+                        </td>
+
+                        <td class="vq-txt-secondary">
+                            @(item.IsMandatory ? "Yes" : "No")
+                        </td>
+
+                        <td>
+                            @if (item.IsAccepted)
+                            {
+                                <span class="status-pill status-approved">
+                                    Accepted
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-pill status-progress">
+                                    Pending
+                                </span>
+                            }
+                        </td>
+
+                        <td class="vq-txt-secondary">
+                            @(item.AcceptedOn?.ToString("dd MMM yyyy") ?? "—")
+                        </td>
+
+                        <td style="text-align: right;">
+                            <div class="d-flex justify-content-end gap-1">
+                                @if (item.AllowDownload)
+                                {
+                                    <a class="btn-action-mini btn-download-theme"
+                                       asp-action="DownloadPolicy"
+                                       asp-controller="CandidateOnboardingPortal"
+                                       asp-route-id="@item.EmployeeOnboardingPolicyId"
+                                       title="Download Policy File">
+                                        <i class="bi bi-download"></i> Download
+                                    </a>
+                                }
+
+                                @if (!item.IsAccepted)
+                                {
+                                    <button class="btn-action-mini btn-accept-theme btnAcceptPolicy"
+                                            type="button"
+                                            data-id="@item.EmployeeOnboardingPolicyId"
+                                            data-name="@item.PolicyName">
+                                        <i class="bi bi-check-lg"></i> Accept
+                                    </button>
+                                }
+                            </div>
                         </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    </div>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center vq-txt-secondary py-4" style="padding: 25px;">
+                        <i class="bi bi-shield-slash d-block mb-1" style="font-size: 18px; opacity: 0.7;"></i>
+                        No system regulatory policies assigned.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+
+<form id="frmAcceptPolicy" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<script>
+    (function () {
+        const tokenInput = document.querySelector("#frmAcceptPolicy input[name='__RequestVerificationToken']");
+
+        document.querySelectorAll(".btnAcceptPolicy").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const policyId = this.dataset.id;
+                const policyName = this.dataset.name || "this regulatory policy";
+
+                if (!confirm(`Do you officially read and accept the terms outlined in: ${policyName}?`)) {
+                    return;
+                }
+
+                // Visual processing state lock
+                this.disabled = true;
+                this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" style="width: 11px; height: 11px; border-width: 1.5px;"></span> Processing...`;
+
+                const tokenValue = tokenInput ? tokenInput.value : "";
+
+                // Formulate parameters via native x-www-form-urlencoded parsing structures
+                const payload = new URLSearchParams();
+                payload.append("id", policyId);
+                payload.append("__RequestVerificationToken", tokenValue);
+
+                fetch("/CandidateOnboardingPortal/AcceptPolicy", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: payload.toString()
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message || "Policy terms accepted successfully.");
+
+                        if (typeof refreshCandidateWorkspace === "function") {
+                            refreshCandidateWorkspace();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.message || "Verification operational error occurred.");
+                        this.disabled = false;
+                        this.innerHTML = `<i class="bi bi-check-lg"></i> Accept`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong during terms confirmation transmission.");
+                    this.disabled = false;
+                    this.innerHTML = `<i class="bi bi-check-lg"></i> Accept`;
+                });
+            });
+        });
+    })();
+</script>

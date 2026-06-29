@@ -1,20 +1,57 @@
 ﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
 
 <div id="portal_overview">
+
     <div class="overview-summary-row">
-        <span class="overview-summary-label">Profile Information Sections Completed</span>
-        <span class="overview-summary-value">@Model.CompletedSections / @Model.TotalSections</span>
+        <span class="overview-summary-label">
+            Overall Completion
+        </span>
+
+        <span class="overview-summary-value">
+            @Model.CompletionPercentage%
+        </span>
     </div>
+
+    <div class="progress mb-3" style="height:10px;">
+        <div class="progress-bar bg-success"
+             role="progressbar"
+             style="width:@Model.CompletionPercentage%;"
+             aria-valuenow="@Model.CompletionPercentage"
+             aria-valuemin="0"
+             aria-valuemax="100">
+        </div>
+    </div>
+
+    <hr />
+
     <div class="overview-summary-row">
-        <span class="overview-summary-label">Mandatory Documents Uploaded</span>
-        <span class="overview-summary-value">@Model.UploadedDocuments / @Model.TotalDocuments</span>
+        <span class="overview-summary-label">
+            Profile Information Sections Completed
+        </span>
+
+        <span class="overview-summary-value">
+            @Model.CompletedSections / @Model.TotalSections
+        </span>
     </div>
+
     <div class="overview-summary-row">
-        <span class="overview-summary-label">Company Policies Accepted</span>
-        <span class="overview-summary-value">@Model.AcceptedPolicies / @Model.TotalPolicies</span>
+        <span class="overview-summary-label">
+            Mandatory Documents Uploaded
+        </span>
+
+        <span class="overview-summary-value">
+            @Model.UploadedDocuments / @Model.TotalDocuments
+        </span>
     </div>
+
     <div class="overview-summary-row">
-        <span class="overview-summary-label">Pending Activities Completed</span>
-        <span class="overview-summary-value">@Model.CompletedActivities / @Model.TotalActivities</span>
+        <span class="overview-summary-label">
+            Company Policies Accepted
+        </span>
+
+        <span class="overview-summary-value">
+            @Model.AcceptedPolicies / @Model.TotalPolicies
+        </span>
     </div>
+
 </div>

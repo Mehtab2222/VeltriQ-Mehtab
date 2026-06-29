@@ -22,7 +22,7 @@ namespace VeltriQ.ViewModels.CandidateOnboardingPortal
         public string Department { get; set; } = string.Empty;
 
         public string EmploymentType { get; set; } = string.Empty;
-
+        public CandidateOnboardingPoliciesViewModel Policies { get; set; }
         public DateTime? ExpectedJoiningDate { get; set; }
         public string Email { get; set; } = string.Empty;
 
@@ -42,9 +42,6 @@ namespace VeltriQ.ViewModels.CandidateOnboardingPortal
 
         public int TotalPolicies { get; set; }
 
-        public int CompletedActivities { get; set; }
-
-        public int TotalActivities { get; set; }
         public decimal CompletionPercentage { get; set; }
         public List<EmployeeOnboardingDocumentViewModel> DocumentsList { get; set; }
     = new();
@@ -52,8 +49,13 @@ namespace VeltriQ.ViewModels.CandidateOnboardingPortal
         public List<EmployeeOnboardingPolicyViewModel> PoliciesList { get; set; }
             = new();
 
-        public List<EmployeeOnboardingActivityViewModel> ActivitiesList { get; set; }
-            = new();
+        public bool CanSubmit { get; set; }
+
+        public bool IsPortalLocked { get; set; }
+
+        public string StatusCode { get; set; } = "";
+
+        public string StatusName { get; set; } = "";
 
         //====================================================
         // LEFT SIDEBAR
@@ -67,5 +69,6 @@ namespace VeltriQ.ViewModels.CandidateOnboardingPortal
         //====================================================
 
         public string SelectedSection { get; set; } = "Personal Information";
+        public List<ActivityViewModel> ActivitiesList { get; set; } = new();
     }
 }

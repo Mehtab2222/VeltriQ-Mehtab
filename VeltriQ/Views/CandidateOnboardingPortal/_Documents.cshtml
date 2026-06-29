@@ -1,16 +1,230 @@
 ﻿@model VeltriQ.ViewModels.CandidateOnboardingPortal.CandidateOnboardingIndexViewModel
 
-<div id="portal_documents">
+<style>
+    /* ── HIGH-DENSITY THEMED CARD CONSOLES ── */
+    .vq-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared sharp border guidelines */
+        margin-bottom: 16px;
+    }
+
+    /* ── PREMIUM SYSTEM RECORD GRID TABLES ── */
+    .responsive-table-holder {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+    }
+
+    .viewport-grid-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+        font-size: 12.5px;
+    }
+
+        .viewport-grid-table th {
+            background: var(--hover-bg);
+            color: var(--text-secondary);
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .viewport-grid-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        .viewport-grid-table tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* Fixed Theme Typography Classes replacing native bootstrap text utils */
+    .vq-txt-primary {
+        color: var(--text-primary) !important;
+    }
+
+    .vq-txt-secondary {
+        color: var(--text-secondary) !important;
+    }
+
+    /* ── SYSTEM CONSOLE ACTION CHIPS ── */
+    .btn-action-mini {
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer;
+        border: 1px solid transparent;
+        background: transparent;
+    }
+
+    .btn-upload-theme {
+        background: rgba(109, 40, 217, 0.1);
+        color: var(--purple);
+        border: 1px solid rgba(109, 40, 217, 0.2);
+    }
+
+        .btn-upload-theme:hover {
+            background: linear-gradient(135deg, #6d28d9, #7c3aed);
+            color: #fff;
+        }
+
+    .btn-replace-theme {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+        .btn-replace-theme:hover {
+            background: #f59e0b;
+            color: #fff;
+        }
+
+    .btn-download-theme {
+        color: var(--text-secondary);
+    }
+
+        .btn-download-theme:hover {
+            color: var(--purple);
+            background: var(--hover-bg);
+        }
+
+    .btn-action-mini.disabled {
+        background: var(--hover-bg);
+        color: var(--text-muted);
+        border-color: var(--border);
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    /* ── SYSTEM STATUS PILLS ── */
+    .status-pill {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: inline-block;
+    }
+
+    .status-approved {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .status-progress {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    /* ── VQ THEME INTERACTIVE MODAL SPECIFICATIONS ── */
+    .vq-modal .modal-content {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 0px !important; /* Sharp squared enterprise grid alignment */
+    }
+
+    .vq-modal .modal-header {
+        background: var(--hover-bg) !important;
+        border-bottom: 1px solid var(--border) !important;
+        padding: 12px 16px;
+    }
+
+    .vq-modal .modal-title {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        color: var(--text-secondary) !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    .vq-modal .modal-body {
+        padding: 16px;
+        background: var(--card-bg) !important;
+    }
+
+    .vq-modal .modal-footer {
+        background: var(--card-bg) !important;
+        padding: 12px 16px;
+    }
+
+    /* Premium Modal Dropzone Console */
+    .modal-dropzone-box {
+        border: 1.5px dashed var(--border);
+        background: var(--hover-bg);
+        border-radius: 6px;
+        padding: 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.15s ease;
+    }
+
+        .modal-dropzone-box:hover, .modal-dropzone-box.dragover {
+            border-color: var(--purple);
+        }
+
+        .modal-dropzone-box p {
+            margin: 0;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-dropzone-box span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+
+    .vq-form-action-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .15s ease-in-out;
+        border: none;
+    }
+
+    .vq-btn-submit {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+    .vq-btn-cancel {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+</style>
+
+<div id="portal_documents" class="vq-form-card">
     <div class="responsive-table-holder">
         <table class="viewport-grid-table">
             <thead>
                 <tr>
-                    <th>Document</th>
-                    <th style="width: 120px;">Mandatory</th>
-                    <th style="width: 120px;">Uploaded</th>
-                    <th style="width: 120px;">Verified</th>
+                    <th>Document Requirement</th>
+                    <th style="width: 100px;">Mandatory</th>
+                    <th style="width: 100px;">Uploaded</th>
+                    <th style="width: 120px;">Verification Status</th>
                     <th>Uploaded On</th>
-                    <th style="width: 100px; text-align: right;">Action</th>
+                    <th style="width: 220px; text-align: right;">Action Control Deck</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,10 +233,10 @@
                     foreach (var doc in Model.DocumentsList)
                     {
                         <tr>
-                            <td style="font-weight: 600;">@doc.DocumentName</td>
-                            <td class="text-muted">@(doc.IsMandatory ? "Yes" : "No")</td>
+                            <td class="vq-txt-primary" style="font-weight: 600;">@doc.DocumentName</td>
+                            <td class="vq-txt-secondary">@(doc.IsMandatory ? "Yes" : "No")</td>
                             <td>
-                                <i class="bi @(doc.IsUploaded ? "bi-check2 text-success" : "bi-dash text-muted")"></i>
+                                <i class="bi @(doc.IsUploaded ? "bi-check2 text-success" : "bi-dash vq-txt-secondary")" style="font-size: 16px; font-weight: bold;"></i>
                             </td>
                             <td>
                                 @if (doc.IsUploaded)
@@ -33,25 +247,42 @@
                                 }
                                 else
                                 {
-                                    <span class="text-muted">-</span>
+                                    <span class="vq-txt-secondary">—</span>
                                 }
                             </td>
-                            <td class="text-muted">@(doc.UploadedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                            <td class="vq-txt-secondary">@(doc.UploadedOn?.ToString("dd MMM yyyy") ?? "—")</td>
                             <td style="text-align: right;">
-                                @if (Model.Status == "Submitted")
-                                {
-                                    <a class="btn-action-mini disabled" href="javascript:void(0);">
-                                        <i class="bi bi-lock"></i> Locked
-                                    </a>
-                                }
-                                else
-                                {
-                                    <a class="btn-action-mini"
-                                       asp-action="UploadDocument"
-                                       asp-route-id="@doc.EmployeeOnboardingDocumentId">
-                                        <i class="bi bi-upload"></i> Upload
-                                    </a>
-                                }
+                                <div class="d-flex justify-content-end gap-1">
+                                    @if (Model.Status == "Submitted")
+                                    {
+                                        <button class="btn-action-mini disabled" type="button">
+                                            <i class="bi bi-lock-fill"></i> Locked
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        if (doc.IsUploaded)
+                                        {
+                                            <a class="btn-action-mini btn-download-theme" href="/CandidateOnboardingPortal/DownloadDocument/@doc.EmployeeOnboardingDocumentId" target="_blank" title="Download Document Attachment">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+
+                                            <button class="btn-action-mini btn-replace-theme trigger-upload-modal" type="button"
+                                                    data-id="@doc.EmployeeOnboardingDocumentId"
+                                                    data-name="@doc.DocumentName">
+                                                <i class="bi bi-arrow-left-right"></i> Replace
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn-action-mini btn-upload-theme trigger-upload-modal" type="button"
+                                                    data-id="@doc.EmployeeOnboardingDocumentId"
+                                                    data-name="@doc.DocumentName">
+                                                <i class="bi bi-cloud-arrow-up"></i> Upload
+                                            </button>
+                                        }
+                                    }
+                                </div>
                             </td>
                         </tr>
                     }
@@ -59,8 +290,9 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                            No document uploads assigned.
+                        <td colspan="6" class="text-center vq-txt-secondary py-4">
+                            <i class="bi bi-folder-x d-block mb-1" style="font-size: 18px; color: var(--text-secondary); opacity: 0.7;"></i>
+                            No document requirements assigned to this profile workspace loop.
                         </td>
                     </tr>
                 }
@@ -68,3 +300,157 @@
         </table>
     </div>
 </div>
+
+<div class="modal fade vq-modal" id="vqDocumentUploadModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title vq-txt-secondary" id="modalDocTitle">Upload Document Attachment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: var(--modal-close-invert); color: var(--text-primary);"></button>
+            </div>
+            <form id="ajaxDocumentUploadForm" asp-action="UploadDocument" asp-controller="CandidateOnboardingPortal" method="post" enctype="multipart/form-data" autocomplete="off">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="EmployeeOnboardingDocumentId" id="hidTargetDocId" value="0" />
+                <input type="hidden" id="hidDocumentName" />
+
+                <div class="modal-body">
+                    <div class="modal-dropzone-box" id="modalDropzone" onclick="document.getElementById('hidModalFileInput').click()">
+                        <i class="bi bi-file-earmark-arrow-up d-block vq-txt-secondary mb-2" id="modalUploadIcon" style="font-size: 28px; opacity: 0.7;"></i>
+                        <p id="modalUploadLabel" class="vq-txt-primary">Click or Drag file attachment here to select</p>
+                        <span class="vq-txt-secondary" style="opacity: 0.8;">Supports standard secure files formats (PDF, PNG, JPG)</span>
+                        <input type="file" id="hidModalFileInput" name="DocumentFile" class="d-none" required accept=".pdf,.png,.jpg,.jpeg" />
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 d-flex justify-content-end gap-2">
+                    <button type="button" class="vq-form-action-btn vq-btn-cancel" data-bs-dismiss="modal">Cancel Workspace</button>
+                    <button type="submit" class="vq-form-action-btn vq-btn-submit" id="btnConfirmModalUpload">
+                        <i class="bi bi-check-circle"></i> Complete Upload
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const modalEl = document.getElementById('vqDocumentUploadModal');
+        let bsModal = null;
+
+        if (modalEl && typeof bootstrap !== "undefined") {
+            bsModal = new bootstrap.Modal(modalEl);
+        }
+
+        const uploadForm = document.getElementById('ajaxDocumentUploadForm');
+        const fileInput = document.getElementById('hidModalFileInput');
+        const fileLabel = document.getElementById('modalUploadLabel');
+        const fileIcon = document.getElementById('modalUploadIcon');
+        const dropzone = document.getElementById('modalDropzone');
+        const targetIdInput = document.getElementById('hidTargetDocId');
+        const targetNameInput = document.getElementById('hidDocumentName');
+        const titleText = document.getElementById('modalDocTitle');
+
+        document.querySelectorAll('.trigger-upload-modal').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const docId = this.dataset.id;
+                const docName = this.dataset.name;
+
+                targetIdInput.value = docId;
+                if (targetNameInput) targetNameInput.value = docName;
+
+                titleText.textContent = `Process File: ${docName}`;
+
+                if(uploadForm) uploadForm.reset();
+                fileLabel.textContent = "Click or Drag file attachment here to select";
+                fileLabel.style.color = "var(--text-primary)";
+                fileIcon.className = "bi bi-file-earmark-arrow-up d-block vq-txt-secondary mb-2";
+
+                if (bsModal) bsModal.show();
+            });
+        });
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    fileLabel.textContent = file.name;
+                    fileLabel.style.color = 'var(--purple)';
+                    fileIcon.className = 'bi bi-file-earmark-check-fill d-block mb-2 text-success';
+                }
+            });
+        }
+
+        if (dropzone && fileInput) {
+            ['dragenter', 'dragover'].forEach(evt => {
+                dropzone.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(evt => {
+                dropzone.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length) {
+                    fileInput.files = files;
+                    fileLabel.textContent = files[0].name;
+                    fileLabel.style.color = 'var(--purple)';
+                    fileIcon.className = 'bi bi-file-earmark-check-fill d-block mb-2 text-success';
+                }
+            }, false);
+        }
+
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                if (!fileInput.files || !fileInput.files.length) {
+                    alert('Please select or pull a valid attachment file before submitting.');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('btnConfirmModalUpload');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" style="width: 12px; height: 12px; border-width: 1.5px;"></span> Uploading file...`;
+
+                const formData = new FormData(uploadForm);
+
+                fetch(uploadForm.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message || 'Document uploaded successfully.');
+                        if (bsModal) bsModal.hide();
+
+                        if (typeof refreshCandidateWorkspace === "function") {
+                            refreshCandidateWorkspace();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        alert(data.message || 'Validation error while executing uploading file parameters.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Complete Upload`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong during document transmission.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="bi bi-check-circle"></i> Complete Upload`;
+                });
+            });
+        }
+    })();
+</script>

@@ -29,7 +29,15 @@ namespace VeltriQ.Models.HR.Onboarding
         public DateTime? ExpectedCompletionDate { get; set; }
 
         public DateTime? CompletedOn { get; set; }
+        public DateTime? SubmittedOn { get; set; }
 
+        public DateTime? ReviewedOn { get; set; }
+
+        public DateTime? ApprovedOn { get; set; }
+
+        public DateTime? ConvertedOn { get; set; }
+
+        public bool IsPortalLocked { get; set; } = false;
         public decimal CompletionPercentage { get; set; } = 0;
 
         [StringLength(500)]
