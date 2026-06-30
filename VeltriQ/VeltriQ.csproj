@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\NewFolder1\" />
+    <Folder Include="Interfaces\" />
     <Folder Include="wwwroot\uploads\employees\documents\" />
   </ItemGroup>
 

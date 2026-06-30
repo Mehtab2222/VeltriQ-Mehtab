@@ -4,6 +4,7 @@ using VeltriQ.Data;
 using VeltriQ.Middleware;
 using VeltriQ.Models.Core;
 using VeltriQ.Services;
+using VeltriQ.Services.HR.Onboarding;
 using VeltriQ.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -94,11 +95,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddScoped<IOnboardingWorkspaceService, OnboardingWorkspaceService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<TenantContext>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

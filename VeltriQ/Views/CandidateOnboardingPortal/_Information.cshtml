@@ -22,14 +22,14 @@
         background: var(--hover-bg);
     }
 
-        .info-sidebar-header h5 {
-            margin: 0;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .info-sidebar-header h5 {
+        margin: 0;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
     .info-list-group {
         display: flex;
@@ -49,15 +49,15 @@
         transition: background-color 0.1s ease, color 0.1s ease;
     }
 
-        .info-list-item:last-child {
-            border-bottom: none;
-        }
+    .info-list-item:last-child {
+        border-bottom: none;
+    }
 
-        .info-list-item:hover,
-        .info-list-item.active {
-            background: var(--hover-bg);
-            color: var(--purple);
-        }
+    .info-list-item:hover,
+    .info-list-item.active {
+        background: var(--hover-bg);
+        color: var(--purple);
+    }
 
     .info-item-label {
         white-space: nowrap;
@@ -80,12 +80,12 @@
         background: var(--hover-bg);
     }
 
-        .info-workspace-header h5 {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
+    .info-workspace-header h5 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
 
     .info-workspace-body {
         padding: 16px;
@@ -102,20 +102,20 @@
         padding: 32px 16px;
     }
 
-        .info-empty-placeholder i {
-            font-size: 24px;
-            opacity: 0.4;
-            display: block;
-            margin-bottom: 8px;
-            color: var(--purple);
-        }
+    .info-empty-placeholder i {
+        font-size: 24px;
+        opacity: 0.4;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--purple);
+    }
 
-        .info-empty-placeholder h6 {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
+    .info-empty-placeholder h6 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
 
     .status-badge-mini {
         font-size: 10px;
@@ -136,19 +136,26 @@
         color: #eab308;
     }
 
+    /* ── SECURE READ-ONLY POINTER BLOCKING LAYOUT OVERLAY ── */
+    .vq-workspace-readonly {
+        pointer-events: none !important;
+        opacity: 0.85 !important;
+    }
+    .vq-workspace-readonly input,
+    .vq-workspace-readonly select,
+    .vq-workspace-readonly button {
+        cursor: not-allowed !important;
+    }
+
     @@media (max-width: 768px) {
-        .information-split-pane
-
-    {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .info-panel-sidebar {
-        width: 100%;
-    }
-
+        .information-split-pane {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        .info-panel-sidebar {
+            width: 100%;
+        }
     }
 </style>
 
@@ -162,7 +169,6 @@
             {
                 foreach (var item in Model.Sections.OrderBy(x => x.DisplayOrder))
                 {
-                    @* Pure string sanitization filter: Ignore Identity Documents matching your separate Documents tab strategy *@
                     if (item.SectionName == "Identity Documents" || item.SectionName == "Identity Document")
                     {
                         continue;
@@ -195,7 +201,8 @@
         </div>
     </div>
 
-    <div class="info-panel-workspace">
+    @* Locks the partial forms loaded dynamically inside the workspace shell using a safe ternary verification check *@
+    <div class="info-panel-workspace @(Model.StatusCode == "SUBMITTED" || Model.StatusCode == "REVIEW" || Model.StatusCode == "APPROVED" ? "vq-workspace-readonly" : "")">
         <div class="info-workspace-header">
             <h5 id="workspaceTitle">Personal Information</h5>
         </div>
@@ -228,7 +235,14 @@
 
             $("#workspace").load(
                 "/CandidateOnboardingPortal/LoadInformationSection?section=" +
-                encodeURIComponent(section)
+                encodeURIComponent(section),
+                function() {
+                    @* Reinforces the lock down rule by immediately removing row action buttons if the parent container is set to read-only *@
+                    if ("@Model.StatusCode" === "SUBMITTED" || "@Model.StatusCode" === "REVIEW" || "@Model.StatusCode" === "APPROVED") {
+                        $("#workspace find('button, input, select')").prop('disabled', true);
+                        $("#workspace find('.form-action-btn, #btnToggleDependentForm, #btnToggleQualificationForm, .btn-row-action')").remove();
+                    }
+                }
             );
         });
     });

@@ -1,5 +1,4 @@
-﻿
-@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDetailsViewModel
+﻿@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDetailsViewModel
 
 @{
     ViewData["Title"] = "Onboarding Profile Details";
@@ -140,23 +139,22 @@
         width: 100%;
         border-collapse: collapse;
         margin-top: 4px;
+        margin-bottom: 16px;
     }
 
         .viewport-grid-table th {
             text-align: left;
             padding: 8px 12px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border);
             background: var(--hover-bg);
+            border: 1px solid var(--border);
         }
 
         .viewport-grid-table td {
             padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
+            border: 1px solid var(--border);
             color: var(--text-primary);
             font-size: 12.5px;
             vertical-align: middle;
@@ -166,48 +164,38 @@
             background: var(--hover-bg);
         }
 
-    /* ── HIGH-DENSITY WORKSPACE LISTS ── */
-    .section-workspace-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+    /* ── TYPOGRAPHY & SEPARATORS ── */
+    .info-section-heading {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--purple);
+        margin: 0 0 10px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
 
-    .section-workspace-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        background: var(--card-bg);
+    .info-address-block {
+        padding: 10px 12px;
+        background: var(--hover-bg);
         border: 1px solid var(--border);
-        transition: background-color 0.15s ease;
+        border-radius: 4px;
+        margin-bottom: 16px;
     }
 
-        .section-workspace-item:hover {
-            background: var(--hover-bg);
+        .info-address-block p {
+            margin: 0 0 4px 0;
+            font-size: 12.5px;
+            color: var(--text-primary);
         }
 
-    .section-item-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+            .info-address-block p:last-child {
+                margin-bottom: 0;
+            }
 
-    .section-item-icon {
-        font-size: 16px;
-    }
-
-    .section-item-info h4 {
-        margin: 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-
-    .section-item-info p {
-        margin: 2px 0 0 0;
-        font-size: 11px;
-        color: var(--text-secondary);
+    .info-divider {
+        border: none;
+        border-top: 1px dashed var(--border);
+        margin: 16px 0;
     }
 
     /* ── OVERVIEW SUMMARY ROWS ── */
@@ -284,6 +272,11 @@
         color: #22c55e;
     }
 
+    .status-rejected {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
     .status-default {
         background: var(--hover-bg);
         color: var(--text-secondary);
@@ -321,6 +314,87 @@
             background: rgba(124, 58, 237, 0.15);
             color: var(--purple);
         }
+
+    .action-link-btn {
+        background: transparent;
+        border: none;
+        color: var(--purple);
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+    }
+
+        .action-link-btn:hover {
+            background: var(--hover-bg);
+        }
+
+        .action-link-btn.btn-danger-text {
+            color: #ef4444;
+        }
+
+    /* ── CUSTOM MICRO MODAL ── */
+    .vq-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .vq-modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        width: 420px;
+        padding: 16px;
+        border-radius: 6px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .vq-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+        .vq-modal-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+    .vq-modal-body textarea {
+        width: 100%;
+        height: 80px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--text-primary);
+        padding: 8px;
+        font-family: inherit;
+        font-size: 12.5px;
+        resize: none;
+        outline: none;
+    }
+
+    .vq-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+    }
 </style>
 
 <div class="profile-details-page">
@@ -431,51 +505,199 @@
         </div>
 
         <div id="view_information" style="display: none;">
-            <div class="section-workspace-list">
-                @if (Model.Sections != null && Model.Sections.Any())
+
+            <h5 class="info-section-heading">Personal Information</h5>
+            <table class="viewport-grid-table">
+                <tbody>
+                    <tr>
+                        <th style="width:220px;">First Name</th>
+                        <td>@(Model.PersonalInformation?.FirstName ?? "-")</td>
+                        <th style="width:220px;">Middle Name</th>
+                        <td>@(Model.PersonalInformation?.MiddleName ?? "-")</td>
+                    </tr>
+                    <tr>
+                        <th>Last Name</th>
+                        <td>@(Model.PersonalInformation?.LastName ?? "-")</td>
+                        <th>Date of Birth</th>
+                        <td>@(Model.PersonalInformation?.DateOfBirth?.ToString("dd MMM yyyy") ?? "-")</td>
+                    </tr>
+                    <tr>
+                        <th>Gender</th>
+                        <td>@(Model.PersonalInformation?.Gender ?? "-")</td>
+                        <th>Marital Status</th>
+                        <td>@(Model.PersonalInformation?.MaritalStatus ?? "-")</td>
+                    </tr>
+                    <tr>
+                        <th>Blood Group</th>
+                        <td>@(Model.PersonalInformation?.BloodGroup ?? "-")</td>
+                        <th>Nationality</th>
+                        <td>@(Model.PersonalInformation?.Nationality ?? "-")</td>
+                    </tr>
+                    <tr>
+                        <th>Religion</th>
+                        <td>@(Model.PersonalInformation?.Religion ?? "-")</td>
+                        <th></th>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr class="info-divider" />
+
+            <h5 class="info-section-heading">Contact Details</h5>
+            <table class="viewport-grid-table">
+                <tbody>
+                    <tr>
+                        <th style="width:220px;">Email</th>
+                        <td>@(Model.PersonalInformation?.Email ?? "-")</td>
+                        <th style="width:220px;">Mobile</th>
+                        <td>@(Model.PersonalInformation?.MobileNumber ?? "-")</td>
+                    </tr>
+                    <tr>
+                        <th>Alternate Mobile</th>
+                        <td>@(Model.PersonalInformation?.AlternateMobileNumber ?? "-")</td>
+                        <th></th>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr class="info-divider" />
+
+            <h5 class="info-section-heading">Family Details</h5>
+            <table class="viewport-grid-table">
+                <tbody>
+                    <tr>
+                        <th style="width:220px;">Father Name</th>
+                        <td>@(Model.PersonalInformation?.FatherName ?? "-")</td>
+                        <th style="width:220px;">Mother Name</th>
+                        <td>@(Model.PersonalInformation?.MotherName ?? "-")</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr class="info-divider" />
+
+            <h5 class="info-section-heading">Current Address</h5>
+            <div class="info-address-block">
+                @if (Model.Address != null && !string.IsNullOrWhiteSpace(Model.Address.CurrentAddressLine1))
                 {
-                    foreach (var item in Model.Sections)
+                    <p>@Model.Address.CurrentAddressLine1</p>
+                    @if (!string.IsNullOrWhiteSpace(Model.Address.CurrentAddressLine2))
                     {
-                        @* Pure string sanitization filter matching the _Information sidebar strategy *@
-                        if (item.SectionName == "Identity Documents" || item.SectionName == "Identity Document")
-                        {
-                            continue;
-                        }
-
-                        <div class="section-workspace-item">
-                            <div class="section-item-left">
-                                <div class="section-item-icon">
-                                    @if (item.IsCompleted)
-                                    {
-                                        <i class="bi bi-check-circle-fill text-success"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-circle text-muted"></i>
-                                    }
-                                </div>
-
-                                <div class="section-item-info">
-                                    <h4>@item.SectionName</h4>
-                                    <p>No information layout sections mapped to this configuration profile.</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <span class="status-pill @(item.IsCompleted ? "status-approved" : "status-progress")">
-                                    @(item.IsCompleted ? "Completed" : "Pending")
-                                </span>
-                            </div>
-                        </div>
+                        <p>@Model.Address.CurrentAddressLine2</p>
                     }
+                    <p>
+                        @Model.Address.CurrentCity, @Model.Address.CurrentState, @Model.Address.CurrentCountry - @Model.Address.CurrentPostalCode
+                    </p>
                 }
                 else
                 {
-                    <div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                        No information layout sections mapped to this configuration profile.
-                    </div>
+                    <p style="color: var(--text-muted); font-style: italic;">No current address information recorded.</p>
                 }
             </div>
+
+            <hr class="info-divider" />
+
+            <h5 class="info-section-heading">Permanent Address</h5>
+            <div class="info-address-block">
+                @if (Model.Address != null && !string.IsNullOrWhiteSpace(Model.Address.PermanentAddressLine1))
+                {
+                    <p>@Model.Address.PermanentAddressLine1</p>
+                    @if (!string.IsNullOrWhiteSpace(Model.Address.PermanentAddressLine2))
+                    {
+                        <p>@Model.Address.PermanentAddressLine2</p>
+                    }
+                    <p>
+                        @Model.Address.PermanentCity, @Model.Address.PermanentState, @Model.Address.PermanentCountry - @Model.Address.PermanentPostalCode
+                    </p>
+                }
+                else
+                {
+                    <p style="color: var(--text-muted); font-style: italic;">No permanent address information recorded.</p>
+                }
+            </div>
+
+            <hr class="info-divider" />
+
+            <h5 class="info-section-heading">Dependents</h5>
+            <table class="viewport-grid-table">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Relationship</th>
+                        <th>Date of Birth</th>
+                        <th>Nominee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Dependents?.Dependents != null && Model.Dependents.Dependents.Any())
+                    {
+                        foreach (var item in Model.Dependents.Dependents)
+                        {
+                            <tr>
+                                <td>@item.FullName</td>
+                                <td>@item.Relationship</td>
+                                <td>@(item.DateOfBirth?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td>
+                                    @if (item.IsNominee)
+                                    {
+                                        <span class="status-pill status-approved">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span>No</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 12px;">
+                                No dependents available.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <hr class="info-divider" />
+
+            <h5 class="info-section-heading">Qualifications</h5>
+            <table class="viewport-grid-table">
+                <thead>
+                    <tr>
+                        <th>Qualification</th>
+                        <th>Institute</th>
+                        <th>Passing Year</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Qualifications?.Qualifications != null && Model.Qualifications.Qualifications.Any())
+                    {
+                        foreach (var item in Model.Qualifications.Qualifications)
+                        {
+                            <tr>
+                                <td>@item.QualificationName</td>
+                                <td>@item.Institute</td>
+                                <td>@item.PassingYear</td>
+                                <td>@item.Percentage %</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 12px;">
+                                No qualifications available.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
 
         <div id="view_documents" style="display: none;">
@@ -483,10 +705,11 @@
                 <thead>
                     <tr>
                         <th>Document Name</th>
-                        <th style="width: 120px;">Mandatory</th>
-                        <th style="width: 120px;">Uploaded</th>
-                        <th style="width: 120px;">Verified</th>
+                        <th style="width: 90px;">Mandatory</th>
+                        <th style="width: 90px;">Uploaded</th>
+                        <th style="width: 110px;">Status</th>
                         <th>Uploaded On</th>
+                        <th style="width: 220px; text-align: center;">HR Action Workspace</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -496,30 +719,55 @@
                         {
                             <tr>
                                 <td style="font-weight: 600;">@doc.DocumentName</td>
-                                <td class="text-muted">@(doc.IsMandatory ? "Yes" : "No")</td>
+                                <td style="color: var(--text-secondary);">@(doc.IsMandatory ? "Yes" : "No")</td>
                                 <td>
-                                    <i class="bi @(doc.IsUploaded ? "bi-check2 text-success" : "bi-dash text-muted")"></i>
+                                    <i class="bi @(doc.IsUploaded ? "bi-check2 text-success" : "bi-dash var(--text-muted)")"></i>
                                 </td>
                                 <td>
                                     @if (doc.IsUploaded)
                                     {
-                                        <span class="status-pill @(doc.IsVerified ? "status-approved" : "status-progress")">
-                                            @(doc.IsVerified ? "Verified" : "Pending")
-                                        </span>
+                                        string docStatusClass = doc.IsVerified ? "status-approved" : "status-progress";
+                                        string docStatusLabel = doc.IsVerified ? "Verified" : "Pending";
+
+                                        <span class="status-pill @docStatusClass">@docStatusLabel</span>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">-</span>
+                                        <span style="color: var(--text-muted);">-</span>
                                     }
                                 </td>
-                                <td class="text-muted">@(doc.UploadedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td style="color: var(--text-secondary);">@(doc.UploadedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td style="text-align: center;">
+                                    @if (doc.IsUploaded)
+                                    {
+                                        <button type="button" class="action-link-btn" disabled style="opacity: 0.6; cursor: not-scale;">
+                                            <i class="bi bi-eye"></i> View
+                                        </button>
+
+                                        @if (!doc.IsVerified)
+                                        {
+                                            <span style="color: var(--border); margin: 0 2px;">|</span>
+                                            <button type="button" class="action-link-btn" onclick="approveDocument(@doc.EmployeeOnboardingDocumentId)">
+                                                <i class="bi bi-check-circle"></i> Approve
+                                            </button>
+                                            <span style="color: var(--border); margin: 0 2px;">|</span>
+                                            <button type="button" class="action-link-btn btn-danger-text" onclick="openRejectModal(@doc.EmployeeOnboardingDocumentId, '@doc.DocumentName')">
+                                                <i class="bi bi-x-circle"></i> Reject
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span style="color: var(--text-muted); font-size: 11px; font-style: italic;">No candidate payload</span>
+                                    }
+                                </td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
                                 No templates documents mapped to this workflow.
                             </td>
                         </tr>
@@ -545,11 +793,11 @@
                         {
                             <tr>
                                 <td style="font-weight: 600;">@policy.PolicyName</td>
-                                <td class="text-muted">@(policy.IsMandatory ? "Yes" : "No")</td>
+                                <td style="color: var(--text-secondary);">@(policy.IsMandatory ? "Yes" : "No")</td>
                                 <td>
                                     <i class="bi @(policy.IsAccepted ? "bi-check2 text-success" : "bi-hourglass-split text-warning")"></i>
                                 </td>
-                                <td class="text-muted">@(policy.AcceptedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td style="color: var(--text-secondary);">@(policy.AcceptedOn?.ToString("dd MMM yyyy") ?? "-")</td>
                             </tr>
                         }
                     }
@@ -582,9 +830,9 @@
                             <tr>
                                 <td style="font-weight: 600;">@act.ActivityName</td>
                                 <td>
-                                    <i class="bi @(act.IsCompleted ? "bi-check2 text-success" : "bi-dash text-muted")"></i>
+                                    <i class="bi @(act.IsCompleted ? "bi-check2 text-success" : "bi-dash var(--text-muted)")"></i>
                                 </td>
-                                <td class="text-muted">@(act.CompletedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td style="color: var(--text-secondary);">@(act.CompletedOn?.ToString("dd MMM yyyy") ?? "-")</td>
                             </tr>
                         }
                     }
@@ -610,6 +858,25 @@
     </div>
 </div>
 
+<div id="hrRejectDocModal" class="vq-modal-backdrop" style="display: none;">
+    <div class="vq-modal-card">
+        <div class="vq-modal-header">
+            <h4 id="rejectModalTitle">Reject Document</h4>
+            <button type="button" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer;" onclick="closeRejectModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="vq-modal-body">
+            <input type="hidden" id="rejectTargetDocId" value="0" />
+            <textarea id="txtRejectRemarks" placeholder="Provide reason or correction remarks for the candidate..."></textarea>
+        </div>
+        <div class="vq-modal-footer">
+            <button type="button" class="form-action-btn btn-cancel-theme" onclick="closeRejectModal()">Cancel</button>
+            <button type="button" class="form-action-btn" style="background:#ef4444; color:#fff;" onclick="submitDocumentRejection()">Confirm Rejection</button>
+        </div>
+    </div>
+</div>
+
 <script>
     function toggleDetailsTab(targetViewId, buttonElement) {
         const tabs = buttonElement.closest('.details-nav-tabs').getElementsByClassName('details-tab-btn');
@@ -628,5 +895,69 @@
         const targetView = document.getElementById('view_' + targetViewId);
         if (targetView) targetView.style.display = 'block';
     }
-</script>
 
+    /* ── DOCUMENT APPROVAL PIPELINE ── */
+    function approveDocument(documentId) {
+        if (!confirm("Are you sure you want to verify and approve this document?")) return;
+
+        fetch('/EmployeeOnboarding/ApproveDocument', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ id: documentId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.message || "Failed to approve the document configuration target.");
+            }
+        })
+        .catch(() => alert("Error communicating with verification action pipeline."));
+    }
+
+    /* ── DOCUMENT REJECTION INTERACTION MODAL ── */
+    function openRejectModal(documentId, docName) {
+        document.getElementById("rejectTargetDocId").value = documentId;
+        document.getElementById("rejectModalTitle").innerText = "Reject - " + docName;
+        document.getElementById("txtRejectRemarks").value = "";
+        document.getElementById("hrRejectDocModal").style.display = "flex";
+    }
+
+    function closeRejectModal() {
+        document.getElementById("hrRejectDocModal").style.display = "none";
+        document.getElementById("rejectTargetDocId").value = "0";
+    }
+
+    function submitDocumentRejection() {
+        const docId = document.getElementById("rejectTargetDocId").value;
+        const remarksValue = document.getElementById("txtRejectRemarks").value.trim();
+
+        if (!remarksValue) {
+            alert("Please enter a rejection remark for context instruction.");
+            return;
+        }
+
+        fetch('/EmployeeOnboarding/RejectDocument', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ id: docId, remarks: remarksValue })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                closeRejectModal();
+                window.location.reload();
+            } else {
+                alert(data.message || "Failed to process target rejection payload workflow state.");
+            }
+        })
+        .catch(() => alert("Fatal connectivity breakdown handling data write."));
+    }
+</script>

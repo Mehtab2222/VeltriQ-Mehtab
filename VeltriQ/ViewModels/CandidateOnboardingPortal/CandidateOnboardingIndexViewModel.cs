@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using VeltriQ.ViewModels.EmployeeOnboarding;
+using VeltriQ.ViewModels.Shared;
 
 namespace VeltriQ.ViewModels.CandidateOnboardingPortal
 {
-    public class CandidateOnboardingIndexViewModel
+    public class CandidateOnboardingIndexViewModel : IOnboardingWorkspaceHeader
     {
         //====================================================
         // HEADER

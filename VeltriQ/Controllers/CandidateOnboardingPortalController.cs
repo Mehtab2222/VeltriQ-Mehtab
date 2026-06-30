@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using VeltriQ.Data;
-using VeltriQ.Models.HR.Onboarding;
-using VeltriQ.ViewModels.CandidateOnboardingPortal;
-using VeltriQ.ViewModels.EmployeeOnboarding;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
-using Microsoft.AspNetCore.Hosting;
+using VeltriQ.Data;
+using VeltriQ.Models.HR.Onboarding;
+using VeltriQ.Services.HR.Onboarding;
+using VeltriQ.ViewModels.CandidateOnboardingPortal;
+using VeltriQ.ViewModels.EmployeeOnboarding;
 
 namespace VeltriQ.Controllers
 {
@@ -15,15 +16,17 @@ namespace VeltriQ.Controllers
         : CandidateOnboardingBaseController
     {
         private readonly IWebHostEnvironment _environment;
-
+        private readonly IOnboardingWorkspaceService _workspaceService;
         public CandidateOnboardingPortalController
         (
             TenantDbContext context,
-            IWebHostEnvironment environment
+            IWebHostEnvironment environment,
+            IOnboardingWorkspaceService workspaceService
         )
             : base(context)
         {
             _environment = environment;
+            _workspaceService = workspaceService;
         }
         public IActionResult DevLogin()
         {
@@ -35,47 +38,7 @@ namespace VeltriQ.Controllers
         {
             return HttpContext.Session.GetInt32("EmployeeOnboardingId");
         }
-        private async Task<CandidateOnboardingPersonalInformationViewModel> LoadPersonalInformation(int employeeOnboardingId)
-        {
-            var model = new CandidateOnboardingPersonalInformationViewModel();
 
-            var entity = await _context.EmployeeOnboardingPersonalInformations
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            if (entity == null)
-            {
-                model.EmployeeOnboardingId = employeeOnboardingId;
-                return model;
-            }
-
-            model.EmployeeOnboardingPersonalInformationId = entity.EmployeeOnboardingPersonalInformationId;
-            model.EmployeeOnboardingId = entity.EmployeeOnboardingId;
-
-            model.FirstName = entity.FirstName;
-            model.MiddleName = entity.MiddleName;
-            model.LastName = entity.LastName;
-
-            model.DateOfBirth = entity.DateOfBirth;
-
-            model.Gender = entity.Gender;
-            model.MaritalStatus = entity.MaritalStatus;
-            model.BloodGroup = entity.BloodGroup;
-            model.Nationality = entity.Nationality;
-            model.Religion = entity.Religion;
-
-            model.FatherName = entity.FatherName;
-            model.MotherName = entity.MotherName;
-
-            model.Email = entity.Email;
-            model.MobileNumber = entity.MobileNumber;
-            model.AlternateMobileNumber = entity.AlternateMobileNumber;
-
-            model.ProfilePhotoPath = entity.ProfilePhotoPath;
-
-            return model;
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SavePersonalInformation(CandidateOnboardingPersonalInformationViewModel model)
@@ -154,7 +117,7 @@ namespace VeltriQ.Controllers
             // UPDATE COMPLETION PERCENTAGE
             //====================================================
 
-            await UpdateCompletionPercentage(model.EmployeeOnboardingId);
+            await _workspaceService.UpdateCompletionPercentage(model.EmployeeOnboardingId);
 
             return Json(new
             {
@@ -162,51 +125,7 @@ namespace VeltriQ.Controllers
                 message = "Personal Information saved successfully."
             });
         }
-        private async Task<CandidateOnboardingAddressViewModel> LoadAddress(int employeeOnboardingId)
-        {
-            var model = new CandidateOnboardingAddressViewModel
-            {
-                EmployeeOnboardingId = employeeOnboardingId
-            };
 
-            var entity = await _context.EmployeeOnboardingAddresses
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            if (entity == null)
-                return model;
-
-            model.EmployeeOnboardingAddressId = entity.EmployeeOnboardingAddressId;
-
-            //====================================================
-            // CURRENT ADDRESS
-            //====================================================
-
-            model.CurrentAddressLine1 = entity.CurrentAddressLine1;
-            model.CurrentAddressLine2 = entity.CurrentAddressLine2;
-            model.CurrentLandmark = entity.CurrentLandmark;
-            model.CurrentCity = entity.CurrentCity;
-            model.CurrentState = entity.CurrentState;
-            model.CurrentCountry = entity.CurrentCountry;
-            model.CurrentPostalCode = entity.CurrentPincode;
-
-            //====================================================
-            // PERMANENT ADDRESS
-            //====================================================
-
-            model.IsPermanentAddressSame = entity.IsPermanentAddressSame;
-
-            model.PermanentAddressLine1 = entity.PermanentAddressLine1;
-            model.PermanentAddressLine2 = entity.PermanentAddressLine2;
-            model.PermanentLandmark = entity.PermanentLandmark;
-            model.PermanentCity = entity.PermanentCity;
-            model.PermanentState = entity.PermanentState;
-            model.PermanentCountry = entity.PermanentCountry;
-            model.PermanentPostalCode = entity.PermanentPincode;
-
-            return model;
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveAddress(CandidateOnboardingAddressViewModel model)
@@ -284,7 +203,7 @@ namespace VeltriQ.Controllers
             // UPDATE COMPLETION PERCENTAGE
             //====================================================
 
-            await UpdateCompletionPercentage(model.EmployeeOnboardingId);
+             await _workspaceService.UpdateCompletionPercentage(model.EmployeeOnboardingId);
 
             return Json(new
             {
@@ -292,30 +211,7 @@ namespace VeltriQ.Controllers
                 message = "Address saved successfully."
             });
         }
-        private async Task<CandidateOnboardingEmergencyContactViewModel> LoadEmergencyContact(int employeeOnboardingId)
-        {
-            var model = new CandidateOnboardingEmergencyContactViewModel
-            {
-                EmployeeOnboardingId = employeeOnboardingId
-            };
 
-            var entity = await _context.EmployeeOnboardingEmergencyContacts
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            if (entity == null)
-                return model;
-
-            model.EmployeeOnboardingEmergencyContactId = entity.EmployeeOnboardingEmergencyContactId;
-            model.ContactPersonName = entity.ContactPersonName;
-            model.Relationship = entity.Relationship;
-            model.MobileNumber = entity.MobileNumber;
-            model.AlternateMobileNumber = entity.AlternateMobileNumber;
-            model.Address = entity.Address;
-
-            return model;
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveEmergencyContact(
@@ -360,7 +256,7 @@ namespace VeltriQ.Controllers
             // UPDATE COMPLETION PERCENTAGE
             //====================================================
 
-            await UpdateCompletionPercentage(model.EmployeeOnboardingId);
+            await _workspaceService.UpdateCompletionPercentage(model.EmployeeOnboardingId);
 
             return Json(new
             {
@@ -368,28 +264,7 @@ namespace VeltriQ.Controllers
                 message = "Emergency Contact saved successfully."
             });
         }
-        private async Task<CandidateOnboardingDependentsViewModel> LoadDependents(int employeeOnboardingId)
-        {
-            var model = new CandidateOnboardingDependentsViewModel
-            {
-                EmployeeOnboardingId = employeeOnboardingId
-            };
 
-            model.Dependents = await _context.EmployeeOnboardingDependents
-                .Where(x => x.EmployeeOnboardingId == employeeOnboardingId && x.IsActive)
-                .OrderBy(x => x.EmployeeOnboardingDependentId)
-                .Select(x => new DependentViewModel
-                {
-                    EmployeeOnboardingDependentId = x.EmployeeOnboardingDependentId,
-                    FullName = x.FullName,
-                    Relationship = x.Relationship,
-                    DateOfBirth = x.DateOfBirth,
-                    IsNominee = x.IsNominee
-                })
-                .ToListAsync();
-
-            return model;
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveDependent(CandidateOnboardingDependentsViewModel model)
@@ -437,7 +312,7 @@ namespace VeltriQ.Controllers
             // UPDATE COMPLETION PERCENTAGE
             //====================================================
 
-            await UpdateCompletionPercentage(model.EmployeeOnboardingId);
+            await _workspaceService.UpdateCompletionPercentage(model.EmployeeOnboardingId);
 
             return Json(new
             {
@@ -469,28 +344,7 @@ namespace VeltriQ.Controllers
                 success = true
             });
         }
-        private async Task<CandidateOnboardingQualificationsViewModel> LoadQualifications(int employeeOnboardingId)
-        {
-            var model = new CandidateOnboardingQualificationsViewModel
-            {
-                EmployeeOnboardingId = employeeOnboardingId
-            };
 
-            model.Qualifications = await _context.EmployeeOnboardingQualifications
-                .Where(x => x.EmployeeOnboardingId == employeeOnboardingId && x.IsActive)
-                .OrderBy(x => x.EmployeeOnboardingQualificationId)
-                .Select(x => new QualificationViewModel
-                {
-                    EmployeeOnboardingQualificationId = x.EmployeeOnboardingQualificationId,
-                    QualificationName = x.QualificationName,
-                    Institute = x.Institute,
-                    PassingYear = x.PassingYear,
-                    Percentage = x.Percentage
-                })
-                .ToListAsync();
-
-            return model;
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveQualifications(CandidateOnboardingQualificationsViewModel model)
@@ -538,7 +392,7 @@ namespace VeltriQ.Controllers
             // UPDATE COMPLETION PERCENTAGE
             //====================================================
 
-            await UpdateCompletionPercentage(model.EmployeeOnboardingId);
+            await _workspaceService.UpdateCompletionPercentage(model.EmployeeOnboardingId);
 
             return Json(new
             {
@@ -586,27 +440,27 @@ namespace VeltriQ.Controllers
                 case "Personal Information":
                     return PartialView(
                         "Information/_PersonalInformation",
-                        await LoadPersonalInformation(employeeOnboardingId.Value));
+                        await _workspaceService.LoadPersonalInformation(employeeOnboardingId.Value));
 
                 case "Address":
                     return PartialView(
                         "Information/_Address",
-                        await LoadAddress(employeeOnboardingId.Value));
+                        await _workspaceService.LoadAddress(employeeOnboardingId.Value));
 
                 case "Emergency Contact":
                     return PartialView(
                         "Information/_EmergencyContact",
-                        await LoadEmergencyContact(employeeOnboardingId.Value));
+                        await _workspaceService.LoadEmergencyContact(employeeOnboardingId.Value));
 
                 case "Dependents":
                     return PartialView(
                         "Information/_Dependents",
-                        await LoadDependents(employeeOnboardingId.Value));
+                        await _workspaceService.LoadDependents(employeeOnboardingId.Value));
 
                 case "Qualifications":
                     return PartialView(
                         "Information/_Qualifications",
-                        await LoadQualifications(employeeOnboardingId.Value));
+                        await _workspaceService.LoadQualifications(employeeOnboardingId.Value));
 
 
                 default:
@@ -878,7 +732,7 @@ namespace VeltriQ.Controllers
             // UPDATE COMPLETION PERCENTAGE
             //====================================================
 
-            await UpdateCompletionPercentage(document.EmployeeOnboardingId);
+            await _workspaceService.UpdateCompletionPercentage(document.EmployeeOnboardingId);
 
             return Json(new
             {
@@ -920,95 +774,7 @@ namespace VeltriQ.Controllers
                 contentType,
                 document.FileName);
         }
-        private async Task LoadInformationSidebar
-(
-    CandidateOnboardingIndexViewModel model,
-    int employeeOnboardingId
-)
-        {
-            model.Sections = await _context.EmployeeOnboardingSections
-
-                .Where(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive)
-
-                .OrderBy(x => x.DisplayOrder)
-
-                .Select(x => new CandidateOnboardingSectionViewModel
-                {
-                    EmployeeOnboardingSectionId = x.EmployeeOnboardingSectionId,
-
-                    OnboardingSectionMasterId = x.OnboardingSectionMasterId,
-
-                    SectionName = x.Section.SectionName,
-
-                    IsMandatory = x.IsMandatory,
-
-                    IsCompleted = x.IsCompleted,
-
-                    DisplayOrder = x.DisplayOrder,
-
-                    Icon = ""
-                })
-
-                .ToListAsync();
-        }
-
-        private async Task LoadDocuments(
-            CandidateOnboardingIndexViewModel model,
-            int employeeOnboardingId)
-        {
-            model.DocumentsList = await _context.EmployeeOnboardingDocuments
-                .Where(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive)
-                .OrderBy(x => x.DisplayOrder)
-                .Select(x => new EmployeeOnboardingDocumentViewModel
-                {
-                    EmployeeOnboardingDocumentId = x.EmployeeOnboardingDocumentId,
-
-                    DocumentName = x.Document.DocumentName,
-
-                    IsMandatory = x.IsMandatory,
-
-                    IsUploaded = x.IsUploaded,
-
-                    IsVerified = x.IsVerified,
-
-                    UploadedOn = x.UploadedOn
-                })
-                .ToListAsync();
-        }
-        private async Task<CandidateOnboardingPoliciesViewModel> LoadPolicies(int employeeOnboardingId)
-        {
-            var model = new CandidateOnboardingPoliciesViewModel
-            {
-                EmployeeOnboardingId = employeeOnboardingId
-            };
-
-            model.Policies = await _context.EmployeeOnboardingPolicies
-                .Where(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive)
-                .OrderBy(x => x.DisplayOrder)
-                .Select(x => new PolicyViewModel
-                {
-                    EmployeeOnboardingPolicyId = x.EmployeeOnboardingPolicyId,
-
-                    PolicyName = x.Policy.PolicyName,
-
-                    IsMandatory = x.IsMandatory,
-
-                    IsAccepted = x.IsAccepted,
-
-                    AcceptedOn = x.AcceptedOn,
-
-                    AllowDownload = x.Policy.AllowDownload
-                })
-                .ToListAsync();
-
-            return model;
-        }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AcceptPolicy(int id)
@@ -1037,7 +803,7 @@ namespace VeltriQ.Controllers
             // UPDATE COMPLETION PERCENTAGE
             //====================================================
 
-            await UpdateCompletionPercentage(policy.EmployeeOnboardingId);
+            await _workspaceService.UpdateCompletionPercentage(policy.EmployeeOnboardingId);
 
             return Json(new
             {
@@ -1045,198 +811,8 @@ namespace VeltriQ.Controllers
                 message = "Policy accepted successfully."
             });
         }
-        private async Task LoadOverview(
-     CandidateOnboardingIndexViewModel model,
-     int employeeOnboardingId)
-        {
-            //====================================================
-            // UPDATE COMPLETION PERCENTAGE
-            //====================================================
-
-            await UpdateCompletionPercentage(employeeOnboardingId);
-
-            //====================================================
-            // LOAD COMPLETION PERCENTAGE
-            //====================================================
-
-            var onboarding = await _context.EmployeeOnboardings
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId);
-
-            if (onboarding != null)
-            {
-                model.CompletionPercentage = onboarding.CompletionPercentage;
-            }
-
-            //====================================================
-            // INFORMATION SECTIONS
-            //====================================================
-
-            model.TotalSections = await _context.EmployeeOnboardingSections
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            model.CompletedSections = await _context.EmployeeOnboardingSections
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsCompleted);
-
-            //====================================================
-            // DOCUMENTS
-            //====================================================
-
-            model.TotalDocuments = await _context.EmployeeOnboardingDocuments
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            model.UploadedDocuments = await _context.EmployeeOnboardingDocuments
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsUploaded);
-
-            //====================================================
-            // POLICIES
-            //====================================================
-
-            model.TotalPolicies = await _context.EmployeeOnboardingPolicies
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            model.AcceptedPolicies = await _context.EmployeeOnboardingPolicies
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsAccepted);
-        }
-        private async Task<decimal> CalculateCompletionPercentage(int employeeOnboardingId)
-        {
-            decimal completed = 0;
-
-            //====================================================
-            // PERSONAL INFORMATION (30%)
-            //====================================================
-
-            var personal = await _context.EmployeeOnboardingPersonalInformations
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            if (personal != null &&
-                !string.IsNullOrWhiteSpace(personal.FirstName) &&
-                !string.IsNullOrWhiteSpace(personal.LastName) &&
-                personal.DateOfBirth != null &&
-                !string.IsNullOrWhiteSpace(personal.Email) &&
-                !string.IsNullOrWhiteSpace(personal.MobileNumber))
-            {
-                completed += 30;
-            }
-
-            //====================================================
-            // ADDRESS (20%)
-            //====================================================
-
-            var address = await _context.EmployeeOnboardingAddresses
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            if (address != null &&
-                !string.IsNullOrWhiteSpace(address.CurrentAddressLine1) &&
-                !string.IsNullOrWhiteSpace(address.CurrentCity) &&
-                !string.IsNullOrWhiteSpace(address.CurrentState) &&
-                !string.IsNullOrWhiteSpace(address.CurrentCountry) &&
-                !string.IsNullOrWhiteSpace(address.CurrentPincode))
-            {
-                completed += 20;
-            }
-
-            //====================================================
-            // EMERGENCY CONTACT (10%)
-            //====================================================
-
-            var emergency = await _context.EmployeeOnboardingEmergencyContacts
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
-
-            if (emergency != null &&
-                !string.IsNullOrWhiteSpace(emergency.ContactPersonName) &&
-                !string.IsNullOrWhiteSpace(emergency.Relationship) &&
-                !string.IsNullOrWhiteSpace(emergency.MobileNumber))
-            {
-                completed += 10;
-            }
-
-            //====================================================
-            // MANDATORY DOCUMENTS (30%)
-            //====================================================
-
-            var totalDocuments = await _context.EmployeeOnboardingDocuments
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsMandatory);
-
-            var uploadedDocuments = await _context.EmployeeOnboardingDocuments
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsMandatory &&
-                    x.IsUploaded);
-
-            if (totalDocuments > 0 &&
-                totalDocuments == uploadedDocuments)
-            {
-                completed += 30;
-            }
-
-            //====================================================
-            // MANDATORY POLICIES (10%)
-            //====================================================
-
-            var totalPolicies = await _context.EmployeeOnboardingPolicies
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsMandatory);
-
-            var acceptedPolicies = await _context.EmployeeOnboardingPolicies
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsMandatory &&
-                    x.IsAccepted);
-
-            if (totalPolicies > 0 &&
-                totalPolicies == acceptedPolicies)
-            {
-                completed += 10;
-            }
-
-            return completed;
-        }
-        private async Task UpdateCompletionPercentage(int employeeOnboardingId)
-        {
-            var percentage = await CalculateCompletionPercentage(employeeOnboardingId);
-
-            var onboarding = await _context.EmployeeOnboardings
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId);
-
-            if (onboarding != null)
-            {
-                onboarding.CompletionPercentage = percentage;
-                onboarding.ModifiedOn = DateTime.Now;
-
-                await _context.SaveChangesAsync();
-            }
-        }
        
+        
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -1248,17 +824,36 @@ namespace VeltriQ.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
+            //====================================================
+            // Move candidate from INVITED → INPROGRESS
+            // on first portal access
+            //====================================================
+
+            var onboarding = await _context.EmployeeOnboardings
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId.Value);
+
+            if (onboarding != null &&
+                onboarding.OnboardingStatusMasterId == 2) // INVITED
+            {
+                onboarding.OnboardingStatusMasterId = 3; // INPROGRESS
+                onboarding.ModifiedOn = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+            }
+
             var model = new CandidateOnboardingIndexViewModel();
 
-            await LoadHeader(model, employeeOnboardingId.Value);
+            await _workspaceService.LoadHeader(model, employeeOnboardingId.Value);
+            await _workspaceService.LoadCandidateHeaderState(model,employeeOnboardingId.Value);
 
-            await LoadOverview(model, employeeOnboardingId.Value);
+            await _workspaceService.LoadOverview(model, employeeOnboardingId.Value);
 
-            await LoadInformationSidebar(model, employeeOnboardingId.Value);
+            await _workspaceService.LoadInformationSidebar(model, employeeOnboardingId.Value);
 
-            await LoadDocuments(model, employeeOnboardingId.Value);
-            model.Policies = await LoadPolicies(employeeOnboardingId.Value);
- 
+            await _workspaceService.LoadDocuments(model, employeeOnboardingId.Value);
+
+            model.Policies = await _workspaceService.LoadPolicies(employeeOnboardingId.Value);
 
             return View(model);
         }
@@ -1297,80 +892,7 @@ namespace VeltriQ.Controllers
                 "application/octet-stream",
                 policy.Policy.FileName);
         }
-        private async Task LoadHeader
-        (
-            CandidateOnboardingIndexViewModel model,
-            int employeeOnboardingId
-        )
-        {
-            var onboarding = await _context.EmployeeOnboardings
-
-                .Include(x => x.OnboardingCandidate)
-                    .ThenInclude(x => x.Department)
-
-                .Include(x => x.OnboardingCandidate)
-                    .ThenInclude(x => x.Designation)
-
-                .Include(x => x.OnboardingCandidate)
-                    .ThenInclude(x => x.EmploymentType)
-
-                .Include(x => x.OnboardingTemplate)
-
-                .Include(x => x.OnboardingStatus)
-
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId);
-
-            if (onboarding == null)
-                return;
-
-            var candidate = onboarding.OnboardingCandidate;
-
-            model.EmployeeOnboardingId = onboarding.EmployeeOnboardingId;
-
-            model.OnboardingCandidateId = onboarding.OnboardingCandidateId;
-
-            model.CandidateName = candidate?.FullName ?? "";
-
-            model.CandidateCode = candidate?.CandidateCode ?? "";
-
-            model.Email = candidate?.Email ?? "";
-
-            model.MobileNumber = candidate?.MobileNumber ?? "";
-
-            model.Department = candidate?.Department?.DepartmentName ?? "";
-
-            model.Designation = candidate?.Designation?.DesignationName ?? "";
-
-            model.EmploymentType = candidate?.EmploymentType?.EmploymentTypeName ?? "";
-
-            model.TemplateName = onboarding.OnboardingTemplate?.TemplateName ?? "";
-
-            model.Status = onboarding.OnboardingStatus?.StatusName ?? "";
-
-            model.StatusName = onboarding.OnboardingStatus?.StatusName ?? "";
-
-            model.StatusCode = onboarding.OnboardingStatus?.StatusCode ?? "";
-
-            model.ExpectedJoiningDate = candidate?.ExpectedJoiningDate;
-
-            model.CompletionPercentage = onboarding.CompletionPercentage;
-
-            model.IsPortalLocked = onboarding.IsPortalLocked;
-
-            // Candidate can submit only if:
-            // 1. Progress is 100%
-            // 2. Portal is not locked
-            // 3. Status is In Progress or Corrections Required
-
-            model.CanSubmit =
-                onboarding.CompletionPercentage == 100 &&
-                !onboarding.IsPortalLocked &&
-                (
-                    onboarding.OnboardingStatus?.StatusCode == "INPROGRESS" ||
-                    onboarding.OnboardingStatus?.StatusCode == "CORRECTION"
-                );
-        }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitOnboarding()
@@ -1387,7 +909,7 @@ namespace VeltriQ.Controllers
                 });
             }
 
-            await UpdateCompletionPercentage(employeeOnboardingId.Value);
+            await _workspaceService.UpdateCompletionPercentage(employeeOnboardingId.Value);
 
             var onboarding = await _context.EmployeeOnboardings
                 .FirstOrDefaultAsync(x =>

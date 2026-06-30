@@ -185,7 +185,6 @@
                 <i class="bi bi-shield-check"></i> Policies
             </button>
         </li>
-
     </ul>
 
     <div class="workspace-tab-viewport">
@@ -203,6 +202,7 @@
         </div>
 
         <div id="view_policies" style="display: none;">
+            @* CRITICAL TYPE FIX: Correctly maps Model.Policies to protect view model dictionary integrity *@
             @await Html.PartialAsync("_Policies", Model.Policies)
         </div>
 
@@ -212,23 +212,19 @@
 @section Scripts {
     <script>
         function toggleDetailsTab(targetViewId, buttonElement) {
-            // Unset current focus attributes cleanly
             const tabs = buttonElement.closest('.details-nav-tabs').getElementsByClassName('details-tab-btn');
             for (let i = 0; i < tabs.length; i++) {
                 tabs[i].classList.remove('active');
             }
 
-            // Register focal destination target active
             buttonElement.classList.add('active');
 
-            // Collapse view instances instantly
             const targets = ['overview', 'information', 'documents', 'policies'];
             targets.forEach(view => {
                 const el = document.getElementById('view_' + view);
                 if (el) el.style.display = 'none';
             });
 
-            // Deploy focal layer panel screen
             const targetView = document.getElementById('view_' + targetViewId);
             if (targetView) targetView.style.display = 'block';
         }

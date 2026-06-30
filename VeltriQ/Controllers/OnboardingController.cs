@@ -5,27 +5,26 @@ using Microsoft.EntityFrameworkCore;
 using VeltriQ.Data;
 using VeltriQ.Models.Core;
 using VeltriQ.Models.HR.Onboarding;
+using VeltriQ.Services.HR.Onboarding;
 using VeltriQ.ViewModels.EmployeeOnboarding;
+
 
 namespace VeltriQ.Controllers
 {
     public class OnboardingController : BaseController
     {
         private readonly TenantDbContext _context;
+        private readonly IOnboardingWorkspaceService _workspaceService;
 
-        public OnboardingController
-        (
+        public OnboardingController(
             TenantDbContext context,
-
             MasterDbContext masterContext,
-
-            UserManager<ApplicationUser> userManager
-        )
-
+            UserManager<ApplicationUser> userManager,
+            IOnboardingWorkspaceService workspaceService)
             : base(context, masterContext, userManager)
-
         {
             _context = context;
+            _workspaceService = workspaceService;
         }
         public async Task<IActionResult> Index()
         {
@@ -476,88 +475,56 @@ namespace VeltriQ.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var onboarding = await _context.EmployeeOnboardings
-
-                .Include(x => x.OnboardingCandidate)
-                    .ThenInclude(x => x.Department)
-
-                .Include(x => x.OnboardingCandidate)
-                    .ThenInclude(x => x.Designation)
-
-                .Include(x => x.OnboardingCandidate)
-                    .ThenInclude(x => x.EmploymentType)
-
-                .Include(x => x.OnboardingTemplate)
-
-                .Include(x => x.OnboardingStatus)
-
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeOnboardingId == id);
+                .FirstOrDefaultAsync(x => x.EmployeeOnboardingId == id);
 
             if (onboarding == null)
                 return NotFound();
 
-            var model = new EmployeeOnboardingDetailsViewModel
-            {
-                EmployeeOnboardingId = onboarding.EmployeeOnboardingId,
+            var model = new EmployeeOnboardingDetailsViewModel();
 
-                OnboardingCandidateId = onboarding.OnboardingCandidateId,
+            //====================================================
+            // HEADER
+            //====================================================
 
-                CandidateCode = onboarding.OnboardingCandidate.CandidateCode,
+            await _workspaceService.LoadHeader(model, id);
 
-                CandidateName = onboarding.OnboardingCandidate.FullName,
+            //====================================================
+            // OVERVIEW
+            //====================================================
 
-                Email = onboarding.OnboardingCandidate.Email,
+            await _workspaceService.LoadOverview(model, id);
 
-                MobileNumber = onboarding.OnboardingCandidate.MobileNumber ?? "",
+            //====================================================
+            // INFORMATION
+            //====================================================
 
-                Department = onboarding.OnboardingCandidate.Department.DepartmentName,
+            model.PersonalInformation =
+                await _workspaceService.LoadPersonalInformation(id);
 
-                Designation = onboarding.OnboardingCandidate.Designation.DesignationName,
+            model.Address =
+                await _workspaceService.LoadAddress(id);
 
-                EmploymentType = onboarding.OnboardingCandidate.EmploymentType.EmploymentTypeName,
+            model.EmergencyContact =
+                await _workspaceService.LoadEmergencyContact(id);
 
-                TemplateName = onboarding.OnboardingTemplate.TemplateName,
+            model.Dependents =
+                await _workspaceService.LoadDependents(id);
 
-                Status = onboarding.OnboardingStatus.StatusName,
+            model.Qualifications =
+                await _workspaceService.LoadQualifications(id);
 
-                CompletionPercentage = onboarding.CompletionPercentage,
+            //====================================================
+            // DOCUMENTS
+            //====================================================
 
-                AssignedOn = onboarding.AssignedOn,
+            await _workspaceService.LoadDocuments(model, id);
 
-                ExpectedJoiningDate = onboarding.OnboardingCandidate.ExpectedJoiningDate,
+            //====================================================
+            // POLICIES
+            //====================================================
 
-                TotalSections = await _context.EmployeeOnboardingSections
-                    .CountAsync(x => x.EmployeeOnboardingId == id),
-
-                CompletedSections = await _context.EmployeeOnboardingSections
-                    .CountAsync(x =>
-                        x.EmployeeOnboardingId == id &&
-                        x.IsCompleted),
-
-                TotalDocuments = await _context.EmployeeOnboardingDocuments
-                    .CountAsync(x => x.EmployeeOnboardingId == id),
-
-                UploadedDocuments = await _context.EmployeeOnboardingDocuments
-                    .CountAsync(x =>
-                        x.EmployeeOnboardingId == id &&
-                        x.IsUploaded),
-
-                TotalPolicies = await _context.EmployeeOnboardingPolicies
-                    .CountAsync(x => x.EmployeeOnboardingId == id),
-
-                AcceptedPolicies = await _context.EmployeeOnboardingPolicies
-                    .CountAsync(x =>
-                        x.EmployeeOnboardingId == id &&
-                        x.IsAccepted),
-
-                TotalActivities = await _context.EmployeeOnboardingActivities
-                    .CountAsync(x => x.EmployeeOnboardingId == id),
-
-                CompletedActivities = await _context.EmployeeOnboardingActivities
-                    .CountAsync(x =>
-                        x.EmployeeOnboardingId == id &&
-                        x.IsCompleted)
-            };
+            model.Policies =
+                await _workspaceService.LoadPolicies(id);
 
             return View(model);
         }

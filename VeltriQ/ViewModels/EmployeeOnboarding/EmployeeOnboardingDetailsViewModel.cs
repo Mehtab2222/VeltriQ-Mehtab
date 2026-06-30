@@ -1,6 +1,9 @@
-﻿namespace VeltriQ.ViewModels.EmployeeOnboarding
+﻿using VeltriQ.ViewModels.CandidateOnboardingPortal;
+using VeltriQ.ViewModels.Shared;
+
+namespace VeltriQ.ViewModels.EmployeeOnboarding
 {
-    public class EmployeeOnboardingDetailsViewModel
+    public class EmployeeOnboardingDetailsViewModel : IOnboardingWorkspaceHeader
     {
         //====================================================
         // HEADER
@@ -72,5 +75,17 @@
 
         public List<EmployeeOnboardingTimelineViewModel> TimelineList { get; set; }
             = new();
+
+        public CandidateOnboardingPersonalInformationViewModel PersonalInformation { get; set; } = new();
+
+        public CandidateOnboardingAddressViewModel Address { get; set; } = new();
+
+        public CandidateOnboardingEmergencyContactViewModel EmergencyContact { get; set; } = new();
+
+        public CandidateOnboardingDependentsViewModel Dependents { get; set; } = new();
+
+        public CandidateOnboardingQualificationsViewModel Qualifications { get; set; } = new();
+        public CandidateOnboardingPoliciesViewModel Policies { get; set; }
+    = new();
     }
 }
