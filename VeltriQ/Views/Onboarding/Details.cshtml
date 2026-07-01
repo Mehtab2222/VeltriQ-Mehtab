@@ -397,6 +397,8 @@
     }
 </style>
 
+@Html.AntiForgeryToken()
+
 <div class="profile-details-page">
 
     <div class="profile-hero-banner">
@@ -492,7 +494,7 @@
             </div>
             <div class="overview-summary-row">
                 <span class="overview-summary-label">Documents Uploaded</span>
-                <span class="overview-summary-value">@Model.UploadedDocuments / @Model.TotalDocuments</span>
+                <span class="overview-summary-value" id="overview_uploaded_docs">@Model.UploadedDocuments / @Model.TotalDocuments</span>
             </div>
             <div class="overview-summary-row">
                 <span class="overview-summary-label">Policies Accepted</span>
@@ -709,7 +711,7 @@
                         <th style="width: 90px;">Uploaded</th>
                         <th style="width: 110px;">Status</th>
                         <th>Uploaded On</th>
-                        <th style="width: 220px; text-align: center;">HR Action Workspace</th>
+                        <th style="width: 240px; text-align: center;">HR Action Workspace</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -717,17 +719,17 @@
                     {
                         foreach (var doc in Model.DocumentsList)
                         {
-                            <tr>
+                            <tr id="doc_row_@doc.EmployeeOnboardingDocumentId">
                                 <td style="font-weight: 600;">@doc.DocumentName</td>
                                 <td style="color: var(--text-secondary);">@(doc.IsMandatory ? "Yes" : "No")</td>
                                 <td>
                                     <i class="bi @(doc.IsUploaded ? "bi-check2 text-success" : "bi-dash var(--text-muted)")"></i>
                                 </td>
-                                <td>
+                                <td class="status-cell">
                                     @if (doc.IsUploaded)
                                     {
-                                        string docStatusClass = doc.IsVerified ? "status-approved" : "status-progress";
-                                        string docStatusLabel = doc.IsVerified ? "Verified" : "Pending";
+                                        string docStatusClass = doc.IsVerified ? "status-approved" : (!string.IsNullOrWhiteSpace(doc.Remarks) ? "status-rejected" : "status-progress");
+                                        string docStatusLabel = doc.IsVerified ? "Verified" : (!string.IsNullOrWhiteSpace(doc.Remarks) ? "Rejected" : "Pending");
 
                                         <span class="status-pill @docStatusClass">@docStatusLabel</span>
                                     }
@@ -737,23 +739,36 @@
                                     }
                                 </td>
                                 <td style="color: var(--text-secondary);">@(doc.UploadedOn?.ToString("dd MMM yyyy") ?? "-")</td>
-                                <td style="text-align: center;">
+                                <td class="action-cell" style="text-align: center;">
                                     @if (doc.IsUploaded)
                                     {
-                                        <button type="button" class="action-link-btn" disabled style="opacity: 0.6; cursor: not-scale;">
-                                            <i class="bi bi-eye"></i> View
-                                        </button>
+                                        @if (!string.IsNullOrWhiteSpace(doc.FilePath))
+                                        {
+                                            <a href="@doc.FilePath" target="_blank" class="action-link-btn view-link">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: var(--text-secondary); font-size: 11px; margin-right: 4px;" class="file-name-txt">@doc.FileName</span>
+                                        }
 
                                         @if (!doc.IsVerified)
                                         {
-                                            <span style="color: var(--border); margin: 0 2px;">|</span>
-                                            <button type="button" class="action-link-btn" onclick="approveDocument(@doc.EmployeeOnboardingDocumentId)">
+                                            <span class="action-divider" style="color: var(--border); margin: 0 2px;">|</span>
+                                            <button type="button" class="action-link-btn btn-approve-action" onclick="approveDocument(@doc.EmployeeOnboardingDocumentId)">
                                                 <i class="bi bi-check-circle"></i> Approve
                                             </button>
-                                            <span style="color: var(--border); margin: 0 2px;">|</span>
-                                            <button type="button" class="action-link-btn btn-danger-text" onclick="openRejectModal(@doc.EmployeeOnboardingDocumentId, '@doc.DocumentName')">
+                                            <span class="action-divider" style="color: var(--border); margin: 0 2px;">|</span>
+                                            <button type="button" class="action-link-btn btn-danger-text btn-reject-action" onclick="openRejectModal(@doc.EmployeeOnboardingDocumentId, '@doc.DocumentName')">
                                                 <i class="bi bi-x-circle"></i> Reject
                                             </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-success verified-badge" style="font-size: 11px; font-weight: 700; margin-left: 6px;">
+                                                <i class="bi bi-shield-check"></i> Verified
+                                            </span>
                                         }
                                     }
                                     else
@@ -900,7 +915,7 @@
     function approveDocument(documentId) {
         if (!confirm("Are you sure you want to verify and approve this document?")) return;
 
-        fetch('/EmployeeOnboarding/ApproveDocument', {
+        fetch('/Onboarding/ApproveDocument', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -911,7 +926,27 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                window.location.reload();
+                // Actualización del DOM en caliente sin refrescar la página
+                const row = document.getElementById(`doc_row_${documentId}`);
+                if (row) {
+                    // 1. Cambiar Badge de Estado a 'Verified'
+                    const statusCell = row.querySelector('.status-cell');
+                    statusCell.innerHTML = '<span class="status-pill status-approved">Verified</span>';
+
+                    // 2. Remover controles interactivos de verificación y dejar firma de completado
+                    const actionCell = row.querySelector('.action-cell');
+                    const viewLink = actionCell.querySelector('.view-link');
+                    const fileNameTxt = actionCell.querySelector('.file-name-txt');
+
+                    let viewHtml = '';
+                    if (viewLink) {
+                        viewHtml = viewLink.outerHTML;
+                    } else if (fileNameTxt) {
+                        viewHtml = fileNameTxt.outerHTML;
+                    }
+
+                    actionCell.innerHTML = viewHtml + ' <span class="text-success verified-badge" style="font-size: 11px; font-weight: 700; margin-left: 6px;"><i class="bi bi-shield-check"></i> Verified</span>';
+                }
             } else {
                 alert(data.message || "Failed to approve the document configuration target.");
             }
@@ -941,7 +976,7 @@
             return;
         }
 
-        fetch('/EmployeeOnboarding/RejectDocument', {
+        fetch('/Onboarding/RejectDocument', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -952,8 +987,17 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
+                // Actualización del DOM en caliente sin refrescar la página
+                const row = document.getElementById(`doc_row_${docId}`);
+                if (row) {
+                    // 1. Cambiar Badge de Estado a 'Rejected'
+                    const statusCell = row.querySelector('.status-cell');
+                    statusCell.innerHTML = '<span class="status-pill status-rejected">Rejected</span>';
+
+                    // Nota: Se conservan los botones de aprobar/rechazar visibles por si el administrador
+                    // desea cambiar su decisión tras la asignación de comentarios de rechazo.
+                }
                 closeRejectModal();
-                window.location.reload();
             } else {
                 alert(data.message || "Failed to process target rejection payload workflow state.");
             }

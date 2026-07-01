@@ -713,7 +713,10 @@ namespace VeltriQ.Controllers
                 await documentFile.CopyToAsync(stream);
             }
 
-            // Update Database
+            //====================================================
+            // UPDATE DOCUMENT
+            //====================================================
+
             document.FileName = documentFile.FileName;
 
             document.FilePath =
@@ -723,8 +726,28 @@ namespace VeltriQ.Controllers
                 fileName;
 
             document.IsUploaded = true;
+
             document.UploadedOn = DateTime.Now;
+
+            document.UploadedBy = User.Identity?.Name;
+
+            //====================================================
+            // RESET PREVIOUS HR REVIEW
+            //====================================================
+
+            document.IsVerified = false;
+
+            document.VerifiedOn = null;
+
+            document.VerifiedBy = null;
+
+            document.Remarks = null;
+
+            //====================================================
+
             document.ModifiedOn = DateTime.Now;
+
+            document.ModifiedBy = User.Identity?.Name;
 
             await _context.SaveChangesAsync();
 

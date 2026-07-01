@@ -16,11 +16,9 @@ namespace VeltriQ.Services.HR.Onboarding
             _context = context;
         }
 
-        public async Task LoadHeader
-        (
-            CandidateOnboardingIndexViewModel model,
-            int employeeOnboardingId
-        )
+        public async Task LoadHeader(
+    CandidateOnboardingIndexViewModel model,
+    int employeeOnboardingId)
         {
             var onboarding = await _context.EmployeeOnboardings
 
@@ -45,6 +43,10 @@ namespace VeltriQ.Services.HR.Onboarding
 
             var candidate = onboarding.OnboardingCandidate;
 
+            //====================================================
+            // HEADER INFORMATION
+            //====================================================
+
             model.EmployeeOnboardingId = onboarding.EmployeeOnboardingId;
 
             model.OnboardingCandidateId = onboarding.OnboardingCandidateId;
@@ -67,16 +69,44 @@ namespace VeltriQ.Services.HR.Onboarding
 
             model.Status = onboarding.OnboardingStatus?.StatusName ?? "";
 
+            model.StatusCode = onboarding.OnboardingStatus?.StatusCode ?? "";
 
+            model.StatusName = onboarding.OnboardingStatus?.StatusName ?? "";
 
             model.ExpectedJoiningDate = candidate?.ExpectedJoiningDate;
 
             model.CompletionPercentage = onboarding.CompletionPercentage;
 
+            model.IsPortalLocked = onboarding.IsPortalLocked;
+
+            //====================================================
+            // CHECK FOR REJECTED DOCUMENTS
+            //====================================================
+
+            var hasRejectedDocuments = await _context.EmployeeOnboardingDocuments
+                .AnyAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsUploaded &&
+                    !x.IsVerified &&
+                    !string.IsNullOrWhiteSpace(x.Remarks));
+
+            //====================================================
+            // CAN SUBMIT?
+            //====================================================
+
+            model.CanSubmit =
+                onboarding.CompletionPercentage == 100 &&
+                !onboarding.IsPortalLocked &&
+                !hasRejectedDocuments &&
+                (
+                    model.StatusCode == "INPROGRESS" ||
+                    model.StatusCode == "CORRECTION"
+                );
         }
         public async Task LoadCandidateHeaderState(
-    CandidateOnboardingIndexViewModel model,
-    int employeeOnboardingId)
+     CandidateOnboardingIndexViewModel model,
+     int employeeOnboardingId)
         {
             var onboarding = await _context.EmployeeOnboardings
                 .Include(x => x.OnboardingStatus)
@@ -92,12 +122,29 @@ namespace VeltriQ.Services.HR.Onboarding
 
             model.IsPortalLocked = onboarding.IsPortalLocked;
 
+            //====================================================
+            // CHECK FOR REJECTED DOCUMENTS
+            //====================================================
+
+            var hasRejectedDocuments = await _context.EmployeeOnboardingDocuments
+                .AnyAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsUploaded &&
+                    !x.IsVerified &&
+                    !string.IsNullOrWhiteSpace(x.Remarks));
+
+            //====================================================
+            // FINAL SUBMIT ALLOWED?
+            //====================================================
+
             model.CanSubmit =
                 onboarding.CompletionPercentage == 100 &&
                 !onboarding.IsPortalLocked &&
+                !hasRejectedDocuments &&
                 (
-                    onboarding.OnboardingStatus?.StatusCode == "INPROGRESS" ||
-                    onboarding.OnboardingStatus?.StatusCode == "CORRECTION"
+                    model.StatusCode == "INPROGRESS" ||
+                    model.StatusCode == "CORRECTION"
                 );
         }
         public async Task LoadOverview(
@@ -335,20 +382,30 @@ namespace VeltriQ.Services.HR.Onboarding
                     x.EmployeeOnboardingId == employeeOnboardingId &&
                     x.IsActive)
                 .OrderBy(x => x.DisplayOrder)
-                .Select(x => new EmployeeOnboardingDocumentViewModel
-                {
-                    EmployeeOnboardingDocumentId = x.EmployeeOnboardingDocumentId,
+                 .Select(x => new EmployeeOnboardingDocumentViewModel
+                 {
+                     EmployeeOnboardingDocumentId = x.EmployeeOnboardingDocumentId,
 
-                    DocumentName = x.Document.DocumentName,
+                     DocumentName = x.Document.DocumentName,
 
-                    IsMandatory = x.IsMandatory,
+                     IsMandatory = x.IsMandatory,
 
-                    IsUploaded = x.IsUploaded,
+                     IsUploaded = x.IsUploaded,
 
-                    IsVerified = x.IsVerified,
+                     IsVerified = x.IsVerified,
 
-                    UploadedOn = x.UploadedOn
-                })
+                     UploadedOn = x.UploadedOn,
+
+                     FileName = x.FileName,
+
+                     FilePath = x.FilePath,
+
+                     Remarks = x.Remarks,
+
+                     VerifiedOn = x.VerifiedOn,
+
+                     VerifiedBy = x.VerifiedBy
+                 })
                 .ToListAsync();
         }
         public async Task<CandidateOnboardingPoliciesViewModel> LoadPolicies(int employeeOnboardingId)
@@ -679,8 +736,45 @@ namespace VeltriQ.Services.HR.Onboarding
 
                     IsVerified = x.IsVerified,
 
-                    UploadedOn = x.UploadedOn
+                    UploadedOn = x.UploadedOn,
+
+                    FileName = x.FileName,
+
+                    FilePath = x.FilePath,
+
+                    Remarks = x.Remarks,
+
+                    VerifiedOn = x.VerifiedOn,
+
+                    VerifiedBy = x.VerifiedBy
                 })
+                .ToListAsync();
+        }
+        public async Task LoadPolicies(
+    EmployeeOnboardingDetailsViewModel model,
+    int employeeOnboardingId)
+        {
+            model.PoliciesList = await _context.EmployeeOnboardingPolicies
+
+                .Where(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive)
+
+                .OrderBy(x => x.DisplayOrder)
+
+                .Select(x => new EmployeeOnboardingPolicyViewModel
+                {
+                    EmployeeOnboardingPolicyId = x.EmployeeOnboardingPolicyId,
+
+                    PolicyName = x.Policy.PolicyName,
+
+                    IsMandatory = x.IsMandatory,
+
+                    IsAccepted = x.IsAccepted,
+
+                    AcceptedOn = x.AcceptedOn
+                })
+
                 .ToListAsync();
         }
 

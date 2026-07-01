@@ -40,6 +40,9 @@ namespace VeltriQ.Services.HR.Onboarding
 
         Task<CandidateOnboardingQualificationsViewModel> LoadQualifications(
             int employeeOnboardingId);
+        Task LoadPolicies(
+    EmployeeOnboardingDetailsViewModel model,
+    int employeeOnboardingId);
         Task LoadHeader(
     EmployeeOnboardingDetailsViewModel model,
     int employeeOnboardingId);

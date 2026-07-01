@@ -7,6 +7,7 @@ using VeltriQ.Models.Core;
 using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.Services.HR.Onboarding;
 using VeltriQ.ViewModels.EmployeeOnboarding;
+using VeltriQ.ViewModels.EmployeeOnboarding.Requests;
 
 
 namespace VeltriQ.Controllers
@@ -523,12 +524,113 @@ namespace VeltriQ.Controllers
             // POLICIES
             //====================================================
 
-            model.Policies =
-                await _workspaceService.LoadPolicies(id);
+            //====================================================
+            // POLICIES
+            //====================================================
+
+            await _workspaceService.LoadPolicies(model, id);
 
             return View(model);
         }
 
         #endregion
+        [HttpPost]
+        public async Task<IActionResult> ApproveDocument(
+    [FromBody] ApproveDocumentRequest request)
+        {
+
+            var document = await _context.EmployeeOnboardingDocuments
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingDocumentId == request.Id);
+            return Json(new
+{
+    success = true,
+    message = "RejectDocument action reached."
+});
+
+            if (document == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Document not found."
+                });
+            }
+
+            document.IsVerified = true;
+
+            document.VerifiedOn = DateTime.Now;
+
+            document.VerifiedBy = User.Identity?.Name;
+
+            document.Remarks = null;
+
+            document.ModifiedOn = DateTime.Now;
+
+            document.ModifiedBy = User.Identity?.Name;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                message = "Document verified successfully."
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> RejectDocument(
+    [FromBody] RejectDocumentRequest request)
+        {
+            var document = await _context.EmployeeOnboardingDocuments
+                .Include(x => x.EmployeeOnboarding)
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingDocumentId == request.Id);
+
+            if (document == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Document not found."
+                });
+            }
+
+            //=========================================
+            // DOCUMENT STATUS
+            //=========================================
+
+            document.IsVerified = false;
+            document.VerifiedOn = null;
+            document.VerifiedBy = null;
+            document.Remarks = request.Remarks;
+
+            document.ModifiedOn = DateTime.Now;
+            document.ModifiedBy = User.Identity?.Name;
+
+            //=========================================
+            // UNLOCK CANDIDATE PORTAL
+            //=========================================
+            var onboarding = await _context.EmployeeOnboardings
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingId == document.EmployeeOnboardingId);
+
+            if (onboarding != null)
+            {
+                onboarding.IsPortalLocked = false;
+
+                onboarding.OnboardingStatusMasterId = 6; // CORRECTION
+
+                onboarding.ModifiedOn = DateTime.Now;
+                onboarding.ModifiedBy = User.Identity?.Name;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                message = "Document rejected successfully."
+            });
+        }
     }
 }

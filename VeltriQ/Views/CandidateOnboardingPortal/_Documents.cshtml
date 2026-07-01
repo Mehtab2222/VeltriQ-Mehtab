@@ -241,9 +241,30 @@
                             <td>
                                 @if (doc.IsUploaded)
                                 {
-                                    <span class="status-pill @(doc.IsVerified ? "status-approved" : "status-progress")">
-                                        @(doc.IsVerified ? "Verified" : "Pending")
-                                    </span>
+                                    if (doc.IsVerified)
+                                    {
+                                        <span class="status-pill status-approved">
+                                            Verified
+                                        </span>
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(doc.Remarks))
+                                    {
+                                        <span class="status-pill status-rejected">
+                                            Rejected
+                                        </span>
+
+                                        <div class="text-danger mt-1">
+                                            <small>
+                                                <strong>HR Remark:</strong> @doc.Remarks
+                                            </small>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill status-progress">
+                                            Pending Review
+                                        </span>
+                                    }
                                 }
                                 else
                                 {
@@ -261,23 +282,52 @@
                                     }
                                     else
                                     {
-                                        if (doc.IsUploaded)
+                                        @if (doc.IsVerified)
                                         {
-                                            <a class="btn-action-mini btn-download-theme" href="/CandidateOnboardingPortal/DownloadDocument/@doc.EmployeeOnboardingDocumentId" target="_blank" title="Download Document Attachment">
+                                            <!-- Verified -->
+                                            <a class="btn-action-mini btn-download-theme"
+                                               href="/CandidateOnboardingPortal/DownloadDocument/@doc.EmployeeOnboardingDocumentId"
+                                               target="_blank">
+
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(doc.Remarks))
+                                        {
+                                            <!-- Rejected -->
+                                            <a class="btn-action-mini btn-download-theme"
+                                               href="/CandidateOnboardingPortal/DownloadDocument/@doc.EmployeeOnboardingDocumentId"
+                                               target="_blank">
+
                                                 <i class="bi bi-download"></i>
                                             </a>
 
-                                            <button class="btn-action-mini btn-replace-theme trigger-upload-modal" type="button"
+                                            <button class="btn-action-mini btn-replace-theme trigger-upload-modal"
+                                                    type="button"
                                                     data-id="@doc.EmployeeOnboardingDocumentId"
                                                     data-name="@doc.DocumentName">
+
                                                 <i class="bi bi-arrow-left-right"></i> Replace
                                             </button>
                                         }
+                                        else if (doc.IsUploaded)
+                                        {
+                                            <!-- Pending Review -->
+                                            <a class="btn-action-mini btn-download-theme"
+                                               href="/CandidateOnboardingPortal/DownloadDocument/@doc.EmployeeOnboardingDocumentId"
+                                               target="_blank">
+
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        }
                                         else
                                         {
-                                            <button class="btn-action-mini btn-upload-theme trigger-upload-modal" type="button"
+                                            <!-- Not Uploaded -->
+                                            <button class="btn-action-mini btn-upload-theme trigger-upload-modal"
+                                                    type="button"
                                                     data-id="@doc.EmployeeOnboardingDocumentId"
                                                     data-name="@doc.DocumentName">
+
                                                 <i class="bi bi-cloud-arrow-up"></i> Upload
                                             </button>
                                         }
