@@ -1,0 +1,547 @@
+﻿@model VeltriQ.ViewModels.OnboardingDocument.OnboardingDocumentCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Onboarding Document";
+}
+
+<style>
+    .template-create-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .validation-summary-box {
+        font-size: 12px;
+        color: #ef4444;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    /* ── HEADER BACK TO LIST NAVIGATION ACTION ── */
+    .form-action-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    /* ── COMPACT SYSTEM BUTTON CONTROLS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    .form-footer-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    /* ── SQUARED SINGLE-PANEL CONTAINER CARD DECK ── */
+    .custom-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Branded sharp corner rules grid matrix */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-form-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+    }
+
+        .custom-form-header h5 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+    .custom-form-body {
+        padding: 16px;
+        background: var(--card-bg);
+    }
+
+    .form-grid-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+    .form-grid-col-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+        padding: 0 8px;
+    }
+
+    .form-grid-col-4 {
+        flex: 0 0 33.3333%;
+        max-width: 33.3333%;
+        padding: 0 8px;
+    }
+
+    .form-grid-col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 8px;
+    }
+
+    .form-grid-col-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0 8px;
+    }
+
+    .form-field-group {
+        margin-bottom: 12px;
+        position: relative;
+    }
+
+    .custom-form-label {
+        display: inline-block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+        .custom-form-label span {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
+    .custom-form-control {
+        width: 100%;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12.5px;
+        outline: none;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+        .custom-form-control:focus {
+            border-color: var(--purple);
+        }
+
+    textarea.custom-form-control {
+        height: 56px;
+        padding: 6px 12px;
+        resize: none;
+    }
+
+    select.custom-form-control {
+        padding-right: 24px;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px 12px;
+    }
+
+    /* ── CUSTOM SELECT DROPDOWN WRAPPER WITH INLINE CHECKBOXES ── */
+    .vq-multiselect-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .vq-multiselect-trigger {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 12px;
+    }
+
+        .vq-multiselect-trigger::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+    .vq-multiselect-panel {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        width: 100%;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        z-index: 1000;
+        max-height: 220px;
+        overflow-y: auto;
+        padding: 6px 0;
+        display: none;
+    }
+
+    .vq-multiselect-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.1s ease;
+    }
+
+        .vq-multiselect-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .vq-multiselect-item input[type="checkbox"] {
+            accent-color: var(--purple);
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+
+        .vq-multiselect-item span {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+    /* ── CHECKBOX CONTROLS ── */
+    .custom-check-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        padding: 4px 0;
+    }
+
+    .custom-check-input {
+        width: 14px;
+        height: 14px;
+        accent-color: var(--purple);
+        cursor: pointer;
+    }
+
+    .custom-check-label {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .validation-err-text {
+        font-size: 11px;
+        color: #ef4444;
+        font-weight: 500;
+        margin-top: 2px;
+        display: block;
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid-col-3, .form-grid-col-4, .form-grid-col-6, .form-grid-col-12
+
+    {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    }
+</style>
+
+<div class="template-create-page">
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-container">
+            <div class="custom-alert custom-alert-danger">@TempData["Error"]</div>
+        </div>
+    }
+
+    <div class="form-action-header">
+        <a href="/OnboardingDocument/index" class="form-action-btn btn-cancel-theme">
+            <i class="bi bi-arrow-left"></i>
+            Back to List
+        </a>
+    </div>
+
+    <form asp-action="Create" method="post" id="createDocumentForm">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary-box"></div>
+
+        <input type="hidden" id="hfAllowedFileTypes" asp-for="AllowedFileTypes" />
+
+        <div class="custom-form-card">
+            <div class="custom-form-header">
+                <h5>Document Setup Configuration</h5>
+            </div>
+
+            <div class="custom-form-body">
+
+                <div class="form-grid-row">
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="DocumentName" class="custom-form-label">Document Name<span>*</span></label>
+                        <input asp-for="DocumentName" class="custom-form-control" placeholder="e.g., Degree Certificate" autocomplete="off" />
+                        <span asp-validation-for="DocumentName" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="OnboardingDocumentCategoryMasterId" class="custom-form-label">Category<span>*</span></label>
+                        <select asp-for="OnboardingDocumentCategoryMasterId" asp-items="Model.Categories" class="custom-form-control">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="OnboardingDocumentCategoryMasterId" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="DisplayOrder" class="custom-form-label">Display Order<span>*</span></label>
+                        <input asp-for="DisplayOrder" type="number" class="custom-form-control" value="@Model.DisplayOrder" min="1" oninput="this.value = Math.abs(this.value) || ''" />
+                        <span asp-validation-for="DisplayOrder" class="validation-err-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-row">
+                    <div class="form-grid-col-12 form-field-group">
+                        <label asp-for="Description" class="custom-form-label">Description</label>
+                        <textarea asp-for="Description" class="custom-form-control" placeholder="Provide description notes or upload instructions for the applicant..."></textarea>
+                        <span asp-validation-for="Description" class="validation-err-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-row">
+                    <div class="form-grid-col-4 form-field-group">
+                        <label class="custom-form-label">Choose File Types<span>*</span></label>
+                        <div class="vq-multiselect-container">
+                            <div class="custom-form-control vq-multiselect-trigger" id="multiselectDropdownTrigger">
+                                <span id="txtDropdownPlaceholder" style="color: var(--text-secondary); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">-- Select Extensions --</span>
+                            </div>
+
+                            <div class="vq-multiselect-panel" id="multiselectDropdownPanel">
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="pdf" checked />
+                                    <span>PDF</span>
+                                </label>
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="jpg" checked />
+                                    <span>JPG</span>
+                                </label>
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="jpeg" checked />
+                                    <span>JPEG</span>
+                                </label>
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="png" checked />
+                                    <span>PNG</span>
+                                </label>
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="doc" checked />
+                                    <span>DOC</span>
+                                </label>
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="docx" />
+                                    <span>DOCX</span>
+                                </label>
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="xls" />
+                                    <span>XLS</span>
+                                </label>
+                                <label class="vq-multiselect-item">
+                                    <input type="checkbox" class="chk-extension-node" value="xlsx" />
+                                    <span>XLSX</span>
+                                </label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="AllowedFileTypes" class="validation-err-text" id="allowedFileTypesErr"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label class="custom-form-label">Active Allowed Formats</label>
+                        <input type="text" id="txtSelectedFormatsBox" class="custom-form-control" style="cursor: not-allowed; opacity: 0.85; font-weight:600;" readonly placeholder="None Selected" />
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="MaxFileSizeMB" class="custom-form-label">Maximum File Size (MB)<span>*</span></label>
+                        <input asp-for="MaxFileSizeMB" type="number" class="custom-form-control" value="@(Model?.MaxFileSizeMB ?? 5)" min="1" max="50" oninput="this.value = Math.abs(this.value) || ''" />
+                        <span asp-validation-for="MaxFileSizeMB" class="validation-err-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-row" style="margin-top: 4px;">
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="IsMandatory" class="custom-check-input" />
+                            <label asp-for="IsMandatory" class="custom-check-label">Mandatory</label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="IsExpiryRequired" class="custom-check-input" />
+                            <label asp-for="IsExpiryRequired" class="custom-check-label">Expiry Required</label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="AllowMultipleFiles" class="custom-check-input" />
+                            <label asp-for="AllowMultipleFiles" class="custom-check-label">Allow Multiple Files</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-row">
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="IsVisibleToCandidate" class="custom-check-input" />
+                            <label asp-for="IsVisibleToCandidate" class="custom-check-label">Visible To Candidate</label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="AllowDownloadByCandidate" class="custom-check-input" />
+                            <label asp-for="AllowDownloadByCandidate" class="custom-check-label">Allow Candidate Download</label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-footer-actions">
+            <button type="submit" class="form-action-btn btn-submit-theme">
+                <i class="bi bi-check-circle"></i>
+                Save Document
+            </button>
+
+            <a href="/OnboardingDocuments" class="form-action-btn btn-cancel-theme">
+                <i class="bi bi-x-circle"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("createDocumentForm");
+            const hiddenField = document.getElementById("hfAllowedFileTypes");
+            const checkboxes = document.querySelectorAll(".chk-extension-node");
+            const errorSpan = document.getElementById("allowedFileTypesErr");
+
+            const dropdownTrigger = document.getElementById("multiselectDropdownTrigger");
+            const dropdownPanel = document.getElementById("multiselectDropdownPanel");
+            const placeholderSpan = document.getElementById("txtDropdownPlaceholder");
+            const selectionTextbox = document.getElementById("txtSelectedFormatsBox");
+
+            // Toggle multiselect expansion box click listeners
+            dropdownTrigger.addEventListener("click", function(e) {
+                e.stopPropagation();
+                const isExpanded = dropdownPanel.style.display === "block";
+                dropdownPanel.style.display = isExpanded ? "none" : "block";
+            });
+
+            // Prevent dropdown panel collapse when checking options inside
+            dropdownPanel.addEventListener("click", function(e) {
+                e.stopPropagation();
+            });
+
+            // Collapse click listeners globally outside matrix boundaries
+            document.addEventListener("click", function() {
+                dropdownPanel.style.display = "none";
+            });
+
+            // Compile the active string value during configuration adjustments
+            function syncExtensions() {
+                let selectedExtensions = [];
+                checkboxes.forEach(chk => {
+                    if (chk.checked) {
+                        selectedExtensions.push(chk.value.toUpperCase());
+                    }
+                });
+
+                const joinedExtensions = selectedExtensions.join(", ");
+                hiddenField.value = joinedExtensions.toLowerCase();
+
+                // Update text selection presentation targets
+                if(selectedExtensions.length > 0) {
+                    placeholderSpan.innerText = selectedExtensions.length + " Items Selected";
+                    selectionTextbox.value = joinedExtensions;
+                    if(errorSpan) errorSpan.innerText = "";
+                } else {
+                    placeholderSpan.innerText = "-- Select Extensions --";
+                    selectionTextbox.value = "";
+                }
+            }
+
+            // Bind change hooks
+            checkboxes.forEach(chk => {
+                chk.addEventListener("change", syncExtensions);
+            });
+
+            // Core prevention during submission checks
+            form.addEventListener("submit", function (e) {
+                syncExtensions();
+                if (!hiddenField.value.trim()) {
+                    e.preventDefault();
+                    if (errorSpan) {
+                        errorSpan.innerText = "Please select at least one format option standard.";
+                    }
+                    return false;
+                }
+            });
+
+            // Initial call to register active database configurations
+            syncExtensions();
+        });
+    </script>
+}

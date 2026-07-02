@@ -1,0 +1,592 @@
+﻿@model VeltriQ.ViewModels.OnboardingDocument.OnboardingDocumentIndexViewModel
+
+@{
+    ViewData["Title"] = "Onboarding Documents";
+}
+
+<style>
+    .documents-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR (CRISP & FULLY SQUARED) ── */
+    .documents-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared corporate grid matching employee page */
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* ── DECK CONTROL ACTIONS TOP HEADER PANEL ── */
+    .documents-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        gap: 20px;
+    }
+
+    .documents-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .documents-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── PUSH BUTTON CLEANLY TO THE RIGHT CORNER ── */
+    .documents-header {
+        display: flex;
+        justify-content: flex-end; /* Aligns button to top right cleanly */
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    /* ── CONTROL EXTRA ACTION CONTAINER BUTTONS ── */
+    .documents-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .documents-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── SYSTEM BRANDED SEARCH BAR ── */
+    .documents-search {
+        width: 280px;
+        position: relative;
+    }
+
+        .documents-search input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .documents-search input:focus {
+                border-color: var(--purple);
+            }
+
+        .documents-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+    /* ── SCROLLABLE GRID MATRIX DESIGN ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+    .documents-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .documents-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .documents-table td {
+            padding: 8px 16px; /* Compressed high density column alignment padding */
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .documents-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    /* ── IDENTITY SEGMENTS ── */
+    .doc-identity-block {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .doc-main-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.2;
+    }
+
+    .doc-category-lbl {
+        font-size: 10.5px;
+        color: var(--purple);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+    }
+
+    /* ── MINIMAL TEXT BASED ALIGNMENT ── */
+    .formats-text-string {
+        font-size: 12.5px;
+        color: var(--text-primary);
+        text-transform: uppercase;
+    }
+
+    .multi-file-indicator {
+        display: block;
+        font-size: 10.5px;
+        color: var(--purple);
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    /* ── THEME ACCENT BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .status-mandatory {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    .status-optional {
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+    }
+
+    .status-active {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
+    /* ── CONTROL ACTIONS BUTTON MATRIX PANEL ── */
+    .table-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: all 0.1s ease;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+    .action-toggle-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.1s ease;
+    }
+
+        .action-toggle-btn.btn-activate {
+            color: #22c55e;
+        }
+
+            .action-toggle-btn.btn-activate:hover {
+                background: #22c55e;
+                color: #fff;
+            }
+
+        .action-toggle-btn.btn-deactivate {
+            color: #ef4444;
+        }
+
+            .action-toggle-btn.btn-deactivate:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+    /* ── SQUARED INTERACTIVE MODAL INTERACTION WINDOW ── */
+    .vq-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .vq-modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        width: 400px;
+        padding: 18px;
+        border-radius: 0px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    .vq-modal-header h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        text-transform: uppercase;
+    }
+
+    .vq-modal-body p {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 12px 0;
+        line-height: 1.4;
+    }
+
+    .vq-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .form-action-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.12);
+        }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="documents-page">
+
+    <div class="documents-header">
+        <a asp-action="Create" class="documents-add-btn">
+            <i class="bi bi-plus-lg"></i>
+            Add Document
+        </a>
+    </div>
+
+    <div class="documents-card">
+
+        <div class="documents-card-top">
+            <div class="documents-card-title">
+                <h3>Onboarding Documents</h3>
+                <p>Total Documents: @(Model.Documents?.Count ?? 0)</p>
+            </div>
+
+            <div class="documents-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="docSearchInput" placeholder="Search documents..." onkeyup="filterDocumentsTable()" autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="documents-table" id="documentsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 70px; text-align: center;">Order</th>
+                        <th style="width: 250px;">Document Details</th>
+                        <th style="width: 220px;">Allowed Formats</th>
+                        <th style="width: 110px;">File Limit</th>
+                        <th style="width: 110px;">Requirement</th>
+                        <th style="width: 110px;">Status</th>
+                        <th style="width: 100px; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Documents != null && Model.Documents.Any())
+                    {
+                        foreach (var item in Model.Documents)
+                        {
+                            <tr class="document-row-item" id="doc_row_@item.OnboardingDocumentMasterId">
+                                <td style="text-align: center; font-weight: 700; color: var(--text-secondary);">
+                                    @item.DisplayOrder
+                                </td>
+                                <td>
+                                    <div class="doc-identity-block">
+                                        <span class="doc-main-name">@item.DocumentName</span>
+                                        <span class="doc-category-lbl">@item.CategoryName</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="formats-text-string">
+                                        @(!string.IsNullOrWhiteSpace(item.AllowedFileTypes)
+                                                                        ? string.Join(", ", item.AllowedFileTypes.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)).ToUpper()
+                                                                        : "ANY FORMAT")
+                            </span>
+                            @if (item.IsAllowMultipleFiles)
+                                    {
+                                        <span class="multi-file-indicator"><i class="bi bi-layers-half"></i> Multi-File Allowed</span>
+                                    }
+                                </td>
+                                <td style="font-weight: 600;">
+                                    @item.MaxFileSizeMB MB
+                                </td>
+                                <td>
+                                    @if (item.IsMandatory)
+                                    {
+                                        <span class="status-badge status-mandatory">Mandatory</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-optional">Optional</span>
+                                    }
+                                </td>
+                                <td class="status-cell">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="status-badge status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="table-actions" style="justify-content: center;">
+                                        <a asp-action="Edit" asp-route-id="@item.OnboardingDocumentMasterId" class="action-btn" title="Edit Properties">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="action-toggle-btn @(item.IsActive ? "btn-deactivate" : "btn-activate")"
+                                                title="@(item.IsActive ? "Deactivate Document" : "Activate Document")"
+                                                onclick="openToggleModal(@item.OnboardingDocumentMasterId, '@item.DocumentName', @(item.IsActive ? "true" : "false"))">
+                                            <i class="bi @(item.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="emptyStatePlaceholderRow">
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No system onboarding documents mapped into operational registries.
+                            </td>
+                        </tr>
+                    }
+
+                    <tr id="searchFallbackRow" style="display: none;">
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            No matching configuration entries detected.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="statusToggleModal" class="vq-modal-backdrop" style="display: none;">
+    <div class="vq-modal-card">
+        <div class="vq-modal-header">
+            <h4 id="modalActionTitle">Change Component State</h4>
+        </div>
+        <div class="vq-modal-body">
+            <input type="hidden" id="targetDocumentId" value="0" />
+            <input type="hidden" id="targetCurrentState" value="false" />
+            <p id="modalActionMessage">Are you sure you want to alter this document configuration lifecycle?</p>
+        </div>
+        <div class="vq-modal-footer">
+            <button type="button" class="form-action-btn btn-cancel-theme" onclick="closeToggleModal()">Cancel</button>
+            <button type="button" id="btnConfirmAction" class="form-action-btn" style="color: #fff;" onclick="submitStateTransition()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterDocumentsTable() {
+        const input = document.getElementById('docSearchInput');
+        const filter = input.value.toLowerCase().trim();
+        const table = document.getElementById('documentsTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByClassName('document-row-item');
+        const fallbackRow = document.getElementById('searchFallbackRow');
+
+        let visualMatches = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const contextString = rows[i].textContent || rows[i].innerText;
+            if (contextString.toLowerCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+                visualMatches++;
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+
+        if (rows.length > 0) {
+            fallbackRow.style.display = (visualMatches === 0) ? "" : "none";
+        }
+    }
+
+    /* ── LOCALIZED STATE MODAL MANAGER ── */
+    function openToggleModal(docId, docName, isActive) {
+        document.getElementById("targetDocumentId").value = docId;
+        document.getElementById("targetCurrentState").value = isActive;
+
+        const titleContainer = document.getElementById("modalActionTitle");
+        const msgContainer = document.getElementById("modalActionMessage");
+        const actionBtn = document.getElementById("btnConfirmAction");
+
+        if (isActive) {
+            titleContainer.innerText = "Deactivate Document";
+            msgContainer.innerHTML = `Are you sure you want to <strong>deactivate</strong> the master data for <strong>"${docName}"</strong>? Profiles won't pull this document as a workflow target requirement.`;
+            actionBtn.style.background = "#ef4444";
+        } else {
+            titleContainer.innerText = "Activate Document";
+            msgContainer.innerHTML = `Are you sure you want to <strong>activate</strong> the master data for <strong>"${docName}"</strong>? It will rejoin active configuration matrices instantly.`;
+            actionBtn.style.background = "#22c55e";
+        }
+
+        document.getElementById("statusToggleModal").style.display = "flex";
+    }
+
+    function closeToggleModal() {
+        document.getElementById("statusToggleModal").style.display = "none";
+        document.getElementById("targetDocumentId").value = "0";
+    }
+
+    function submitStateTransition() {
+        const docId = document.getElementById("targetDocumentId").value;
+        const isCurrentlyActive = document.getElementById("targetCurrentState").value === "true";
+
+        const targetEndpoint = isCurrentlyActive
+            ? '/OnboardingDocuments/Deactivate'
+            : '/OnboardingDocuments/Activate';
+
+        fetch(targetEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken':
+                    document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify(parseInt(docId))
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.getElementById(`doc_row_${docId}`);
+                    if (row) {
+                        const statusCell = row.querySelector('.status-cell');
+                        const actionButton = row.querySelector('.action-toggle-btn');
+                        const docNameText = row.querySelector('.doc-main-name').innerText;
+
+                        if (isCurrentlyActive) {
+                            statusCell.innerHTML = '<span class="status-badge status-inactive">Inactive</span>';
+                            actionButton.className = 'action-toggle-btn btn-activate';
+                            actionButton.title = 'Activate Document';
+                            actionButton.setAttribute('onclick', `openToggleModal(${docId}, '${docNameText}', false)`);
+                            actionButton.innerHTML = '<i class="bi bi-check-circle"></i>';
+                        } else {
+                            statusCell.innerHTML = '<span class="status-badge status-active">Active</span>';
+                            actionButton.className = 'action-toggle-btn btn-deactivate';
+                            actionButton.title = 'Deactivate Document';
+                            actionButton.setAttribute('onclick', `openToggleModal(${docId}, '${docNameText}', true)`);
+                            actionButton.innerHTML = '<i class="bi bi-slash-circle"></i>';
+                        }
+                    }
+                    closeToggleModal();
+                } else {
+                    alert(data.message || "Failed to update target row lifecycle parameters.");
+                }
+            })
+            .catch(() => alert("Network communication failure executing lifecycle state updates."));
+    }
+</script>

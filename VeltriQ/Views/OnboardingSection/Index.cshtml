@@ -1,0 +1,542 @@
+﻿@model VeltriQ.ViewModels.OnboardingSection.OnboardingSectionIndexViewModel
+
+@{
+    ViewData["Title"] = "Onboarding Sections";
+}
+
+<style>
+    .sections-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* ── SYSTEM NOTICE INFO BOX ── */
+    .system-info-notice {
+        background: rgba(124, 58, 237, 0.07);
+        border: 1px dashed rgba(124, 58, 237, 0.3);
+        padding: 12px 16px;
+        color: var(--text-primary);
+        font-size: 12.5px;
+        line-height: 1.4;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+        .system-info-notice i {
+            color: var(--purple);
+            font-size: 15px;
+            margin-top: 1px;
+        }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR (CRISP & FULLY SQUARED) ── */
+    .sections-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared corporate grid schema matching employee page */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* ── CONTROL DECK HEADER PANEL ── */
+    .sections-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        gap: 20px;
+    }
+
+    .sections-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .sections-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── SYSTEM BRANDED SEARCH BAR ── */
+    .sections-search {
+        width: 280px;
+        position: relative;
+    }
+
+        .sections-search input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .sections-search input:focus {
+                border-color: var(--purple);
+            }
+
+        .sections-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+    /* ── SCROLLABLE GRID CONFIGURATION ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+    .sections-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .sections-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sections-table td {
+            padding: 8px 16px; /* Compressed padding for high density view */
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .sections-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    /* ── IDENTITY SEGMENTS ── */
+    .section-identity-block {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-avatar-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--purple);
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    .section-main-name {
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    /* ── THEME STATUS BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .status-mandatory {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    .status-optional {
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+    }
+
+    .status-active {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
+    /* ── ACTION INTERACTION PLUGINS ── */
+    .table-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .action-toggle-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.1s ease;
+    }
+
+        .action-toggle-btn.btn-activate {
+            color: #22c55e;
+        }
+
+            .action-toggle-btn.btn-activate:hover {
+                background: #22c55e;
+                color: #fff;
+            }
+
+        .action-toggle-btn.btn-deactivate {
+            color: #ef4444;
+        }
+
+            .action-toggle-btn.btn-deactivate:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+    /* ── SQUARED INTERACTIVE CONFIRMATION MODAL ── */
+    .vq-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .vq-modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        width: 400px;
+        padding: 18px;
+        border-radius: 0px; /* Branded sharp corners */
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    .vq-modal-header h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        text-transform: uppercase;
+    }
+
+    .vq-modal-body p {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 12px 0;
+        line-height: 1.4;
+    }
+
+    .vq-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .form-action-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.12);
+        }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="sections-page">
+
+    <div class="system-info-notice">
+        <i class="bi bi-info-circle-fill"></i>
+        <div>
+            <strong>Note:</strong> Onboarding sections are built-in system components. They can be enabled or disabled within onboarding templates. If your organization requires an additional section, please contact your system administrator or development team.
+        </div>
+    </div>
+
+    <div class="sections-card">
+
+        <div class="sections-card-top">
+            <div class="sections-card-title">
+                <h3>Onboarding Sections</h3>
+                <p>Total Sections: @(Model.Sections?.Count ?? 0)</p>
+            </div>
+
+            <div class="sections-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="sectionSearchInput" placeholder="Search sections..." onkeyup="filterSectionsTable()" autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="sections-table" id="sectionsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 80px; text-align: center;">Order</th>
+                        <th>Section Details</th>
+                        <th>Description</th>
+                        <th style="width: 120px;">Requirement</th>
+                        <th style="width: 120px;">Status</th>
+                        <th style="width: 100px; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Sections != null && Model.Sections.Any())
+                    {
+                        foreach (var item in Model.Sections)
+                        {
+                            <tr class="section-row-item" id="section_row_@item.OnboardingSectionMasterId">
+                                <td style="text-align: center; font-weight: 700; color: var(--text-secondary);">
+                                    @item.DisplayOrder
+                                </td>
+                                <td>
+                                    <div class="section-identity-block">
+                                        <div class="section-avatar-icon">
+                                            <i class="bi @(string.IsNullOrWhiteSpace(item.IconCss) ? "bi-layers" : item.IconCss)"></i>
+                                        </div>
+                                        <div class="section-main-name">@item.SectionName</div>
+                                    </div>
+                                </td>
+                                <td style="color: var(--text-secondary); font-size: 12px;">
+                                    @(string.IsNullOrWhiteSpace(item.Description) ? "No description provided." : item.Description)
+                                </td>
+                                <td>
+                                    @if (item.IsMandatory)
+                                    {
+                                        <span class="status-badge status-mandatory">Mandatory</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-optional">Optional</span>
+                                    }
+                                </td>
+                                <td class="status-cell">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="status-badge status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="table-actions" style="justify-content: center;">
+                                        <button type="button"
+                                                class="action-toggle-btn @(item.IsActive ? "btn-deactivate" : "btn-activate")"
+                                                title="@(item.IsActive ? "Deactivate Section" : "Activate Section")"
+                                                onclick="openToggleModal(@item.OnboardingSectionMasterId, '@item.SectionName', @(item.IsActive ? "true" : "false"))">
+                                            <i class="bi @(item.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="emptyStatePlaceholderRow">
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No onboarding sections located inside system workspace memory definitions.
+                            </td>
+                        </tr>
+                    }
+
+                    <tr id="searchFallbackRow" style="display: none;">
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            No matching segments located.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="statusToggleModal" class="vq-modal-backdrop" style="display: none;">
+    <div class="vq-modal-card">
+        <div class="vq-modal-header">
+            <h4 id="modalActionTitle">Change Component State</h4>
+        </div>
+        <div class="vq-modal-body">
+            <input type="hidden" id="targetSectionId" value="0" />
+            <input type="hidden" id="targetCurrentState" value="false" />
+            <p id="modalActionMessage">Are you sure you want to alter this onboarding system component lifecycle?</p>
+        </div>
+        <div class="vq-modal-footer">
+            <button type="button" class="form-action-btn btn-cancel-theme" onclick="closeToggleModal()">Cancel</button>
+            <button type="button" id="btnConfirmAction" class="form-action-btn" style="color: #fff;" onclick="submitStateTransition()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterSectionsTable() {
+        const input = document.getElementById('sectionSearchInput');
+        const filter = input.value.toLowerCase().trim();
+        const table = document.getElementById('sectionsTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByClassName('section-row-item');
+        const fallbackRow = document.getElementById('searchFallbackRow');
+
+        let visualMatches = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const contextString = rows[i].textContent || rows[i].innerText;
+            if (contextString.toLowerCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+                visualMatches++;
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+
+        if (rows.length > 0) {
+            fallbackRow.style.display = (visualMatches === 0) ? "" : "none";
+        }
+    }
+
+    /* ── LOCALIZED STATE MODAL MANAGER ── */
+    function openToggleModal(sectionId, sectionName, isActive) {
+        document.getElementById("targetSectionId").value = sectionId;
+        document.getElementById("targetCurrentState").value = isActive;
+
+        const titleContainer = document.getElementById("modalActionTitle");
+        const msgContainer = document.getElementById("modalActionMessage");
+        const actionBtn = document.getElementById("btnConfirmAction");
+
+        if (isActive) {
+            titleContainer.innerText = "Deactivate Section";
+            msgContainer.innerHTML = `Are you sure you want to <strong>deactivate</strong> the section <strong>"${sectionName}"</strong>? This component will become unavailable for onboarding setup.`;
+            actionBtn.style.background = "#ef4444";
+        } else {
+            titleContainer.innerText = "Activate Section";
+            msgContainer.innerHTML = `Are you sure you want to <strong>activate</strong> the section <strong>"${sectionName}"</strong>? It will instantly rejoin active configuration matrices.`;
+            actionBtn.style.background = "#22c55e";
+        }
+
+        document.getElementById("statusToggleModal").style.display = "flex";
+    }
+
+    function closeToggleModal() {
+        document.getElementById("statusToggleModal").style.display = "none";
+        document.getElementById("targetSectionId").value = "0";
+    }
+
+        function submitStateTransition() {
+        const sectionId = document.getElementById("targetSectionId").value;
+        const isCurrentlyActive = document.getElementById("targetCurrentState").value === "true";
+
+        const targetEndpoint = isCurrentlyActive
+            ? '/OnboardingSection/Deactivate'
+            : '/OnboardingSection/Activate';
+
+        fetch(targetEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify(parseInt(sectionId))
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+
+                const row = document.getElementById(`section_row_${sectionId}`);
+
+                if (row) {
+                    const statusCell = row.querySelector('.status-cell');
+                    const actionButton = row.querySelector('.action-toggle-btn');
+                    const sectionNameText = row.querySelector('.section-main-name').innerText;
+
+                    if (isCurrentlyActive) {
+                        statusCell.innerHTML = '<span class="status-badge status-inactive">Inactive</span>';
+                        actionButton.className = 'action-toggle-btn btn-activate';
+                        actionButton.title = 'Activate Section';
+                        actionButton.setAttribute('onclick', `openToggleModal(${sectionId}, '${sectionNameText}', false)`);
+                        actionButton.innerHTML = '<i class="bi bi-check-circle"></i>';
+                    } else {
+                        statusCell.innerHTML = '<span class="status-badge status-active">Active</span>';
+                        actionButton.className = 'action-toggle-btn btn-deactivate';
+                        actionButton.title = 'Deactivate Section';
+                        actionButton.setAttribute('onclick', `openToggleModal(${sectionId}, '${sectionNameText}', true)`);
+                        actionButton.innerHTML = '<i class="bi bi-slash-circle"></i>';
+                    }
+                }
+
+                closeToggleModal();
+            }
+            else {
+                alert(data.message || "Failed to update section status.");
+            }
+        })
+        .catch(() => {
+            alert("Network error while updating section status.");
+        });
+    }
+</script>

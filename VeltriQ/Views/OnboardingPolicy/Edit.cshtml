@@ -1,0 +1,444 @@
+﻿
+@model VeltriQ.ViewModels.OnboardingPolicy.OnboardingPolicyEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Onboarding Policy";
+}
+
+<style>
+    .template-create-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .validation-summary-box {
+        font-size: 12px;
+        color: #ef4444;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    /* ── HEADER ACTION PLUGINS ── */
+    .form-action-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    /* ── COMPACT BRANDED BUTTON CONTROLS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    .form-footer-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    /* ── HIGH DENSITY SQUARED SINGLE PANEL CARD ── */
+    .custom-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Branded strict crisp layout corners */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-form-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+    }
+
+        .custom-form-header h5 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+    .custom-form-body {
+        padding: 16px;
+        background: var(--card-bg);
+    }
+
+    .form-grid-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+    .form-grid-col-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+        padding: 0 8px;
+    }
+
+    .form-grid-col-4 {
+        flex: 0 0 33.3333%;
+        max-width: 33.3333%;
+        padding: 0 8px;
+    }
+
+    .form-grid-col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 8px;
+    }
+
+    .form-grid-col-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0 8px;
+    }
+
+    .form-field-group {
+        margin-bottom: 12px;
+        position: relative;
+    }
+
+    .custom-form-label {
+        display: inline-block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+        .custom-form-label span {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
+    .custom-form-control {
+        width: 100%;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12.5px;
+        outline: none;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+        .custom-form-control:focus {
+            border-color: var(--purple);
+        }
+
+    textarea.custom-form-control {
+        height: 56px;
+        padding: 6px 12px;
+        resize: none;
+    }
+
+    select.custom-form-control {
+        padding-right: 24px;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px 12px;
+    }
+
+    /* ── FILE INPUT CUSTOM OVERLAY ── */
+    .custom-file-upload-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 34px;
+        border: 1px dashed var(--border);
+        background: var(--input-bg);
+        border-radius: 4px;
+        cursor: pointer;
+        padding-left: 10px;
+    }
+
+        .custom-file-upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .custom-file-upload-box span {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 70px;
+        }
+
+        .custom-file-upload-box .upload-trigger-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            background: var(--hover-bg);
+            border-left: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+    /* ── EXISTING ATTACHMENT LABELS ── */
+    .existing-file-info {
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .existing-file-info i {
+            color: var(--purple);
+        }
+
+    /* ── CHECKBOX CONTROLS ── */
+    .custom-check-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        padding: 4px 0;
+    }
+
+    .custom-check-input {
+        width: 14px;
+        height: 14px;
+        accent-color: var(--purple);
+        cursor: pointer;
+    }
+
+    .custom-check-label {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .validation-err-text {
+        font-size: 11px;
+        color: #ef4444;
+        font-weight: 500;
+        margin-top: 2px;
+        display: block;
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid-col-3, .form-grid-col-4, .form-grid-col-6, .form-grid-col-12
+
+    {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    }
+</style>
+
+<div class="template-create-page">
+
+    <div class="form-action-header">
+        <a href="/OnboardingPolicy/index" class="form-action-btn btn-cancel-theme">
+            <i class="bi bi-arrow-left"></i>
+            Back to List
+        </a>
+    </div>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" id="editPolicyForm">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary-box"></div>
+
+        <input type="hidden" asp-for="OnboardingPolicyMasterId" />
+        <input type="hidden" asp-for="ExistingFileName" />
+        <input type="hidden" asp-for="ExistingFilePath" />
+
+        <div class="custom-form-card">
+            <div class="custom-form-header">
+                <h5>Edit Policy Configuration</h5>
+            </div>
+
+            <div class="custom-form-body">
+
+                <div class="form-grid-row">
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="PolicyName" class="custom-form-label">Policy Name<span>*</span></label>
+                        <input asp-for="PolicyName" class="custom-form-control" placeholder="e.g., Code of Conduct" autocomplete="off" />
+                        <span asp-validation-for="PolicyName" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="OnboardingPolicyCategoryMasterId" class="custom-form-label">Category<span>*</span></label>
+                        <select asp-for="OnboardingPolicyCategoryMasterId" asp-items="Model.Categories" class="custom-form-control">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="OnboardingPolicyCategoryMasterId" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="DisplayOrder" class="custom-form-label">Display Order<span>*</span></label>
+                        <input asp-for="DisplayOrder" type="number" class="custom-form-control" min="1" oninput="this.value = Math.abs(this.value) || ''" />
+                        <span asp-validation-for="DisplayOrder" class="validation-err-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-row">
+                    <div class="form-grid-col-12 form-field-group">
+                        <label asp-for="Description" class="custom-form-label">Description</label>
+                        <textarea asp-for="Description" class="custom-form-control" placeholder="Provide overview text or instructional summaries for this standard corporate policy..."></textarea>
+                        <span asp-validation-for="Description" class="validation-err-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-row">
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="PolicyVersion" class="custom-form-label">Version<span>*</span></label>
+                        <input asp-for="PolicyVersion" class="custom-form-control" placeholder="e.g., 1.0" autocomplete="off" />
+                        <span asp-validation-for="PolicyVersion" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="EffectiveDate" class="custom-form-label">Effective Date<span>*</span></label>
+                        <input asp-for="EffectiveDate" type="date" class="custom-form-control" value="@Model.EffectiveDate.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="EffectiveDate" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="PolicyFile" class="custom-form-label">Replace Document (Optional PDF)</label>
+                        <div class="custom-file-upload-box">
+                            <input asp-for="PolicyFile" type="file" accept=".pdf" id="filePolicyUploadInput" />
+                            <span id="lblFileSelectionTracker">Choose file to replace...</span>
+                            <div class="upload-trigger-btn">Browse</div>
+                        </div>
+                        <span asp-validation-for="PolicyFile" class="validation-err-text"></span>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.ExistingFileName))
+                        {
+                            <div class="existing-file-info">
+                                <i class="bi bi-file-earmark-check-fill"></i>
+                                <span>Current: <strong>@Model.ExistingFileName</strong></span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-grid-row" style="margin-top: 4px;">
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="IsMandatory" class="custom-check-input" />
+                            <label asp-for="IsMandatory" class="custom-check-label">Mandatory</label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="RequiresAcceptance" class="custom-check-input" />
+                            <label asp-for="RequiresAcceptance" class="custom-check-label">Requires Acceptance</label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <div class="custom-check-group">
+                            <input type="checkbox" asp-for="AllowDownload" class="custom-check-input" />
+                            <label asp-for="AllowDownload" class="custom-check-label">Allow Candidate Download</label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-footer-actions">
+            <button type="submit" class="form-action-btn btn-submit-theme">
+                <i class="bi bi-check-circle"></i>
+                Save Changes
+            </button>
+
+            <a href="/OnboardingPolicy" class="form-action-btn btn-cancel-theme">
+                <i class="bi bi-x-circle"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fileInput = document.getElementById("filePolicyUploadInput");
+            const labelTracker = document.getElementById("lblFileSelectionTracker");
+
+            if (fileInput && labelTracker) {
+                fileInput.addEventListener("change", function () {
+                    if (this.files && this.files.length > 0) {
+                        labelTracker.innerText = this.files[0].name;
+                        labelTracker.style.color = "var(--text-primary)";
+                    } else {
+                        labelTracker.innerText = "Choose file to replace...";
+                        labelTracker.style.color = "var(--text-secondary)";
+                    }
+                });
+            }
+        });
+    </script>
+}

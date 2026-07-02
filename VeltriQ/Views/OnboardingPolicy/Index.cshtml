@@ -1,0 +1,600 @@
+﻿@model VeltriQ.ViewModels.OnboardingPolicy.OnboardingPolicyIndexViewModel
+
+@{
+    ViewData["Title"] = "Onboarding Policies";
+}
+
+<style>
+    .policies-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR (CRISP & FULLY SQUARED) ── */
+    .policies-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Fully squared corporate grid matching employee page */
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* ── CONTROL DECK HEADER PANEL ── */
+    .policies-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        gap: 20px;
+    }
+
+    .policies-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .policies-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── COMPACT ADD ACTION BUTTON ── */
+    .policies-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .policies-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── SYSTEM BRANDED SEARCH BAR ── */
+    .policies-search {
+        width: 280px;
+        position: relative;
+    }
+
+        .policies-search input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .policies-search input:focus {
+                border-color: var(--purple);
+            }
+
+        .policies-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+    /* ── SCROLLABLE GRID MATRIX STRUCTURE ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+    .policies-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .policies-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .policies-table td {
+            padding: 8px 16px; /* Compressed high density column spacing */
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .policies-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    /* ── IDENTITY SEGMENTS ── */
+    .policy-identity-block {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .policy-main-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.2;
+    }
+
+    .policy-category-lbl {
+        font-size: 10.5px;
+        color: var(--purple);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+    }
+
+    /* ── DOCUMENT SPECIFIC META LABELS ── */
+    .policy-meta-block {
+        font-size: 11px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+
+    .policy-meta-file {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--purple);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        .policy-meta-file:hover {
+            text-decoration: underline;
+        }
+
+    /* ── CUSTOM REUSE BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .status-mandatory {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    .status-optional {
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+    }
+
+    .status-active {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
+    /* ── SYSTEM GRID CONSOLE ACTIONS PANEL ── */
+    .table-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: all 0.1s ease;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+    .action-toggle-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.1s ease;
+    }
+
+        .action-toggle-btn.btn-activate {
+            color: #22c55e;
+        }
+
+            .action-toggle-btn.btn-activate:hover {
+                background: #22c55e;
+                color: #fff;
+            }
+
+        .action-toggle-btn.btn-deactivate {
+            color: #ef4444;
+        }
+
+            .action-toggle-btn.btn-deactivate:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+    /* ── CRISP BRANDED INTERACTIVE POPUP MODAL ── */
+    .vq-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .vq-modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        width: 400px;
+        padding: 18px;
+        border-radius: 0px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    .vq-modal-header h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        text-transform: uppercase;
+    }
+
+    .vq-modal-body p {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 12px 0;
+        line-height: 1.4;
+    }
+
+    .vq-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .form-action-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.12);
+        }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="policies-page">
+
+    <div class="documents-header" style="display: flex; justify-content: flex-end; margin-bottom: 4px;">
+        <a asp-action="Create" class="policies-add-btn">
+            <i class="bi bi-plus-lg"></i>
+            Add Policy
+        </a>
+    </div>
+
+    <div class="policies-card">
+
+        <div class="policies-card-top">
+            <div class="policies-card-title">
+                <h3>Onboarding Policies</h3>
+                <p>Total Policies: @(Model.Policies?.Count ?? 0)</p>
+            </div>
+
+            <div class="policies-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="policySearchInput" placeholder="Search policies..." onkeyup="filterPoliciesTable()" autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="policies-table" id="policiesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 70px; text-align: center;">Order</th>
+                        <th style="width: 240px;">Policy Details</th>
+                        <th style="width: 200px;">Version & Effective Date</th>
+                        <th style="width: 220px;">Document Attachment</th>
+                        <th style="width: 110px;">Requirement</th>
+                        <th style="width: 110px;">Status</th>
+                        <th style="width: 100px; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Policies != null && Model.Policies.Any())
+                    {
+                        foreach (var item in Model.Policies)
+                        {
+                            <tr class="policy-row-item" id="policy_row_@item.OnboardingPolicyMasterId">
+                                <td style="text-align: center; font-weight: 700; color: var(--text-secondary);">
+                                    @item.DisplayOrder
+                                </td>
+                                <td>
+                                    <div class="policy-identity-block">
+                                        <span class="policy-main-name">@item.PolicyName</span>
+                                        <span class="policy-category-lbl">@item.CategoryName</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="policy-meta-block">
+                                        Version: <strong style="color: var(--text-primary);">@item.PolicyVersion</strong><br />
+                                        Effective: <span>@(item.EffectiveDate?.ToString("dd MMM yyyy") ?? "-")</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="policy-meta-block">
+                                        @if (!string.IsNullOrWhiteSpace(item.FileName))
+                                        {
+                                            <a href="/OnboardingPolicy/Download/@item.OnboardingPolicyMasterId" class="policy-meta-file" title="Download Policy File">
+                                                <i class="bi bi-file-earmark-pdf-fill"></i> @item.FileName
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: var(--text-muted); font-style: italic;">No document file attached</span>
+                                        }
+
+                                        @if (item.RequiresAcceptance)
+                                        {
+                                            <span style="display: block; color: var(--purple); font-weight: 600; font-size: 10.5px; margin-top: 2px;">
+                                                <i class="bi bi-pen-fill"></i> Acceptance Required
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.IsMandatory)
+                                    {
+                                        <span class="status-badge status-mandatory">Mandatory</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-optional">Optional</span>
+                                    }
+                                </td>
+                                <td class="status-cell">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="status-badge status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="table-actions" style="justify-content: center;">
+                                        <a asp-action="Edit" asp-route-id="@item.OnboardingPolicyMasterId" class="action-btn" title="Edit Properties">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="action-toggle-btn @(item.IsActive ? "btn-deactivate" : "btn-activate")"
+                                                title="@(item.IsActive ? "Deactivate Policy" : "Activate Policy")"
+                                                onclick="openToggleModal(@item.OnboardingPolicyMasterId, '@item.PolicyName', @(item.IsActive ? "true" : "false"))">
+                                            <i class="bi @(item.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="emptyStatePlaceholderRow">
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No configuration onboarding policies cataloged inside database schemas.
+                            </td>
+                        </tr>
+                    }
+
+                    <tr id="searchFallbackRow" style="display: none;">
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            No matching operational policies discovered.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="statusToggleModal" class="vq-modal-backdrop" style="display: none;">
+    <div class="vq-modal-card">
+        <div class="vq-modal-header">
+            <h4 id="modalActionTitle">Change Component State</h4>
+        </div>
+        <div class="vq-modal-body">
+            <input type="hidden" id="targetPolicyId" value="0" />
+            <input type="hidden" id="targetCurrentState" value="false" />
+            <p id="modalActionMessage">Are you sure you want to alter this corporate policy deployment configuration lifecycle?</p>
+        </div>
+        <div class="vq-modal-footer">
+            <button type="button" class="form-action-btn btn-cancel-theme" onclick="closeToggleModal()">Cancel</button>
+            <button type="button" id="btnConfirmAction" class="form-action-btn" style="color: #fff;" onclick="submitStateTransition()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterPoliciesTable() {
+        const input = document.getElementById('policySearchInput');
+        const filter = input.value.toLowerCase().trim();
+        const table = document.getElementById('policiesTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByClassName('policy-row-item');
+        const fallbackRow = document.getElementById('searchFallbackRow');
+
+        let visualMatches = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const contextString = rows[i].textContent || rows[i].innerText;
+            if (contextString.toLowerCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+                visualMatches++;
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+
+        if (rows.length > 0) {
+            fallbackRow.style.display = (visualMatches === 0) ? "" : "none";
+        }
+    }
+
+    /* ── LOCALIZED STATE MODAL MANAGER ── */
+    function openToggleModal(policyId, policyName, isActive) {
+        document.getElementById("targetPolicyId").value = policyId;
+        document.getElementById("targetCurrentState").value = isActive;
+
+        const titleContainer = document.getElementById("modalActionTitle");
+        const msgContainer = document.getElementById("modalActionMessage");
+        const actionBtn = document.getElementById("btnConfirmAction");
+
+        if (isActive) {
+            titleContainer.innerText = "Deactivate Policy";
+            msgContainer.innerHTML = `Are you sure you want to <strong>deactivate</strong> the corporate policy for <strong>"${policyName}"</strong>? New employee profiles won't pull this setup requirement.`;
+            actionBtn.style.background = "#ef4444";
+        } else {
+            titleContainer.innerText = "Activate Policy";
+            msgContainer.innerHTML = `Are you sure you want to <strong>activate</strong> the corporate policy for <strong>"${policyName}"</strong>? It will rejoin active checklist layouts immediately.`;
+            actionBtn.style.background = "#22c55e";
+        }
+
+        document.getElementById("statusToggleModal").style.display = "flex";
+    }
+
+    function closeToggleModal() {
+        document.getElementById("statusToggleModal").style.display = "none";
+        document.getElementById("targetPolicyId").value = "0";
+    }
+
+    function submitStateTransition() {
+        const policyId = document.getElementById("targetPolicyId").value;
+        const isCurrentlyActive = document.getElementById("targetCurrentState").value === "true";
+
+        // Exact API routing targeting your OnboardingPolicy controller actions
+        const targetEndpoint = isCurrentlyActive ? '/OnboardingPolicy/Deactivate' : '/OnboardingPolicy/Activate';
+
+        fetch(targetEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify(parseInt(policyId)) // Passed primitive matching [FromBody] int id
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById(`policy_row_${policyId}`);
+                if (row) {
+                    const statusCell = row.querySelector('.status-cell');
+                    const actionButton = row.querySelector('.action-toggle-btn');
+                    const policyNameText = row.querySelector('.policy-main-name').innerText.replace(/'/g, "\\'");
+
+                    if (isCurrentlyActive) {
+                        statusCell.innerHTML = '<span class="status-badge status-inactive">Inactive</span>';
+                        actionButton.className = 'action-toggle-btn btn-activate';
+                        actionButton.title = 'Activate Policy';
+                        actionButton.setAttribute('onclick', `openToggleModal(${policyId}, '${policyNameText}', false)`);
+                        actionButton.innerHTML = '<i class="bi bi-check-circle"></i>';
+                    } else {
+                        statusCell.innerHTML = '<span class="status-badge status-active">Active</span>';
+                        actionButton.className = 'action-toggle-btn btn-deactivate';
+                        actionButton.title = 'Deactivate Policy';
+                        actionButton.setAttribute('onclick', `openToggleModal(${policyId}, '${policyNameText}', true)`);
+                        actionButton.innerHTML = '<i class="bi bi-slash-circle"></i>';
+                    }
+                }
+                closeToggleModal();
+            } else {
+                alert(data.message || "Failed to update target policy row lifecycle configuration parameters.");
+            }
+        })
+        .catch(() => alert("Network communication error updating policy lifecycle logs."));
+    }
+</script>

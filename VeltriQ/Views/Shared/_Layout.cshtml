@@ -807,26 +807,31 @@
 
                         <ul class="submenu">
                             <li>
-                                <a asp-controller="Onboarding" asp-action="Dashboard">
+                                <a asp-controller="Onboarding" asp-action="Index">
                                     <i class="bi bi-speedometer2"></i>Dashboard
                                 </a>
                             </li>
-
                             <li>
-                                <a asp-controller="Onboarding" asp-action="Documents">
+                                <a asp-controller="OnboardingSection" asp-action="Index">
+                                    <i class="bi bi-folder2-open"></i>Sections
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="OnboardingDocument" asp-action="Index">
                                     <i class="bi bi-folder2-open"></i>Documents
                                 </a>
                             </li>
 
+
                             <li>
-                                <a asp-controller="Onboarding" asp-action="Policies">
+                                <a asp-controller="OnboardingPolicy" asp-action="Index">
                                     <i class="bi bi-file-earmark-text"></i>Policies
                                 </a>
                             </li>
 
                             <li>
-                                <a asp-controller="Onboarding" asp-action="Activities">
-                                    <i class="bi bi-activity"></i>Activities
+                                <a asp-controller="OnboardingTemplate" asp-action="Index">
+                                    <i class="bi bi-activity"></i>Templates
                                 </a>
                             </li>
                         </ul>
