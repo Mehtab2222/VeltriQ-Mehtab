@@ -151,15 +151,11 @@ namespace VeltriQ.Services.HR.Onboarding
             CandidateOnboardingIndexViewModel model,
             int employeeOnboardingId)
         {
-            //====================================================
-            // UPDATE COMPLETION PERCENTAGE
-            //====================================================
+
 
             await UpdateCompletionPercentage(employeeOnboardingId);
 
-            //====================================================
-            // LOAD COMPLETION PERCENTAGE
-            //====================================================
+
 
             var onboarding = await _context.EmployeeOnboardings
                 .FirstOrDefaultAsync(x =>
@@ -199,6 +195,8 @@ namespace VeltriQ.Services.HR.Onboarding
                     x.EmployeeOnboardingId == employeeOnboardingId &&
                     x.IsActive &&
                     x.IsUploaded);
+
+
 
             //====================================================
             // POLICIES
@@ -699,6 +697,16 @@ namespace VeltriQ.Services.HR.Onboarding
                     x.EmployeeOnboardingId == employeeOnboardingId &&
                     x.IsActive &&
                     x.IsUploaded);
+            //====================================================
+            // VERIFIED DOCUMENTS
+            //====================================================
+
+            model.VerifiedDocuments = await _context.EmployeeOnboardingDocuments
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
+                    x.IsVerified);
 
             //====================================================
             // POLICIES
@@ -714,6 +722,16 @@ namespace VeltriQ.Services.HR.Onboarding
                     x.EmployeeOnboardingId == employeeOnboardingId &&
                     x.IsActive &&
                     x.IsAccepted);
+
+            //====================================================
+            // APPROVAL CHECK
+            //====================================================
+
+            model.CanApproveOnboarding =
+                model.CompletedSections == model.TotalSections &&
+                model.UploadedDocuments == model.TotalDocuments &&
+                model.VerifiedDocuments == model.TotalDocuments &&
+                model.AcceptedPolicies == model.TotalPolicies;
         }
         public async Task LoadDocuments(
     EmployeeOnboardingDetailsViewModel model,

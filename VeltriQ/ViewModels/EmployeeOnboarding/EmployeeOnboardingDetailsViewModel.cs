@@ -57,6 +57,10 @@ namespace VeltriQ.ViewModels.EmployeeOnboarding
 
         public int CompletedActivities { get; set; }
 
+        public int VerifiedDocuments { get; set; }
+
+        public bool CanApproveOnboarding { get; set; }
+
         //====================================================
         // TAB COLLECTIONS
         //====================================================

@@ -74,7 +74,7 @@
     .custom-form-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
-        border-radius: 0px; /* Branded sharp corner rules grid matrix */
+        border-radius: 0px; /* Branded strict crisp layout corners */
         display: flex;
         flex-direction: column;
     }
@@ -106,21 +106,9 @@
         margin-left: -8px;
     }
 
-    .form-grid-col-3 {
-        flex: 0 0 25%;
-        max-width: 25%;
-        padding: 0 8px;
-    }
-
     .form-grid-col-4 {
         flex: 0 0 33.3333%;
         max-width: 33.3333%;
-        padding: 0 8px;
-    }
-
-    .form-grid-col-6 {
-        flex: 0 0 50%;
-        max-width: 50%;
         padding: 0 8px;
     }
 
@@ -181,6 +169,36 @@
         background-position: right 8px center;
         background-size: 12px 12px;
     }
+
+    /* ── FLEX SEGMENTED COMBO SELECTION FIELD NODE ── */
+    .vq-input-combo-group {
+        display: flex;
+        gap: 4px;
+        width: 100%;
+    }
+
+    .btn-inline-manage {
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--purple);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+    }
+
+        .btn-inline-manage:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
 
     /* ── CUSTOM SELECT DROPDOWN WRAPPER WITH INLINE CHECKBOXES ── */
     .vq-multiselect-container {
@@ -282,7 +300,7 @@
     }
 
     @@media (max-width: 768px) {
-        .form-grid-col-3, .form-grid-col-4, .form-grid-col-6, .form-grid-col-12
+        .form-grid-col-4, .form-grid-col-12
 
     {
         flex: 0 0 100%;
@@ -302,7 +320,7 @@
     }
 
     <div class="form-action-header">
-        <a href="/OnboardingDocument/index" class="form-action-btn btn-cancel-theme">
+        <a href="/OnboardingDocuments" class="form-action-btn btn-cancel-theme">
             <i class="bi bi-arrow-left"></i>
             Back to List
         </a>
@@ -331,9 +349,14 @@
 
                     <div class="form-grid-col-4 form-field-group">
                         <label asp-for="OnboardingDocumentCategoryMasterId" class="custom-form-label">Category<span>*</span></label>
-                        <select asp-for="OnboardingDocumentCategoryMasterId" asp-items="Model.Categories" class="custom-form-control">
-                            <option value="">-- Select Category --</option>
-                        </select>
+                        <div class="vq-input-combo-group">
+                            <select asp-for="OnboardingDocumentCategoryMasterId" id="ddlCategorySelectBox" asp-items="Model.Categories" class="custom-form-control">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <a href="/DocumentCategory/Index" class="btn-inline-manage" title="Manage Document Categories Dashboard">
+                                <i class="bi bi-plus-lg"></i>
+                            </a>
+                        </div>
                         <span asp-validation-for="OnboardingDocumentCategoryMasterId" class="validation-err-text"></span>
                     </div>
 
@@ -483,24 +506,21 @@
             const placeholderSpan = document.getElementById("txtDropdownPlaceholder");
             const selectionTextbox = document.getElementById("txtSelectedFormatsBox");
 
-            // Toggle multiselect expansion box click listeners
+            // Extension dropdown expansion logic
             dropdownTrigger.addEventListener("click", function(e) {
                 e.stopPropagation();
                 const isExpanded = dropdownPanel.style.display === "block";
                 dropdownPanel.style.display = isExpanded ? "none" : "block";
             });
 
-            // Prevent dropdown panel collapse when checking options inside
             dropdownPanel.addEventListener("click", function(e) {
                 e.stopPropagation();
             });
 
-            // Collapse click listeners globally outside matrix boundaries
             document.addEventListener("click", function() {
                 dropdownPanel.style.display = "none";
             });
 
-            // Compile the active string value during configuration adjustments
             function syncExtensions() {
                 let selectedExtensions = [];
                 checkboxes.forEach(chk => {
@@ -512,7 +532,6 @@
                 const joinedExtensions = selectedExtensions.join(", ");
                 hiddenField.value = joinedExtensions.toLowerCase();
 
-                // Update text selection presentation targets
                 if(selectedExtensions.length > 0) {
                     placeholderSpan.innerText = selectedExtensions.length + " Items Selected";
                     selectionTextbox.value = joinedExtensions;
@@ -523,24 +542,21 @@
                 }
             }
 
-            // Bind change hooks
             checkboxes.forEach(chk => {
                 chk.addEventListener("change", syncExtensions);
             });
 
-            // Core prevention during submission checks
             form.addEventListener("submit", function (e) {
                 syncExtensions();
                 if (!hiddenField.value.trim()) {
                     e.preventDefault();
                     if (errorSpan) {
-                        errorSpan.innerText = "Please select at least one format option standard.";
+                        errorSpan.innerText = "Please select at least one format standard option.";
                     }
                     return false;
                 }
             });
 
-            // Initial call to register active database configurations
             syncExtensions();
         });
     </script>

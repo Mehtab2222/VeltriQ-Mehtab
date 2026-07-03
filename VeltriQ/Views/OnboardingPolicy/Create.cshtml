@@ -18,7 +18,7 @@
         font-weight: 500;
     }
 
-    /* ── HEADER ACTION PLUGINS ── */
+    /* ── HEADER BACK TO LIST NAVIGATION ACTION ── */
     .form-action-header {
         display: flex;
         justify-content: flex-end;
@@ -26,7 +26,7 @@
         margin-bottom: 12px;
     }
 
-    /* ── COMPACT BRANDED BUTTON CONTROLS ── */
+    /* ── COMPACT SYSTEM BUTTON CONTROLS ── */
     .form-action-btn {
         height: 34px;
         padding: 0 14px;
@@ -106,21 +106,9 @@
         margin-left: -8px;
     }
 
-    .form-grid-col-3 {
-        flex: 0 0 25%;
-        max-width: 25%;
-        padding: 0 8px;
-    }
-
     .form-grid-col-4 {
         flex: 0 0 33.3333%;
         max-width: 33.3333%;
-        padding: 0 8px;
-    }
-
-    .form-grid-col-6 {
-        flex: 0 0 50%;
-        max-width: 50%;
         padding: 0 8px;
     }
 
@@ -181,6 +169,36 @@
         background-position: right 8px center;
         background-size: 12px 12px;
     }
+
+    /* ── FLEX SEGMENTED COMBO SELECTION FIELD NODE ── */
+    .vq-input-combo-group {
+        display: flex;
+        gap: 4px;
+        width: 100%;
+    }
+
+    .btn-inline-manage {
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--purple);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+    }
+
+        .btn-inline-manage:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
 
     /* ── FILE INPUT CUSTOM OVERLAY ── */
     .custom-file-upload-box {
@@ -257,16 +275,8 @@
         user-select: none;
     }
 
-    .validation-err-text {
-        font-size: 11px;
-        color: #ef4444;
-        font-weight: 500;
-        margin-top: 2px;
-        display: block;
-    }
-
     @@media (max-width: 768px) {
-        .form-grid-col-3, .form-grid-col-4, .form-grid-col-6, .form-grid-col-12
+        .form-grid-col-4, .form-grid-col-12
 
     {
         flex: 0 0 100%;
@@ -306,9 +316,14 @@
 
                     <div class="form-grid-col-4 form-field-group">
                         <label asp-for="OnboardingPolicyCategoryMasterId" class="custom-form-label">Category<span>*</span></label>
-                        <select asp-for="OnboardingPolicyCategoryMasterId" asp-items="Model.Categories" class="custom-form-control">
-                            <option value="">-- Select Category --</option>
-                        </select>
+                        <div class="vq-input-combo-group">
+                            <select asp-for="OnboardingPolicyCategoryMasterId" asp-items="Model.Categories" class="custom-form-control">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <a href="/PolicyCategory/Index" class="btn-inline-manage" title="Manage Policy Categories Dashboard">
+                                <i class="bi bi-plus-lg"></i>
+                            </a>
+                        </div>
                         <span asp-validation-for="OnboardingPolicyCategoryMasterId" class="validation-err-text"></span>
                     </div>
 

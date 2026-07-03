@@ -6,6 +6,7 @@ using VeltriQ.Data;
 using VeltriQ.Models;
 using VeltriQ.Models.Core;
 using VeltriQ.Models.HR.Onboarding;
+using VeltriQ.ViewModels.Common;
 using VeltriQ.ViewModels.OnboardingDocument;
 
 namespace VeltriQ.Controllers
@@ -480,6 +481,118 @@ namespace VeltriQ.Controllers
                 success = true,
                 message = "Document deactivated successfully."
             });
+        }
+        //====================================================
+        // ADD CATEGORY
+        //====================================================
+
+        [HttpPost]
+        public async Task<IActionResult> AddCategory(
+            [FromBody] AddCategoryRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.CategoryName))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Category name is required."
+                });
+            }
+
+            request.CategoryName = request.CategoryName.Trim();
+
+            var exists = await _context.OnboardingDocumentCategoryMasters
+                .AnyAsync(x =>
+                    x.CategoryName.ToLower() ==
+                    request.CategoryName.ToLower());
+
+            if (exists)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Category already exists."
+                });
+            }
+
+            var nextDisplayOrder =
+                await _context.OnboardingDocumentCategoryMasters.AnyAsync()
+                ? await _context.OnboardingDocumentCategoryMasters.MaxAsync(x => x.DisplayOrder) + 1
+                : 1;
+
+            var categoryCode = new string(
+                request.CategoryName
+                    .ToUpper()
+                    .Where(char.IsLetterOrDigit)
+                    .ToArray());
+
+            var entity = new OnboardingDocumentCategoryMaster
+            {
+                CategoryCode = categoryCode,
+
+                CategoryName = request.CategoryName,
+
+                Description = request.Description,
+
+                DisplayOrder = nextDisplayOrder,
+
+                IsActive = true,
+
+                CreatedOn = DateTime.Now,
+
+                CreatedBy = User.Identity?.Name
+            };
+
+            _context.OnboardingDocumentCategoryMasters.Add(entity);
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+
+                id = entity.OnboardingDocumentCategoryMasterId,
+
+                name = entity.CategoryName
+            });
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCategoriesList()
+        {
+            var categories = await _context.OnboardingDocumentCategoryMasters
+                .OrderBy(x => x.DisplayOrder)
+                .Select(x => new {
+                    id = x.OnboardingDocumentCategoryMasterId,
+                    categoryName = x.CategoryName,
+                    description = x.Description ?? "",
+                    isActive = x.IsActive,
+                    // Dynamic count evaluation matching active system tables
+                    documentCount = _context.OnboardingDocumentMasters.Count(d => d.OnboardingDocumentCategoryMasterId == x.OnboardingDocumentCategoryMasterId && d.IsActive)
+                })
+                .ToListAsync();
+
+            return Json(categories);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeactivateCategory([FromBody] int id)
+        {
+            var category = await _context.OnboardingDocumentCategoryMasters
+                .FirstOrDefaultAsync(x => x.OnboardingDocumentCategoryMasterId == id);
+
+            if (category == null) return Json(new { success = false, message = "Category item not found." });
+
+            // Enterprise Metric Logic validation lookup check
+            var docCount = await _context.OnboardingDocumentMasters.CountAsync(x => x.OnboardingDocumentCategoryMasterId == id && x.IsActive);
+            if (docCount > 0)
+            {
+                // Custom messaging format matching requirement specification layout
+                return Json(new { success = false, message = $"This category is currently assigned to {docCount} document(s). Remove it from the document(s) before deactivating it." });
+            }
+
+            category.IsActive = false;
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
         }
     }
 }

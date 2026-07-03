@@ -1,4 +1,5 @@
-﻿@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDetailsViewModel
+﻿
+@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDetailsViewModel
 
 @{
     ViewData["Title"] = "Onboarding Profile Details";
@@ -215,12 +216,23 @@
         font-size: 13px;
         font-weight: 600;
         color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .overview-summary-value {
         font-size: 12px;
         font-weight: 700;
         color: var(--purple);
+    }
+
+    .indicator-check {
+        color: #22c55e;
+    }
+
+    .indicator-cross {
+        color: #ef4444;
     }
 
     /* ── TIMELINE WORKSPACE ── */
@@ -290,8 +302,8 @@
     }
 
     .form-action-btn {
-        height: 30px;
-        padding: 0 12px;
+        height: 32px;
+        padding: 0 16px;
         border-radius: 6px;
         border: none;
         font-size: 12px;
@@ -304,13 +316,18 @@
         cursor: pointer;
     }
 
+        .form-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+        }
+
     .btn-cancel-theme {
         background: var(--hover-bg);
         color: var(--text-primary);
         border: 1px solid var(--border);
     }
 
-        .btn-cancel-theme:hover {
+        .btn-cancel-theme:hover:not(:disabled) {
             background: rgba(124, 58, 237, 0.15);
             color: var(--purple);
         }
@@ -489,20 +506,88 @@
 
         <div id="view_overview">
             <div class="overview-summary-row">
-                <span class="overview-summary-label">Information Sections Completed</span>
+                <span class="overview-summary-label">
+                    @if (Model.CompletedSections == Model.TotalSections)
+                    {
+                        <i class="bi bi-check-circle-fill indicator-check"></i>
+                    }
+                    else
+                    {
+
+                        <i class="bi bi-x-circle-fill indicator-cross"></i>
+                    }
+                    Information Sections Completed
+                </span>
                 <span class="overview-summary-value">@Model.CompletedSections / @Model.TotalSections</span>
             </div>
             <div class="overview-summary-row">
-                <span class="overview-summary-label">Documents Uploaded</span>
+                <span class="overview-summary-label">
+                    @if (Model.UploadedDocuments == Model.TotalDocuments)
+                    {
+                        <i class="bi bi-check-circle-fill indicator-check"></i>
+                    }
+                    else
+                    {
+
+                        <i class="bi bi-x-circle-fill indicator-cross"></i>
+                    }
+                    Documents Uploaded
+                </span>
                 <span class="overview-summary-value" id="overview_uploaded_docs">@Model.UploadedDocuments / @Model.TotalDocuments</span>
             </div>
             <div class="overview-summary-row">
-                <span class="overview-summary-label">Policies Accepted</span>
+                <span class="overview-summary-label">
+                    @if (Model.VerifiedDocuments == Model.TotalDocuments)
+                    {
+                        <i class="bi bi-check-circle-fill indicator-check"></i>
+                    }
+                    else
+                    {
+
+                        <i class="bi bi-x-circle-fill indicator-cross"></i>
+                    }
+                    Mandatory Documents Verified
+                </span>
+                <span class="overview-summary-value">@Model.VerifiedDocuments / @Model.TotalDocuments</span>
+            </div>
+            <div class="overview-summary-row">
+                <span class="overview-summary-label">
+                    @if (Model.AcceptedPolicies == Model.TotalPolicies)
+                    {
+                        <i class="bi bi-check-circle-fill indicator-check"></i>
+                    }
+                    else
+                    {
+
+                        <i class="bi bi-x-circle-fill indicator-cross"></i>
+                    }
+                    Policies Accepted
+                </span>
                 <span class="overview-summary-value">@Model.AcceptedPolicies / @Model.TotalPolicies</span>
             </div>
             <div class="overview-summary-row">
-                <span class="overview-summary-label">Activities Completed</span>
+                <span class="overview-summary-label">
+                    @if (Model.CompletedActivities == Model.TotalActivities)
+                    {
+                        <i class="bi bi-check-circle-fill indicator-check"></i>
+                    }
+                    else
+                    {
+
+                        <i class="bi bi-x-circle-fill indicator-cross"></i>
+                    }
+                    Activities Completed
+                </span>
                 <span class="overview-summary-value">@Model.CompletedActivities / @Model.TotalActivities</span>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="button"
+                        class="form-action-btn"
+                        style="background: var(--purple); color: white;"
+                        @(Model.CanApproveOnboarding ? "" : "disabled")>
+                    <i class="bi bi-check-circle"></i> Approve Onboarding
+                </button>
             </div>
         </div>
 
@@ -926,14 +1011,11 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // Actualización del DOM en caliente sin refrescar la página
                 const row = document.getElementById(`doc_row_${documentId}`);
                 if (row) {
-                    // 1. Cambiar Badge de Estado a 'Verified'
                     const statusCell = row.querySelector('.status-cell');
                     statusCell.innerHTML = '<span class="status-pill status-approved">Verified</span>';
 
-                    // 2. Remover controles interactivos de verificación y dejar firma de completado
                     const actionCell = row.querySelector('.action-cell');
                     const viewLink = actionCell.querySelector('.view-link');
                     const fileNameTxt = actionCell.querySelector('.file-name-txt');
@@ -987,15 +1069,10 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // Actualización del DOM en caliente sin refrescar la página
                 const row = document.getElementById(`doc_row_${docId}`);
                 if (row) {
-                    // 1. Cambiar Badge de Estado a 'Rejected'
                     const statusCell = row.querySelector('.status-cell');
                     statusCell.innerHTML = '<span class="status-pill status-rejected">Rejected</span>';
-
-                    // Nota: Se conservan los botones de aprobar/rechazar visibles por si el administrador
-                    // desea cambiar su decisión tras la asignación de comentarios de rechazo.
                 }
                 closeRejectModal();
             } else {

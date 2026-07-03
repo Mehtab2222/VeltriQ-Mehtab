@@ -520,13 +520,6 @@ namespace VeltriQ.Controllers
 
             await _workspaceService.LoadDocuments(model, id);
 
-            //====================================================
-            // POLICIES
-            //====================================================
-
-            //====================================================
-            // POLICIES
-            //====================================================
 
             await _workspaceService.LoadPolicies(model, id);
 
@@ -542,11 +535,7 @@ namespace VeltriQ.Controllers
             var document = await _context.EmployeeOnboardingDocuments
                 .FirstOrDefaultAsync(x =>
                     x.EmployeeOnboardingDocumentId == request.Id);
-            return Json(new
-{
-    success = true,
-    message = "RejectDocument action reached."
-});
+
 
             if (document == null)
             {
