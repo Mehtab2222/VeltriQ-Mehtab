@@ -513,7 +513,6 @@
                     }
                     else
                     {
-
                         <i class="bi bi-x-circle-fill indicator-cross"></i>
                     }
                     Information Sections Completed
@@ -528,7 +527,6 @@
                     }
                     else
                     {
-
                         <i class="bi bi-x-circle-fill indicator-cross"></i>
                     }
                     Documents Uploaded
@@ -543,7 +541,6 @@
                     }
                     else
                     {
-
                         <i class="bi bi-x-circle-fill indicator-cross"></i>
                     }
                     Mandatory Documents Verified
@@ -558,7 +555,6 @@
                     }
                     else
                     {
-
                         <i class="bi bi-x-circle-fill indicator-cross"></i>
                     }
                     Policies Accepted
@@ -573,26 +569,55 @@
                     }
                     else
                     {
-
                         <i class="bi bi-x-circle-fill indicator-cross"></i>
                     }
                     Activities Completed
                 </span>
                 <span class="overview-summary-value">@Model.CompletedActivities / @Model.TotalActivities</span>
             </div>
+            @if (Model.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="text-end"
+                     style="margin-top:32px;
+                    border-top:1px dashed var(--border);
+                    padding-top:16px;
+                    font-size:14px;">
 
-            <div class="text-end mt-4">
-                <button type="button"
-                        class="form-action-btn"
-                        style="background: var(--purple); color: white;"
-                        @(Model.CanApproveOnboarding ? "" : "disabled")>
-                    <i class="bi bi-check-circle"></i> Approve Onboarding
-                </button>
-            </div>
+                    <div style="margin-bottom:6px;">
+                        <strong>Approved On:</strong>
+                        @(Model.ApprovedOn?.ToString("dd MMM yyyy hh:mm tt") ?? "-")
+                    </div>
+
+                    <div>
+                        <strong>Approved By:</strong>
+                        @Model.ApprovedBy
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="text-end"
+                     style="margin-top:32px;
+                    border-top:1px dashed var(--border);
+                    padding-top:16px;">
+
+                    <button type="button"
+                            class="form-action-btn"
+                            style="background:var(--purple);color:white;"
+                            onclick="openApproveOnboardingModal()"
+                            @(Model.CanApproveOnboarding ? "" : "disabled")>
+
+                        <i class="bi bi-check-circle"></i>
+                        Approve Onboarding
+
+                    </button>
+
+                </div>
+            }
         </div>
 
         <div id="view_information" style="display: none;">
-
             <h5 class="info-section-heading">Personal Information</h5>
             <table class="viewport-grid-table">
                 <tbody>
@@ -958,6 +983,7 @@
     </div>
 </div>
 
+<!-- ── CUSTOM MODAL: REJECT DOCUMENT ── -->
 <div id="hrRejectDocModal" class="vq-modal-backdrop" style="display: none;">
     <div class="vq-modal-card">
         <div class="vq-modal-header">
@@ -973,6 +999,29 @@
         <div class="vq-modal-footer">
             <button type="button" class="form-action-btn btn-cancel-theme" onclick="closeRejectModal()">Cancel</button>
             <button type="button" class="form-action-btn" style="background:#ef4444; color:#fff;" onclick="submitDocumentRejection()">Confirm Rejection</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── CUSTOM MODAL: APPROVE ONBOARDING ── -->
+<div id="approveOnboardingModal" class="vq-modal-backdrop" style="display: none;">
+    <div class="vq-modal-card">
+        <div class="vq-modal-header">
+            <h4>Approve Onboarding Workflow</h4>
+            <button type="button" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer;" onclick="closeApproveOnboardingModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="vq-modal-body">
+            <p style="margin: 0; font-size: 13px; color: var(--text-primary); line-height: 1.5;">
+                Are you sure you want to finalize and approve this onboarding profile setup?
+                <br /><br />
+                Once confirmed, the workflow milestones will be locked down, transitioning the records to active state.
+            </p>
+        </div>
+        <div class="vq-modal-footer">
+            <button type="button" class="form-action-btn btn-cancel-theme" onclick="closeApproveOnboardingModal()">Cancel</button>
+            <button type="button" class="form-action-btn" style="background: #22c55e; color: #fff;" onclick="submitApproveOnboarding()">Confirm Approval</button>
         </div>
     </div>
 </div>
@@ -1080,5 +1129,40 @@
             }
         })
         .catch(() => alert("Fatal connectivity breakdown handling data write."));
+    }
+
+    /* ── APPLICATION OVERVIEW ONBOARDING WORKFLOW APPROVAL PIPELINE ── */
+    function openApproveOnboardingModal() {
+        document.getElementById("approveOnboardingModal").style.display = "flex";
+    }
+
+    function closeApproveOnboardingModal() {
+        document.getElementById("approveOnboardingModal").style.display = "none";
+    }
+
+    function submitApproveOnboarding() {
+        const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+
+        fetch('/Onboarding/ApproveOnboarding', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': tokenElement ? tokenElement.value : ''
+            },
+            body: JSON.stringify({ employeeOnboardingId: @Model.EmployeeOnboardingId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                closeApproveOnboardingModal();
+                if(data.message) {
+                    alert(data.message);
+                }
+                location.reload();
+            } else {
+                alert(data.message || "Failed to finalize target validation state mapping pipeline workflow.");
+            }
+        })
+        .catch(() => alert("Fatal connectivity breakdown handling data write validation processing actions."));
     }
 </script>

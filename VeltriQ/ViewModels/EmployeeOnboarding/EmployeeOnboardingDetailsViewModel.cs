@@ -60,6 +60,8 @@ namespace VeltriQ.ViewModels.EmployeeOnboarding
         public int VerifiedDocuments { get; set; }
 
         public bool CanApproveOnboarding { get; set; }
+        public DateTime? ApprovedOn { get; set; }
+        public string ApprovedBy { get; set; } = "";
 
         //====================================================
         // TAB COLLECTIONS

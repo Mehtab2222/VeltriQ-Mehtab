@@ -1,223 +1,207 @@
-﻿
-@model VeltriQ.ViewModels.EmployeeOnboarding.EmployeeOnboardingDashboardViewModel
+﻿@model IEnumerable<VeltriQ.Models.HR.AssetMaster>
 
 @{
-    ViewData["Title"] = "Employee Onboarding";
+    ViewData["Title"] = "Asset Master";
 }
 
 <style>
-    .page-container {
-        display: flex;
-        flex-direction: column;
+    .asset-page {
         width: 100%;
         height: 100%;
-    }
-
-    /* ── HEADER ── */
-    .page-header {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+    }
+
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .asset-header {
+        display: flex;
+        justify-content: flex-end; /* Aligns button to right cleanly without big text */
         align-items: center;
-        margin-bottom: 12px;
+        margin-bottom: 12px; /* Reduced to push card up */
     }
 
-    .page-title h3 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    /* ── SYSTEM ACTION BUTTONS ── */
-    .form-action-btn {
-        height: 34px;
+    /* ── COMPACT ADD BUTTON ── */
+    .asset-add-btn {
+        height: 34px; /* Scaled down height */
         padding: 0 14px;
         border-radius: 6px;
         border: none;
-        font-size: 12px;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px; /* Slightly smaller typography */
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         text-decoration: none;
-        transition: .15s ease-in-out;
-        cursor: pointer;
+        transition: .2s ease;
     }
 
-    .btn-submit-theme {
-        background: linear-gradient(135deg, #6d28d9, #7c3aed);
-        color: #fff;
-    }
-
-        .btn-submit-theme:hover {
+        .asset-add-btn:hover {
             transform: translateY(-1px);
             color: #fff;
         }
 
-    .btn-table-action {
-        height: 26px;
-        padding: 0 10px;
-        border: 1px solid var(--border);
-        background: var(--hover-bg);
-        color: var(--text-primary);
-        border-radius: 4px;
-        font-size: 11.5px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        text-decoration: none;
-        transition: all 0.15s ease;
-    }
-
-        .btn-table-action:hover {
-            background: var(--purple);
-            color: #fff;
-            border-color: var(--purple);
-        }
-
-    /* ── HIGH-DENSITY DASHBOARD CARDS ── */
-    .dashboard-cards {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 12px;
-        margin-bottom: 16px;
-    }
-
-    .dashboard-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        padding: 12px 14px;
-        border-radius: 0px;
-    }
-
-        .dashboard-card h6 {
-            margin: 0;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-        }
-
-        .dashboard-card h3 {
-            margin: 6px 0 0 0;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-    /* ── UNIFIED WORKSPACE PANEL ── */
-    .unified-workspace-panel {
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .asset-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
         border-radius: 0px;
-        max-height: calc(100vh - var(--topbar-h) - 240px);
+        /* Strict max-height constraint calculated based on remaining viewport space */
+        max-height: calc(100vh - var(--topbar-h) - 100px);
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    .filter-control-deck {
+    .asset-card-top {
         display: flex;
-        gap: 12px;
-        padding: 14px 16px;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px; /* Compressed padding */
         border-bottom: 1px solid var(--border);
-        background: var(--card-bg);
-        flex-shrink: 0;
+        gap: 20px;
     }
 
-    .custom-control {
-        height: 34px;
-        border-radius: 6px;
-        border: 1px solid var(--border);
-        background: var(--input-bg);
+    .asset-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
         color: var(--text-primary);
-        padding: 0 12px;
-        font-size: 12.5px;
-        outline: none;
-        transition: border-color 0.1s ease;
+        margin: 0;
     }
 
-        .custom-control:focus {
-            border-color: var(--purple);
-        }
-
-    .search-input {
-        flex: 1;
+    .asset-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
     }
 
-    .select-filter {
-        width: 170px;
-        cursor: pointer;
+    /* ── SEARCH BAR ── */
+    .asset-search {
+        width: 280px;
+        position: relative;
     }
 
-    /* Scroll container handles dynamic overflow columns internally */
-    .table-wrapper {
-        overflow-x: auto;
-        overflow-y: auto;
-        flex: 1;
-    }
-
-        /* Micro-thin custom scrollbars */
-        .table-wrapper::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
+        .asset-search input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        .table-wrapper::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 2px;
-        }
-
-            .table-wrapper::-webkit-scrollbar-thumb:hover {
-                background: var(--purple);
+            .asset-search input:focus {
+                border-color: var(--purple);
             }
 
-    .designer-table {
+        .asset-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        /* Invisible scrollbars for modern browsers */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+    .asset-table {
         width: 100%;
         border-collapse: collapse;
     }
 
-        .designer-table th {
+        .asset-table th {
             text-align: left;
-            padding: 10px 16px;
+            padding: 10px 16px; /* Compact padding */
             font-size: 10px;
             font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: .5px;
+            white-space: nowrap;
             border-bottom: 1px solid var(--border);
             background: var(--card-bg);
             position: sticky;
             top: 0;
             z-index: 10;
-            white-space: nowrap;
-            vertical-align: middle;
         }
 
-        .designer-table td {
-            padding: 8px 16px;
+        .asset-table td {
+            padding: 8px 16px; /* Significantly reduced row height */
             border-bottom: 1px solid var(--border);
             color: var(--text-primary);
             font-size: 12.5px;
             vertical-align: middle;
-            white-space: nowrap;
         }
 
-        .designer-table tbody tr {
+        .asset-table tbody tr {
             transition: background-color .1s ease;
         }
 
-            .designer-table tbody tr:hover {
+            .asset-table tbody tr:hover {
                 background: var(--hover-bg);
             }
 
-    /* ── STATE VALUE BADGES ── */
+    /* ── COMPACT IDENTITY PLATFORMS ── */
+    .asset-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .asset-avatar {
+        width: 32px; /* Smaller avatars */
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7c3aed, #9333ea);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+    .asset-name {
+        font-weight: 600;
+        margin-bottom: 1px;
+        line-height: 1.2;
+    }
+
+    .asset-profile-link {
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+        .asset-profile-link:hover {
+            color: var(--purple);
+        }
+
+    .asset-code {
+        font-size: 10.5px;
+        color: var(--text-muted);
+        line-height: 1;
+    }
+
+    /* ── BADGES & CONTROLS ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -227,190 +211,174 @@
         border-radius: 4px;
         font-size: 10.5px;
         font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
     }
 
-    .status-invited {
+    .status-category {
+        background: rgba(124, 58, 237, 0.12);
+        color: var(--purple);
+    }
+
+    .status-serial {
         background: rgba(59, 130, 246, 0.12);
         color: #3b82f6;
     }
 
-    .status-progress {
-        background: rgba(234, 179, 8, 0.12);
-        color: #eab308;
-    }
-
-    .status-submitted {
-        background: rgba(147, 51, 234, 0.12);
-        color: #a855f7;
-    }
-
-    .status-approved {
-        background: rgba(34, 197, 94, 0.12);
+    .status-returnable {
+        background: rgba(34, 197, 94, .12);
         color: #22c55e;
     }
 
-    .status-default {
-        background: var(--hover-bg);
-        color: var(--text-secondary);
+    .status-nonreturnable {
+        background: rgba(239, 68, 68, .12);
+        color: #ef4444;
     }
 
-    .dataTables_wrapper .dataTables_info {
-        color: var(--text-secondary) !important;
-        font-size: 12px;
-        padding: 12px 16px;
+    .table-actions {
+        display: flex;
+        gap: 4px;
     }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .action-btn.delete-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.delete-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
 </style>
 
-<div class="page-container">
+<div class="asset-page">
 
-    <div class="page-header">
-        <div class="page-title">
-            <h3>Employee Onboarding</h3>
-        </div>
-        <div>
-            <a asp-action="InitiateOnboarding" class="form-action-btn btn-submit-theme">
-                <i class="bi bi-plus-circle"></i> Initiate Onboarding
-            </a>
-        </div>
+    <div class="asset-header">
+        <a href="/AssetMaster/Create" class="asset-add-btn">
+            <i class="bi bi-plus-lg"></i>
+            Add Asset
+        </a>
     </div>
 
-    <div class="dashboard-cards">
-        <div class="dashboard-card">
-            <h6>Total</h6>
-            <h3>@Model.Total</h3>
-        </div>
-        <div class="dashboard-card">
-            <h6>Invited</h6>
-            <h3>@Model.Invited</h3>
-        </div>
-        <div class="dashboard-card">
-            <h6>In Progress</h6>
-            <h3>@Model.InProgress</h3>
-        </div>
-        <div class="dashboard-card">
-            <h6>Submitted</h6>
-            <h3>@Model.Submitted</h3>
-        </div>
-        <div class="dashboard-card">
-            <h6>Approved</h6>
-            <h3>@Model.Approved</h3>
-        </div>
-    </div>
+    <div class="asset-card">
 
-    <div class="unified-workspace-panel">
+        <div class="asset-card-top">
+            <div class="asset-card-title">
+                <h3>Asset Directory</h3>
+                <p>Total Records: @Model.Count()</p>
+            </div>
 
-        <div class="filter-control-deck">
-            <input type="text" class="custom-control search-input" id="searchBox" placeholder="Search Candidate..." autocomplete="off" />
-
-            <select class="custom-control select-filter" id="statusFilter">
-                <option value="">All Statuses</option>
-                <option value="Invited">Invited</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Submitted">Submitted</option>
-                <option value="Approved">Approved</option>
-            </select>
-
-            <select class="custom-control select-filter" id="templateFilter">
-                <option value="">All Templates</option>
-            </select>
-
-            <select class="custom-control select-filter" id="deptFilter">
-                <option value="">All Departments</option>
-            </select>
+            <div class="asset-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="assetSearchInput" placeholder="Search assets..." onkeyup="filterAssetsTable()" />
+            </div>
         </div>
 
         <div class="table-wrapper">
-            <table class="designer-table" id="onboardingDashboardTable">
+            <table class="asset-table" id="assetTable">
                 <thead>
                     <tr>
-                        <th>Candidate Name</th>
-                        <th>Email Address</th>
-                        <th>Department</th>
-                        <th>Designation</th>
-                        <th>Assigned Template</th>
-                        <th>Status</th>
-                        <th>Assigned Date</th>
-                        <th>Progress</th>
-                        <th style="width: 80px; text-align: right; padding-right: 16px;">Action</th>
+                        <th>Asset</th>
+                        <th>Category</th>
+                        <th>Brand / Model</th>
+                        <th>Serial Required</th>
+                        <th>Returnable</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model.Items != null && Model.Items.Any())
+                    @foreach (var item in Model)
                     {
-                        foreach (var item in Model.Items)
-                        {
-                            string statusClass = (item.Status ?? "").ToLower() switch
-                            {
-                                "invited" => "status-invited",
-                                "in progress" or "progress" => "status-progress",
-                                "submitted" => "status-submitted",
-                                "approved" => "status-approved",
-                                _ => "status-default"
-                            };
+                        var primaryId = item.GetType().GetProperty("AssetMasterId")?.GetValue(item)
+                        ?? item.GetType().GetProperty("Id")?.GetValue(item)
+                        ?? "0";
 
-                            <tr>
-                                <td style="font-weight: 600;">@item.CandidateName</td>
-                                <td>@item.Email</td>
-                                <td>@item.Department</td>
-                                <td>@item.Designation</td>
-                                <td>@item.Template</td>
-                                <td>
-                                    <span class="status-badge @statusClass">
-                                        @item.Status
-                                    </span>
-                                </td>
-                                <td>@item.AssignedOn.ToString("dd MMM yyyy")</td>
-                                <td style="font-weight: 600; color: var(--purple);">
-                                    @item.Completion%
-                                </td>
-                                <td style="text-align: right; padding-right: 16px;">
-                                    <a asp-action="Details" asp-route-id="@item.EmployeeOnboardingId" class="btn-table-action">
-                                        <i class="bi bi-eye"></i> View
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
                         <tr>
-                            <td colspan="9" class="text-center py-5" style="border: none;">
-                                <i class="bi bi-people text-muted d-block mb-2" style="font-size: 32px; opacity: 0.4;"></i>
-                                <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">No pipeline records tracked yet.</div>
-                                <div style="color: var(--text-muted); font-size: 11px; margin-top: 2px;">Click "Initiate Onboarding" to assign workflows to accepted candidates.</div>
+                            <td>
+                                <div class="asset-info">
+                                    <div class="asset-avatar">
+                                        @(item.AssetName?.Substring(0, Math.Min(2, item.AssetName.Length)).ToUpper())
+                                    </div>
+                                    <div>
+                                        <div class="asset-name">
+                                            <a href="/AssetMaster/Details/@primaryId" class="asset-profile-link">
+                                                @item.AssetName
+                                            </a>
+                                        </div>
+                                        <div class="asset-code">@item.AssetCode</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-category">@item.AssetCategory</span>
+                            </td>
+                            <td>@item.BrandName / @item.ModelName</td>
+                            <td>
+                                @if (item.SerialNumberRequired)
+                                {
+                                    <span class="status-badge status-serial">Required</span>
+                                }
+                                else
+                                {
+                                    <span style="color: var(--text-muted); font-size: 12px;">No</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsReturnable)
+                                {
+                                    <span class="status-badge status-returnable">Returnable</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-nonreturnable">Non Returnable</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a href="/AssetMaster/Details/@primaryId" class="action-btn" title="View Details"><i class="bi bi-eye"></i></a>
+                                    <a href="/AssetMaster/Edit/@primaryId" class="action-btn" title="Edit Entry"><i class="bi bi-pencil"></i></a>
+                                    <a href="/AssetMaster/Delete/@primaryId" class="action-btn delete-btn" title="Delete" onclick="return confirm('Are you sure?')"><i class="bi bi-trash"></i></a>
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        if (typeof $ !== 'undefined' && $.fn.DataTable && document.querySelector('#onboardingDashboardTable tbody tr .btn-table-action')) {
-            const table = $('#onboardingDashboardTable').DataTable({
-                pageLength: 10,
-                responsive: false,
-                ordering: true,
-                searching: true,
-                info: true,
-                lengthChange: false,
-                dom: 'rtip'
-            });
+    function filterAssetsTable() {
+        const input = document.getElementById('assetSearchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('assetTable');
+        const tr = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-            document.getElementById('searchBox').addEventListener('input', function() {
-                table.search(this.value).draw();
-            });
-
-            document.getElementById('statusFilter').addEventListener('change', function() {
-                table.column(5).search(this.value).draw();
-            });
+        for (let i = 0; i < tr.length; i++) {
+            // Evaluates Identity Strings, Categories, Brands, and Models for match validation
+            const textContent = tr[i].textContent || tr[i].innerText;
+            if (textContent.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
         }
-    });
+    }
 </script>
-

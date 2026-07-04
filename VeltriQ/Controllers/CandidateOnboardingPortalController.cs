@@ -30,7 +30,7 @@ namespace VeltriQ.Controllers
         }
         public IActionResult DevLogin()
         {
-            HttpContext.Session.SetInt32("EmployeeOnboardingId", 6);
+            HttpContext.Session.SetInt32("EmployeeOnboardingId", 5);
 
             return RedirectToAction(nameof(Index));
         }

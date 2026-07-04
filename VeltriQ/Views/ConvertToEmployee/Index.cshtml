@@ -1,0 +1,404 @@
+﻿@model VeltriQ.ViewModels.ConvertToEmployee.ConvertToEmployeeIndexViewModel
+
+@{
+    ViewData["Title"] = "Employee Conversion Workspace";
+}
+
+<style>
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .page-title h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* ── SYSTEM ACTION BUTTONS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .btn-table-action {
+        height: 26px;
+        padding: 0 10px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border-radius: 4px;
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+        .btn-table-action:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+        .btn-table-action.btn-success-action:hover {
+            background: #22c55e;
+            color: #fff;
+            border-color: #22c55e;
+        }
+
+    /* ── HIGH-DENSITY DASHBOARD CARDS ── */
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .dashboard-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 12px 14px;
+        border-radius: 0px;
+    }
+
+        .dashboard-card h6 {
+            margin: 0;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-card h3 {
+            margin: 6px 0 0 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+    /* ── UNIFIED WORKSPACE PANEL ── */
+    .unified-workspace-panel {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .filter-control-deck {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        flex-shrink: 0;
+    }
+
+    .custom-control {
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+        transition: border-color 0.1s ease;
+    }
+
+        .custom-control:focus {
+            border-color: var(--purple);
+        }
+
+    .search-input {
+        flex: 1;
+    }
+
+    .select-filter {
+        width: 170px;
+        cursor: pointer;
+    }
+
+    /* ── FIXED LAYOUT MIN-HEIGHT CONTROLS ── */
+    .table-wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 400px; /* Added explicit min-height to ensure area displays completely */
+    }
+
+        /* Micro-thin custom scrollbars */
+        .table-wrapper::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+            .table-wrapper::-webkit-scrollbar-thumb:hover {
+                background: var(--purple);
+            }
+
+    .designer-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .designer-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .designer-table td {
+            padding: 12px 16px; /* Increased vertical padding to preserve spatial balance */
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .designer-table tbody tr {
+            height: 48px; /* Locked explicit layout heights per row */
+            transition: background-color .1s ease;
+        }
+
+            .designer-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── STATE VALUE BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .status-pending {
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+    }
+
+    .status-converted {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        color: var(--text-secondary) !important;
+        font-size: 12px;
+        padding: 12px 16px;
+    }
+</style>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <div class="page-title">
+            <h3>Employee Conversion Workspace</h3>
+        </div>
+    </div>
+
+    <!-- ── DASHBOARD SUMMARY METRIC CARDS ── -->
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <h6>Total Approved</h6>
+            <h3>@Model.TotalApproved</h3>
+        </div>
+        <div class="dashboard-card">
+            <h6>Pending Conversion</h6>
+            <h3>@Model.PendingConversion</h3>
+        </div>
+        <div class="dashboard-card">
+            <h6>Converted</h6>
+            <h3>@Model.Converted</h3>
+        </div>
+        <div class="dashboard-card">
+            <h6>Onboarding Approved Today</h6>
+            <h3>@Model.ApprovedToday</h3>
+        </div>
+    </div>
+
+    <!-- ── UNIFIED WORKSPACE PANEL ── -->
+    <div class="unified-workspace-panel">
+
+        <div class="filter-control-deck">
+            <input type="text" class="custom-control search-input" id="searchBox" placeholder="Search Candidate..." autocomplete="off" />
+
+            <select class="custom-control select-filter" id="deptFilter">
+                <option value="">All Departments</option>
+            </select>
+
+            <select class="custom-control select-filter" id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="Pending Conversion">Pending Conversion</option>
+                <option value="Converted">Converted</option>
+            </select>
+
+            <select class="custom-control select-filter" id="manpowerFilter">
+                <option value="">All Requests</option>
+            </select>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="designer-table" id="conversionDashboardTable">
+                <thead>
+                    <tr>
+                        <th>Candidate Code</th>
+                        <th>Candidate Name</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Template Mapped</th>
+                        <th>Approved On</th>
+                        <th>Status</th>
+                        <th style="width: 120px; text-align: right; padding-right: 16px;"> Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            string badgeClass = item.IsConverted ? "status-converted" : "status-pending";
+
+                            <tr>
+                                <td style="font-weight: 700; color: var(--text-primary);">@item.CandidateCode</td>
+                                <td style="font-weight: 600;">@item.CandidateName</td>
+                                <td>@item.Department</td>
+                                <td>@item.Designation</td>
+                                <td style="color: var(--text-secondary);">@item.TemplateName</td>
+                                <td>@(item.ApprovedOn?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td>
+                                    <span class="status-badge @badgeClass">
+                                        @item.ConversionStatus
+                                    </span>
+                                </td>
+                                <td style="text-align: right; padding-right: 16px;">
+                                    @if (item.IsConverted)
+                                    {
+                                        <a asp-controller="Employee" asp-action="Details" asp-route-id="@item.OnboardingCandidateId" class="btn-table-action btn-success-action">
+                                            <i class="bi bi-eye"></i> View Employee
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Convert" asp-route-id="@item.EmployeeOnboardingId" class="btn-table-action">
+                                            <i class="bi bi-gear"></i> Convert
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5" style="border: none;">
+                                <i class="bi bi-people text-muted d-block mb-2" style="font-size: 32px; opacity: 0.4;"></i>
+                                <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">No approved candidate conversion records found.</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Check if jQuery and DataTables are loaded, and ensure the table exists
+        if (typeof $ !== 'undefined' && $.fn.DataTable && document.getElementById('conversionDashboardTable')) {
+
+            const table = $('#conversionDashboardTable').DataTable({
+                pageLength: 10,
+                responsive: false,
+                ordering: true,
+                searching: true, // Enables the internal search engine
+                info: true,
+                lengthChange: false,
+                dom: 'rtip' // Hides default DataTables search box input text box, keeping layout clean
+            });
+
+            // Universal input search mapping logic
+            const searchBox = document.getElementById('searchBox');
+            if (searchBox) {
+                searchBox.addEventListener('input', function() {
+                    table.search(this.value).draw();
+                });
+            }
+
+            // Status filter mapping logic
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function() {
+                    table.column(6).search(this.value).draw();
+                });
+            }
+        }
+    });
+</script>

@@ -170,16 +170,10 @@ namespace VeltriQ.Services.HR.Onboarding
             // INFORMATION SECTIONS
             //====================================================
 
-            model.TotalSections = await _context.EmployeeOnboardingSections
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
+            model.TotalSections = 5;
 
-            model.CompletedSections = await _context.EmployeeOnboardingSections
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsCompleted);
+            model.CompletedSections =
+                await CalculateCompletedInformationSections(employeeOnboardingId);
 
             //====================================================
             // DOCUMENTS
@@ -211,6 +205,23 @@ namespace VeltriQ.Services.HR.Onboarding
                 .CountAsync(x =>
                     x.EmployeeOnboardingId == employeeOnboardingId &&
                     x.IsActive &&
+                    x.IsAccepted);
+
+            //====================================================
+            // MANDATORY POLICY COUNTS
+            //====================================================
+
+            var totalMandatoryPolicies = await _context.EmployeeOnboardingPolicies
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory);
+
+            var acceptedMandatoryPolicies = await _context.EmployeeOnboardingPolicies
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
                     x.IsAccepted);
         }
         public async Task<decimal> CalculateCompletionPercentage(int employeeOnboardingId)
@@ -336,7 +347,210 @@ namespace VeltriQ.Services.HR.Onboarding
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<int> CalculateCompletedInformationSections(int employeeOnboardingId)
+        {
+            int completed = 0;
 
+            //====================================================
+            // PERSONAL INFORMATION
+            //====================================================
+
+            var personal = await _context.EmployeeOnboardingPersonalInformations
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive);
+
+            if (personal != null &&
+                !string.IsNullOrWhiteSpace(personal.FirstName) &&
+                !string.IsNullOrWhiteSpace(personal.LastName) &&
+                personal.DateOfBirth != null &&
+                !string.IsNullOrWhiteSpace(personal.Email) &&
+                !string.IsNullOrWhiteSpace(personal.MobileNumber))
+            {
+                completed++;
+            }
+
+            //====================================================
+            // ADDRESS
+            //====================================================
+
+            var address = await _context.EmployeeOnboardingAddresses
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive);
+
+            if (address != null &&
+                !string.IsNullOrWhiteSpace(address.CurrentAddressLine1) &&
+                !string.IsNullOrWhiteSpace(address.CurrentCity) &&
+                !string.IsNullOrWhiteSpace(address.CurrentState) &&
+                !string.IsNullOrWhiteSpace(address.CurrentCountry) &&
+                !string.IsNullOrWhiteSpace(address.CurrentPincode))
+            {
+                completed++;
+            }
+
+            //====================================================
+            // EMERGENCY CONTACT
+            //====================================================
+
+            var emergency = await _context.EmployeeOnboardingEmergencyContacts
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive);
+
+            if (emergency != null &&
+                !string.IsNullOrWhiteSpace(emergency.ContactPersonName) &&
+                !string.IsNullOrWhiteSpace(emergency.Relationship) &&
+                !string.IsNullOrWhiteSpace(emergency.MobileNumber))
+            {
+                completed++;
+            }
+
+            //====================================================
+            // DEPENDENTS
+            //====================================================
+
+            var hasDependents = await _context.EmployeeOnboardingDependents
+                .AnyAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive);
+
+            if (hasDependents)
+            {
+                completed++;
+            }
+
+            //====================================================
+            // QUALIFICATIONS
+            //====================================================
+
+            var hasQualifications = await _context.EmployeeOnboardingQualifications
+                .AnyAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive);
+
+            if (hasQualifications)
+            {
+                completed++;
+            }
+
+            return completed;
+        }
+        public async Task<(bool Success, string Message)> ApproveOnboarding(
+    int employeeOnboardingId,
+    string? approvedBy)
+        {
+            //====================================================
+            // GET ONBOARDING
+            //====================================================
+
+            var onboarding = await _context.EmployeeOnboardings
+                .FirstOrDefaultAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId);
+
+            if (onboarding == null)
+            {
+                return (false, "Onboarding record not found.");
+            }
+
+            //====================================================
+            // INFORMATION SECTIONS
+            //====================================================
+
+            var completedSections =
+                await CalculateCompletedInformationSections(employeeOnboardingId);
+
+            var totalSections = 5;
+
+            //====================================================
+            // MANDATORY DOCUMENTS
+            //====================================================
+
+            var totalMandatoryDocuments = await _context.EmployeeOnboardingDocuments
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory);
+
+            var uploadedMandatoryDocuments = await _context.EmployeeOnboardingDocuments
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
+                    x.IsUploaded);
+
+            var verifiedMandatoryDocuments = await _context.EmployeeOnboardingDocuments
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
+                    x.IsVerified);
+
+            //====================================================
+            // MANDATORY POLICIES
+            //====================================================
+
+            var totalMandatoryPolicies = await _context.EmployeeOnboardingPolicies
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory);
+
+            var acceptedMandatoryPolicies = await _context.EmployeeOnboardingPolicies
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
+                    x.IsAccepted);
+
+            //====================================================
+            // VALIDATION
+            //====================================================
+
+            var canApprove =
+                completedSections == totalSections &&
+                uploadedMandatoryDocuments == totalMandatoryDocuments &&
+                verifiedMandatoryDocuments == totalMandatoryDocuments &&
+                acceptedMandatoryPolicies == totalMandatoryPolicies;
+
+            if (!canApprove)
+            {
+                return (false,
+                    "All mandatory onboarding requirements must be completed before approval.");
+            }
+
+            //====================================================
+            // APPROVED STATUS
+            //====================================================
+
+            var approvedStatus = await _context.OnboardingStatusMasters
+                .FirstOrDefaultAsync(x =>
+                    x.StatusCode == "APPROVED");
+
+            if (approvedStatus == null)
+            {
+                return (false, "Approved status is not configured.");
+            }
+
+            //====================================================
+            // APPROVE
+            //====================================================
+
+            onboarding.OnboardingStatusMasterId =
+                approvedStatus.OnboardingStatusMasterId;
+
+            onboarding.ApprovedOn = DateTime.Now;
+            onboarding.ApprovedBy = approvedBy;
+            onboarding.IsPortalLocked = true;
+
+            onboarding.ModifiedOn = DateTime.Now;
+
+            onboarding.ModifiedBy = approvedBy;
+
+            await _context.SaveChangesAsync();
+
+            return (true, "Onboarding approved successfully.");
+        }
         public async Task LoadInformationSidebar
         (
             CandidateOnboardingIndexViewModel model,
@@ -644,20 +858,18 @@ namespace VeltriQ.Services.HR.Onboarding
             model.CompletionPercentage = onboarding.CompletionPercentage;
 
             model.AssignedOn = onboarding.AssignedOn;
+            model.ApprovedOn = onboarding.ApprovedOn;
+            model.ApprovedBy = onboarding.ApprovedBy ?? "";
         }
         public async Task LoadOverview(
     EmployeeOnboardingDetailsViewModel model,
     int employeeOnboardingId)
         {
-            //====================================================
-            // UPDATE COMPLETION PERCENTAGE
-            //====================================================
+
 
             await UpdateCompletionPercentage(employeeOnboardingId);
 
-            //====================================================
-            // LOAD COMPLETION PERCENTAGE
-            //====================================================
+
 
             var onboarding = await _context.EmployeeOnboardings
                 .FirstOrDefaultAsync(x =>
@@ -668,24 +880,13 @@ namespace VeltriQ.Services.HR.Onboarding
                 model.CompletionPercentage = onboarding.CompletionPercentage;
             }
 
-            //====================================================
-            // INFORMATION SECTIONS
-            //====================================================
 
-            model.TotalSections = await _context.EmployeeOnboardingSections
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive);
 
-            model.CompletedSections = await _context.EmployeeOnboardingSections
-                .CountAsync(x =>
-                    x.EmployeeOnboardingId == employeeOnboardingId &&
-                    x.IsActive &&
-                    x.IsCompleted);
+            model.TotalSections = 5;
 
-            //====================================================
-            // DOCUMENTS
-            //====================================================
+            model.CompletedSections =
+                await CalculateCompletedInformationSections(employeeOnboardingId);
+
 
             model.TotalDocuments = await _context.EmployeeOnboardingDocuments
                 .CountAsync(x =>
@@ -707,6 +908,29 @@ namespace VeltriQ.Services.HR.Onboarding
                     x.IsActive &&
                     x.IsMandatory &&
                     x.IsVerified);
+            //====================================================
+            // MANDATORY DOCUMENT COUNTS
+            //====================================================
+
+            var totalMandatoryDocuments = await _context.EmployeeOnboardingDocuments
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory);
+
+            var uploadedMandatoryDocuments = await _context.EmployeeOnboardingDocuments
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
+                    x.IsUploaded);
+
+            var verifiedMandatoryDocuments = await _context.EmployeeOnboardingDocuments
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
+                    x.IsVerified);
 
             //====================================================
             // POLICIES
@@ -722,16 +946,30 @@ namespace VeltriQ.Services.HR.Onboarding
                     x.EmployeeOnboardingId == employeeOnboardingId &&
                     x.IsActive &&
                     x.IsAccepted);
+            //====================================================
+            // MANDATORY POLICY COUNTS
+            //====================================================
 
+            var totalMandatoryPolicies = await _context.EmployeeOnboardingPolicies
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory);
+
+            var acceptedMandatoryPolicies = await _context.EmployeeOnboardingPolicies
+                .CountAsync(x =>
+                    x.EmployeeOnboardingId == employeeOnboardingId &&
+                    x.IsActive &&
+                    x.IsMandatory &&
+                    x.IsAccepted);
             //====================================================
             // APPROVAL CHECK
             //====================================================
-
             model.CanApproveOnboarding =
                 model.CompletedSections == model.TotalSections &&
-                model.UploadedDocuments == model.TotalDocuments &&
-                model.VerifiedDocuments == model.TotalDocuments &&
-                model.AcceptedPolicies == model.TotalPolicies;
+                uploadedMandatoryDocuments == totalMandatoryDocuments &&
+                verifiedMandatoryDocuments == totalMandatoryDocuments &&
+                acceptedMandatoryPolicies == totalMandatoryPolicies;
         }
         public async Task LoadDocuments(
     EmployeeOnboardingDetailsViewModel model,

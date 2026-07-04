@@ -621,5 +621,21 @@ namespace VeltriQ.Controllers
                 message = "Document rejected successfully."
             });
         }
+        [HttpPost]
+        public async Task<IActionResult> ApproveOnboarding(
+            [FromBody] ApproveOnboardingRequest request)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            var result = await _workspaceService.ApproveOnboarding(
+                request.EmployeeOnboardingId,
+                currentUser?.FullName);
+
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message
+            });
+        }
     }
 }

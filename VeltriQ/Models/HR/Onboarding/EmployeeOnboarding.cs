@@ -34,11 +34,13 @@ namespace VeltriQ.Models.HR.Onboarding
         public DateTime? ReviewedOn { get; set; }
 
         public DateTime? ApprovedOn { get; set; }
-
+        [StringLength(450)]
+        public string? ApprovedBy { get; set; }
         public DateTime? ConvertedOn { get; set; }
 
         public bool IsPortalLocked { get; set; } = false;
         public decimal CompletionPercentage { get; set; } = 0;
+
 
         [StringLength(500)]
         public string? Remarks { get; set; }
