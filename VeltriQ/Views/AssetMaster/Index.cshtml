@@ -7,99 +7,27 @@
 <style>
     .asset-page {
         width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
+    }
+
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .asset-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
         gap: 12px;
     }
 
-    /* ── UNIFIED CORE MATRIX PANEL ── */
-    .asset-master-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 0px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    /* ── TOP CONTROL DECK HEADER ── */
-    .asset-card-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 14px;
-        border-bottom: 1px solid var(--border);
-        background: var(--card-bg);
-        gap: 16px;
-    }
-
-    .asset-card-title {
-        display: flex;
-        flex-direction: column;
-    }
-
-        .asset-card-title h3 {
-            color: var(--text-primary);
-            font-size: 14px;
-            font-weight: 700;
-            margin: 0 0 2px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .asset-card-title p {
-            color: var(--text-secondary);
-            font-size: 11.5px;
-            font-weight: 600;
-            margin: 0;
-        }
-
-    /* ── ALIGNED SEARCH INTERFACE ── */
-    .asset-search-deck {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .asset-search {
-        width: 280px;
-        position: relative;
-    }
-
-        .asset-search input {
-            width: 100%;
-            height: 30px;
-            border-radius: 0px;
-            border: 1px solid var(--border);
-            background: var(--input-bg);
-            padding: 0 10px 0 32px;
-            color: var(--text-primary);
-            font-size: 12px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.15s ease-in-out;
-        }
-
-            .asset-search input:focus {
-                border-color: rgba(124, 58, 237, 0.6);
-            }
-
-        .asset-search i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-
-    /* ── THEMED ACTION WORKSPACE BUTTONS ── */
+    /* ── COMPACT ADD BUTTON ── */
     .asset-add-btn {
-        height: 30px;
-        padding: 0 12px;
-        border-radius: 0px;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
         border: none;
-        background: var(--purple);
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
         color: #fff;
         font-size: 12px;
         font-weight: 600;
@@ -107,28 +35,90 @@
         align-items: center;
         gap: 6px;
         text-decoration: none;
-        transition: opacity 0.15s ease-in-out;
+        transition: .2s ease;
     }
 
         .asset-add-btn:hover {
-            opacity: 0.9;
+            transform: translateY(-1px);
             color: #fff;
         }
 
-    /* ── HIGH-DENSITY HIGH-PERFORMANCE DATA MATRIX ── */
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .asset-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .asset-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .asset-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .asset-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .asset-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .asset-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .asset-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .asset-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
     .table-wrapper {
+        overflow-y: auto;
         overflow-x: auto;
-        scrollbar-width: thin;
-        scrollbar-color: var(--scrollbar-thumb) transparent;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
         .table-wrapper::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: var(--scrollbar-thumb);
-            border-radius: 0px;
+            display: none;
         }
 
     .asset-table {
@@ -138,74 +128,56 @@
 
         .asset-table th {
             text-align: left;
-            padding: 8px 12px;
-            font-size: 11px;
+            padding: 10px 16px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--text-secondary);
-            background: var(--hover-bg);
-            border-bottom: 1px solid var(--border);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: .5px;
             white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .asset-table td {
-            padding: 8px 12px;
+            padding: 6px 16px;
             border-bottom: 1px solid var(--border);
             color: var(--text-primary);
             font-size: 12.5px;
             vertical-align: middle;
         }
 
-        .asset-table tbody tr:last-child td {
-            border-bottom: none;
+        .asset-table tbody tr {
+            transition: background-color .1s ease;
         }
 
-        .asset-table tbody tr:hover {
-            background: var(--hover-bg);
-        }
-
-    /* ── CONDENSED TRACKING LABELS ── */
-    .asset-identity-block {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .asset-name {
-        font-weight: 700;
-        color: var(--text-primary);
-        line-height: 1.3;
-    }
-
-    .asset-code {
-        font-size: 11px;
-        color: var(--text-muted);
-        font-weight: 600;
-        margin-top: 1px;
-    }
+            .asset-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
 
     /* ── HIGH-DENSITY COMPACT BADGES ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        justify-content: center;
         height: 20px;
         padding: 0 8px;
-        border-radius: 0px;
+        border-radius: 4px;
         font-size: 10.5px;
         font-weight: 700;
-        white-space: nowrap;
     }
 
     .badge-category {
         background: rgba(124, 58, 237, 0.12);
         color: var(--purple);
-        border: 1px solid rgba(124, 58, 237, 0.2);
     }
 
     .badge-required {
         background: rgba(59, 130, 246, 0.12);
-        color: #3b82f6;
+        color: #60a5fa;
     }
 
     .badge-returnable {
@@ -215,60 +187,74 @@
 
     .badge-nonreturnable {
         background: rgba(239, 68, 68, 0.12);
-        color: #ef4444;
+        color: #f87171;
     }
 
-    /* ── CONTROL ACTIONS DECK ── */
+    /* ── INLINE ACTIONS (EDIT & TOGGLE WORKFLOWS) ── */
     .table-actions {
         display: flex;
         gap: 4px;
+        justify-content: flex-end;
     }
 
-    .action-link-btn {
-        background: transparent;
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
         border: none;
-        color: var(--purple);
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 12px;
-        padding: 2px 6px;
-        border-radius: 0px;
-        display: inline-flex;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
         align-items: center;
-        gap: 4px;
+        justify-content: center;
+        font-size: 12px;
         text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
     }
 
-        .action-link-btn:hover {
-            background: var(--hover-bg);
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
         }
 
-    .action-divider {
-        color: var(--border);
-        align-self: center;
-        font-size: 11px;
-    }
+        .action-btn.toggle-deactivate-btn {
+            color: #22c55e;
+        }
+
+            .action-btn.toggle-deactivate-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        .action-btn.toggle-activate-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.toggle-activate-btn:hover {
+                background: #22c55e;
+                color: #fff;
+            }
 </style>
 
 <div class="asset-page">
+
+    <div class="asset-header">
+        <a href="/AssetMaster/Create" class="asset-add-btn">
+            <i class="bi bi-plus-lg"></i> Add Asset
+        </a>
+    </div>
 
     <div class="asset-master-card">
 
         <div class="asset-card-top">
             <div class="asset-card-title">
-                <h3>Asset Inventory Configuration</h3>
-                <p>Total Registered Framework Assets: <span style="color: var(--purple);" id="assetCounter">@Model.Count()</span></p>
+                <h3>Asset Inventory</h3>
+                <p>Total Records: <span id="assetCounter">@Model.Count()</span></p>
             </div>
 
-            <div class="asset-search-deck">
-                <div class="asset-search">
-                    <i class="bi bi-search"></i>
-                    <input type="text" id="assetSearchInput" placeholder="Search parameters..." autocomplete="off" />
-                </div>
-
-                <a href="/AssetMaster/Create" class="asset-add-btn">
-                    <i class="bi bi-plus-lg"></i> Add Asset
-                </a>
+            <div class="asset-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="assetSearchInput" placeholder="Search assets..." autocomplete="off" />
             </div>
         </div>
 
@@ -276,12 +262,14 @@
             <table class="asset-table" id="assetGridMatrix">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">Asset / Identity Code</th>
-                        <th style="width: 20%;">Category Group</th>
-                        <th style="width: 20%;">Brand / Model Blueprint</th>
-                        <th style="width: 15%;">Serial Required</th>
-                        <th style="width: 12%;">Returnable Lifecycle</th>
-                        <th style="width: 8%; text-align: center;">Actions</th>
+                        <th>Asset Name</th>
+                        <th>Asset Code</th>
+                        <th>Asset Category</th>
+                        <th>Brand</th>
+                        <th>Model</th>
+                        <th>Serial No</th>
+                        <th>Returnable</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -290,62 +278,67 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td data-search="name-code">
-                                    <div class="asset-identity-block">
-                                        <span class="asset-name">@item.AssetName</span>
-                                        <span class="asset-code">@item.AssetCode</span>
-                                    </div>
+                                <td data-search="name" style="font-weight: 600;">
+                                    @item.AssetName
                                 </td>
-
-                                <td data-search="category" style="font-weight: 600;">
+                                <td data-search="code">
+                                    <code>@item.AssetCode</code>
+                                </td>
+                                <td data-search="category">
                                     <span class="status-badge badge-category">
-                                        <i class="bi bi-layers-half" style="font-size: 10px;"></i> @item.AssetCategory
+                                        @item.AssetCategory
                                     </span>
                                 </td>
-
-                                <td data-search="brand-model" style="color: var(--text-secondary); font-weight: 600;">
+                                <td data-search="brand">
                                     @(string.IsNullOrWhiteSpace(item.BrandName) ? "-" : item.BrandName)
-                                    <span style="color: var(--border); margin: 0 2px;">/</span>
+                                </td>
+                                <td data-search="model">
                                     @(string.IsNullOrWhiteSpace(item.ModelName) ? "-" : item.ModelName)
                                 </td>
-
                                 <td>
                                     @if (item.SerialNumberRequired)
                                     {
-                                        <span class="status-badge badge-required">
-                                            <i class="bi bi-shield-lock" style="font-size: 10px;"></i> Required
-                                        </span>
+                                        <span class="status-badge badge-required">Required</span>
                                     }
                                     else
                                     {
-                                        <span style="color: var(--text-muted); font-size: 12px; font-weight: 500; margin-left: 6px;">No</span>
+                                        <span style="color: var(--text-muted); font-size: 12px; font-weight: 500; padding-left: 6px;">No</span>
                                     }
                                 </td>
-
                                 <td>
                                     @if (item.IsReturnable)
                                     {
-                                        <span class="status-badge badge-returnable">
-                                            <i class="bi bi-arrow-counterclockwise" style="font-size: 10px;"></i> Returnable
-                                        </span>
+                                        <span class="status-badge badge-returnable">Yes</span>
                                     }
                                     else
                                     {
-                                        <span class="status-badge badge-nonreturnable">
-                                            <i class="bi bi-dash-circle" style="font-size: 10px;"></i> Non-Returnable
-                                        </span>
+                                        <span class="status-badge badge-nonreturnable">No</span>
                                     }
                                 </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="/AssetMaster/Edit/@item.AssetMasterId" class="action-btn" title="Edit Properties">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
 
-                                <td style="text-align: center;">
-                                    <div class="table-actions" style="justify-content: center;">
-                                        <a href="/AssetMaster/Details/@(item.GetType().GetProperty("AssetMasterId")?.GetValue(item) ?? item.GetType().GetProperty("Id")?.GetValue(item) ?? "0")" class="action-link-btn" title="View Specifications">
-                                            <i class="bi bi-eye"></i> View
-                                        </a>
-                                        <span class="action-divider">|</span>
-                                        <a href="/AssetMaster/Edit/@(item.GetType().GetProperty("AssetMasterId")?.GetValue(item) ?? item.GetType().GetProperty("Id")?.GetValue(item) ?? "0")" class="action-link-btn" title="Edit Properties">
-                                            <i class="bi bi-pencil"></i> Edit
-                                        </a>
+                                        @if (item.IsActive == true)
+                                        {
+                                            <a href="/AssetMaster/ToggleStatus/@item.AssetMasterId"
+                                               class="action-btn toggle-deactivate-btn"
+                                               title="Deactivate Asset"
+                                               onclick="return confirm('Are you sure you want to deactivate this asset?')">
+                                                <i class="bi bi-toggle-on" style="font-size: 14px;"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a href="/AssetMaster/ToggleStatus/@item.AssetMasterId"
+                                               class="action-btn toggle-activate-btn"
+                                               title="Activate Asset"
+                                               onclick="return confirm('Are you sure you want to activate this asset?')">
+                                                <i class="bi bi-toggle-off" style="font-size: 14px;"></i>
+                                            </a>
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -354,8 +347,8 @@
                     else
                     {
                         <tr id="emptyMatrixFallback">
-                            <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                                No organization inventory configurations mapped to database registries.
+                            <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No records found.
                             </td>
                         </tr>
                     }
@@ -375,12 +368,11 @@
 
         const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
 
-        // Dynamic Fallback Element Construction
         let inlineFallbackRow = document.getElementById("emptyMatrixFallback");
         if (!inlineFallbackRow) {
             inlineFallbackRow = document.createElement("tr");
             inlineFallbackRow.id = "emptyMatrixFallback";
-            inlineFallbackRow.innerHTML = `<td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found inside local matrices.</td>`;
+            inlineFallbackRow.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found.</td>`;
             inlineFallbackRow.style.display = "none";
             matrixGrid.querySelector("tbody").appendChild(inlineFallbackRow);
         }
@@ -390,11 +382,13 @@
             let matchedCount = 0;
 
             dataRows.forEach(row => {
-                const nameCodeText = row.querySelector('[data-search="name-code"]')?.textContent.toLowerCase() || "";
+                const nameText = row.querySelector('[data-search="name"]')?.textContent.toLowerCase() || "";
+                const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
                 const categoryText = row.querySelector('[data-search="category"]')?.textContent.toLowerCase() || "";
-                const brandModelText = row.querySelector('[data-search="brand-model"]')?.textContent.toLowerCase() || "";
+                const brandText = row.querySelector('[data-search="brand"]')?.textContent.toLowerCase() || "";
+                const modelText = row.querySelector('[data-search="model"]')?.textContent.toLowerCase() || "";
 
-                const compoundSourceText = `${nameCodeText} ${categoryText} ${brandModelText}`;
+                const compoundSourceText = `${nameText} ${codeText} ${categoryText} ${brandText} ${modelText}`;
 
                 if (compoundSourceText.includes(criteria)) {
                     row.style.display = "";
@@ -404,14 +398,12 @@
                 }
             });
 
-            // Toggle Empty State Visibility
             if (matchedCount === 0 && dataRows.length > 0) {
                 inlineFallbackRow.style.display = "";
             } else {
                 inlineFallbackRow.style.display = "none";
             }
 
-            // Synchronize counter text
             if (counterTracker) {
                 counterTracker.textContent = matchedCount;
             }

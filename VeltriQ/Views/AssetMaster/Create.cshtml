@@ -5,372 +5,298 @@
 }
 
 <style>
-
-    .asset-create-page {
-        padding: 4px 0 32px;
-    }
-
-    /* TOPBAR */
-
-    .asset-topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 18px;
-        gap: 20px;
-    }
-
-    .asset-breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        font-size: 13px;
-    }
-
-        .asset-breadcrumb a {
-            color: #8b5cf6;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .asset-breadcrumb span {
-            color: #94a3b8;
-        }
-
-    .asset-top-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .cancel-btn {
-        height: 40px;
-        padding: 0 18px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.03);
-        color: #94a3b8;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .save-btn {
-        height: 40px;
-        padding: 0 20px;
-        border-radius: 10px;
-        border: none;
-        background: linear-gradient(135deg,#6d28d9,#7c3aed);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 8px 22px rgba(124,58,237,.24);
-    }
-
-    /* CARD */
-
-    .asset-card {
-        max-width: 1000px;
-        background: rgba(30,35,44,.92);
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,.06);
-        overflow: hidden;
-    }
-
-    .asset-card-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 18px 22px;
-        border-bottom: 1px solid rgba(255,255,255,.05);
-    }
-
-    .asset-card-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        background: rgba(124,58,237,.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #a78bfa;
-    }
-
-    .asset-card-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #fff;
-    }
-
-    /* BODY */
-
-    .asset-card-body {
-        padding: 22px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-
-    .full-width {
-        grid-column: span 2;
-    }
-
-    /* FIELD */
-
-    .form-field {
+    .template-create-page {
+        width: 100%;
         display: flex;
         flex-direction: column;
     }
 
-        .form-field label {
-            margin-bottom: 7px;
-            font-size: 11px;
-            font-weight: 700;
-            color: #64748b;
-            letter-spacing: .7px;
-            text-transform: uppercase;
-        }
-
-    /* INPUT */
-
-    .form-input,
-    .form-select {
-        width: 100%;
-        height: 42px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,.07);
-        background: rgba(15,20,30,.7);
-        color: #fff;
-        padding: 0 14px;
-        font-size: 13px;
-        outline: none;
+    .validation-summary-box {
+        font-size: 12px;
+        color: #ef4444;
+        margin-bottom: 12px;
+        font-weight: 500;
     }
 
-        .form-input:focus,
-        .form-select:focus {
-            border-color: #7c3aed;
-            background: rgba(124,58,237,.06);
-            box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+    /* ── HEADER BACK TO LIST NAVIGATION ACTION ── */
+    .form-action-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    /* ── COMPACT SYSTEM BUTTON CONTROLS ── */
+    .form-action-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-submit-theme {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+    }
+
+        .btn-submit-theme:hover {
+            transform: translateY(-1px);
+            color: #fff;
         }
 
+    .btn-cancel-theme {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    .form-footer-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    /* ── SQUARED SINGLE-PANEL CONTAINER CARD DECK ── */
+    .custom-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px; /* Branded strict crisp layout corners */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-form-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+    }
+
+        .custom-form-header h5 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+    .custom-form-body {
+        padding: 16px;
+        background: var(--card-bg);
+    }
+
+    .form-grid-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+    .form-grid-col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 8px;
+    }
+
+    .form-grid-col-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0 8px;
+    }
+
+    .form-field-group {
+        margin-bottom: 12px;
+        position: relative;
+    }
+
+    .custom-form-label {
+        display: inline-block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+        .custom-form-label span {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
+    .custom-form-control {
+        width: 100%;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12.5px;
+        outline: none;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+        .custom-form-control:focus {
+            border-color: var(--purple);
+        }
+
+    textarea.custom-form-control {
+        height: 56px;
+        padding: 6px 12px;
+        resize: none;
+    }
+
+    select.custom-form-control {
+        padding-right: 24px;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px 12px;
+    }
+
+    .validation-err-text {
+        font-size: 11px;
+        color: #ef4444;
+        font-weight: 500;
+        margin-top: 2px;
+        display: block;
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid-col-6, .form-grid-col-12
+
+    {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    }
 </style>
 
-<div class="asset-create-page">
+<div class="template-create-page">
 
-    <!-- TOPBAR -->
-
-    <div class="asset-topbar">
-
-        <div class="asset-breadcrumb">
-
-            <a href="/AssetMaster/Index">
-                Asset Master
-            </a>
-
-            <i class="bi bi-chevron-right"></i>
-
-            <span>Create</span>
-
-        </div>
-
-        <div class="asset-top-actions">
-
-            <a href="/AssetMaster/Index"
-               class="cancel-btn">
-
-                <i class="bi bi-x"></i>
-
-                Cancel
-
-            </a>
-
-            <button type="submit"
-                    form="assetForm"
-                    class="save-btn">
-
-                <i class="bi bi-box-seam"></i>
-
-                Save Asset
-
-            </button>
-
-        </div>
-
+    <div class="form-action-header">
+        <a href="/AssetMaster/Index" class="form-action-btn btn-cancel-theme">
+            <i class="bi bi-arrow-left"></i>
+            Back to List
+        </a>
     </div>
 
-    <!-- FORM -->
+    <form id="assetForm" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
 
-    <form id="assetForm"
-          asp-action="Create"
-          method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-summary-box"></div>
 
-        <div class="asset-card">
-
-            <div class="asset-card-header">
-
-                <div class="asset-card-icon">
-
-                    <i class="bi bi-laptop"></i>
-
-                </div>
-
-                <div class="asset-card-title">
-                    Asset Information
-                </div>
-
+        <div class="custom-form-card">
+            <div class="custom-form-header">
+                <h5>Asset Configuration setup</h5>
             </div>
 
-            <div class="asset-card-body">
-
-                <!-- NAME -->
-
-                <div class="form-field full-width">
-
-                    <label>
-                        Asset Name
-                    </label>
-
-                    <input asp-for="AssetName"
-                           class="form-input"
-                           placeholder="Enter asset name" />
-
+            <div class="custom-form-body">
+                <div class="form-grid-row">
+                    <div class="form-grid-col-12 form-field-group">
+                        <label asp-for="AssetName" class="custom-form-label">Asset Name<span>*</span></label>
+                        <input asp-for="AssetName" class="custom-form-control" placeholder="Enter asset name" autocomplete="off" />
+                        <span asp-validation-for="AssetName" class="validation-err-text"></span>
+                    </div>
                 </div>
 
-                <!-- CODE -->
+                <div class="form-grid-row">
+                    <div class="form-grid-col-6 form-field-group">
+                        <label asp-for="AssetCode" class="custom-form-label">Asset Code<span>*</span></label>
+                        <input asp-for="AssetCode" class="custom-form-control" placeholder="AST-001" autocomplete="off" />
+                        <span asp-validation-for="AssetCode" class="validation-err-text"></span>
+                    </div>
 
-                <div class="form-field">
-
-                    <label>
-                        Asset Code
-                    </label>
-
-                    <input asp-for="AssetCode"
-                           class="form-input"
-                           placeholder="AST-001" />
-
+                    <div class="form-grid-col-6 form-field-group">
+                        <label asp-for="AssetCategory" class="custom-form-label">Asset Category<span>*</span></label>
+                        <select asp-for="AssetCategory" class="custom-form-control">
+                            <option value="">Select Category</option>
+                            <option>IT Asset</option>
+                            <option>Office Asset</option>
+                            <option>Security Asset</option>
+                            <option>Furniture</option>
+                        </select>
+                        <span asp-validation-for="AssetCategory" class="validation-err-text"></span>
+                    </div>
                 </div>
 
-                <!-- CATEGORY -->
+                <div class="form-grid-row">
+                    <div class="form-grid-col-6 form-field-group">
+                        <label asp-for="BrandName" class="custom-form-label">Brand Name</label>
+                        <input asp-for="BrandName" class="custom-form-control" placeholder="Dell / HP / Lenovo" autocomplete="off" />
+                        <span asp-validation-for="BrandName" class="validation-err-text"></span>
+                    </div>
 
-                <div class="form-field">
-
-                    <label>
-                        Asset Category
-                    </label>
-
-                    <select asp-for="AssetCategory"
-                            class="form-select">
-
-                        <option value="">
-                            Select Category
-                        </option>
-
-                        <option>IT Asset</option>
-                        <option>Office Asset</option>
-                        <option>Security Asset</option>
-                        <option>Furniture</option>
-
-                    </select>
-
+                    <div class="form-grid-col-6 form-field-group">
+                        <label asp-for="ModelName" class="custom-form-label">Model Name</label>
+                        <input asp-for="ModelName" class="custom-form-control" placeholder="Latitude 5440" autocomplete="off" />
+                        <span asp-validation-for="ModelName" class="validation-err-text"></span>
+                    </div>
                 </div>
 
-                <!-- BRAND -->
+                <div class="form-grid-row">
+                    <div class="form-grid-col-6 form-field-group">
+                        <label asp-for="SerialNumberRequired" class="custom-form-label">Serial Number Required</label>
+                        <select asp-for="SerialNumberRequired" class="custom-form-control">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                        <span asp-validation-for="SerialNumberRequired" class="validation-err-text"></span>
+                    </div>
 
-                <div class="form-field">
-
-                    <label>
-                        Brand Name
-                    </label>
-
-                    <input asp-for="BrandName"
-                           class="form-input"
-                           placeholder="Dell / HP / Lenovo" />
-
+                    <div class="form-grid-col-6 form-field-group">
+                        <label asp-for="IsReturnable" class="custom-form-label">Is Returnable</label>
+                        <select asp-for="IsReturnable" class="custom-form-control">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                        <span asp-validation-for="IsReturnable" class="validation-err-text"></span>
+                    </div>
                 </div>
 
-                <!-- MODEL -->
-
-                <div class="form-field">
-
-                    <label>
-                        Model Name
-                    </label>
-
-                    <input asp-for="ModelName"
-                           class="form-input"
-                           placeholder="Latitude 5440" />
-
+                <div class="form-grid-row">
+                    <div class="form-grid-col-12 form-field-group">
+                        <label asp-for="Description" class="custom-form-label">Description</label>
+                        <textarea asp-for="Description" class="custom-form-control" placeholder="Provide additional configuration rules or asset inventory notes..."></textarea>
+                        <span asp-validation-for="Description" class="validation-err-text"></span>
+                    </div>
                 </div>
-
-                <!-- SERIAL -->
-
-                <div class="form-field">
-
-                    <label>
-                        Serial Number Required
-                    </label>
-
-                    <select asp-for="SerialNumberRequired"
-                            class="form-select">
-
-                        <option value="true">
-                            Yes
-                        </option>
-
-                        <option value="false">
-                            No
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <!-- RETURNABLE -->
-
-                <div class="form-field">
-
-                    <label>
-                        Is Returnable
-                    </label>
-
-                    <select asp-for="IsReturnable"
-                            class="form-select">
-
-                        <option value="true">
-                            Yes
-                        </option>
-
-                        <option value="false">
-                            No
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <!-- DESCRIPTION -->
-
-                <div class="form-field full-width">
-
-                    <label>
-                        Description
-                    </label>
-
-                    <input asp-for="Description"
-                           class="form-input"
-                           placeholder="Enter asset description" />
-
-                </div>
-
             </div>
-
         </div>
 
-    </form>
+        <div class="form-footer-actions">
+            <button type="submit" class="form-action-btn btn-submit-theme">
+                <i class="bi bi-check-circle"></i>
+                Save Asset
+            </button>
 
+            <a href="/AssetMaster/Index" class="form-action-btn btn-cancel-theme">
+                <i class="bi bi-x-circle"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

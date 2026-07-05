@@ -1,368 +1,353 @@
-﻿@model IEnumerable<VeltriQ.Models.HR.Department>
+﻿
+@model IEnumerable<VeltriQ.Models.HR.Department>
 
 @{
     ViewData["Title"] = "Departments";
 }
 
-<style>
-
-    .department-page {
-        width: 100%;
-    }
-
-    /* HEADER */
-
-    .department-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 22px;
-        gap: 20px;
-    }
-
-    .department-header-left h2 {
-        font-size: 22px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 4px;
-        letter-spacing: -.4px;
-    }
-
-    .department-header-left p {
-        font-size: 14px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    /* BUTTON */
-
-    .department-add-btn {
-        height: 42px;
-        padding: 0 18px;
-        border: none;
-        border-radius: 12px;
-        background: linear-gradient(135deg,#6d28d9,#7c3aed);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        transition: .2s ease;
-        box-shadow: 0 8px 22px rgba(124,58,237,.22);
-    }
-
-        .department-add-btn:hover {
-            transform: translateY(-2px);
-            color: #fff;
-        }
-
-    /* CARD */
-
-    .department-card {
-        background: rgba(30,35,44,.92);
-        border: 1px solid rgba(255,255,255,.06);
-        border-radius: 18px;
-        overflow: hidden;
-    }
-
-    .department-card-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 18px 20px;
-        border-bottom: 1px solid rgba(255,255,255,.05);
-        gap: 16px;
-    }
-
-    .department-card-title h3 {
-        font-size: 17px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 3px;
-    }
-
-    .department-card-title p {
-        font-size: 13px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    /* SEARCH */
-
-    .department-search {
-        width: 280px;
-        position: relative;
-    }
-
-        .department-search input {
-            width: 100%;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid #2a3441;
-            background: #0d1117;
-            padding: 0 14px 0 40px;
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-        }
-
-            .department-search input:focus {
-                border-color: #7c3aed;
+        <style>
+            .department-page {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
             }
 
-        .department-search i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-        }
-
-    /* TABLE */
-
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    .department-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-        .department-table th {
-            text-align: left;
-            padding: 0 20px 14px;
-            font-size: 10px;
-            font-weight: 700;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-        }
-
-        .department-table td {
-            padding: 16px 20px;
-            border-top: 1px solid rgba(255,255,255,.04);
-            color: #fff;
-            font-size: 13px;
-        }
-
-        .department-table tbody tr:hover {
-            background: rgba(255,255,255,.02);
-        }
-
-    .department-name {
-        font-weight: 700;
-        margin-bottom: 2px;
-    }
-
-    .department-code {
-        font-size: 11px;
-        color: #6b7280;
-    }
-
-    /* BADGE */
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 28px;
-        padding: 0 12px;
-        border-radius: 30px;
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .status-active {
-        background: rgba(34,197,94,.14);
-        color: #22c55e;
-    }
-
-    /* ACTIONS */
-
-    .table-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .action-btn {
-        width: 30px;
-        height: 30px;
-        border-radius: 10px;
-        border: none;
-        background: rgba(124,58,237,.12);
-        color: #7c3aed;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: .2s ease;
-        text-decoration: none;
-    }
-
-        .action-btn:hover {
-            background: #7c3aed;
-            color: #fff;
-        }
-
-    .delete-btn {
-        background: rgba(239,68,68,.12);
-        color: #ef4444;
-    }
-
-        .delete-btn:hover {
-            background: #ef4444;
-            color: #fff;
-        }
-
-</style>
-
-<div class="department-page">
-
-    <!-- HEADER -->
-
-    <div class="department-header">
-
-        <div class="department-header-left">
-
-            <h2>Departments</h2>
-
-            <p>
-                Manage organization departments.
-            </p>
-
-        </div>
-
-        <a href="/Department/Create"
-           class="department-add-btn">
-
-            <i class="bi bi-plus-lg"></i>
-
-            Add Department
-
-        </a>
-
-    </div>
-
-    <!-- CARD -->
-
-    <div class="department-card">
-
-        <div class="department-card-top">
-
-            <div class="department-card-title">
-
-                <h3>Department Directory</h3>
-
-                <p>
-                    Total Departments:
-                    @Model.Count()
-                </p>
-
-            </div>
-
-            <div class="department-search">
-
-                <i class="bi bi-search"></i>
-
-                <input type="text"
-                       placeholder="Search departments..." />
-
-            </div>
-
-        </div>
-
-        <div class="table-wrapper">
-
-            <table class="department-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>Department</th>
-                        <th>Branch</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-
-                            <td>
-
-                                <div class="department-name">
-                                    @item.DepartmentName
-                                </div>
-
-                                <div class="department-code">
-                                    @item.DepartmentCode
-                                </div>
-
-                            </td>
-
-                            <td>
-                                @item.Branch?.BranchName
-                            </td>
-
-                            <td>
-                                @item.Email
-                            </td>
-
-                            <td>
-
-                                <span class="status-badge status-active">
-                                    Active
-                                </span>
-
-                            </td>
-
-                            <td>
-
-                                <div class="table-actions">
-
-                                    <a href="#"
-                                       class="action-btn">
-
-                                        <i class="bi bi-eye"></i>
-
-                                    </a>
-
-                                    <a href="#"
-                                       class="action-btn">
-
-                                        <i class="bi bi-pencil"></i>
-
-                                    </a>
-
-                                    <a href="#"
-                                       class="action-btn delete-btn">
-
-                                        <i class="bi bi-trash"></i>
-
-                                    </a>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
+            /* ── HEADER (Optimized & Pushed Up) ── */
+            .department-header {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                margin-bottom: 12px;
+                gap: 12px;
+            }
+
+            /* ── COMPACT ADD BUTTON ── */
+            .department-add-btn {
+                height: 34px;
+                padding: 0 14px;
+                border-radius: 6px;
+                border: none;
+                background: linear-gradient(135deg, #6d28d9, #7c3aed);
+                color: #fff;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                text-decoration: none;
+                transition: .2s ease;
+            }
+
+                .department-add-btn:hover {
+                    transform: translateY(-1px);
+                    color: #fff;
+                }
+
+            /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+            .department-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 0px;
+                max-height: calc(100vh - var(--topbar-h) - 100px);
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .department-card-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 16px;
+                border-bottom: 1px solid var(--border);
+                gap: 20px;
+            }
+
+            .department-card-title h3 {
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin: 0;
+            }
+
+            .department-card-title p {
+                font-size: 11px;
+                color: var(--text-secondary);
+                margin: 2px 0 0 0;
+            }
+
+            /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+            .department-search-wrapper {
+                position: relative;
+                width: 320px;
+            }
+
+                .department-search-wrapper input {
+                    width: 100%;
+                    height: 34px;
+                    border-radius: 6px;
+                    border: 1px solid var(--border);
+                    background: var(--input-bg);
+                    padding: 0 12px 0 36px;
+                    color: var(--text-primary);
+                    font-size: 12px;
+                    outline: none;
+                    transition: border-color 0.2s;
+                }
+
+                    .department-search-wrapper input:focus {
+                        border-color: var(--purple);
                     }
 
-                </tbody>
+                .department-search-wrapper i {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: var(--text-muted);
+                    font-size: 13px;
+                }
 
-            </table>
+            /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
+            .table-wrapper {
+                overflow-y: auto;
+                overflow-x: auto;
+                flex: 1;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
 
+                .table-wrapper::-webkit-scrollbar {
+                    display: none;
+                }
+
+            .department-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+                .department-table th {
+                    text-align: left;
+                    padding: 10px 16px;
+                    font-size: 10px;
+                    font-weight: 700;
+                    color: var(--text-secondary);
+                    text-transform: uppercase;
+                    letter-spacing: .5px;
+                    white-space: nowrap;
+                    border-bottom: 1px solid var(--border);
+                    background: var(--card-bg);
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
+                }
+
+                .department-table td {
+                    padding: 6px 16px;
+                    border-bottom: 1px solid var(--border);
+                    color: var(--text-primary);
+                    font-size: 12.5px;
+                    vertical-align: middle;
+                }
+
+                .department-table tbody tr {
+                    transition: background-color .1s ease;
+                }
+
+                    .department-table tbody tr:hover {
+                        background: var(--hover-bg);
+                    }
+
+            /* ── HIGH-DENSITY COMPACT BADGES ── */
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                height: 20px;
+                padding: 0 8px;
+                border-radius: 4px;
+                font-size: 10.5px;
+                font-weight: 700;
+            }
+
+            .status-active {
+                background: rgba(34, 197, 94, .12);
+                color: #22c55e;
+            }
+
+            /* ── INLINE ACTIONS (RIGHT ALIGNED TO MATCH HEADER) ── */
+            .table-actions {
+                display: flex;
+                gap: 4px;
+                justify-content: flex-end;
+            }
+
+            .action-btn {
+                width: 28px;
+                height: 28px;
+                border-radius: 4px;
+                border: none;
+                background: var(--hover-bg);
+                color: var(--text-primary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                text-decoration: none;
+                transition: background-color 0.2s, color 0.2s;
+            }
+
+                .action-btn:hover {
+                    background: var(--purple);
+                    color: #fff;
+                }
+
+                .action-btn.delete-btn {
+                    color: #ef4444;
+                }
+
+                    .action-btn.delete-btn:hover {
+                        background: #ef4444;
+                        color: #fff;
+                    }
+        </style>
+
+        <div class="department-page">
+
+            <div class="department-header">
+                <a href="/Department/Create" class="department-add-btn">
+                    <i class="bi bi-plus-lg"></i> Add Department
+                </a>
+            </div>
+
+            <div class="department-card">
+
+                <div class="department-card-top">
+                    <div class="department-card-title">
+                        <h3>Department Directory</h3>
+                        <p>Total Records: <span id="deptCounter">@Model.Count()</span></p>
+                    </div>
+
+                    <div class="department-search-wrapper">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="deptSearchInput" placeholder="Search departments..." autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="department-table" id="deptTableMatrix">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Department Code</th>
+                                <th>Branch</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td data-search="name" style="font-weight: 600;">
+                                            @item.DepartmentName
+                                        </td>
+                                        <td data-search="code">
+                                            <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">
+                                                @item.DepartmentCode
+                                            </span>
+                                        </td>
+                                        <td data-search="branch">
+                                            @(item.Branch?.BranchName ?? "-")
+                                        </td>
+                                        <td data-search="email">
+                                            @(string.IsNullOrWhiteSpace(item.Email) ? "-" : item.Email)
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-active">Active</span>
+                                        </td>
+                                        <td>
+                                            <div class="table-actions">
+                                                <a href="/Department/Details/@item.DepartmentId" class="action-btn" title="View Details">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="/Department/Edit/@item.DepartmentId" class="action-btn" title="Edit Properties">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="/Department/Delete/@item.DepartmentId" class="action-btn delete-btn" title="Delete Entry" onclick="return confirm('Are you sure?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr id="emptyMatrixFallback">
+                                    <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                        No records found.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-    </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const searchInput = document.getElementById("deptSearchInput");
+                const matrixGrid = document.getElementById("deptTableMatrix");
+                const counterTracker = document.getElementById("deptCounter");
 
-</div>
+                if (!searchInput || !matrixGrid) return;
+
+                const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
+
+                let inlineFallbackRow = document.getElementById("emptyMatrixFallback");
+                if (!inlineFallbackRow) {
+                    inlineFallbackRow = document.createElement("tr");
+                    inlineFallbackRow.id = "emptyMatrixFallback";
+                    inlineFallbackRow.innerHTML = `<td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found.</td>`;
+                    inlineFallbackRow.style.display = "none";
+                    matrixGrid.querySelector("tbody").appendChild(inlineFallbackRow);
+                }
+
+                searchInput.addEventListener("input", function () {
+                    const criteria = this.value.trim().toLowerCase();
+                    let matchedCount = 0;
+
+                    dataRows.forEach(row => {
+                        const nameText = row.querySelector('[data-search="name"]')?.textContent.toLowerCase() || "";
+                        const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
+                        const branchText = row.querySelector('[data-search="branch"]')?.textContent.toLowerCase() || "";
+                        const emailText = row.querySelector('[data-search="email"]')?.textContent.toLowerCase() || "";
+
+                        const compoundSourceText = `${nameText} ${codeText} ${branchText} ${emailText}`;
+
+                        if (compoundSourceText.includes(criteria)) {
+                            row.style.display = "";
+                            matchedCount++;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+
+                    if (matchedCount === 0 && dataRows.length > 0) {
+                        inlineFallbackRow.style.display = "";
+                    } else {
+                        inlineFallbackRow.style.display = "none";
+                    }
+
+                    if (counterTracker) {
+                        counterTracker.textContent = matchedCount;
+                    }
+                });
+            });
+        </script>

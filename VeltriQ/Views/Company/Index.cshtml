@@ -1,34 +1,365 @@
-﻿@model IEnumerable<VeltriQ.Models.HR.Company>
+﻿
+@model IEnumerable<VeltriQ.Models.Master.MasterCompany>
 
 @{
     ViewData["Title"] = "Company";
 }
 
-<h2>Company Master</h2>
+<style>
+    .company-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
 
-<table class="table">
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .company-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
 
-    <thead>
-        <tr>
-            <th>Company Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>City</th>
-        </tr>
-    </thead>
+    /* ── COMPACT ADD BUTTON ── */
+    .company-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+    }
 
-    <tbody>
-
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.CompanyName</td>
-                <td>@item.Email</td>
-                <td>@item.PhoneNumber</td>
-                <td>@item.City</td>
-            </tr>
+        .company-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
         }
 
-    </tbody>
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .company-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
 
-</table>
+    .company-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .company-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .company-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .company-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .company-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .company-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .company-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .company-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .company-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .company-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .company-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .company-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── HIGH-DENSITY COMPACT BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: rgba(34, 197, 94, .12);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, .12);
+        color: #ef4444;
+    }
+
+    /* ── INLINE ACTIONS (RIGHT ALIGNED) ── */
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .action-btn.delete-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.delete-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+</style>
+
+<div class="company-page">
+
+    <div class="company-header">
+        <a href="/Company/Create" class="company-add-btn">
+            <i class="bi bi-plus-lg"></i> Add Company
+        </a>
+    </div>
+
+    <div class="company-card">
+
+        <div class="company-card-top">
+            <div class="company-card-title">
+                <h3>Company Directory</h3>
+                <p>Total Records: <span id="companyCounter">@Model.Count()</span></p>
+            </div>
+
+            <div class="company-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="companySearchInput" placeholder="Search companies..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="company-table" id="companyTableMatrix">
+                <thead>
+                    <tr>
+                        <th>Company Name</th>
+                        <th>Company Code</th>
+                        <th>Database Name</th>
+                        <th>Server Name</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td data-search="name" style="font-weight: 600;">
+                                    @item.CompanyName
+                                </td>
+                                <td data-search="code">
+                                    <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">
+                                        @item.CompanyCode
+                                    </span>
+                                </td>
+                                <td data-search="database">
+                                    @(string.IsNullOrWhiteSpace(item.DatabaseName) ? "-" : item.DatabaseName)
+                                </td>
+                                <td data-search="server">
+                                    @(string.IsNullOrWhiteSpace(item.ServerName) ? "-" : item.ServerName)
+                                </td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="status-badge status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="/Company/Details/@item.CompanyId" class="action-btn" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="/Company/Edit/@item.CompanyId" class="action-btn" title="Edit Properties">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="/Company/Delete/@item.CompanyId" class="action-btn delete-btn" title="Delete Entry" onclick="return confirm('Are you sure?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="emptyMatrixFallback">
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No records found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("companySearchInput");
+        const matrixGrid = document.getElementById("companyTableMatrix");
+        const counterTracker = document.getElementById("companyCounter");
+
+        if (!searchInput || !matrixGrid) return;
+
+        const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
+
+        let inlineFallbackRow = document.getElementById("emptyMatrixFallback");
+        if (!inlineFallbackRow) {
+            inlineFallbackRow = document.createElement("tr");
+            inlineFallbackRow.id = "emptyMatrixFallback";
+            inlineFallbackRow.innerHTML = `<td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found.</td>`;
+            inlineFallbackRow.style.display = "none";
+            matrixGrid.querySelector("tbody").appendChild(inlineFallbackRow);
+        }
+
+        searchInput.addEventListener("input", function () {
+            const criteria = this.value.trim().toLowerCase();
+            let matchedCount = 0;
+
+            dataRows.forEach(row => {
+                const nameText = row.querySelector('[data-search="name"]')?.textContent.toLowerCase() || "";
+                const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
+                const dbText = row.querySelector('[data-search="database"]')?.textContent.toLowerCase() || "";
+                const serverText = row.querySelector('[data-search="server"]')?.textContent.toLowerCase() || "";
+
+                const compoundSourceText = `${nameText} ${codeText} ${dbText} ${serverText}`;
+
+                if (compoundSourceText.includes(criteria)) {
+                    row.style.display = "";
+                    matchedCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            if (matchedCount === 0 && dataRows.length > 0) {
+                inlineFallbackRow.style.display = "";
+            } else {
+                inlineFallbackRow.style.display = "none";
+            }
+
+            if (counterTracker) {
+                counterTracker.textContent = matchedCount;
+            }
+        });
+    });
+</script>

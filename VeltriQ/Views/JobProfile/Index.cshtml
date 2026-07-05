@@ -5,410 +5,353 @@
 }
 
 <style>
-
-    .employee-page {
+    .job-profile-page {
         width: 100%;
-    }
-
-    .employee-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 22px;
-        gap: 20px;
-    }
-
-    .employee-header-left h2 {
-        font-size: 24px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 4px;
-        letter-spacing: -.4px;
-    }
-
-    .employee-header-left p {
-        font-size: 14px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    .employee-add-btn {
-        height: 44px;
-        padding: 0 18px;
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg,#6d28d9,#7c3aed);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        transition: .2s ease;
-        box-shadow: 0 8px 22px rgba(124,58,237,.22);
-    }
-
-        .employee-add-btn:hover {
-            transform: translateY(-2px);
-            color: #fff;
-        }
-
-    .employee-card {
-        background: rgba(30,35,44,.94);
-        border: 1px solid rgba(255,255,255,.06);
-        border-radius: 20px;
-        overflow: hidden;
-    }
-
-    .employee-card-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 18px 22px;
-        border-bottom: 1px solid rgba(255,255,255,.05);
-        gap: 20px;
-    }
-
-    .employee-card-title h3 {
-        font-size: 18px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 3px;
-    }
-
-    .employee-card-title p {
-        font-size: 13px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    .employee-search {
-        width: 320px;
-        position: relative;
-    }
-
-        .employee-search input {
-            width: 100%;
-            height: 42px;
-            border-radius: 12px;
-            border: 1px solid #2a3441;
-            background: #0d1117;
-            padding: 0 14px 0 42px;
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-        }
-
-            .employee-search input:focus {
-                border-color: #7c3aed;
-            }
-
-        .employee-search i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-        }
-
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    .employee-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-        .employee-table th {
-            text-align: left;
-            padding: 0 20px 14px;
-            font-size: 10px;
-            font-weight: 700;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            white-space: nowrap;
-        }
-
-        .employee-table td {
-            padding: 18px 20px;
-            border-top: 1px solid rgba(255,255,255,.04);
-            color: #fff;
-            font-size: 13px;
-            vertical-align: middle;
-        }
-
-        .employee-table tbody tr {
-            transition: .2s ease;
-        }
-
-            .employee-table tbody tr:hover {
-                background: rgba(255,255,255,.02);
-            }
-
-    .job-info {
+        height: 100%;
         display: flex;
         flex-direction: column;
     }
 
-    .job-title {
-        font-weight: 700;
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .job-profile-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    /* ── COMPACT ADD BUTTON ── */
+    .job-profile-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
         color: #fff;
-        margin-bottom: 3px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
     }
 
-    .job-code {
+        .job-profile-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .job-profile-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .job-profile-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .job-profile-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .job-profile-card-title p {
         font-size: 11px;
-        color: #6b7280;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
     }
 
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .job-profile-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .job-profile-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .job-profile-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .job-profile-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .job-profile-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .job-profile-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .job-profile-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .job-profile-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .job-profile-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── HIGH-DENSITY COMPACT BADGES ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 28px;
-        padding: 0 12px;
-        border-radius: 30px;
-        font-size: 11px;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
         font-weight: 700;
     }
 
     .status-active {
-        background: rgba(34,197,94,.14);
+        background: rgba(34, 197, 94, .12);
         color: #22c55e;
     }
 
+    /* ── INLINE ACTIONS (RIGHT ALIGNED) ── */
     .table-actions {
         display: flex;
-        gap: 8px;
+        gap: 4px;
+        justify-content: flex-end;
     }
 
     .action-btn {
-        width: 30px;
-        height: 30px;
-        border-radius: 10px;
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
         border: none;
-        background: rgba(124,58,237,.12);
-        color: #7c3aed;
+        background: var(--hover-bg);
+        color: var(--text-primary);
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: .2s ease;
+        font-size: 12px;
         text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
     }
 
         .action-btn:hover {
-            background: #7c3aed;
+            background: var(--purple);
             color: #fff;
         }
 
-    .delete-btn {
-        background: rgba(239,68,68,.12);
-        color: #ef4444;
-    }
-
-        .delete-btn:hover {
-            background: #ef4444;
-            color: #fff;
+        .action-btn.delete-btn {
+            color: #ef4444;
         }
 
+            .action-btn.delete-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
 </style>
 
-<div class="employee-page">
+<div class="job-profile-page">
 
-    <!-- HEADER -->
-
-    <div class="employee-header">
-
-        <div class="employee-header-left">
-
-            <h2>Job Profiles</h2>
-
-            <p>
-                Manage company job profile records.
-            </p>
-
-        </div>
-
-        <a href="/JobProfile/Create"
-           class="employee-add-btn">
-
-            <i class="bi bi-plus-lg"></i>
-
-            Add Job Profile
-
+    <div class="job-profile-header">
+        <a href="/JobProfile/Create" class="job-profile-add-btn">
+            <i class="bi bi-plus-lg"></i> Add Job Profile
         </a>
-
     </div>
 
-    <!-- CARD -->
+    <div class="job-profile-card">
 
-    <div class="employee-card">
-
-        <!-- TOP -->
-
-        <div class="employee-card-top">
-
-            <div class="employee-card-title">
-
+        <div class="job-profile-card-top">
+            <div class="job-profile-card-title">
                 <h3>Job Profile Directory</h3>
-
-                <p>
-                    Total Profiles:
-                    @Model.Count()
-                </p>
-
+                <p>Total Records: <span id="profilesCounter">@Model.Count()</span></p>
             </div>
 
-            <div class="employee-search">
-
+            <div class="job-profile-search-wrapper">
                 <i class="bi bi-search"></i>
-
-                <input type="text"
-                       id="searchBox"
-                       placeholder="Search job profiles..." />
-
+                <input type="text" id="searchBox" placeholder="Search job profiles..." autocomplete="off" />
             </div>
-
         </div>
 
-        <!-- TABLE -->
-
         <div class="table-wrapper">
-
-            <table class="employee-table">
-
+            <table class="job-profile-table" id="jobProfileTableMatrix">
                 <thead>
-
                     <tr>
-
                         <th>Job Title</th>
+                        <th>Job Code</th>
                         <th>Department</th>
                         <th>Designation</th>
                         <th>Experience</th>
                         <th>Salary Range</th>
                         <th>Status</th>
-                        <th>Actions</th>
-
+                        <th class="text-end">Actions</th>
                     </tr>
-
                 </thead>
-
-                <tbody id="jobProfileTable">
-
-                    @foreach (var item in Model)
+                <tbody>
+                    @if (Model != null && Model.Any())
                     {
-                        <tr>
-
-                            <!-- JOB TITLE -->
-
-                            <td>
-
-                                <div class="job-info">
-
-                                    <div class="job-title">
-                                        @item.JobTitle
-                                    </div>
-
-                                    <div class="job-code">
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td data-search="title" style="font-weight: 600;">
+                                    @item.JobTitle
+                                </td>
+                                <td data-search="code">
+                                    <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">
                                         JP-@item.JobProfileId
+                                    </span>
+                                </td>
+                                <td data-search="department">
+                                    @item.DepartmentId
+                                </td>
+                                <td data-search="designation">
+                                    @item.DesignationId
+                                </td>
+                                <td>
+                                    @item.MinExperience - @item.MaxExperience Years
+                                </td>
+                                <td>
+                                    ₹@item.MinSalary - ₹@item.MaxSalary
+                                </td>
+                                <td>
+                                    <span class="status-badge status-active">Active</span>
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="/JobProfile/Edit/@item.JobProfileId" class="action-btn" title="Edit Properties">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="#" class="action-btn delete-btn" title="Delete Entry" onclick="return confirm('Are you sure?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
                                     </div>
-
-                                </div>
-
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="emptyMatrixFallback">
+                            <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No records found.
                             </td>
-
-                            <!-- DEPARTMENT -->
-
-                            <td>
-                                @item.DepartmentId
-                            </td>
-
-                            <!-- DESIGNATION -->
-
-                            <td>
-                                @item.DesignationId
-                            </td>
-
-                            <!-- EXPERIENCE -->
-
-                            <td>
-                                @item.MinExperience -
-                                @item.MaxExperience Years
-                            </td>
-
-                            <!-- SALARY -->
-
-                            <td>
-                                ₹@item.MinSalary -
-                                ₹@item.MaxSalary
-                            </td>
-
-                            <!-- STATUS -->
-
-                            <td>
-
-                                <span class="status-badge status-active">
-
-                                    Active
-
-                                </span>
-
-                            </td>
-
-                            <!-- ACTIONS -->
-
-                            <td>
-
-                                <div class="table-actions">
-
-                                    <a href="/JobProfile/Edit/@item.JobProfileId"
-                                       class="action-btn">
-
-                                        <i class="bi bi-pencil"></i>
-
-                                    </a>
-
-                                    <a href="#"
-                                       class="action-btn delete-btn">
-
-                                        <i class="bi bi-trash"></i>
-
-                                    </a>
-
-                                </div>
-
-                            </td>
-
                         </tr>
                     }
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchBox");
+        const matrixGrid = document.getElementById("jobProfileTableMatrix");
+        const counterTracker = document.getElementById("profilesCounter");
 
-    $("#searchBox").on("keyup", function () {
+        if (!searchInput || !matrixGrid) return;
 
-        var value = $(this).val().toLowerCase();
+        const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
 
-        $("#jobProfileTable tr").filter(function () {
+        let inlineFallbackRow = document.getElementById("emptyMatrixFallback");
+        if (!inlineFallbackRow) {
+            inlineFallbackRow = document.createElement("tr");
+            inlineFallbackRow.id = "emptyMatrixFallback";
+            inlineFallbackRow.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found.</td>`;
+            inlineFallbackRow.style.display = "none";
+            matrixGrid.querySelector("tbody").appendChild(inlineFallbackRow);
+        }
 
-            $(this).toggle(
-                $(this).text().toLowerCase().indexOf(value) > -1
-            );
+        searchInput.addEventListener("input", function () {
+            const criteria = this.value.trim().toLowerCase();
+            let matchedCount = 0;
 
+            dataRows.forEach(row => {
+                const titleText = row.querySelector('[data-search="title"]')?.textContent.toLowerCase() || "";
+                const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
+                const deptText = row.querySelector('[data-search="department"]')?.textContent.toLowerCase() || "";
+                const desigText = row.querySelector('[data-search="designation"]')?.textContent.toLowerCase() || "";
+
+                const compoundSourceText = `${titleText} ${codeText} ${deptText} ${desigText}`;
+
+                if (compoundSourceText.includes(criteria)) {
+                    row.style.display = "";
+                    matchedCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            if (matchedCount === 0 && dataRows.length > 0) {
+                inlineFallbackRow.style.display = "";
+            } else {
+                inlineFallbackRow.style.display = "none";
+            }
+
+            if (counterTracker) {
+                counterTracker.textContent = matchedCount;
+            }
         });
-
     });
-
 </script>

@@ -1,156 +1,125 @@
-﻿@model IEnumerable<VeltriQ.Models.HR.Branch>
+﻿
+@model IEnumerable<VeltriQ.Models.HR.Branch>
 
 @{
     ViewData["Title"] = "Branches";
 }
 
 <style>
-
     .branch-page {
         width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
-    /* ─────────────────────────────────────
-           PAGE HEADER
-        ───────────────────────────────────── */
-
+    /* ── HEADER (Optimized & Pushed Up) ── */
     .branch-header {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
-        margin-bottom: 22px;
-        gap: 20px;
+        margin-bottom: 12px;
+        gap: 12px;
     }
 
-    .branch-header-left h2 {
-        font-size: 22px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 4px;
-        line-height: 1;
-        letter-spacing: -.4px;
-    }
-
-    .branch-header-left p {
-        font-size: 14px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    /* BUTTON */
-
+    /* ── COMPACT ADD BUTTON ── */
     .branch-add-btn {
-        height: 42px;
-        padding: 0 18px;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
         border: none;
-        border-radius: 12px;
-        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
         color: #fff;
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         text-decoration: none;
-        box-shadow: 0 8px 22px rgba(124,58,237,.22);
         transition: .2s ease;
-        flex-shrink: 0;
     }
 
         .branch-add-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             color: #fff;
         }
 
-    /* ─────────────────────────────────────
-           CARD
-        ───────────────────────────────────── */
-
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
     .branch-card {
-        background: rgba(30,35,44,.92);
-        border: 1px solid rgba(255,255,255,.06);
-        border-radius: 18px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
     }
-
-    /* CARD TOP */
 
     .branch-card-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 18px 20px;
-        border-bottom: 1px solid rgba(255,255,255,.05);
-        gap: 16px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
     }
 
     .branch-card-title h3 {
-        font-size: 17px;
+        font-size: 15px;
         font-weight: 700;
-        color: #fff;
-        margin-bottom: 3px;
-    }
-
-    .branch-card-title p {
-        font-size: 13px;
-        color: #94a3b8;
+        color: var(--text-primary);
         margin: 0;
     }
 
-    /* SEARCH */
-
-    .branch-search {
-        width: 280px;
-        position: relative;
-        flex-shrink: 0;
+    .branch-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
     }
 
-        .branch-search input {
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .branch-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .branch-search-wrapper input {
             width: 100%;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid #2a3441;
-            background: #0d1117;
-            padding: 0 14px 0 40px;
-            color: #fff;
-            font-size: 13px;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
             outline: none;
-            transition: .2s ease;
+            transition: border-color 0.2s;
         }
 
-            .branch-search input:focus {
-                border-color: #7c3aed;
+            .branch-search-wrapper input:focus {
+                border-color: var(--purple);
             }
 
-            .branch-search input::placeholder {
-                color: #6b7280;
-            }
-
-        .branch-search i {
+        .branch-search-wrapper i {
             position: absolute;
-            left: 14px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #6b7280;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 13px;
         }
 
-    /* ─────────────────────────────────────
-           TABLE
-        ───────────────────────────────────── */
-
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
     .table-wrapper {
-        width: 100%;
+        overflow-y: auto;
         overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
         .table-wrapper::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: #2a3441;
-            border-radius: 20px;
+            display: none;
         }
 
     .branch-table {
@@ -158,104 +127,88 @@
         border-collapse: collapse;
     }
 
-        .branch-table thead tr {
-            border-bottom: 1px solid rgba(255,255,255,.05);
-        }
-
         .branch-table th {
             text-align: left;
-            padding: 0 20px 14px;
+            padding: 10px 16px;
             font-size: 10px;
             font-weight: 700;
-            color: #94a3b8;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: .5px;
             white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .branch-table td {
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255,255,255,.04);
-            color: #fff;
-            font-size: 13px;
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
             vertical-align: middle;
         }
 
         .branch-table tbody tr {
-            transition: .2s ease;
+            transition: background-color .1s ease;
         }
 
             .branch-table tbody tr:hover {
-                background: rgba(255,255,255,.02);
+                background: var(--hover-bg);
             }
 
-    /* BRANCH INFO */
-
-    .branch-name {
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 2px;
-    }
-
-    .branch-code {
-        font-size: 11px;
-        color: #6b7280;
-    }
-
-    /* STATUS */
-
+    /* ── HIGH-DENSITY COMPACT BADGES ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 28px;
-        padding: 0 12px;
-        border-radius: 30px;
-        font-size: 11px;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
         font-weight: 700;
     }
 
     .status-active {
-        background: rgba(34,197,94,.14);
+        background: rgba(34, 197, 94, .12);
         color: #22c55e;
     }
 
     .status-inactive {
-        background: rgba(239,68,68,.14);
+        background: rgba(239, 68, 68, .12);
         color: #ef4444;
     }
 
-    /* ACTIONS */
-
+    /* ── INLINE ACTIONS (RIGHT ALIGNED) ── */
     .table-actions {
         display: flex;
-        align-items: center;
-        gap: 8px;
+        gap: 4px;
+        justify-content: flex-end;
     }
 
     .action-btn {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
         border: none;
-        border-radius: 10px;
-        background: rgba(124,58,237,.12);
-        color: #7c3aed;
+        background: var(--hover-bg);
+        color: var(--text-primary);
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        transition: .2s ease;
-        text-decoration: none;
         font-size: 12px;
+        text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
     }
 
         .action-btn:hover {
-            background: #7c3aed;
+            background: var(--purple);
             color: #fff;
         }
 
         .action-btn.delete-btn {
-            background: rgba(239,68,68,.12);
             color: #ef4444;
         }
 
@@ -264,259 +217,187 @@
                 color: #fff;
             }
 
-    /* EMPTY */
-
     .empty-state {
-        padding: 60px 20px;
+        padding: 40px 20px;
         text-align: center;
     }
 
         .empty-state i {
-            font-size: 48px;
-            color: #374151;
-            margin-bottom: 14px;
+            font-size: 36px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: block;
         }
 
         .empty-state h4 {
-            color: #fff;
-            font-size: 18px;
-            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
         .empty-state p {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 14px;
         }
-
-    /* RESPONSIVE */
-
-    @@media(max-width: 992px) {
-
-        .branch-header,
-        .branch-card-top {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .branch-search {
-            width: 100%;
-        }
-    }
-
 </style>
 
 <div class="branch-page">
 
-    <!-- HEADER -->
-
     <div class="branch-header">
-
-        <div class="branch-header-left">
-
-            <h2>Branches</h2>
-
-            <p>
-                Manage organization branches and office locations.
-            </p>
-
-        </div>
-
-        <a href="/Branch/Create"
-           class="branch-add-btn">
-
-            <i class="bi bi-plus-lg"></i>
-
-            <span>Add Branch</span>
-
+        <a href="/Branch/Create" class="branch-add-btn">
+            <i class="bi bi-plus-lg"></i> Add Branch
         </a>
-
     </div>
-
-    <!-- CARD -->
 
     <div class="branch-card">
 
-        <!-- TOP -->
-
         <div class="branch-card-top">
-
             <div class="branch-card-title">
-
                 <h3>Branch Directory</h3>
-
-                <p>
-                    Total Branches:
-                    @Model.Count()
-                </p>
-
+                <p>Total Records: <span id="branchCounter">@Model.Count()</span></p>
             </div>
 
-            <!-- SEARCH -->
-
-            <div class="branch-search">
-
+            <div class="branch-search-wrapper">
                 <i class="bi bi-search"></i>
-
-                <input type="text"
-                       placeholder="Search branches..." />
-
+                <input type="text" id="branchSearchInput" placeholder="Search branches..." autocomplete="off" />
             </div>
-
         </div>
 
-        <!-- TABLE -->
         @if (Model.Any())
         {
             <div class="table-wrapper">
-
-                <table class="branch-table">
-
+                <table class="branch-table" id="branchTableMatrix">
                     <thead>
-
                         <tr>
-
                             <th>Branch</th>
+                            <th>Branch Code</th>
                             <th>Company</th>
                             <th>Email</th>
                             <th>Phone</th>
                             <th>City</th>
                             <th>Status</th>
-                            <th>Actions</th>
-
+                            <th class="text-end">Actions</th>
                         </tr>
-
                     </thead>
-
                     <tbody>
-
                         @foreach (var item in Model)
                         {
                             <tr>
-
-                                <!-- BRANCH -->
-
-                                <td>
-
-                                    <div class="branch-name">
-                                        @item.BranchName
-                                    </div>
-
-                                    <div class="branch-code">
+                                <td data-search="name" style="font-weight: 600;">
+                                    @item.BranchName
+                                </td>
+                                <td data-search="code">
+                                    <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">
                                         @item.BranchCode
-                                    </div>
-
+                                    </span>
                                 </td>
-
-                                <!-- COMPANY -->
-
-                                <td>
-                                    @item.Company?.CompanyName
+                                <td data-search="company">
+                                    @(item.Company?.CompanyName ?? "-")
                                 </td>
-
-                                <!-- EMAIL -->
-
-                                <td>
-                                    @item.Email
+                                <td data-search="email">
+                                    @(string.IsNullOrWhiteSpace(item.Email) ? "-" : item.Email)
                                 </td>
-
-                                <!-- PHONE -->
-
-                                <td>
-                                    @item.PhoneNumber
+                                <td data-search="phone">
+                                    @(string.IsNullOrWhiteSpace(item.PhoneNumber) ? "-" : item.PhoneNumber)
                                 </td>
-
-                                <!-- CITY -->
-
-                                <td>
-                                    @item.City
+                                <td data-search="city">
+                                    @(string.IsNullOrWhiteSpace(item.City) ? "-" : item.City)
                                 </td>
-
-                                <!-- STATUS -->
-
                                 <td>
-
                                     @if (item.IsActive)
                                     {
-                                        <span class="status-badge status-active">
-                                            Active
-                                        </span>
+                                        <span class="status-badge status-active">Active</span>
                                     }
                                     else
                                     {
-                                        <span class="status-badge status-inactive">
-                                            Inactive
-                                        </span>
+                                        <span class="status-badge status-inactive">Inactive</span>
                                     }
-
                                 </td>
-
-                                <!-- ACTIONS -->
-
                                 <td>
-
                                     <div class="table-actions">
-
-                                        <a href="#"
-                                           class="action-btn">
-
+                                        <a href="/Branch/Details/@item.BranchId" class="action-btn" title="View Details">
                                             <i class="bi bi-eye"></i>
-
                                         </a>
-
-                                        <a href="#"
-                                           class="action-btn">
-
+                                        <a href="/Branch/Edit/@item.BranchId" class="action-btn" title="Edit Properties">
                                             <i class="bi bi-pencil"></i>
-
                                         </a>
-
-                                        <a href="#"
-                                           class="action-btn delete-btn">
-
+                                        <a href="/Branch/Delete/@item.BranchId" class="action-btn delete-btn" title="Delete Entry" onclick="return confirm('Are you sure?')">
                                             <i class="bi bi-trash"></i>
-
                                         </a>
-
                                     </div>
-
                                 </td>
-
                             </tr>
                         }
-
+                        <tr id="emptyMatrixFallback" style="display: none;">
+                            <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No matching records found.
+                            </td>
+                        </tr>
                     </tbody>
-
                 </table>
-
             </div>
         }
         else
         {
-            <!-- EMPTY -->
-
             <div class="empty-state">
-
                 <i class="bi bi-building"></i>
-
                 <h4>No Branches Found</h4>
-
-                <p>
-                    Start by creating your first organization branch.
-                </p>
-
-                <a href="/Branch/Create"
-                   class="branch-add-btn">
-
-                    <i class="bi bi-plus-lg"></i>
-
-                    <span>Create Branch</span>
-
+                <p>Start by creating your first organization branch workspace registry node.</p>
+                <a href="/Branch/Create" class="branch-add-btn" style="box-shadow: none;">
+                    <i class="bi bi-plus-lg"></i> Create Branch
                 </a>
-
             </div>
         }
-
     </div>
-
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("branchSearchInput");
+        const matrixGrid = document.getElementById("branchTableMatrix");
+        const counterTracker = document.getElementById("branchCounter");
+
+        if (!searchInput || !matrixGrid) return;
+
+        const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
+        const inlineFallbackRow = document.getElementById("emptyMatrixFallback");
+
+        searchInput.addEventListener("input", function () {
+            const criteria = this.value.trim().toLowerCase();
+            let matchedCount = 0;
+
+            dataRows.forEach(row => {
+                const nameText = row.querySelector('[data-search="name"]')?.textContent.toLowerCase() || "";
+                const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
+                const companyText = row.querySelector('[data-search="company"]')?.textContent.toLowerCase() || "";
+                const emailText = row.querySelector('[data-search="email"]')?.textContent.toLowerCase() || "";
+                const phoneText = row.querySelector('[data-search="phone"]')?.textContent.toLowerCase() || "";
+                const cityText = row.querySelector('[data-search="city"]')?.textContent.toLowerCase() || "";
+
+                const compoundSourceText = `${nameText} ${codeText} ${companyText} ${emailText} ${phoneText} ${cityText}`;
+
+                if (compoundSourceText.includes(criteria)) {
+                    row.style.display = "";
+                    matchedCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            if (inlineFallbackRow) {
+                if (matchedCount === 0 && dataRows.length > 0) {
+                    inlineFallbackRow.style.display = "";
+                } else {
+                    inlineFallbackRow.style.display = "none";
+                }
+            }
+
+            if (counterTracker) {
+                counterTracker.textContent = matchedCount;
+            }
+        });
+    });
+</script>
+
