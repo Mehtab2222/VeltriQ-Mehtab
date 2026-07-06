@@ -1,0 +1,624 @@
+﻿@{
+    ViewData["Title"] = "Leave";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .leave-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .leave-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    /* ── COMPACT ADD BUTTON ── */
+    .leave-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+        cursor: pointer;
+    }
+
+        .leave-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .leave-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .leave-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .leave-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .leave-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .leave-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .leave-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .leave-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .leave-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .leave-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .leave-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .leave-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .leave-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .leave-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── HIGH-DENSITY COMPACT BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: rgba(34, 197, 94, .12);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, .12);
+        color: #f87171;
+    }
+
+    /* ── INLINE ACTIONS (RIGHT ALIGNED) ── */
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .action-btn.delete-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.delete-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+    /* ── MODAL SYSTEM ── */
+    .custom-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+        .custom-modal.active {
+            display: flex;
+        }
+
+    .custom-modal-box {
+        width: 100%;
+        max-width: 760px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+        animation: modalShow .2s ease;
+    }
+
+    @@keyframes modalShow {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-header-custom {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+        .modal-header-custom h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .modal-header-custom p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+    .close-modal-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 4px;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-body-custom {
+        padding: 20px;
+    }
+
+    .modal-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+    .custom-input {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+        .custom-input:focus {
+            border-color: var(--purple);
+        }
+
+    .modal-footer-custom {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .cancel-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-primary);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .save-btn {
+        height: 34px;
+        padding: 0 16px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-weight: 600;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    @@media(max-width:768px) {
+        .modal-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="leave-page">
+
+    <div class="leave-header">
+        <button class="leave-add-btn" onclick="openLeaveModal()">
+            <i class="bi bi-plus-lg"></i> Add New Leave
+        </button>
+    </div>
+
+    <div class="leave-card">
+
+        <div class="leave-card-top">
+            <div class="leave-card-title">
+                <h3>Leave Type Directory</h3>
+                <p>Total Leave Types: <span id="leaveCounter">3</span></p>
+            </div>
+
+            <div class="leave-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="leaveSearchInput" placeholder="Search leave type..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="leave-table" id="leaveTableMatrix">
+                <thead>
+                    <tr>
+                        <th>Leave Name</th>
+                        <th>Leave ID</th>
+                        <th>Created By</th>
+                        <th>Created On</th>
+                        <th>Updated By</th>
+                        <th>Updated On</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-search="name" style="font-weight: 600;">Annual Leave</td>
+                        <td data-search="id">
+                            <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">LV001</span>
+                        </td>
+                        <td>Admin</td>
+                        <td>12 Jan 2025</td>
+                        <td>HR Manager</td>
+                        <td>05 Feb 2025</td>
+                        <td>
+                            <span class="status-badge status-active">Active</span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="action-btn" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="action-btn" title="Edit Properties">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="action-btn delete-btn" title="Delete Entry">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-search="name" style="font-weight: 600;">Sick Leave</td>
+                        <td data-search="id">
+                            <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">LV002</span>
+                        </td>
+                        <td>Admin</td>
+                        <td>14 Jan 2025</td>
+                        <td>HR Manager</td>
+                        <td>01 Mar 2025</td>
+                        <td>
+                            <span class="status-badge status-active">Active</span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="action-btn" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="action-btn" title="Edit Properties">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="action-btn delete-btn" title="Delete Entry">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-search="name" style="font-weight: 600;">Maternity Leave</td>
+                        <td data-search="id">
+                            <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">LV003</span>
+                        </td>
+                        <td>System</td>
+                        <td>22 Jan 2025</td>
+                        <td>Admin</td>
+                        <td>11 Apr 2025</td>
+                        <td>
+                            <span class="status-badge status-inactive">Inactive</span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="action-btn" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="action-btn" title="Edit Properties">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="action-btn delete-btn" title="Delete Entry">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr id="emptyMatrixFallback" style="display: none;">
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            No matching records found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ADD / EDIT LEAVE MODAL -->
+<div class="custom-modal" id="leaveModal">
+    <div class="custom-modal-box">
+        <div class="modal-header-custom">
+            <div>
+                <h3 id="modalTitle">Add Leave Type</h3>
+                <p>Create and manage leave configurations.</p>
+            </div>
+            <button class="close-modal-btn" onclick="closeLeaveModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body-custom">
+            <div class="modal-grid">
+                <div class="form-group">
+                    <label>Leave Name</label>
+                    <input type="text" class="custom-input" placeholder="Enter leave name" />
+                </div>
+                <div class="form-group">
+                    <label>Leave Code</label>
+                    <input type="text" class="custom-input" placeholder="Ex : AL" />
+                </div>
+                <div class="form-group">
+                    <label>No Of Days</label>
+                    <input type="number" class="custom-input" placeholder="Enter number of days" />
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="custom-input">
+                        <option>Active</option>
+                        <option>Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Gender Applicability</label>
+                    <select class="custom-input">
+                        <option>All</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Carry Forward</label>
+                    <select class="custom-input">
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Encashment Allowed</label>
+                    <select class="custom-input">
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Half Day Allowed</label>
+                    <select class="custom-input">
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer-custom">
+            <button class="cancel-btn" onclick="closeLeaveModal()">Cancel</button>
+            <button class="save-btn">
+                <i class="bi bi-check2-circle"></i> Save Leave Type
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openLeaveModal() {
+        document.getElementById('leaveModal').classList.add('active');
+    }
+
+    function closeLeaveModal() {
+        document.getElementById('leaveModal').classList.remove('active');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("leaveSearchInput");
+        const matrixGrid = document.getElementById("leaveTableMatrix");
+        const counterTracker = document.getElementById("leaveCounter");
+
+        if (!searchInput || !matrixGrid) return;
+
+        const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
+        const inlineFallbackRow = document.getElementById("emptyMatrixFallback");
+
+        searchInput.addEventListener("input", function () {
+            const criteria = this.value.trim().toLowerCase();
+            let matchedCount = 0;
+
+            dataRows.forEach(row => {
+                const nameText = row.querySelector('[data-search="name"]')?.textContent.toLowerCase() || "";
+                const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
+
+                const compoundSourceText = `${nameText} ${codeText}`;
+
+                if (compoundSourceText.includes(criteria)) {
+                    row.style.display = "";
+                    matchedCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            if (inlineFallbackRow) {
+                if (matchedCount === 0 && dataRows.length > 0) {
+                    inlineFallbackRow.style.display = "";
+                } else {
+                    inlineFallbackRow.style.display = "none";
+                }
+            }
+
+            if (counterTracker) {
+                counterTracker.textContent = matchedCount;
+            }
+        });
+    });
+</script>

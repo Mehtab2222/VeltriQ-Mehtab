@@ -84,5 +84,16 @@ namespace VeltriQ.Models.HR
         public string? UserId { get; set; }
         public virtual ApplicationUser? User { get; set; }
         public bool IsSuspended { get; set; }
+        public virtual ICollection<EmployeeAddress> Addresses { get; set; }
+    = new List<EmployeeAddress>();
+
+        public virtual ICollection<EmployeeEmergencyContact> EmergencyContacts { get; set; }
+            = new List<EmployeeEmergencyContact>();
+
+        public virtual ICollection<EmployeeDependent> Dependents { get; set; }
+            = new List<EmployeeDependent>();
+
+        public virtual ICollection<EmployeeQualification> Qualifications { get; set; }
+            = new List<EmployeeQualification>();
     }
 }
