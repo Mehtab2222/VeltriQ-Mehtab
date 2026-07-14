@@ -3,7 +3,7 @@
     public class ConvertToEmployeeListItemViewModel
     {
         public int EmployeeOnboardingId { get; set; }
-
+        public int? EmployeeId { get; set; }
         public int OnboardingCandidateId { get; set; }
 
         public string CandidateCode { get; set; } = "";

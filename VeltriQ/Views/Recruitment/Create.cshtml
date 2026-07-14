@@ -246,27 +246,76 @@
                 </div>
 
                 <div class="form-grid-row">
+
                     <div class="form-grid-col-4 form-field-group">
-                        <label asp-for="DepartmentId" class="custom-form-label">Department<span>*</span></label>
-                        <select asp-for="DepartmentId" asp-items="Model.DepartmentList" class="custom-form-control">
+                        <label asp-for="BranchId" class="custom-form-label">
+                            Branch<span>*</span>
+                        </label>
+
+                        <select asp-for="BranchId"
+                                asp-items="Model.BranchList"
+                                class="custom-form-control">
+
+                            <option value="">Select Branch</option>
+
+                        </select>
+
+                        <span asp-validation-for="BranchId"
+                              class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="DepartmentId" class="custom-form-label">
+                            Department<span>*</span>
+                        </label>
+
+                        <select asp-for="DepartmentId"
+                                asp-items="Model.DepartmentList"
+                                class="custom-form-control">
+
                             <option value="">Select Department</option>
+
                         </select>
-                        <span asp-validation-for="DepartmentId" class="validation-err-text"></span>
+
+                        <span asp-validation-for="DepartmentId"
+                              class="validation-err-text"></span>
                     </div>
 
                     <div class="form-grid-col-4 form-field-group">
-                        <label asp-for="DesignationId" class="custom-form-label">Designation<span>*</span></label>
-                        <select asp-for="DesignationId" asp-items="Model.DesignationList" class="custom-form-control">
+                        <label asp-for="DesignationId" class="custom-form-label">
+                            Designation<span>*</span>
+                        </label>
+
+                        <select asp-for="DesignationId"
+                                asp-items="Model.DesignationList"
+                                class="custom-form-control">
+
                             <option value="">Select Designation</option>
+
                         </select>
-                        <span asp-validation-for="DesignationId" class="validation-err-text"></span>
+
+                        <span asp-validation-for="DesignationId"
+                              class="validation-err-text"></span>
                     </div>
 
+                </div>
+
+                <div class="form-grid-row">
+
                     <div class="form-grid-col-4 form-field-group">
-                        <label asp-for="RequiredJoiningDate" class="custom-form-label">Required Joining Date<span>*</span></label>
-                        <input asp-for="RequiredJoiningDate" type="date" class="custom-form-control" />
-                        <span asp-validation-for="RequiredJoiningDate" class="validation-err-text"></span>
+                        <label asp-for="RequiredJoiningDate"
+                               class="custom-form-label">
+                            Required Joining Date<span>*</span>
+                        </label>
+
+                        <input asp-for="RequiredJoiningDate"
+                               type="date"
+                               class="custom-form-control" />
+
+                        <span asp-validation-for="RequiredJoiningDate"
+                              class="validation-err-text"></span>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -434,6 +483,81 @@
                 $("#employeeDropdown").val("");
             }
         }
+                $(document).ready(function () {
+
+            //-------------------------------------------------------
+            // BRANCH CHANGED
+            //-------------------------------------------------------
+
+                   $("#BranchId").change(function () {
+
+            var branchId = $(this).val();
+
+            // Clear Department
+            $("#DepartmentId").html('<option value="">Select Department</option>');
+
+            // Clear Designation
+            $("#DesignationId").html('<option value="">Select Designation</option>');
+
+            if (branchId == "")
+                return;
+
+            $.get("/Recruitment/GetDepartments",
+                { branchId: branchId },
+                function (data) {
+
+                    $.each(data, function (i, item) {
+
+                        $("#DepartmentId").append(
+                            $("<option></option>")
+                                .val(item.id)
+                                .text(item.text)
+                        );
+
+                    });
+
+                });
+
+        });
+            //-------------------------------------------------------
+            // DEPARTMENT CHANGED
+            //-------------------------------------------------------
+
+            $("#DepartmentId").change(function () {
+
+                var departmentId = $(this).val();
+
+                $("#DesignationId").empty();
+
+                $("#DesignationId").append(
+                    '<option value="">Select Designation</option>'
+                );
+
+                if (departmentId == "")
+                    return;
+
+                $.get('/Recruitment/GetDesignations',
+                    { departmentId: departmentId },
+
+                    function (data) {
+
+                        $.each(data, function (i, item) {
+
+                            $("#DesignationId").append(
+
+                                $('<option></option>')
+                                    .val(item.id)
+                                    .text(item.text)
+
+                            );
+
+                        });
+
+                    });
+
+            });
+
+        });
     </script>
 }
 

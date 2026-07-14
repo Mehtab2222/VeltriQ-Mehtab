@@ -14,6 +14,9 @@ namespace VeltriQ.ViewModels
 
         public int DepartmentId { get; set; }
 
+        public int BranchId { get; set; }
+
+        public int? DivisionId { get; set; }
         public int DesignationId { get; set; }
 
         public int? ReplacementEmployeeId { get; set; }
@@ -50,6 +53,9 @@ namespace VeltriQ.ViewModels
 
         public IEnumerable<SelectListItem> HODList { get; set; }
 
+        public IEnumerable<SelectListItem> BranchList { get; set; }
+
+        public IEnumerable<SelectListItem> DivisionList { get; set; }
         public IEnumerable<SelectListItem> DepartmentList { get; set; }
 
         public IEnumerable<SelectListItem> DesignationList { get; set; }

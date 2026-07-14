@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using VeltriQ.Models.HR;
 
 namespace VeltriQ.Models.Recruitment
 {
@@ -16,7 +17,10 @@ namespace VeltriQ.Models.Recruitment
         public int RecruitmentTypeId { get; set; }
 
         public int? HODId { get; set; }
+        public int BranchId { get; set; }
 
+        [ForeignKey(nameof(BranchId))]
+        public virtual Branch? Branch { get; set; }
         public int DepartmentId { get; set; }
 
         public int DesignationId { get; set; }

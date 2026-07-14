@@ -78,21 +78,12 @@ namespace VeltriQ.Data
         public DbSet<OnboardingPolicyCategoryMaster> OnboardingPolicyCategoryMasters { get; set; }
         public DbSet<OnboardingActivityCategoryMaster> OnboardingActivityCategoryMasters { get; set; }
 
-        public DbSet<OnboardingEmployeePersonal> OnboardingEmployeePersonals { get; set; }
-        public DbSet<OnboardingEmployeeAddress> OnboardingEmployeeAddresses { get; set; }
-        public DbSet<OnboardingEmployeeEmergencyContact> OnboardingEmployeeEmergencyContacts { get; set; }
         public DbSet<QualificationTypeMaster> QualificationTypeMasters { get; set; }
 
         public DbSet<QualificationMaster> QualificationMasters { get; set; }
         public DbSet<QualificationSpecializationMaster> QualificationSpecializationMasters { get; set; }
-        public DbSet<OnboardingEmployeeQualification> OnboardingEmployeeQualifications { get; set; }
         public DbSet<IdentityDocumentMaster> IdentityDocumentMasters { get; set; }
 
-        public DbSet<OnboardingEmployeeIdentity> OnboardingEmployeeIdentities { get; set; }
-        public DbSet<OnboardingEmployeeBank> OnboardingEmployeeBanks { get; set; }
-        public DbSet<OnboardingEmployeeDocument> OnboardingEmployeeDocuments { get; set; }
-        public DbSet<OnboardingEmployeePolicyAcceptance> OnboardingEmployeePolicyAcceptances { get; set; }
-        public DbSet<OnboardingEmployeeActivity> OnboardingEmployeeActivities { get; set; }
         public DbSet<OnboardingTemplateSection> OnboardingTemplateSections { get; set; }
         public DbSet<EmployeeOnboarding> EmployeeOnboardings { get; set; }
         public DbSet<OnboardingCandidate> OnboardingCandidates { get; set; }
@@ -241,24 +232,13 @@ namespace VeltriQ.Data
     .WithMany()
     .HasForeignKey(x => x.OnboardingCandidateId)
     .OnDelete(DeleteBehavior.NoAction);
-            modelBuilder.Entity<OnboardingEmployeeActivity>()
-    .ToTable("OnboardingEmployeeActivity", "HR");
-            modelBuilder.Entity<OnboardingEmployeePolicyAcceptance>()
-    .ToTable("OnboardingEmployeePolicyAcceptance", "HR");
-            modelBuilder.Entity<OnboardingEmployeeDocument>()
-    .ToTable("OnboardingEmployeeDocument", "HR");
-            modelBuilder.Entity<OnboardingEmployeeBank>()
-    .ToTable("OnboardingEmployeeBank", "HR");
-            modelBuilder.Entity<OnboardingEmployeeQualification>()
-    .ToTable("OnboardingEmployeeQualification", "HR");
+           
             modelBuilder.Entity<QualificationTypeMaster>()
     .ToTable("QualificationTypeMaster", "HR");
 
             modelBuilder.Entity<IdentityDocumentMaster>()
     .ToTable("IdentityDocumentMaster", "HR");
 
-            modelBuilder.Entity<OnboardingEmployeeIdentity>()
-                .ToTable("OnboardingEmployeeIdentity", "HR");
             modelBuilder.Entity<IdentityDocumentMaster>()
     .HasData(IdentityDocumentSeedData.GetData());
 
@@ -273,12 +253,6 @@ namespace VeltriQ.Data
             modelBuilder.Entity<QualificationMaster>()
                 .HasData(QualificationSeedData.GetData());
 
-            modelBuilder.Entity<OnboardingEmployeeEmergencyContact>()
-    .ToTable("OnboardingEmployeeEmergencyContact", "HR");
-            modelBuilder.Entity<OnboardingEmployeeAddress>()
-    .ToTable("OnboardingEmployeeAddress", "HR");
-            modelBuilder.Entity<OnboardingEmployeePersonal>()
-    .ToTable("OnboardingEmployeePersonal", "HR");
             modelBuilder.Entity<OnboardingTemplate>()
     .ToTable("OnboardingTemplate", "HR");
 

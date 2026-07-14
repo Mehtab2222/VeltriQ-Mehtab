@@ -46,7 +46,12 @@ namespace VeltriQ.Models.HR.Onboarding
         public string? Remarks { get; set; }
 
         public bool IsActive { get; set; } = true;
+        public bool IsConverted { get; set; } = false;
 
+        public int? EmployeeId { get; set; }
+
+        [StringLength(450)]
+        public string? ConvertedBy { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
 
         [StringLength(450)]

@@ -22,7 +22,10 @@ namespace VeltriQ.Models.HR.Onboarding
 
         [StringLength(15)]
         public string? MobileNumber { get; set; }
+        public int? BranchId { get; set; }
 
+        [ForeignKey(nameof(BranchId))]
+        public virtual Branch? Branch { get; set; }
         public int DepartmentId { get; set; }
 
         [ForeignKey(nameof(DepartmentId))]

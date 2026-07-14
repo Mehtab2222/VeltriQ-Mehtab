@@ -34,50 +34,88 @@ namespace VeltriQ.Controllers
 
             return View(requests);
         }
-        public async Task<IActionResult> Create()
+        private async Task LoadDropdowns(
+            ManpowerRequestViewModel vm,
+            int? selectedBranchId = null,
+            int? selectedDepartmentId = null)
         {
-            ManpowerRequestViewModel vm = new();
-
-            vm.RequestDate = DateTime.Now;
+            //====================================================
+            // RECRUITMENT TYPES
+            //====================================================
 
             vm.RecruitmentTypes = new List<SelectListItem>
-                {
-                    new SelectListItem
-                    {
-                        Value = "1",
-                        Text = "New"
-                    },
+    {
+        new() { Value = "1", Text = "New" },
+        new() { Value = "2", Text = "Resignation" },
+        new() { Value = "3", Text = "Termination" }
+    };
 
-                    new SelectListItem
-                    {
-                        Value = "2",
-                        Text = "Resignation"
-                    },
+            //====================================================
+            // BRANCH
+            //====================================================
 
-                    new SelectListItem
-                    {
-                        Value = "3",
-                        Text = "Termination"
-                    }
-                };
-
-            vm.DepartmentList = await _context.Departments
+            vm.BranchList = await _context.Branches
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.BranchName)
                 .Select(x => new SelectListItem
                 {
-                    Value = x.DepartmentId.ToString(),
-                    Text = x.DepartmentName
+                    Value = x.BranchId.ToString(),
+                    Text = x.BranchName
                 })
                 .ToListAsync();
 
-            vm.DesignationList = await _context.Designations
-                .Select(x => new SelectListItem
-                {
-                    Value = x.DesignationId.ToString(),
-                    Text = x.DesignationName
-                })
-                .ToListAsync();
+            //====================================================
+            // DEPARTMENT
+            //====================================================
+
+            if (selectedBranchId.HasValue)
+            {
+                vm.DepartmentList = await _context.Departments
+                    .Where(x =>
+                        x.IsActive &&
+                        x.BranchId == selectedBranchId.Value)
+                    .OrderBy(x => x.DepartmentName)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.DepartmentId.ToString(),
+                        Text = x.DepartmentName
+                    })
+                    .ToListAsync();
+            }
+            else
+            {
+                vm.DepartmentList = new List<SelectListItem>();
+            }
+
+            //====================================================
+            // DESIGNATION
+            //====================================================
+
+            if (selectedDepartmentId.HasValue)
+            {
+                vm.DesignationList = await _context.Designations
+                    .Where(x =>
+                        x.IsActive &&
+                        x.DepartmentId == selectedDepartmentId.Value)
+                    .OrderBy(x => x.DesignationName)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.DesignationId.ToString(),
+                        Text = x.DesignationName
+                    })
+                    .ToListAsync();
+            }
+            else
+            {
+                vm.DesignationList = new List<SelectListItem>();
+            }
+
+            //====================================================
+            // NATIONALITY
+            //====================================================
 
             vm.NationalityList = await _context.Nationalities
+                .OrderBy(x => x.NationalityName)
                 .Select(x => new SelectListItem
                 {
                     Value = x.NationalityId.ToString(),
@@ -85,16 +123,34 @@ namespace VeltriQ.Controllers
                 })
                 .ToListAsync();
 
+            // TODO:
+            // Education
+            // Priority
+            // Employee List
+        }
+        public async Task<IActionResult> Create()
+        {
+            ManpowerRequestViewModel vm = new();
+
+            vm.RequestDate = DateTime.Now;
+
+            await LoadDropdowns(vm);
+
             return View(vm);
         }
         [HttpPost]
         public async Task<IActionResult> Create
-(
-    ManpowerRequestViewModel vm
-)
+            (
+                ManpowerRequestViewModel vm
+            )
         {
             if (!ModelState.IsValid)
             {
+                await LoadDropdowns(
+                    vm,
+                    vm.BranchId,
+                    vm.DepartmentId);
+
                 return View(vm);
             }
 
@@ -120,6 +176,7 @@ namespace VeltriQ.Controllers
                 RecruitmentTypeId = vm.RecruitmentTypeId,
 
                 HODId = vm.HODId,
+                BranchId = vm.BranchId,
 
                 DepartmentId = vm.DepartmentId,
 
@@ -190,56 +247,111 @@ namespace VeltriQ.Controllers
 
             return RedirectToAction("Index");
         }
+        [HttpGet]
+        public async Task<IActionResult> GetDepartments(int branchId)
+        {
+            var departments = await _context.Departments
+
+                .Where(x =>
+                    x.IsActive &&
+                    x.BranchId == branchId)
+
+                .OrderBy(x => x.DepartmentName)
+
+                .Select(x => new
+                {
+                    id = x.DepartmentId,
+                    text = x.DepartmentName
+                })
+
+                .ToListAsync();
+
+            return Json(departments);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetDesignations(int departmentId)
+        {
+            var designations = await _context.Designations
+
+                .Where(x =>
+                    x.IsActive &&
+                    x.DepartmentId == departmentId)
+
+                .OrderBy(x => x.DesignationName)
+
+                .Select(x => new
+                {
+                    id = x.DesignationId,
+                    text = x.DesignationName
+                })
+
+                .ToListAsync();
+
+            return Json(designations);
+        }
         // 1. GET: ManpowerRequest/Edit/5
         // GET: Recruitment/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var request = await _context.ManpowerRequests.FindAsync(id);
-            if (request == null) return NotFound();
 
-            var viewModel = new ManpowerRequestViewModel
+            if (request == null)
+                return NotFound();
+
+            var vm = new ManpowerRequestViewModel
             {
                 ManpowerRequestId = request.ManpowerRequestId,
+
                 RequestDate = request.RequestDate,
+
                 RecruitmentTypeId = request.RecruitmentTypeId,
-                NumberOfPositions = request.NumberOfPositions,
+
+                HODId = request.HODId,
+
+                BranchId = request.BranchId,
+
                 DepartmentId = request.DepartmentId,
+
                 DesignationId = request.DesignationId,
-                RequiredJoiningDate = request.RequiredJoiningDate,
+
                 ReplacementEmployeeId = request.ReplacementEmployeeId,
-                Remarks = request.Remarks,
+
+                NumberOfPositions = request.NumberOfPositions,
+
+                RequiredJoiningDate = request.RequiredJoiningDate,
+
                 MinExperience = request.MinExperience,
+
                 MaxExperience = request.MaxExperience,
+
                 MinAge = request.MinAge,
+
                 MaxAge = request.MaxAge,
+
                 EducationId = request.EducationId,
+
                 NationalityId = request.NationalityId,
-                PriorityId = request.PriorityId,
+
                 MinSalary = request.MinSalary,
+
                 MaxSalary = request.MaxSalary,
-                RequiredSkills = request.RequiredSkills,
+
+                PriorityId = request.PriorityId,
+
                 JobDescription = request.JobDescription,
 
-                // POPULATING DROPDOWNS:
-                RecruitmentTypes = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "1", Text = "New" },
-            new SelectListItem { Value = "2", Text = "Resignation" },
-            new SelectListItem { Value = "3", Text = "Termination" }
-        },
-                DepartmentList = await _context.Departments
-                    .Select(x => new SelectListItem { Value = x.DepartmentId.ToString(), Text = x.DepartmentName })
-                    .ToListAsync(),
-                DesignationList = await _context.Designations
-                    .Select(x => new SelectListItem { Value = x.DesignationId.ToString(), Text = x.DesignationName })
-                    .ToListAsync(),
-                NationalityList = await _context.Nationalities
-                    .Select(x => new SelectListItem { Value = x.NationalityId.ToString(), Text = x.NationalityName })
-                    .ToListAsync()
+                RequiredSkills = request.RequiredSkills,
+
+                Remarks = request.Remarks
             };
 
-            return View(viewModel);
+            await LoadDropdowns(
+                vm,
+                request.BranchId,
+                request.DepartmentId);
+
+            return View(vm);
         }
 
         // POST: Recruitment/Edit/5
@@ -247,53 +359,77 @@ namespace VeltriQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ManpowerRequestViewModel viewModel)
         {
-            if (id != viewModel.ManpowerRequestId) return BadRequest();
+            if (id != viewModel.ManpowerRequestId)
+                return BadRequest();
 
             if (ModelState.IsValid)
             {
                 var request = await _context.ManpowerRequests.FindAsync(id);
-                if (request == null) return NotFound();
+
+                if (request == null)
+                    return NotFound();
 
                 request.RequestDate = viewModel.RequestDate;
+
                 request.RecruitmentTypeId = viewModel.RecruitmentTypeId;
-                request.NumberOfPositions = viewModel.NumberOfPositions;
+
+                request.HODId = viewModel.HODId;
+
+                request.BranchId = viewModel.BranchId;
+
                 request.DepartmentId = viewModel.DepartmentId;
+
                 request.DesignationId = viewModel.DesignationId;
-                request.RequiredJoiningDate = viewModel.RequiredJoiningDate;
+
                 request.ReplacementEmployeeId = viewModel.ReplacementEmployeeId;
-                request.Remarks = viewModel.Remarks;
+
+                request.NumberOfPositions = viewModel.NumberOfPositions;
+
+                request.RequiredJoiningDate = viewModel.RequiredJoiningDate;
+
                 request.MinExperience = viewModel.MinExperience;
+
                 request.MaxExperience = viewModel.MaxExperience;
+
                 request.MinAge = viewModel.MinAge;
+
                 request.MaxAge = viewModel.MaxAge;
+
                 request.EducationId = viewModel.EducationId;
+
                 request.NationalityId = viewModel.NationalityId;
-                request.PriorityId = viewModel.PriorityId;
+
                 request.MinSalary = viewModel.MinSalary;
+
                 request.MaxSalary = viewModel.MaxSalary;
-                request.RequiredSkills = viewModel.RequiredSkills;
+
+                request.PriorityId = viewModel.PriorityId;
+
                 request.JobDescription = viewModel.JobDescription;
 
-                request.ModifiedBy = Convert.ToInt32(HttpContext.Session.GetString("EmployeeId"));
+                request.RequiredSkills = viewModel.RequiredSkills;
+
+                request.Remarks = viewModel.Remarks;
+
+                request.ModifiedBy =
+                    Convert.ToInt32(HttpContext.Session.GetString("EmployeeId"));
+
                 request.ModifiedDate = DateTime.Now;
 
                 _context.Update(request);
+
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Recruitment request updated successfully.";
+                TempData["Success"] =
+                    "Recruitment request updated successfully.";
+
                 return RedirectToAction(nameof(Index));
             }
 
-            // Re-populate dropdown packages here if validation fails so the screen doesn't break
-            viewModel.RecruitmentTypes = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "1", Text = "New" },
-        new SelectListItem { Value = "2", Text = "Resignation" },
-        new SelectListItem { Value = "3", Text = "Termination" }
-    };
-            viewModel.DepartmentList = await _context.Departments.Select(x => new SelectListItem { Value = x.DepartmentId.ToString(), Text = x.DepartmentName }).ToListAsync();
-            viewModel.DesignationList = await _context.Designations.Select(x => new SelectListItem { Value = x.DesignationId.ToString(), Text = x.DesignationName }).ToListAsync();
-            viewModel.NationalityList = await _context.Nationalities.Select(x => new SelectListItem { Value = x.NationalityId.ToString(), Text = x.NationalityName }).ToListAsync();
+            await LoadDropdowns(
+                viewModel,
+                viewModel.BranchId,
+                viewModel.DepartmentId);
 
             return View(viewModel);
         }
