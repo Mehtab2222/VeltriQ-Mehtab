@@ -1,0 +1,557 @@
+﻿
+@model VeltriQ.ViewModels.AssetAllocation.AssetAllocationCreateViewModel
+
+@{
+    ViewData["Title"] = "Allocate Assets";
+}
+
+<style>
+    .allocate-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* ── TOP BAR DECK ── */
+    .allocate-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .btn-cancel-theme {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    /* ── RIGID STRUCTURAL CARD ── */
+    .allocate-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .allocate-card-top {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .allocate-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .allocate-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── GRID FILTERS INPUT DECK ── */
+    .deck-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 16px;
+        align-items: flex-end;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.01);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .form-group-deck {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group-deck label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .select-deck-input {
+        width: 100%;
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12.5px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .select-deck-input:focus {
+            border-color: var(--purple);
+        }
+
+    .btn-deck-add {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: none;
+        background: var(--purple);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.15s ease-in-out;
+    }
+
+        .btn-deck-add:hover {
+            opacity: 0.9;
+        }
+
+    /* ── HIGH DENSITY GRID MATRIX ── */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .matrix-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .matrix-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--hover-bg);
+        }
+
+        .matrix-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .matrix-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* ── COMPACT STAGE BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-category {
+        background: rgba(124, 58, 237, 0.12);
+        color: var(--purple);
+    }
+
+    /* ── REMOVE TRASH BUTTON ── */
+    .btn-remove-row {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: #ef4444;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.15s ease-in-out;
+    }
+
+        .btn-remove-row:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+    /* ── SUBMISSION FOOTER BAR ── */
+    .panel-footer-deck {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.01);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-submit-allocation {
+        height: 36px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: transform 0.2s ease;
+    }
+
+        .btn-submit-allocation:hover {
+            transform: translateY(-1px);
+        }
+</style>
+
+<div class="allocate-container">
+
+    <div class="allocate-header">
+        <a asp-action="Index" class="btn-cancel-theme">
+            <i class="bi bi-arrow-left"></i> Back to Directory
+        </a>
+    </div>
+    <div asp-validation-summary="ModelOnly" style="color: #ef4444; font-size: 13px; font-weight: 600; padding: 12px 16px; background: rgba(239,68,68,0.05); border-bottom: 1px solid var(--border); display: @(ViewData.ModelState.IsValid ? "none" : "block");"></div>
+    <form asp-action="Create" method="post" id="allocationSubmitForm">
+        @Html.AntiForgeryToken()
+
+        <div class="allocate-card">
+
+            <div class="allocate-card-top">
+                <div class="allocate-card-title">
+                    <h3>New Asset Allocation</h3>
+                    <p>Assign corporate assets to active organization staff.</p>
+                </div>
+            </div>
+
+            <div class="deck-form-row">
+                <div class="form-group-deck">
+                    <label>Employee Target</label>
+                    <select id="ddlEmployee" class="select-deck-input" asp-items="Model.Employees"></select>
+                </div>
+
+                <div class="form-group-deck">
+                    <label>Asset Master Reference</label>
+                    <select id="ddlAsset" class="select-deck-input" asp-items="Model.Assets"></select>
+                </div>
+
+                <div class="form-group-deck">
+                    <button type="button" id="btnAddAllocation" class="btn-deck-add">
+                        <i class="bi bi-plus-lg"></i> Add Row
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="matrix-table" id="gridMatrixTable">
+                    <thead>
+                        <tr>
+                            <th>Employee Code</th>
+                            <th>Employee Name</th>
+                            <th>Asset Code</th>
+                            <th>Asset Name</th>
+                            <th>Category</th>
+                            <th style="width: 70px; text-align: center;">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gridMatrixBody">
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                var item = Model.Items[i];
+                                var rowKey = $"{item.EmployeeId}_{item.AssetMasterId}";
+                                <tr id="matrix_row_@rowKey" data-key="@rowKey">
+                                    <input type="hidden" name="Items[@i].EmployeeId" value="@item.EmployeeId" />
+                                    <input type="hidden" name="Items[@i].EmployeeCode" value="@item.EmployeeCode" />
+                                    <input type="hidden" name="Items[@i].EmployeeName" value="@item.EmployeeName" />
+                                    <input type="hidden" name="Items[@i].AssetMasterId" value="@item.AssetMasterId" />
+                                    <input type="hidden" name="Items[@i].AssetCode" value="@item.AssetCode" />
+                                    <input type="hidden" name="Items[@i].AssetName" value="@item.AssetName" />
+                                    <td style="font-weight: 700; color: var(--text-primary);">@item.EmployeeCode</td>
+                                    <td style="font-weight: 600;">@item.EmployeeName</td>
+                                    <td style="font-weight: 600; color: var(--text-secondary);">@item.AssetCode</td>
+                                    <td>@item.AssetName</td>
+                                    <td><span class="status-badge badge-category">Allocating</span></td>
+                                    <td style="text-align: center;">
+                                        <button type="button" class="btn-remove-row" data-key="@rowKey">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr id="rowPlaceholderEmpty">
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                    No temporary staging transactions allocated yet.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel-footer-deck">
+                <button type="submit" class="btn-submit-allocation">
+                    <i class="bi bi-check-circle"></i> Save Allocation
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btnAdd = document.getElementById("btnAddAllocation");
+        const formSubmit = document.getElementById("allocationSubmitForm");
+        const ddlEmployee = document.getElementById("ddlEmployee");
+        const ddlAsset = document.getElementById("ddlAsset");
+        const gridBody = document.getElementById("gridMatrixBody");
+        const emptyPlaceholder = document.getElementById("rowPlaceholderEmpty");
+
+            let structuredMapCache = [];
+
+    // Seed cache + wire remove buttons for rows rendered server-side (e.g. after a failed save)
+    document.querySelectorAll("#gridMatrixBody tr[data-key]").forEach(function (row) {
+        const rowKey = row.getAttribute("data-key");
+        structuredMapCache.push(rowKey);
+
+        row.querySelector(".btn-remove-row").addEventListener("click", function () {
+            document.getElementById(`matrix_row_${rowKey}`).remove();
+            structuredMapCache = structuredMapCache.filter(item => item !== rowKey);
+
+            const totalRemainingRows = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
+            if (totalRemainingRows === 0 && emptyPlaceholder) {
+                emptyPlaceholder.style.display = "";
+            }
+
+            reindexFormSubmitModelNames();
+        });
+    });
+
+        btnAdd.addEventListener("click", async function () {
+            const empId = ddlEmployee.value;
+            const assetId = ddlAsset.value;
+
+            // Validation 1: Check Employee Dropdown
+            if (!empId) {
+                alert("Please select an employee.");
+                ddlEmployee.focus();
+                return;
+            }
+
+            // Validation 2: Check Asset Dropdown
+            if (!assetId) {
+                alert("Please select an asset.");
+                ddlAsset.focus();
+                return;
+            }
+
+            // Validation 3: Check Grid Cache Duplicates
+            const matrixKey = `${empId}_${assetId}`;
+            if (structuredMapCache.includes(matrixKey)) {
+                alert("This employee already has this asset in the allocation list.");
+                return;
+            }
+
+            btnAdd.disabled = true;
+
+            try {
+                // Validation 4: Async Database Check Pipeline Route
+                const verificationUrl = `/AssetAllocation/VerifyExistingAllocation?employeeId=${empId}&assetMasterId=${assetId}`;
+                const checkResponse = await fetch(verificationUrl, { method: 'GET' });
+
+                if (!checkResponse.ok) {
+                    throw new Error("Server response break.");
+                }
+
+                const resultData = await checkResponse.json();
+
+                if (resultData.alreadyAllocated) {
+                    alert("This asset has already been allocated to the selected employee.");
+                    btnAdd.disabled = false;
+                    return;
+                }
+
+                // Parse out values text strings safely
+                const empText = ddlEmployee.options[ddlEmployee.selectedIndex].text;
+                const assetText = ddlAsset.options[ddlAsset.selectedIndex].text;
+
+                // Deconstruct texts using exact hyphen breaks safely
+                let empCode = "", empName = "";
+                if (empText.includes(" - ")) {
+                    empCode = empText.substring(0, empText.indexOf(" - ")).trim();
+                    empName = empText.substring(empText.indexOf(" - ") + 3).trim();
+                } else {
+                    empCode = "EMP";
+                    empName = empText;
+                }
+
+                let assetCode = "", assetName = "";
+                if (assetText.includes(" - ")) {
+                    assetCode = assetText.substring(0, assetText.indexOf(" - ")).trim();
+                    assetName = assetText.substring(assetText.indexOf(" - ") + 3).trim();
+                } else {
+                    assetCode = "AST";
+                    assetName = assetText;
+                }
+
+                if (emptyPlaceholder && emptyPlaceholder.style.display !== "none") {
+                    emptyPlaceholder.style.display = "none";
+                }
+
+                const nextRowIndex = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
+
+                const rowElement = document.createElement("tr");
+                rowElement.id = `matrix_row_${matrixKey}`;
+                rowElement.innerHTML = `
+                    <input type="hidden" name="Items[${nextRowIndex}].EmployeeId" value="${empId}" />
+                    <input type="hidden" name="Items[${nextRowIndex}].EmployeeCode" value="${empCode}" />
+                    <input type="hidden" name="Items[${nextRowIndex}].EmployeeName" value="${empName}" />
+                    <input type="hidden" name="Items[${nextRowIndex}].AssetMasterId" value="${assetId}" />
+                    <input type="hidden" name="Items[${nextRowIndex}].AssetCode" value="${assetCode}" />
+                    <input type="hidden" name="Items[${nextRowIndex}].AssetName" value="${assetName}" />
+
+                    <td style="font-weight: 700; color: var(--text-primary);">${empCode}</td>
+                    <td style="font-weight: 600;">${empName}</td>
+                    <td style="font-weight: 600; color: var(--text-secondary);">${assetCode}</td>
+                    <td>${assetName}</td>
+                    <td><span class="status-badge badge-category">Allocating</span></td>
+                    <td style="text-align: center;">
+                        <button type="button" class="btn-remove-row" data-key="${matrixKey}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+
+                gridBody.appendChild(rowElement);
+                structuredMapCache.push(matrixKey);
+
+                // Row Remove Event
+                rowElement.querySelector(".btn-remove-row").addEventListener("click", function () {
+                    const rowKey = this.getAttribute("data-key");
+                    document.getElementById(`matrix_row_${rowKey}`).remove();
+
+                    structuredMapCache = structuredMapCache.filter(item => item !== rowKey);
+
+                    const totalRemainingRows = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
+                    if (totalRemainingRows === 0 && emptyPlaceholder) {
+                        emptyPlaceholder.style.display = "";
+                    }
+
+                    reindexFormSubmitModelNames();
+                });
+
+                // Clear single asset input for swift loops
+                ddlAsset.value = "";
+
+            } catch (err) {
+                console.error(err);
+                alert("Background verification endpoint returned an error or is unmapped. Row added locally for workflow bypass.");
+
+                // Fallback: Continue processing row locally if verification fails to prevent blocking HR completely
+                appendRowLocallyFallback(empId, assetId, matrixKey);
+            } finally {
+                btnAdd.disabled = false;
+            }
+        });
+
+        function appendRowLocallyFallback(empId, assetId, matrixKey) {
+            const empText = ddlEmployee.options[ddlEmployee.selectedIndex].text;
+            const assetText = ddlAsset.options[ddlAsset.selectedIndex].text;
+            const empCode = empText.includes(" - ") ? empText.split(" - ")[0].trim() : "EMP";
+            const empName = empText.includes(" - ") ? empText.split(" - ")[1].trim() : empText;
+            const assetCode = assetText.includes(" - ") ? assetText.split(" - ")[0].trim() : "AST";
+            const assetName = assetText.includes(" - ") ? assetText.split(" - ")[1].trim() : assetText;
+
+            if (emptyPlaceholder) emptyPlaceholder.style.display = "none";
+
+            const nextRowIndex = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
+            const rowElement = document.createElement("tr");
+            rowElement.id = `matrix_row_${matrixKey}`;
+            rowElement.innerHTML = `
+                <input type="hidden" name="Items[${nextRowIndex}].EmployeeId" value="${empId}" />
+                <input type="hidden" name="Items[${nextRowIndex}].EmployeeCode" value="${empCode}" />
+                <input type="hidden" name="Items[${nextRowIndex}].EmployeeName" value="${empName}" />
+                <input type="hidden" name="Items[${nextRowIndex}].AssetMasterId" value="${assetId}" />
+                <input type="hidden" name="Items[${nextRowIndex}].AssetCode" value="${assetCode}" />
+                <input type="hidden" name="Items[${nextRowIndex}].AssetName" value="${assetName}" />
+                <td style="font-weight: 700; color: var(--text-primary);">${empCode}</td>
+                <td style="font-weight: 600;">${empName}</td>
+                <td style="font-weight: 600; color: var(--text-secondary);">${assetCode}</td>
+                <td>${assetName}</td>
+                <td><span class="status-badge badge-category">Allocating</span></td>
+                <td style="text-align: center;">
+                    <button type="button" class="btn-remove-row" data-key="${matrixKey}"><i class="bi bi-trash"></i></button>
+                </td>
+            `;
+            gridBody.appendChild(rowElement);
+            if (!structuredMapCache.includes(matrixKey)) structuredMapCache.push(matrixKey);
+
+            rowElement.querySelector(".btn-remove-row").addEventListener("click", function () {
+                document.getElementById(`matrix_row_${matrixKey}`).remove();
+                structuredMapCache = structuredMapCache.filter(item => item !== matrixKey);
+                if (gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length === 0 && emptyPlaceholder) emptyPlaceholder.style.display = "";
+                reindexFormSubmitModelNames();
+            });
+            ddlAsset.value = "";
+        }
+
+        // Validation 5: Block Empty Transactions
+        formSubmit.addEventListener("submit", function (e) {
+            const actualItemsCount = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
+            if (actualItemsCount === 0) {
+                e.preventDefault();
+                alert("Please add at least one asset allocation.");
+            }
+        });
+
+        function reindexFormSubmitModelNames() {
+            const currentRows = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)");
+            currentRows.forEach((row, rowIndex) => {
+                const targets = row.querySelectorAll("input[type='hidden']");
+                targets.forEach(input => {
+                    const currentNameAttr = input.getAttribute("name");
+                    const propertyTargetSignature = currentNameAttr.substring(currentNameAttr.indexOf("].") + 2);
+                    input.setAttribute("name", `Items[${rowIndex}].${propertyTargetSignature}`);
+                });
+            });
+        }
+    });
+</script>
