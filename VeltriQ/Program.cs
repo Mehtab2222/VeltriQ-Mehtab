@@ -14,23 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDbContext<MasterDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("MasterConnection")));
-//builder.Services.AddDbContext<TenantDbContext>
-//(
-//    (serviceProvider, options) =>
-//    {
-//        var tenantService =
-//            serviceProvider
-//                .GetRequiredService<ITenantService>();
 
-//        var tenant =
-//            tenantService.GetCurrentTenant();
-
-//        options.UseSqlServer
-//        (
-//            tenant.ConnectionString
-//        );
-//    }
-//);
 builder.Services.AddDbContext<TenantDbContext>
 (
     (serviceProvider, options) =>

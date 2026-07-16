@@ -5,553 +5,566 @@
     ViewData["Title"] = "Allocate Assets";
 }
 
-<style>
-    .allocate-container {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    /* ── TOP BAR DECK ── */
-    .allocate-header {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        margin-bottom: 4px;
-    }
-
-    .btn-cancel-theme {
-        height: 34px;
-        padding: 0 14px;
-        border-radius: 6px;
-        border: 1px solid var(--border);
-        background: var(--hover-bg);
-        color: var(--text-primary);
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        text-decoration: none;
-        transition: .15s ease-in-out;
-    }
-
-        .btn-cancel-theme:hover {
-            background: rgba(124, 58, 237, 0.15);
-            color: var(--purple);
-        }
-
-    /* ── RIGID STRUCTURAL CARD ── */
-    .allocate-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 0px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .allocate-card-top {
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .allocate-card-title h3 {
-        font-size: 15px;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-    .allocate-card-title p {
-        font-size: 11px;
-        color: var(--text-secondary);
-        margin: 2px 0 0 0;
-    }
-
-    /* ── GRID FILTERS INPUT DECK ── */
-    .deck-form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr auto;
-        gap: 16px;
-        align-items: flex-end;
-        padding: 16px;
-        background: rgba(255, 255, 255, 0.01);
-        border-bottom: 1px solid var(--border);
-    }
-
-    .form-group-deck {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-        .form-group-deck label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-    .select-deck-input {
-        width: 100%;
-        height: 34px;
-        border-radius: 6px;
-        border: 1px solid var(--border);
-        background: var(--input-bg);
-        color: var(--text-primary);
-        padding: 0 10px;
-        font-size: 12.5px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-        .select-deck-input:focus {
-            border-color: var(--purple);
-        }
-
-    .btn-deck-add {
-        height: 34px;
-        padding: 0 16px;
-        border-radius: 6px;
-        border: none;
-        background: var(--purple);
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: opacity 0.15s ease-in-out;
-    }
-
-        .btn-deck-add:hover {
-            opacity: 0.9;
-        }
-
-    /* ── HIGH DENSITY GRID MATRIX ── */
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    .matrix-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-        .matrix-table th {
-            text-align: left;
-            padding: 10px 16px;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            white-space: nowrap;
-            border-bottom: 1px solid var(--border);
-            background: var(--hover-bg);
-        }
-
-        .matrix-table td {
-            padding: 8px 16px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-primary);
-            font-size: 12.5px;
-            vertical-align: middle;
-        }
-
-        .matrix-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-    /* ── COMPACT STAGE BADGES ── */
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 20px;
-        padding: 0 8px;
-        border-radius: 4px;
-        font-size: 10.5px;
-        font-weight: 700;
-        white-space: nowrap;
-    }
-
-    .badge-category {
-        background: rgba(124, 58, 237, 0.12);
-        color: var(--purple);
-    }
-
-    /* ── REMOVE TRASH BUTTON ── */
-    .btn-remove-row {
-        width: 28px;
-        height: 28px;
-        border-radius: 4px;
-        border: none;
-        background: var(--hover-bg);
-        color: #ef4444;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 13px;
-        transition: all 0.15s ease-in-out;
-    }
-
-        .btn-remove-row:hover {
-            background: #ef4444;
-            color: #fff;
-        }
-
-    /* ── SUBMISSION FOOTER BAR ── */
-    .panel-footer-deck {
-        padding: 16px;
-        border-top: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.01);
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .btn-submit-allocation {
-        height: 36px;
-        padding: 0 20px;
-        border-radius: 6px;
-        border: none;
-        background: linear-gradient(135deg, #6d28d9, #7c3aed);
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: transform 0.2s ease;
-    }
-
-        .btn-submit-allocation:hover {
-            transform: translateY(-1px);
-        }
-</style>
-
-<div class="allocate-container">
-
-    <div class="allocate-header">
-        <a asp-action="Index" class="btn-cancel-theme">
-            <i class="bi bi-arrow-left"></i> Back to Directory
-        </a>
-    </div>
-    <div asp-validation-summary="ModelOnly" style="color: #ef4444; font-size: 13px; font-weight: 600; padding: 12px 16px; background: rgba(239,68,68,0.05); border-bottom: 1px solid var(--border); display: @(ViewData.ModelState.IsValid ? "none" : "block");"></div>
-    <form asp-action="Create" method="post" id="allocationSubmitForm">
-        @Html.AntiForgeryToken()
-
-        <div class="allocate-card">
-
-            <div class="allocate-card-top">
-                <div class="allocate-card-title">
-                    <h3>New Asset Allocation</h3>
-                    <p>Assign corporate assets to active organization staff.</p>
-                </div>
-            </div>
-
-            <div class="deck-form-row">
-                <div class="form-group-deck">
-                    <label>Employee Target</label>
-                    <select id="ddlEmployee" class="select-deck-input" asp-items="Model.Employees"></select>
-                </div>
-
-                <div class="form-group-deck">
-                    <label>Asset Master Reference</label>
-                    <select id="ddlAsset" class="select-deck-input" asp-items="Model.Assets"></select>
-                </div>
-
-                <div class="form-group-deck">
-                    <button type="button" id="btnAddAllocation" class="btn-deck-add">
-                        <i class="bi bi-plus-lg"></i> Add Row
-                    </button>
-                </div>
-            </div>
-
-            <div class="table-wrapper">
-                <table class="matrix-table" id="gridMatrixTable">
-                    <thead>
-                        <tr>
-                            <th>Employee Code</th>
-                            <th>Employee Name</th>
-                            <th>Asset Code</th>
-                            <th>Asset Name</th>
-                            <th>Category</th>
-                            <th style="width: 70px; text-align: center;">Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody id="gridMatrixBody">
-                        @if (Model.Items != null && Model.Items.Any())
-                        {
-                            for (int i = 0; i < Model.Items.Count; i++)
-                            {
-                                var item = Model.Items[i];
-                                var rowKey = $"{item.EmployeeId}_{item.AssetMasterId}";
-                                <tr id="matrix_row_@rowKey" data-key="@rowKey">
-                                    <input type="hidden" name="Items[@i].EmployeeId" value="@item.EmployeeId" />
-                                    <input type="hidden" name="Items[@i].EmployeeCode" value="@item.EmployeeCode" />
-                                    <input type="hidden" name="Items[@i].EmployeeName" value="@item.EmployeeName" />
-                                    <input type="hidden" name="Items[@i].AssetMasterId" value="@item.AssetMasterId" />
-                                    <input type="hidden" name="Items[@i].AssetCode" value="@item.AssetCode" />
-                                    <input type="hidden" name="Items[@i].AssetName" value="@item.AssetName" />
-                                    <td style="font-weight: 700; color: var(--text-primary);">@item.EmployeeCode</td>
-                                    <td style="font-weight: 600;">@item.EmployeeName</td>
-                                    <td style="font-weight: 600; color: var(--text-secondary);">@item.AssetCode</td>
-                                    <td>@item.AssetName</td>
-                                    <td><span class="status-badge badge-category">Allocating</span></td>
-                                    <td style="text-align: center;">
-                                        <button type="button" class="btn-remove-row" data-key="@rowKey">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr id="rowPlaceholderEmpty">
-                                <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                                    No temporary staging transactions allocated yet.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="panel-footer-deck">
-                <button type="submit" class="btn-submit-allocation">
-                    <i class="bi bi-check-circle"></i> Save Allocation
-                </button>
-            </div>
-
-        </div>
-    </form>
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const btnAdd = document.getElementById("btnAddAllocation");
-        const formSubmit = document.getElementById("allocationSubmitForm");
-        const ddlEmployee = document.getElementById("ddlEmployee");
-        const ddlAsset = document.getElementById("ddlAsset");
-        const gridBody = document.getElementById("gridMatrixBody");
-        const emptyPlaceholder = document.getElementById("rowPlaceholderEmpty");
-
-            let structuredMapCache = [];
-
-    // Seed cache + wire remove buttons for rows rendered server-side (e.g. after a failed save)
-    document.querySelectorAll("#gridMatrixBody tr[data-key]").forEach(function (row) {
-        const rowKey = row.getAttribute("data-key");
-        structuredMapCache.push(rowKey);
-
-        row.querySelector(".btn-remove-row").addEventListener("click", function () {
-            document.getElementById(`matrix_row_${rowKey}`).remove();
-            structuredMapCache = structuredMapCache.filter(item => item !== rowKey);
-
-            const totalRemainingRows = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
-            if (totalRemainingRows === 0 && emptyPlaceholder) {
-                emptyPlaceholder.style.display = "";
-            }
-
-            reindexFormSubmitModelNames();
-        });
-    });
-
-        btnAdd.addEventListener("click", async function () {
-            const empId = ddlEmployee.value;
-            const assetId = ddlAsset.value;
-
-            // Validation 1: Check Employee Dropdown
-            if (!empId) {
-                alert("Please select an employee.");
-                ddlEmployee.focus();
-                return;
-            }
-
-            // Validation 2: Check Asset Dropdown
-            if (!assetId) {
-                alert("Please select an asset.");
-                ddlAsset.focus();
-                return;
-            }
-
-            // Validation 3: Check Grid Cache Duplicates
-            const matrixKey = `${empId}_${assetId}`;
-            if (structuredMapCache.includes(matrixKey)) {
-                alert("This employee already has this asset in the allocation list.");
-                return;
-            }
-
-            btnAdd.disabled = true;
-
-            try {
-                // Validation 4: Async Database Check Pipeline Route
-                const verificationUrl = `/AssetAllocation/VerifyExistingAllocation?employeeId=${empId}&assetMasterId=${assetId}`;
-                const checkResponse = await fetch(verificationUrl, { method: 'GET' });
-
-                if (!checkResponse.ok) {
-                    throw new Error("Server response break.");
+            <style>
+                .allocate-container {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
                 }
 
-                const resultData = await checkResponse.json();
-
-                if (resultData.alreadyAllocated) {
-                    alert("This asset has already been allocated to the selected employee.");
-                    btnAdd.disabled = false;
-                    return;
+                /* ── TOP ACTION BAR DECK ── */
+                .allocate-header {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    margin-bottom: 4px;
                 }
 
-                // Parse out values text strings safely
-                const empText = ddlEmployee.options[ddlEmployee.selectedIndex].text;
-                const assetText = ddlAsset.options[ddlAsset.selectedIndex].text;
-
-                // Deconstruct texts using exact hyphen breaks safely
-                let empCode = "", empName = "";
-                if (empText.includes(" - ")) {
-                    empCode = empText.substring(0, empText.indexOf(" - ")).trim();
-                    empName = empText.substring(empText.indexOf(" - ") + 3).trim();
-                } else {
-                    empCode = "EMP";
-                    empName = empText;
+                .btn-cancel-theme {
+                    height: 34px;
+                    padding: 0 14px;
+                    border-radius: 6px;
+                    border: 1px solid var(--border);
+                    background: var(--hover-bg);
+                    color: var(--text-primary);
+                    font-size: 12px;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    text-decoration: none;
+                    transition: .15s ease-in-out;
                 }
 
-                let assetCode = "", assetName = "";
-                if (assetText.includes(" - ")) {
-                    assetCode = assetText.substring(0, assetText.indexOf(" - ")).trim();
-                    assetName = assetText.substring(assetText.indexOf(" - ") + 3).trim();
-                } else {
-                    assetCode = "AST";
-                    assetName = assetText;
-                }
-
-                if (emptyPlaceholder && emptyPlaceholder.style.display !== "none") {
-                    emptyPlaceholder.style.display = "none";
-                }
-
-                const nextRowIndex = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
-
-                const rowElement = document.createElement("tr");
-                rowElement.id = `matrix_row_${matrixKey}`;
-                rowElement.innerHTML = `
-                    <input type="hidden" name="Items[${nextRowIndex}].EmployeeId" value="${empId}" />
-                    <input type="hidden" name="Items[${nextRowIndex}].EmployeeCode" value="${empCode}" />
-                    <input type="hidden" name="Items[${nextRowIndex}].EmployeeName" value="${empName}" />
-                    <input type="hidden" name="Items[${nextRowIndex}].AssetMasterId" value="${assetId}" />
-                    <input type="hidden" name="Items[${nextRowIndex}].AssetCode" value="${assetCode}" />
-                    <input type="hidden" name="Items[${nextRowIndex}].AssetName" value="${assetName}" />
-
-                    <td style="font-weight: 700; color: var(--text-primary);">${empCode}</td>
-                    <td style="font-weight: 600;">${empName}</td>
-                    <td style="font-weight: 600; color: var(--text-secondary);">${assetCode}</td>
-                    <td>${assetName}</td>
-                    <td><span class="status-badge badge-category">Allocating</span></td>
-                    <td style="text-align: center;">
-                        <button type="button" class="btn-remove-row" data-key="${matrixKey}">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-
-                gridBody.appendChild(rowElement);
-                structuredMapCache.push(matrixKey);
-
-                // Row Remove Event
-                rowElement.querySelector(".btn-remove-row").addEventListener("click", function () {
-                    const rowKey = this.getAttribute("data-key");
-                    document.getElementById(`matrix_row_${rowKey}`).remove();
-
-                    structuredMapCache = structuredMapCache.filter(item => item !== rowKey);
-
-                    const totalRemainingRows = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
-                    if (totalRemainingRows === 0 && emptyPlaceholder) {
-                        emptyPlaceholder.style.display = "";
+                    .btn-cancel-theme:hover {
+                        background: rgba(124, 58, 237, 0.15);
+                        color: var(--purple);
                     }
 
-                    reindexFormSubmitModelNames();
+                /* ── RIGID CORE CONTEXT CARD ── */
+                .allocate-card {
+                    background: var(--card-bg);
+                    border: 1px solid var(--border);
+                    border-radius: 0px;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .allocate-card-top {
+                    padding: 12px 16px;
+                    border-bottom: 1px solid var(--border);
+                }
+
+                .allocate-card-title h3 {
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: var(--text-primary);
+                    margin: 0;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                }
+
+                .allocate-card-title p {
+                    font-size: 11px;
+                    color: var(--text-secondary);
+                    margin: 2px 0 0 0;
+                }
+
+                /* ── COMPACT WORKSPACE DROPDOWNS DECK ── */
+                .deck-form-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr auto;
+                    gap: 16px;
+                    align-items: flex-end;
+                    padding: 16px;
+                    background: rgba(255, 255, 255, 0.01);
+                    border-bottom: 1px solid var(--border);
+                }
+
+                .form-group-deck {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                }
+
+                    .form-group-deck label {
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: var(--text-secondary);
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+
+                .select-deck-input {
+                    width: 100%;
+                    height: 34px;
+                    border-radius: 6px;
+                    border: 1px solid var(--border);
+                    background: var(--input-bg);
+                    color: var(--text-primary);
+                    padding: 0 10px;
+                    font-size: 12.5px;
+                    outline: none;
+                    transition: border-color 0.2s;
+                }
+
+                    .select-deck-input:focus {
+                        border-color: var(--purple);
+                    }
+
+                .btn-deck-add {
+                    height: 34px;
+                    padding: 0 16px;
+                    border-radius: 6px;
+                    border: none;
+                    background: var(--purple);
+                    color: #fff;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: opacity 0.15s ease-in-out;
+                }
+
+                    .btn-deck-add:hover {
+                        opacity: 0.9;
+                    }
+
+                /* ── HIGH DENSITY CONCISE TABLE GRID ── */
+                .table-wrapper {
+                    overflow-x: auto;
+                }
+
+                .matrix-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                    .matrix-table th {
+                        text-align: left;
+                        padding: 10px 16px;
+                        font-size: 10px;
+                        font-weight: 700;
+                        color: var(--text-secondary);
+                        text-transform: uppercase;
+                        letter-spacing: .5px;
+                        white-space: nowrap;
+                        border-bottom: 1px solid var(--border);
+                        background: var(--hover-bg);
+                    }
+
+                    .matrix-table td {
+                        padding: 8px 16px;
+                        border-bottom: 1px solid var(--border);
+                        color: var(--text-primary);
+                        font-size: 12.5px;
+                        vertical-align: middle;
+                    }
+
+                    .matrix-table tbody tr:last-child td {
+                        border-bottom: none;
+                    }
+
+                /* ── MICRO ALLOCATION STATE BADGES ── */
+                .status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 20px;
+                    padding: 0 8px;
+                    border-radius: 4px;
+                    font-size: 10.5px;
+                    font-weight: 700;
+                    white-space: nowrap;
+                }
+
+                .badge-category {
+                    background: rgba(124, 58, 237, 0.12);
+                    color: var(--purple);
+                }
+
+                /* ── COMPACT DELETE ROW BUTTON ── */
+                .btn-remove-row {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 4px;
+                    border: none;
+                    background: var(--hover-bg);
+                    color: #ef4444;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    font-size: 13px;
+                    transition: all 0.15s ease-in-out;
+                }
+
+                    .btn-remove-row:hover {
+                        background: #ef4444;
+                        color: #fff;
+                    }
+
+                /* ── FOOTER TOOLBAR ACTION CONTAINER ── */
+                .panel-footer-deck {
+                    padding: 16px;
+                    border-top: 1px solid var(--border);
+                    background: rgba(255, 255, 255, 0.01);
+                    display: flex;
+                    justify-content: flex-end;
+                }
+
+                .btn-submit-allocation {
+                    height: 36px;
+                    padding: 0 20px;
+                    border-radius: 6px;
+                    border: none;
+                    background: linear-gradient(135deg, #6d28d9, #7c3aed);
+                    color: #fff;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: transform 0.2s ease;
+                }
+
+                    .btn-submit-allocation:hover {
+                        transform: translateY(-1px);
+                    }
+
+                /* ── ACCORDANT CUSTOM FRAMEWORK POPUP MODAL ── */
+                .vq-system-backdrop {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(0,0,0,0.65);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 3000;
+                }
+
+                .vq-system-modal {
+                    background: var(--card-bg);
+                    border: 1px solid var(--border);
+                    width: 400px;
+                    padding: 20px;
+                    border-radius: 0px; /* Rigid Squared Pattern */
+                    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 14px;
+                }
+
+                .vq-modal-icon {
+                    font-size: 38px;
+                }
+
+                .icon-success {
+                    color: #22c55e;
+                }
+
+                .icon-alert {
+                    color: #eab308;
+                }
+
+                .vq-system-modal h4 {
+                    margin: 0;
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: var(--text-primary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                }
+
+                .vq-system-modal p {
+                    margin: 0;
+                    font-size: 12.5px;
+                    color: var(--text-secondary);
+                    line-height: 1.4;
+                }
+            </style>
+
+            <div class="allocate-container">
+
+                <div class="allocate-header">
+                    <a asp-action="Index" class="btn-cancel-theme">
+                        <i class="bi bi-arrow-left"></i> Back to Directory
+                    </a>
+                </div>
+
+                <form id="allocationSubmitForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="allocate-card">
+
+                        <div class="allocate-card-top">
+                            <div class="allocate-card-title">
+                                <h3>New Asset Allocation</h3>
+                                <p>Assign corporate assets to active organization staff.</p>
+                            </div>
+                        </div>
+
+                        <div class="deck-form-row">
+                            <div class="form-group-deck">
+                                <label>Employee Target</label>
+                                <select id="ddlEmployee" class="select-deck-input">
+                                    <option value="">-- Select Employee --</option>
+                                    @foreach (var emp in ViewBag.EmployeesList)
+                                    {
+                                        <option value="@emp.EmployeeId" data-code="@emp.EmployeeCode" data-name="@(emp.FirstName + " " + emp.LastName)">
+                                            @emp.EmployeeCode - @emp.FirstName @emp.LastName
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="form-group-deck">
+                                <label>Asset Master Reference</label>
+                                <select id="ddlAsset" class="select-deck-input">
+                                    <option value="">-- Select Asset --</option>
+                                    @foreach (var asset in ViewBag.AssetsList)
+                                    {
+                                        <option value="@asset.AssetMasterId" data-code="@asset.AssetCode" data-name="@asset.AssetName" data-category="@asset.AssetCategory">
+                                            @asset.AssetCode - @asset.AssetName
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="form-group-deck">
+                                <button type="button" id="btnAddAllocation" class="btn-deck-add">
+                                    <i class="bi bi-plus-lg"></i> Add Row
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="matrix-table" id="gridMatrixTable">
+                                <thead>
+                                    <tr>
+                                        <th>Employee Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Asset Code</th>
+                                        <th>Asset Name</th>
+                                        <th>Category</th>
+                                        <th style="width: 70px; text-align: center;">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gridMatrixBody">
+                                    <tr id="rowPlaceholderEmpty">
+                                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                            No temporary staging transactions allocated yet.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="panel-footer-deck">
+                            <button type="button" id="btnSaveAll" class="btn-submit-allocation">
+                                <i class="bi bi-check-circle"></i> Save Allocation
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <div id="vqAlertModal" class="vq-system-backdrop" style="display: none;">
+                <div class="vq-system-modal">
+                    <div id="vqModalIconDeck" class="vq-modal-icon"><i class="bi bi-exclamation-triangle-fill icon-alert"></i></div>
+                    <h4 id="vqModalTitle">System Warning</h4>
+                    <p id="vqModalMessage">Alert diagnostic statement summary details log context placeholder.</p>
+                    <button type="button" class="form-action-btn" style="background: var(--purple); color:#fff; height:30px; padding:0 16px; border:none; font-size:12px; font-weight:600; cursor:pointer;" onclick="closeVqModal()">OK</button>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const btnAdd = document.getElementById("btnAddAllocation");
+                    const btnSaveAll = document.getElementById("btnSaveAll");
+                    const ddlEmployee = document.getElementById("ddlEmployee");
+                    const ddlAsset = document.getElementById("ddlAsset");
+                    const gridBody = document.getElementById("gridMatrixBody");
+                    const emptyPlaceholder = document.getElementById("rowPlaceholderEmpty");
+
+                    let structuredMapCache = [];
+
+                    // Global Alert Modal Dynamic Interceptor Hook
+                    window.showVqSystemAlert = function(title, message, isSuccess = false) {
+                        document.getElementById("vqModalTitle").innerText = title;
+                        document.getElementById("vqModalMessage").innerText = message;
+                        const iconContainer = document.getElementById("vqModalIconDeck");
+
+                        if (isSuccess) {
+                            iconContainer.innerHTML = '<i class="bi bi-check-circle-fill icon-success"></i>';
+                        } else {
+                            iconContainer.innerHTML = '<i class="bi bi-exclamation-triangle-fill icon-alert"></i>';
+                        }
+                        document.getElementById("vqAlertModal").style.display = "flex";
+                    };
+
+                    window.closeVqModal = function() {
+                        document.getElementById("vqAlertModal").style.display = "none";
+                    };
+
+                    btnAdd.addEventListener("click", async function () {
+                        const empOption = ddlEmployee.options[ddlEmployee.selectedIndex];
+                        const assetOption = ddlAsset.options[ddlAsset.selectedIndex];
+
+                        const empId = ddlEmployee.value;
+                        const assetId = ddlAsset.value;
+
+                        // Validation 1: Employee Select Assertion
+                        if (!empId) {
+                            showVqSystemAlert("Selection Missing", "Please select an employee parameter target before appending.");
+                            return;
+                        }
+
+                        // Validation 2: Asset Select Assertion
+                        if (!assetId) {
+                            showVqSystemAlert("Selection Missing", "Please select a template inventory asset master configuration.");
+                            return;
+                        }
+
+                        // Validation 3: Client-side Duplication Rule
+                        const matrixKey = `${empId}_${assetId}`;
+                        if (structuredMapCache.includes(matrixKey)) {
+                            showVqSystemAlert("Duplicate Assignment", "This employee already has this asset in the allocation list.");
+                            return;
+                        }
+
+                        btnAdd.disabled = true;
+
+                        try {
+                            // Validation 4: Async Database State Pipeline Assertion Check
+                            const verificationUrl = `/AssetAllocation/VerifyExistingAllocation?employeeId=${empId}&assetMasterId=${assetId}`;
+                            const checkResponse = await fetch(verificationUrl, { method: 'GET' });
+                            const resultData = await checkResponse.json();
+
+                            if (resultData.alreadyAllocated) {
+                                showVqSystemAlert("Allocation Collision", "This asset has already been allocated to the selected employee inside database registries.");
+                                btnAdd.disabled = false;
+                                return;
+                            }
+
+                            // Extracted HTML5 metadata tags safely via data sets
+                            const empCode = empOption.getAttribute("data-code");
+                            const empName = empOption.getAttribute("data-name");
+                            const assetCode = assetOption.getAttribute("data-code");
+                            const assetName = assetOption.getAttribute("data-name");
+                            const assetCategory = assetOption.getAttribute("data-category") || "Asset";
+
+                            if (emptyPlaceholder) emptyPlaceholder.style.display = "none";
+
+                            const rowElement = document.createElement("tr");
+                            rowElement.id = `matrix_row_${matrixKey}`;
+                            rowElement.setAttribute("data-employee-id", empId);
+                            rowElement.setAttribute("data-employee-code", empCode);
+                            rowElement.setAttribute("data-employee-name", empName);
+                            rowElement.setAttribute("data-asset-id", assetId);
+                            rowElement.setAttribute("data-asset-code", assetCode);
+                            rowElement.setAttribute("data-asset-name", assetName);
+                            rowElement.setAttribute("data-asset-category", assetCategory);
+
+                            rowElement.innerHTML = `
+                                <td style="font-weight: 700; color: var(--text-primary);">${empCode}</td>
+                                <td style="font-weight: 600;">${empName}</td>
+                                <td style="font-weight: 600; color: var(--text-secondary);">${assetCode}</td>
+                                <td>${assetName}</td>
+                                <td><span class="status-badge badge-category">${assetCategory}</span></td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn-remove-row" data-key="${matrixKey}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            `;
+
+                            gridBody.appendChild(rowElement);
+                            structuredMapCache.push(matrixKey);
+
+                            rowElement.querySelector(".btn-remove-row").addEventListener("click", function () {
+                                const rowKey = this.getAttribute("data-key");
+                                document.getElementById(`matrix_row_${rowKey}`).remove();
+                                structuredMapCache = structuredMapCache.filter(item => item !== rowKey);
+
+                                if (gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length === 0 && emptyPlaceholder) {
+                                    emptyPlaceholder.style.display = "";
+                                }
+                            });
+
+                            // Clear single asset input for swift loops
+                            ddlAsset.value = "";
+
+                        } catch (err) {
+                            showVqSystemAlert("System Breakdown", "Fatal background communication processing pipeline failure.");
+                        } finally {
+                            btnAdd.disabled = false;
+                        }
+                    });
+
+                    // Validation 5 & AJAX Creation Form Post Interceptor Hook
+                    btnSaveAll.addEventListener("click", async function () {
+                        const rowElements = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)");
+
+                        if (rowElements.length === 0) {
+                            showVqSystemAlert("Empty Matrix", "Please add at least one asset allocation row to the transaction grid.");
+                            return;
+                        }
+
+                        btnSaveAll.disabled = true;
+
+                        // Package data array into standard JSON schema layout matching model classes
+                        let payloadItems = [];
+                        rowElements.forEach(row => {
+                            payloadItems.push({
+                                EmployeeId: parseInt(row.getAttribute("data-employee-id")),
+                                EmployeeCode: row.getAttribute("data-employee-code"),
+                                EmployeeName: row.getAttribute("data-employee-name"),
+                                AssetMasterId: parseInt(row.getAttribute("data-asset-id")),
+                                AssetCode: row.getAttribute("data-asset-code"),
+                                AssetName: row.getAttribute("data-asset-name"),
+                                AssetCategory: row.getAttribute("data-asset-category")
+                            });
+                        });
+
+                        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+                        try {
+                            const response = await fetch('/AssetAllocation/CreateJson', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'RequestVerificationToken': token
+                                },
+                                body: JSON.stringify({ Items: payloadItems })
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                                // Success Case: Stays on page, alerts clean modal, then flushes grid out
+                                showVqSystemAlert("Allocation Completed", result.message, true);
+                                gridBody.innerHTML = '';
+                                if (emptyPlaceholder) emptyPlaceholder.style.display = "";
+                                structuredMapCache = [];
+                            } else {
+                                showVqSystemAlert("Execution Refusal", result.message);
+                            }
+                        } catch (err) {
+                            showVqSystemAlert("Post Exception Break", "Fatal failure saving entity batch payloads.");
+                        } finally {
+                            btnSaveAll.disabled = false;
+                        }
+                    });
                 });
-
-                // Clear single asset input for swift loops
-                ddlAsset.value = "";
-
-            } catch (err) {
-                console.error(err);
-                alert("Background verification endpoint returned an error or is unmapped. Row added locally for workflow bypass.");
-
-                // Fallback: Continue processing row locally if verification fails to prevent blocking HR completely
-                appendRowLocallyFallback(empId, assetId, matrixKey);
-            } finally {
-                btnAdd.disabled = false;
-            }
-        });
-
-        function appendRowLocallyFallback(empId, assetId, matrixKey) {
-            const empText = ddlEmployee.options[ddlEmployee.selectedIndex].text;
-            const assetText = ddlAsset.options[ddlAsset.selectedIndex].text;
-            const empCode = empText.includes(" - ") ? empText.split(" - ")[0].trim() : "EMP";
-            const empName = empText.includes(" - ") ? empText.split(" - ")[1].trim() : empText;
-            const assetCode = assetText.includes(" - ") ? assetText.split(" - ")[0].trim() : "AST";
-            const assetName = assetText.includes(" - ") ? assetText.split(" - ")[1].trim() : assetText;
-
-            if (emptyPlaceholder) emptyPlaceholder.style.display = "none";
-
-            const nextRowIndex = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
-            const rowElement = document.createElement("tr");
-            rowElement.id = `matrix_row_${matrixKey}`;
-            rowElement.innerHTML = `
-                <input type="hidden" name="Items[${nextRowIndex}].EmployeeId" value="${empId}" />
-                <input type="hidden" name="Items[${nextRowIndex}].EmployeeCode" value="${empCode}" />
-                <input type="hidden" name="Items[${nextRowIndex}].EmployeeName" value="${empName}" />
-                <input type="hidden" name="Items[${nextRowIndex}].AssetMasterId" value="${assetId}" />
-                <input type="hidden" name="Items[${nextRowIndex}].AssetCode" value="${assetCode}" />
-                <input type="hidden" name="Items[${nextRowIndex}].AssetName" value="${assetName}" />
-                <td style="font-weight: 700; color: var(--text-primary);">${empCode}</td>
-                <td style="font-weight: 600;">${empName}</td>
-                <td style="font-weight: 600; color: var(--text-secondary);">${assetCode}</td>
-                <td>${assetName}</td>
-                <td><span class="status-badge badge-category">Allocating</span></td>
-                <td style="text-align: center;">
-                    <button type="button" class="btn-remove-row" data-key="${matrixKey}"><i class="bi bi-trash"></i></button>
-                </td>
-            `;
-            gridBody.appendChild(rowElement);
-            if (!structuredMapCache.includes(matrixKey)) structuredMapCache.push(matrixKey);
-
-            rowElement.querySelector(".btn-remove-row").addEventListener("click", function () {
-                document.getElementById(`matrix_row_${matrixKey}`).remove();
-                structuredMapCache = structuredMapCache.filter(item => item !== matrixKey);
-                if (gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length === 0 && emptyPlaceholder) emptyPlaceholder.style.display = "";
-                reindexFormSubmitModelNames();
-            });
-            ddlAsset.value = "";
-        }
-
-        // Validation 5: Block Empty Transactions
-        formSubmit.addEventListener("submit", function (e) {
-            const actualItemsCount = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)").length;
-            if (actualItemsCount === 0) {
-                e.preventDefault();
-                alert("Please add at least one asset allocation.");
-            }
-        });
-
-        function reindexFormSubmitModelNames() {
-            const currentRows = gridBody.querySelectorAll("tr:not(#rowPlaceholderEmpty)");
-            currentRows.forEach((row, rowIndex) => {
-                const targets = row.querySelectorAll("input[type='hidden']");
-                targets.forEach(input => {
-                    const currentNameAttr = input.getAttribute("name");
-                    const propertyTargetSignature = currentNameAttr.substring(currentNameAttr.indexOf("].") + 2);
-                    input.setAttribute("name", `Items[${rowIndex}].${propertyTargetSignature}`);
-                });
-            });
-        }
-    });
-</script>
+            </script>

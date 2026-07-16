@@ -1,4 +1,6 @@
-﻿namespace VeltriQ.Models.HR
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace VeltriQ.Models.HR
 {
     public class AssetMaster
     {
@@ -24,10 +26,14 @@
 
         public DateTime CreatedOn { get; set; }
 
-        public int? CreatedBy { get; set; }
+        [StringLength(450)]
+        public string? CreatedBy { get; set; }
+
+        [StringLength(450)]
+        public string? ModifiedBy { get; set; }
 
         public DateTime? ModifiedOn { get; set; }
 
-        public int? ModifiedBy { get; set; }
+ 
     }
 }

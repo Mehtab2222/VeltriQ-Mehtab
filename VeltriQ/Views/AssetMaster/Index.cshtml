@@ -248,7 +248,7 @@
 
         <div class="asset-card-top">
             <div class="asset-card-title">
-                <h3>Asset Inventory</h3>
+                <h3>Asset Master</h3>
                 <p>Total Records: <span id="assetCounter">@Model.Count()</span></p>
             </div>
 
@@ -317,28 +317,30 @@
                                 </td>
                                 <td>
                                     <div class="table-actions">
-                                        <a href="/AssetMaster/Edit/@item.AssetMasterId" class="action-btn" title="Edit Properties">
+
+                                        <!-- EDIT -->
+
+                                        <a href="/AssetMaster/Edit/@item.AssetMasterId"
+                                           class="action-btn"
+                                           title="Edit Asset">
+
                                             <i class="bi bi-pencil"></i>
+
                                         </a>
 
-                                        @if (item.IsActive == true)
-                                        {
-                                            <a href="/AssetMaster/ToggleStatus/@item.AssetMasterId"
-                                               class="action-btn toggle-deactivate-btn"
-                                               title="Deactivate Asset"
-                                               onclick="return confirm('Are you sure you want to deactivate this asset?')">
-                                                <i class="bi bi-toggle-on" style="font-size: 14px;"></i>
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/AssetMaster/ToggleStatus/@item.AssetMasterId"
-                                               class="action-btn toggle-activate-btn"
-                                               title="Activate Asset"
-                                               onclick="return confirm('Are you sure you want to activate this asset?')">
-                                                <i class="bi bi-toggle-off" style="font-size: 14px;"></i>
-                                            </a>
-                                        }
+                                        <!-- ACTIVATE / DEACTIVATE -->
+
+                                        <a href="#"
+                                           class="action-btn toggle-status @(item.IsActive ? "toggle-deactivate-btn" : "toggle-activate-btn")"
+                                           data-id="@item.AssetMasterId"
+                                           data-status="@(item.IsActive ? "Deactivate" : "Activate")"
+                                           title="@(item.IsActive ? "Deactivate Asset" : "Activate Asset")">
+
+                                            <i class="bi @(item.IsActive ? "bi-toggle-on" : "bi-toggle-off")"
+                                               style="font-size:14px;"></i>
+
+                                        </a>
+
                                     </div>
                                 </td>
                             </tr>
@@ -359,54 +361,134 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
+
         const searchInput = document.getElementById("assetSearchInput");
         const matrixGrid = document.getElementById("assetGridMatrix");
         const counterTracker = document.getElementById("assetCounter");
 
-        if (!searchInput || !matrixGrid) return;
+        if (!searchInput || !matrixGrid)
+            return;
 
         const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
 
         let inlineFallbackRow = document.getElementById("emptyMatrixFallback");
+
         if (!inlineFallbackRow) {
+
             inlineFallbackRow = document.createElement("tr");
+
             inlineFallbackRow.id = "emptyMatrixFallback";
-            inlineFallbackRow.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found.</td>`;
+
+            inlineFallbackRow.innerHTML =
+                `<td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">
+                    No matching records found.
+                 </td>`;
+
             inlineFallbackRow.style.display = "none";
+
             matrixGrid.querySelector("tbody").appendChild(inlineFallbackRow);
         }
 
+        //====================================================
+        // SEARCH
+        //====================================================
+
         searchInput.addEventListener("input", function () {
+
             const criteria = this.value.trim().toLowerCase();
+
             let matchedCount = 0;
 
             dataRows.forEach(row => {
-                const nameText = row.querySelector('[data-search="name"]')?.textContent.toLowerCase() || "";
-                const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
-                const categoryText = row.querySelector('[data-search="category"]')?.textContent.toLowerCase() || "";
-                const brandText = row.querySelector('[data-search="brand"]')?.textContent.toLowerCase() || "";
-                const modelText = row.querySelector('[data-search="model"]')?.textContent.toLowerCase() || "";
 
-                const compoundSourceText = `${nameText} ${codeText} ${categoryText} ${brandText} ${modelText}`;
+                const text = row.innerText.toLowerCase();
 
-                if (compoundSourceText.includes(criteria)) {
+                if (text.includes(criteria)) {
+
                     row.style.display = "";
+
                     matchedCount++;
-                } else {
-                    row.style.display = "none";
+
                 }
+                else {
+
+                    row.style.display = "none";
+
+                }
+
             });
 
-            if (matchedCount === 0 && dataRows.length > 0) {
-                inlineFallbackRow.style.display = "";
-            } else {
-                inlineFallbackRow.style.display = "none";
-            }
+            inlineFallbackRow.style.display =
+                matchedCount === 0 ? "" : "none";
 
-            if (counterTracker) {
-                counterTracker.textContent = matchedCount;
-            }
+            counterTracker.textContent = matchedCount;
+
         });
+
+    });
+
+    //====================================================
+    // ACTIVATE / DEACTIVATE
+    //====================================================
+
+        document.addEventListener("click", function (e) {
+
+        const button = e.target.closest(".toggle-status");
+
+        if (!button)
+            return;
+
+        e.preventDefault();
+
+        const id = button.dataset.id;
+
+        const status = button.dataset.status;
+
+        showVqConfirm(
+
+            status + " Asset",
+
+            "Are you sure you want to " + status.toLowerCase() + " this asset?",
+
+            async function () {
+
+                const response = await fetch("/AssetMaster/ToggleStatus", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+
+                    body: "id=" + encodeURIComponent(id)
+
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+
+                    showVqAlert(
+                        "Success",
+                        "Asset status updated successfully.",
+                        true
+                    );
+
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+
+                } else {
+
+                    showVqAlert(
+                        "Cannot Continue",
+                        result.message
+                    );
+
+                }
+
+            });
+
     });
 </script>

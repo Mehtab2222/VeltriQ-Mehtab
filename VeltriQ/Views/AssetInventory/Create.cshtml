@@ -1,0 +1,465 @@
+﻿@model VeltriQ.ViewModels.AssetInventory.AssetInventoryCreateViewModel
+
+@{
+    ViewData["Title"] = "Add Inventory Stock";
+}
+
+<style>
+    .inventory-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* ── TOP ACTION BAR DECK ── */
+    .inventory-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .btn-cancel-theme {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    /* ── RIGID CORE CONTEXT CARD ── */
+    .inventory-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .inventory-card-top {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .inventory-card-title h3 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .inventory-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── DATA WORKSPACE FORM CONTENT ── */
+    .workspace-form-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .form-grid-deck {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    /* ── DROPDOWN & INPUT STYLING ── */
+    .form-deck-input, .select-deck-input {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+    select.select-deck-input {
+        cursor: pointer;
+        padding-right: 24px;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+        select.select-deck-input option {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            padding: 8px;
+        }
+
+    .form-deck-input:focus, .select-deck-input:focus {
+        border-color: var(--purple);
+    }
+
+    .form-deck-textarea {
+        width: 100%;
+        height: 64px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 8px 12px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        resize: none;
+        transition: border-color 0.2s ease;
+    }
+
+        .form-deck-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    /* ── HIGH-DENSITY READ-ONLY INFO CARDS PANEL ── */
+    .metadata-panel-deck {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+        padding: 12px 14px;
+        background: var(--hover-bg);
+        border: 1px dashed var(--border);
+        margin: 4px 0;
+    }
+
+    .metadata-info-card {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .metadata-card-label {
+        font-size: 9.5px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .metadata-card-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--purple);
+    }
+
+    /* ── SCROLLABLE SERIAL NUMBERS TABLE WORKSPACE ── */
+    .inventory-table-wrapper {
+        border: 1px solid var(--border);
+        max-height: 280px;
+        overflow-y: auto;
+        margin-top: 8px;
+    }
+
+    .inventory-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .inventory-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--hover-bg);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .inventory-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .inventory-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* ── PANEL FOOTER WORKSPACE ── */
+    .panel-footer-deck {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.01);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-submit-stock {
+        height: 36px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: transform 0.2s ease;
+    }
+
+        .btn-submit-stock:hover {
+            transform: translateY(-1px);
+        }
+</style>
+
+<div class="inventory-container">
+
+    <div class="inventory-header">
+        <a asp-action="Index" class="btn-cancel-theme">
+            <i class="bi bi-arrow-left"></i> Back to Directory
+        </a>
+    </div>
+
+    <form asp-action="Create" method="post" id="inventoryForm">
+        @Html.AntiForgeryToken()
+
+        <div class="inventory-card">
+
+            <div class="inventory-card-top">
+                <div class="inventory-card-title">
+                    <h3>Add Asset Stock Registration</h3>
+                    <p>Track purchase specifications and serial identities into physical stock registers.</p>
+                </div>
+            </div>
+
+            <div class="workspace-form-body">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger" style="font-size: 12.5px; font-weight: 600; list-style: none; padding: 0; margin: 0 0 4px 0;"></div>
+
+                <div class="form-grid-deck">
+                    <div class="form-group-block">
+                        <label>Asset Reference Target <span class="text-danger">*</span></label>
+                        <select asp-for="AssetMasterId" id="ddlAssetMaster" class="select-deck-input" asp-items="Model.Assets">
+                            <option value="">-- Select Corporate Asset --</option>
+                        </select>
+                        <span asp-validation-for="AssetMasterId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-block">
+                        <label>Quantity <span class="text-danger">*</span></label>
+                        <input asp-for="Quantity" id="txtQuantity" type="number" min="1" class="form-deck-input" placeholder="1" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="metadata-panel-deck" id="panelAssetBlueprint" style="display: none;">
+                    <div class="metadata-info-card">
+                        <span class="metadata-card-label">Asset Category Group</span>
+                        <span class="metadata-card-value" id="lblAssetCategory">-</span>
+                    </div>
+                    <div class="metadata-info-card">
+                        <span class="metadata-card-label">Manufacturer Brand</span>
+                        <span class="metadata-card-value" id="lblAssetBrand">-</span>
+                    </div>
+                    <div class="metadata-info-card">
+                        <span class="metadata-card-label">Blueprint Model Name</span>
+                        <span class="metadata-card-value" id="lblAssetModel">-</span>
+                    </div>
+                </div>
+
+                <div class="form-group-block" id="serialNumberPanel" style="display: none; margin-top: 4px;">
+                    <label style="color: var(--purple);">Manufacturer Serial Numbers Allocation <span class="text-danger">*</span></label>
+                    <div class="inventory-table-wrapper">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px; text-align: center;">#</th>
+                                    <th>Serial Number Unique Key Identifier</th>
+                                </tr>
+                            </thead>
+                            <tbody id="serialNumberBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-grid-deck">
+                    <div class="form-group-block">
+                        <label>Purchase Acquisition Date</label>
+                        <input asp-for="PurchaseDate" type="date" class="form-deck-input" />
+                        <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-block">
+                        <label>Unit Acquisition Cost</label>
+                        <input asp-for="PurchaseCost" type="number" step="0.01" class="form-deck-input" placeholder="0.00" autocomplete="off" />
+                        <span asp-validation-for="PurchaseCost" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-deck">
+                    <div class="form-group-block">
+                        <label>Vendor Supplier Entity</label>
+                        <input asp-for="VendorName" class="form-deck-input" placeholder="Supplier corporate trade title..." autocomplete="off" />
+                        <span asp-validation-for="VendorName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-block">
+                        <label>Asset Structural Condition</label>
+                        <select asp-for="AssetCondition" class="select-deck-input">
+                            <option value="New / In Box">New / In Box</option>
+                            <option value="Excellent">Excellent Condition</option>
+                            <option value="Good">Good / Refurbished</option>
+                            <option value="Damaged">Damaged / Needs Review</option>
+                        </select>
+                        <span asp-validation-for="AssetCondition" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group-block">
+                    <label>Internal Technical Remarks</label>
+                    <textarea asp-for="Remarks" class="form-deck-textarea" placeholder="Provide extra log configuration details or storage references..."></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="panel-footer-deck">
+                <button type="submit" class="btn-submit-stock">
+                    <i class="bi bi-box-seam"></i> Register Stock Entry
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ddlAsset = document.getElementById("ddlAssetMaster");
+        const quantityTextbox = document.getElementById("txtQuantity");
+        const panelBlueprint = document.getElementById("panelAssetBlueprint");
+
+        const serialNumberPanel = document.getElementById("serialNumberPanel");
+        const serialNumberBody = document.getElementById("serialNumberBody");
+
+        const lblCategory = document.getElementById("lblAssetCategory");
+        const lblBrand = document.getElementById("lblAssetBrand");
+        const lblModel = document.getElementById("lblAssetModel");
+
+        let isSerialRequiredByAssetModel = false;
+
+        function generateSerialGrid() {
+            if (!isSerialRequiredByAssetModel) {
+                serialNumberPanel.style.display = "none";
+                serialNumberBody.innerHTML = "";
+                return;
+            }
+
+            const qty = parseInt(quantityTextbox.value);
+            if (!qty || qty <= 0) {
+                serialNumberPanel.style.display = "none";
+                serialNumberBody.innerHTML = "";
+                return;
+            }
+
+            serialNumberPanel.style.display = "flex";
+            let htmlBuffer = "";
+
+            for (let i = 0; i < qty; i++) {
+                htmlBuffer += `
+                <tr>
+                    <td style="text-align: center; font-weight: 700; color: var(--text-secondary);">${i + 1}</td>
+                    <td>
+                        <input name="SerialNumbers[${i}]" class="form-deck-input" placeholder="Type serial for item #${i + 1}..." autocomplete="off" required />
+                    </td>
+                </tr>`;
+            }
+            serialNumberBody.innerHTML = htmlBuffer;
+        }
+
+        if (ddlAsset) {
+            ddlAsset.addEventListener("change", async function () {
+                const assetMasterId = this.value;
+
+                if (!assetMasterId) {
+                    panelBlueprint.style.display = "none";
+                    serialNumberPanel.style.display = "none";
+                    serialNumberBody.innerHTML = "";
+                    isSerialRequiredByAssetModel = false;
+                    return;
+                }
+
+                try {
+                    const detailsUrl = `/AssetInventory/GetAssetDetails?assetMasterId=${assetMasterId}`;
+                    const fetchStream = await fetch(detailsUrl, { method: 'GET' });
+
+                    if (!fetchStream.ok) throw new Error("API break.");
+                    const assetData = await fetchStream.json();
+
+                    if (assetData) {
+                        lblCategory.innerText = assetData.category || "-";
+                        lblBrand.innerText = assetData.brand || "-";
+                        lblModel.innerText = assetData.model || "-";
+                        panelBlueprint.style.display = "grid";
+
+                        isSerialRequiredByAssetModel = assetData.serialRequired;
+                        generateSerialGrid();
+                    }
+                } catch (err) {
+                    console.error("Background data parsing breakdown: ", err);
+                }
+            });
+        }
+
+        if (quantityTextbox) {
+            quantityTextbox.addEventListener("input", function () {
+                generateSerialGrid();
+            });
+        }
+    });
+</script>

@@ -1066,58 +1066,289 @@
         function updateThemeIcon(theme) {
             var icon = document.getElementById('themeIcon');
             if (!icon) return;
-            icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+            icon.className = theme === 'dark'
+                ? 'bi bi-sun-fill'
+                : 'bi bi-moon-fill';
         }
-        // ── End theme toggle ──────────────────────────
 
-        // Dropdown toggles
-        document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
-            toggle.addEventListener('click', function() {
+        // ── Sidebar Dropdowns ─────────────────────────
+
+        document.querySelectorAll('.dropdown-toggle').forEach(function (toggle) {
+
+            toggle.addEventListener('click', function () {
+
                 this.parentElement.classList.toggle('active');
+
             });
-        });
-                // Company switcher toggle
-        document.getElementById('companySwitchBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.getElementById('companyDropdown').classList.toggle('open');
-        });
-        document.addEventListener('click', function() {
-            document.getElementById('companyDropdown').classList.remove('open');
+
         });
 
-        // Switch company — posts to your controller
-        function switchCompany(id, name) {
-            document.getElementById('activeCompanyName').textContent = name;
+        // ── Company Switcher ──────────────────────────
+
+        document.getElementById('companySwitchBtn').addEventListener('click', function (e) {
+
+            e.stopPropagation();
+
+            document.getElementById('companyDropdown').classList.toggle('open');
+
+        });
+
+        document.addEventListener('click', function () {
+
             document.getElementById('companyDropdown').classList.remove('open');
-            // Update active state visually
+
+        });
+
+        function switchCompany(id, name) {
+
+            document.getElementById('activeCompanyName').textContent = name;
+
+            document.getElementById('companyDropdown').classList.remove('open');
+
             document.querySelectorAll('.company-drop-item').forEach(el => {
+
                 el.classList.toggle('active', el.dataset.id == id);
+
                 const chk = el.querySelector('.co-check');
+
                 if (chk) chk.remove();
+
                 if (el.dataset.id == id) {
+
                     const icon = document.createElement('i');
+
                     icon.className = 'bi bi-check2 co-check';
+
                     el.appendChild(icon);
+
                 }
+
             });
-            // POST to your backend to set the active company in session
+
             fetch('/Company/SwitchCompany', {
+
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || '' },
-                body: JSON.stringify({ companyId: id })
+
+                headers: {
+
+                    'Content-Type': 'application/json',
+
+                    'RequestVerificationToken':
+                        document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+
+                },
+
+                body: JSON.stringify({
+
+                    companyId: id
+
+                })
+
             }).then(() => window.location.reload());
+
         }
-                const toggle = document.getElementById('profileToggle');
+
+        // ── Profile Menu ──────────────────────────────
+
+        const toggle = document.getElementById('profileToggle');
+
         const menu = document.getElementById('logoutMenu');
 
-        toggle.addEventListener('click', (e) => {
+        toggle.addEventListener('click', function (e) {
+
             e.stopPropagation();
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+
+            menu.style.display =
+                menu.style.display === 'none'
+                    ? 'block'
+                    : 'none';
+
         });
 
-        // Close menu if clicking anywhere else
-        document.addEventListener('click', () => { menu.style.display = 'none'; });
+        document.addEventListener('click', function () {
+
+            menu.style.display = 'none';
+
+        });
+
+        // ===========================================================
+        // VeltriQ Alert
+        // ===========================================================
+
+        window.showVqAlert = function (title, message, type = "success") {
+
+            document.getElementById("vqModalTitle").innerText = title;
+
+            document.getElementById("vqModalMessage").innerText = message;
+
+            document.getElementById("vqCancelBtn").style.display = "none";
+
+            document.getElementById("vqOkBtn").onclick = function () {
+
+                document.getElementById("vqSystemModal").style.display = "none";
+
+            };
+
+            let icon = "";
+
+            switch (type) {
+
+                case "success":
+
+                    icon = '<i class="bi bi-check-circle-fill" style="color:#22c55e;"></i>';
+
+                    break;
+
+                case "error":
+
+                    icon = '<i class="bi bi-x-circle-fill" style="color:#ef4444;"></i>';
+
+                    break;
+
+                case "warning":
+
+                    icon = '<i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;"></i>';
+
+                    break;
+
+                default:
+
+                    icon = '<i class="bi bi-info-circle-fill" style="color:#3b82f6;"></i>';
+
+                    break;
+
+            }
+
+            document.getElementById("vqModalIcon").innerHTML = icon;
+
+            document.getElementById("vqSystemModal").style.display = "flex";
+
+        };
+
+        // ===========================================================
+        // VeltriQ Confirm
+        // ===========================================================
+
+        window.showVqConfirm = function (title, message, onYes) {
+
+            document.getElementById("vqModalTitle").innerText = title;
+
+            document.getElementById("vqModalMessage").innerText = message;
+
+            document.getElementById("vqModalIcon").innerHTML =
+                '<i class="bi bi-question-circle-fill" style="color:#7c3aed;"></i>';
+
+            document.getElementById("vqCancelBtn").style.display = "";
+
+            document.getElementById("vqCancelBtn").onclick = function () {
+
+                document.getElementById("vqSystemModal").style.display = "none";
+
+            };
+
+            document.getElementById("vqOkBtn").onclick = function () {
+
+                document.getElementById("vqSystemModal").style.display = "none";
+
+                if (onYes)
+                    onYes();
+
+            };
+
+            document.getElementById("vqSystemModal").style.display = "flex";
+
+        };
+
+        // ===========================================================
+        // Helper Methods
+        // ===========================================================
+
+        window.showVqSuccess = function (message) {
+
+            showVqAlert("Success", message, "success");
+
+        };
+
+        window.showVqError = function (message) {
+
+            showVqAlert("Error", message, "error");
+
+        };
+
+        window.showVqWarning = function (message) {
+
+            showVqAlert("Warning", message, "warning");
+
+        };
+
+        window.showVqInfo = function (message) {
+
+            showVqAlert("Information", message, "info");
+
+        };
+
     </script>
+    <!-- VeltriQ System Modal -->
+    <div id="vqSystemModal"
+         style="display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.55);
+            z-index:99999;
+            align-items:center;
+            justify-content:center;">
+
+        <div style="background:#1f2937;
+                color:white;
+                width:420px;
+                max-width:90%;
+                border-radius:10px;
+                overflow:hidden;">
+
+            <div style="padding:25px;text-align:center;">
+
+                <div id="vqModalIcon"
+                     style="font-size:48px;margin-bottom:15px;">
+                </div>
+
+                <h4 id="vqModalTitle"
+                    style="margin-bottom:10px;">
+                </h4>
+
+                <p id="vqModalMessage"
+                   style="color:#cbd5e1;">
+                </p>
+
+            </div>
+
+            <div style="padding:15px;
+                    display:flex;
+                    justify-content:center;
+                    gap:10px;
+                    border-top:1px solid #374151;">
+
+                <button id="vqCancelBtn"
+                        style="padding:8px 20px;
+                           border:none;
+                           border-radius:6px;
+                           cursor:pointer;">
+                    Cancel
+                </button>
+
+                <button id="vqOkBtn"
+                        style="padding:8px 20px;
+                           border:none;
+                           border-radius:6px;
+                           background:#7c3aed;
+                           color:white;
+                           cursor:pointer;">
+                    OK
+                </button>
+
+            </div>
+
+        </div>
+    </div>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

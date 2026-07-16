@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VeltriQ.Data.SeedData.HR;
+using VeltriQ.Models;
 using VeltriQ.Models.HR;
 using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.Models.Recruitment;
@@ -47,7 +48,7 @@ namespace VeltriQ.Data
         public DbSet<DocumentMaster> DocumentMasters { get; set; }
 
         public DbSet<AssetMaster> AssetMasters { get; set; }
-
+        public DbSet<AssetInventory> AssetInventories { get; set; }
         public DbSet<EmployeeAsset> EmployeeAssets { get; set; }
 
         public DbSet<EmployeeDocument> EmployeeDocuments { get; set; }
@@ -313,7 +314,10 @@ namespace VeltriQ.Data
                 .ToTable("DocumentMaster", "HR");
 
             modelBuilder.Entity<AssetMaster>()
-                .ToTable("AssetMaster", "HR");
+     .ToTable("AssetMaster", "HR");
+
+            modelBuilder.Entity<AssetInventory>()
+                .ToTable("AssetInventory", "HR");
 
             modelBuilder.Entity<EmployeeAsset>()
                 .ToTable("EmployeeAsset", "HR");
