@@ -153,13 +153,15 @@ namespace VeltriQ.Controllers
             }
 
             //====================================================
-            // CHECK WHETHER ASSET IS ALLOCATED
+            // CHECK WHETHER ANY INVENTORY OF THIS ASSET IS ALLOCATED
             //====================================================
 
             bool isAllocated = await _context.EmployeeAssets
+                .Include(x => x.AssetInventory)
                 .AnyAsync(x =>
-                    x.AssetMasterId == id &&
-                    x.IsActive);
+                    x.IsActive &&
+                    x.AssetInventory != null &&
+                    x.AssetInventory.AssetMasterId == id);
 
             if (asset.IsActive && isAllocated)
             {
@@ -171,11 +173,9 @@ namespace VeltriQ.Controllers
             }
 
             asset.IsActive = !asset.IsActive;
-
             asset.ModifiedOn = DateTime.Now;
 
             var currentUser = await _userManager.GetUserAsync(User);
-
             asset.ModifiedBy = currentUser?.Id;
 
             await _context.SaveChangesAsync();

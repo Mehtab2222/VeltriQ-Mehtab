@@ -8,7 +8,7 @@ namespace VeltriQ.Models.HR
 
         public int EmployeeId { get; set; }
 
-        public int AssetMasterId { get; set; }
+        public int AssetInventoryId { get; set; }
 
         public string? AssetNumber { get; set; }
 
@@ -38,6 +38,6 @@ namespace VeltriQ.Models.HR
 
         public virtual Employee? Employee { get; set; }
 
-        public virtual AssetMaster? AssetMaster { get; set; }
+        public virtual AssetInventory? AssetInventory { get; set; }
     }
 }

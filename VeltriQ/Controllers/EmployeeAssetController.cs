@@ -33,15 +33,12 @@ namespace VeltriQ.Controllers
             ViewBag.EmployeeId = employeeId;
 
             var assets = await _context.EmployeeAssets
-
-                .Include(x => x.AssetMaster)
-
+                .Include(x => x.AssetInventory)
+                    .ThenInclude(x => x.AssetMaster)
                 .Where(x => x.EmployeeId == employeeId)
-
                 .ToListAsync();
 
-            return PartialView
-            (
+            return PartialView(
                 "_EmployeeAssetsPartial",
                 assets
             );

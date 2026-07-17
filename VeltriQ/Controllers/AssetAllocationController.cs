@@ -73,14 +73,15 @@ namespace VeltriQ.Controllers
                 .OrderBy(x => x.EmployeeCode)
                 .ToListAsync();
 
-            var assets = await _context.AssetMasters
-                .Where(x => x.IsActive)
-                .OrderBy(x => x.AssetCode)
+            var inventoryItems = await _context.AssetInventories
+                .Include(x => x.AssetMaster)
+                .Where(x => x.IsActive && x.InventoryStatus == "Available")
+                .OrderBy(x => x.InventoryCode)
                 .ToListAsync();
 
             // 2. Assign them to ViewBag (which treats them as dynamic references)
             ViewBag.EmployeesList = employees;
-            ViewBag.AssetsList = assets;
+            ViewBag.InventoryItemsList = inventoryItems;
 
             // 3. CRITICAL FIX: Cast the strongly-typed variables directly to avoid the dynamic lambda compiler breakdown
             model.Employees = employees.Select(x => new SelectListItem
@@ -90,12 +91,17 @@ namespace VeltriQ.Controllers
             }).ToList();
             model.Employees.Insert(0, new SelectListItem { Value = "", Text = "-- Select Employee --" });
 
-            model.Assets = assets.Select(x => new SelectListItem
+            model.InventoryItems = inventoryItems.Select(x => new SelectListItem
             {
-                Value = x.AssetMasterId.ToString(),
-                Text = x.AssetCode + " - " + x.AssetName
+                Value = x.AssetInventoryId.ToString(),
+                Text = $"{x.InventoryCode} | {x.AssetMaster!.AssetName} | {(string.IsNullOrWhiteSpace(x.SerialNumber) ? "No Serial" : x.SerialNumber)}"
             }).ToList();
-            model.Assets.Insert(0, new SelectListItem { Value = "", Text = "-- Select Asset --" });
+
+            model.InventoryItems.Insert(0, new SelectListItem
+            {
+                Value = "",
+                Text = "-- Select Inventory Item --"
+            });
 
             return View(model);
         }
@@ -104,17 +110,27 @@ namespace VeltriQ.Controllers
         // VERIFY EXISTING ALLOCATION (AJAX GET)
         //====================================================
         [HttpGet]
-        public async Task<IActionResult> VerifyExistingAllocation(int employeeId, int assetMasterId)
+        public async Task<IActionResult> VerifyExistingAllocation(int employeeId, int assetInventoryId)
         {
-            // Dynamically checks database state to eliminate live duplicate records
+            // Check whether this inventory item is already allocated to the employee
             bool exists = await _context.EmployeeAssets
-                .AnyAsync(a => a.EmployeeId == employeeId && a.AssetMasterId == assetMasterId && a.IsActive);
+                .AnyAsync(a =>
+                    a.EmployeeId == employeeId &&
+                    a.AssetInventoryId == assetInventoryId &&
+                    a.IsActive);
 
-            // Fetch the structural category string from asset masters
-            var asset = await _context.AssetMasters.FindAsync(assetMasterId);
-            string category = asset != null ? asset.AssetCategory : "Asset";
+            // Get inventory item along with its Asset Master
+            var inventory = await _context.AssetInventories
+                .Include(x => x.AssetMaster)
+                .FirstOrDefaultAsync(x => x.AssetInventoryId == assetInventoryId);
 
-            return Json(new { alreadyAllocated = exists, assetCategory = category });
+            string category = inventory?.AssetMaster?.AssetCategory ?? "Asset";
+
+            return Json(new
+            {
+                alreadyAllocated = exists,
+                assetCategory = category
+            });
         }
 
         //====================================================
@@ -126,7 +142,7 @@ namespace VeltriQ.Controllers
         {
             if (model == null || model.Items == null || !model.Items.Any())
             {
-                return Json(new { success = false, message = "Please add at least one asset allocation row to the list matrix." });
+                return Json(new { success = false, message = "Please add at least one asset allocation row to the list." });
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
@@ -137,44 +153,79 @@ namespace VeltriQ.Controllers
                 {
                     foreach (var row in model.Items)
                     {
-                        bool absoluteDuplicate = await _context.EmployeeAssets
-                            .AnyAsync(a => a.EmployeeId == row.EmployeeId && a.AssetMasterId == row.AssetMasterId && a.IsActive);
+                        // Check if this inventory item is already allocated
+                        bool alreadyAllocated = await _context.EmployeeAssets
+                            .AnyAsync(a =>
+                                a.EmployeeId == row.EmployeeId &&
+                                a.AssetInventoryId == row.AssetInventoryId &&
+                                a.IsActive);
 
-                        if (absoluteDuplicate) continue;
+                        if (alreadyAllocated)
+                            continue;
 
-                        var newAssignment = new EmployeeAsset
+                        // Fetch inventory item
+                        var inventory = await _context.AssetInventories
+                            .FirstOrDefaultAsync(x => x.AssetInventoryId == row.AssetInventoryId);
+
+                        if (inventory == null)
+                            continue;
+
+                        if (inventory.InventoryStatus != "Available")
+                            continue;
+
+                        // Create allocation
+                        var employeeAsset = new EmployeeAsset
                         {
                             EmployeeId = row.EmployeeId,
-                            AssetMasterId = row.AssetMasterId,
+                            AssetInventoryId = row.AssetInventoryId,
                             IsActive = true,
                             CreatedOn = DateTime.Now,
                             CreatedBy = currentUser?.Id
                         };
 
-                        await _context.EmployeeAssets.AddAsync(newAssignment);
+                        await _context.EmployeeAssets.AddAsync(employeeAsset);
+
+                        // Update inventory status
+                        inventory.InventoryStatus = "Allocated";
                     }
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return Json(new { success = true, message = "Allocation Completed Successfully." });
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Assets allocated successfully."
+                    });
                 }
                 catch (DbUpdateException dbEx)
                 {
                     await transaction.RollbackAsync();
-                    var innerMessage = dbEx.InnerException != null ? dbEx.InnerException.Message : dbEx.Message;
-                    return Json(new { success = false, message = $"Database Schema Rejection: {innerMessage}" });
+
+                    return Json(new
+                    {
+                        success = false,
+                        message = dbEx.InnerException?.Message ?? dbEx.Message
+                    });
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    return Json(new { success = false, message = $"System Transaction Failure: {ex.Message}" });
+
+                    return Json(new
+                    {
+                        success = false,
+                        message = ex.Message
+                    });
                 }
             }
         }
         // Private rebalancing utility handling input pipeline fallback flows
         private async Task RepopulateDropdownsAsync(AssetAllocationCreateViewModel model)
         {
+            //====================================================
+            // EMPLOYEES
+            //====================================================
             model.Employees = await _context.Employees
                 .Where(x => x.IsActive)
                 .OrderBy(x => x.EmployeeCode)
@@ -182,18 +233,38 @@ namespace VeltriQ.Controllers
                 {
                     Value = x.EmployeeId.ToString(),
                     Text = x.EmployeeCode + " - " + x.FirstName + " " + x.LastName
-                }).ToListAsync();
-            model.Employees.Insert(0, new SelectListItem { Value = "", Text = "-- Select Employee --" });
+                })
+                .ToListAsync();
 
-            model.Assets = await _context.AssetMasters
-                .Where(x => x.IsActive)
-                .OrderBy(x => x.AssetCode)
+            model.Employees.Insert(0, new SelectListItem
+            {
+                Value = "",
+                Text = "-- Select Employee --"
+            });
+
+            //====================================================
+            // AVAILABLE INVENTORY ITEMS
+            //====================================================
+            model.InventoryItems = await _context.AssetInventories
+                .Include(x => x.AssetMaster)
+                .Where(x => x.IsActive && x.InventoryStatus == "Available")
+                .OrderBy(x => x.InventoryCode)
                 .Select(x => new SelectListItem
                 {
-                    Value = x.AssetMasterId.ToString(),
-                    Text = x.AssetCode + " - " + x.AssetName
-                }).ToListAsync();
-            model.Assets.Insert(0, new SelectListItem { Value = "", Text = "-- Select Asset --" });
+                    Value = x.AssetInventoryId.ToString(),
+                    Text = x.InventoryCode + " - " +
+                           x.AssetMaster.AssetName +
+                           (string.IsNullOrWhiteSpace(x.SerialNumber)
+                                ? ""
+                                : " (" + x.SerialNumber + ")")
+                })
+                .ToListAsync();
+
+            model.InventoryItems.Insert(0, new SelectListItem
+            {
+                Value = "",
+                Text = "-- Select Inventory Item --"
+            });
         }
         //====================================================
         // DETAILS
@@ -222,21 +293,40 @@ namespace VeltriQ.Controllers
                 JoiningDate = employee.JoiningDate
             };
 
-            // Extracting all active allocated assets with contextual information logs
+            //====================================================
+            // LOAD ALLOCATED INVENTORY ITEMS
+            //====================================================
             model.AllocatedAssets = await _context.EmployeeAssets
-                .Include(a => a.AssetMaster)
-                .Where(a => a.EmployeeId == id && a.IsActive)
-                .OrderByDescending(a => a.EmployeeAssetId)
-                .Select(a => new AllocatedAssetItemViewModel
+                .Include(x => x.AssetInventory)
+                    .ThenInclude(x => x.AssetMaster)
+                .Where(x => x.EmployeeId == id && x.IsActive)
+                .OrderByDescending(x => x.EmployeeAssetId)
+                .Select(x => new AllocatedAssetItemViewModel
                 {
-                    EmployeeAssetId = a.EmployeeAssetId,
-                    AssetCode = a.AssetMaster != null ? a.AssetMaster.AssetCode : "",
-                    AssetName = a.AssetMaster != null ? a.AssetMaster.AssetName : "",
-                    AssetCategory = a.AssetMaster != null ? a.AssetMaster.AssetCategory : "",
-                    BrandName = a.AssetMaster != null ? a.AssetMaster.BrandName : "",
-                    ModelName = a.AssetMaster != null ? a.AssetMaster.ModelName : "",
-                    AllocatedOn = a.CreatedOn,
-                    // Assuming your project links identity usernames or names via the Master/Tenant mappings:
+                    EmployeeAssetId = x.EmployeeAssetId,
+
+                    AssetCode = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
+                        ? x.AssetInventory.AssetMaster.AssetCode
+                        : "",
+
+                    AssetName = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
+                        ? x.AssetInventory.AssetMaster.AssetName
+                        : "",
+
+                    AssetCategory = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
+                        ? x.AssetInventory.AssetMaster.AssetCategory
+                        : "",
+
+                    BrandName = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
+                        ? x.AssetInventory.AssetMaster.BrandName
+                        : "",
+
+                    ModelName = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
+                        ? x.AssetInventory.AssetMaster.ModelName
+                        : "",
+
+                    AllocatedOn = x.CreatedOn,
+
                     AllocatedBy = "System Admin"
                 })
                 .ToListAsync();

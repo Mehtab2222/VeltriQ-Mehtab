@@ -1,0 +1,271 @@
+﻿@model VeltriQ.ViewModels.AssetReturn.AssetReturnDetailsViewModel
+
+@{
+    ViewData["Title"] = "Asset Return Details";
+}
+
+<style>
+    .return-details-frame {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .details-hero-banner {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 14px 16px;
+        position: relative;
+    }
+
+    .hero-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .hero-identity-deck {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .hero-avatar-box {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, #d97706, #eab308);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .hero-title-block {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .hero-title-block h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+    .hero-meta-subtitle {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+        font-weight: 600;
+    }
+
+    .hero-metadata-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--border);
+        font-size: 11.5px;
+        color: var(--text-secondary);
+    }
+
+        .hero-metadata-strip span strong {
+            color: var(--text-primary);
+        }
+
+    .grid-layout-deck {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .workspace-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .workspace-card-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--hover-bg);
+    }
+
+        .workspace-card-header h3 {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .viewport-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .viewport-grid-table th {
+            text-align: left;
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.01);
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            width: 160px;
+        }
+
+        .viewport-grid-table td {
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .viewport-grid-table tr:last-child th,
+        .viewport-grid-table tr:last-child td {
+            border-bottom: none;
+        }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-returned {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .badge-category {
+        background: rgba(124, 58, 237, 0.12);
+        color: var(--purple);
+    }
+
+    .btn-cancel-theme {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+</style>
+
+<div class="return-details-frame">
+
+    <div class="hero-top-row">
+        <div>
+            <a asp-action="Index" class="btn-cancel-theme">
+                <i class="bi bi-arrow-left"></i> Back to Registries
+            </a>
+        </div>
+    </div>
+
+    <div class="details-hero-banner">
+        <div class="hero-top-row">
+            <div class="hero-identity-deck">
+                <div class="hero-avatar-box">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </div>
+                <div class="hero-title-block">
+                    <h2>@Model.AssetName</h2>
+                    <div class="hero-meta-subtitle">
+                        @Model.BrandName <span style="color: var(--border); margin: 0 4px;">•</span> @Model.ModelName
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="status-badge badge-returned">Returned Ledger Case</span>
+            </div>
+        </div>
+
+        <div class="hero-metadata-strip">
+            <span>Inventory Stock ID: <strong style="color: var(--purple);">@Model.InventoryCode</strong></span>
+            <span>Asset Code: <strong>@Model.AssetCode</strong></span>
+            <span>Category Group: <span class="status-badge badge-category" style="height: 16px; font-size: 9.5px; padding: 0 6px;">@Model.AssetCategory</span></span>
+            <span>Manufacture Serial: <strong style="font-family: monospace;">@(string.IsNullOrWhiteSpace(Model.SerialNumber) ? "N/A" : Model.SerialNumber)</strong></span>
+        </div>
+    </div>
+
+    <div class="grid-layout-deck">
+
+        <div class="workspace-card">
+            <div class="workspace-card-header">
+                <h3>Custodian Staff Audit</h3>
+            </div>
+            <table class="viewport-grid-table">
+                <tbody>
+                    <tr>
+                        <th>Employee Custodian</th>
+                        <td style="font-weight: 700;">
+                            <i class="bi bi-person-badge" style="color: var(--purple); margin-right: 4px;"></i> @Model.EmployeeName
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Staff Code Reference</th>
+                        <td style="font-weight: 600; color: var(--text-secondary);">@Model.EmployeeCode</td>
+                    </tr>
+                    <tr>
+                        <th>Handover Issue Timestamp</th>
+                        <td>@(Model.IssueDate?.ToString("dd MMM yyyy") ?? "-")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="workspace-card">
+            <div class="workspace-card-header">
+                <h3>Logistical Metrics</h3>
+            </div>
+            <table class="viewport-grid-table">
+                <tbody>
+                    <tr>
+                        <th>Returned Condition</th>
+                        <td style="font-weight: 700; color: var(--purple);">@Model.AssetCondition</td>
+                    </tr>
+                    <tr>
+                        <th>Warehouse Stock Status</th>
+                        <td><span class="status-badge status-available">@Model.InventoryStatus</span></td>
+                    </tr>
+                    <tr>
+                        <th>Audit Returns Notes</th>
+                        <td style="color: var(--text-secondary); font-style: italic; font-size: 12px; line-height: 1.4;">
+                            @(string.IsNullOrWhiteSpace(Model.Remarks) ? "No handover technical or condition log exception remarks documented." : Model.Remarks)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>

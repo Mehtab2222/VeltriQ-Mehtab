@@ -10,11 +10,15 @@
 
         public string Department { get; set; } = "";
 
-        public int AssetMasterId { get; set; }
+        public int AssetInventoryId { get; set; }
 
-        public string AssetCode { get; set; } = "";
+        public string? InventoryCode { get; set; }
 
-        public string AssetName { get; set; } = "";
+        public string? AssetName { get; set; }
+
+        public string? AssetCode { get; set; }
+
+        public string? SerialNumber { get; set; }
 
         public string AssetCategory { get; set; } = "";
     }

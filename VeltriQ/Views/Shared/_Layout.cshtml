@@ -700,6 +700,31 @@
                         </ul>
                     </li>
 
+                    <!-- Assets -->
+                    <li class="menu-dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle">
+                            <i class="bi bi-box-seam"></i>
+                            <span>Assets</span>
+                            <i class="bi bi-chevron-down dropdown-icon"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li>
+                                <a asp-controller="AssetMaster" asp-action="Index">
+                                    <i class="bi bi-sliders"></i>Master
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="AssetInventory" asp-action="Index">
+                                    <i class="bi bi-boxes"></i>Inventory
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="AssetReturn" asp-action="Index">
+                                    <i class="bi bi-arrow-counterclockwise"></i>Return
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <!-- Employees -->
                     <li class="menu-dropdown">
                         <a href="javascript:void(0);" class="dropdown-toggle">

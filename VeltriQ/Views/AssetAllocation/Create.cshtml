@@ -328,13 +328,24 @@
                             </div>
 
                             <div class="form-group-deck">
-                                <label>Asset Master Reference</label>
-                                <select id="ddlAsset" class="select-deck-input">
+                                <label>Inventory Item</label>
+
+                                <select id="ddlInventory" class="select-deck-input">
                                     <option value="">-- Select Asset --</option>
-                                    @foreach (var asset in ViewBag.AssetsList)
+                                    @foreach (var item in ViewBag.InventoryItemsList)
                                     {
-                                        <option value="@asset.AssetMasterId" data-code="@asset.AssetCode" data-name="@asset.AssetName" data-category="@asset.AssetCategory">
-                                            @asset.AssetCode - @asset.AssetName
+                                        <option value="@item.AssetInventoryId"
+                                                data-inventory="@item.InventoryCode"
+                                                data-code="@item.AssetMaster.AssetCode"
+                                                data-name="@item.AssetMaster.AssetName"
+                                                data-category="@item.AssetMaster.AssetCategory"
+                                                data-serial="@item.SerialNumber">
+
+                                @item.InventoryCode |
+                                @item.AssetMaster.AssetCode |
+                                @item.AssetMaster.AssetName |
+                                SN: @item.SerialNumber
+
                                         </option>
                                     }
                                 </select>
@@ -353,16 +364,23 @@
                                     <tr>
                                         <th>Employee Code</th>
                                         <th>Employee Name</th>
+                                        <th>Inventory Code</th>
                                         <th>Asset Code</th>
                                         <th>Asset Name</th>
+                                        <th>Serial Number</th>
                                         <th>Category</th>
-                                        <th style="width: 70px; text-align: center;">Remove</th>
+                                        <th style="width:70px;text-align:center;">Remove</th>
                                     </tr>
                                 </thead>
+
                                 <tbody id="gridMatrixBody">
                                     <tr id="rowPlaceholderEmpty">
-                                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
-                                            No temporary staging transactions allocated yet.
+                                        <td colspan="8"
+                                            style="text-align:center;
+                                       color:var(--text-muted);
+                                       font-style:italic;
+                                       padding:24px;">
+                                No assets have been added for allocation.
                                         </td>
                                     </tr>
                                 </tbody>
@@ -393,7 +411,7 @@
                     const btnAdd = document.getElementById("btnAddAllocation");
                     const btnSaveAll = document.getElementById("btnSaveAll");
                     const ddlEmployee = document.getElementById("ddlEmployee");
-                    const ddlAsset = document.getElementById("ddlAsset");
+                    const ddlInventory = document.getElementById("ddlInventory");
                     const gridBody = document.getElementById("gridMatrixBody");
                     const emptyPlaceholder = document.getElementById("rowPlaceholderEmpty");
 
@@ -419,10 +437,10 @@
 
                     btnAdd.addEventListener("click", async function () {
                         const empOption = ddlEmployee.options[ddlEmployee.selectedIndex];
-                        const assetOption = ddlAsset.options[ddlAsset.selectedIndex];
+                        const inventoryOption =ddlInventory.options[ddlInventory.selectedIndex];
 
                         const empId = ddlEmployee.value;
-                        const assetId = ddlAsset.value;
+                        const inventoryId = ddlInventory.value;
 
                         // Validation 1: Employee Select Assertion
                         if (!empId) {
@@ -431,13 +449,13 @@
                         }
 
                         // Validation 2: Asset Select Assertion
-                        if (!assetId) {
+                        if (!inventoryId) {
                             showVqSystemAlert("Selection Missing", "Please select a template inventory asset master configuration.");
                             return;
                         }
 
                         // Validation 3: Client-side Duplication Rule
-                        const matrixKey = `${empId}_${assetId}`;
+                        const matrixKey = `${empId}_${inventoryId}`;
                         if (structuredMapCache.includes(matrixKey)) {
                             showVqSystemAlert("Duplicate Assignment", "This employee already has this asset in the allocation list.");
                             return;
@@ -447,7 +465,7 @@
 
                         try {
                             // Validation 4: Async Database State Pipeline Assertion Check
-                            const verificationUrl = `/AssetAllocation/VerifyExistingAllocation?employeeId=${empId}&assetMasterId=${assetId}`;
+                            const verificationUrl = `/AssetAllocation/VerifyExistingAllocation?employeeId=${empId}&assetInventoryId=${inventoryId}`;
                             const checkResponse = await fetch(verificationUrl, { method: 'GET' });
                             const resultData = await checkResponse.json();
 
@@ -460,9 +478,15 @@
                             // Extracted HTML5 metadata tags safely via data sets
                             const empCode = empOption.getAttribute("data-code");
                             const empName = empOption.getAttribute("data-name");
-                            const assetCode = assetOption.getAttribute("data-code");
-                            const assetName = assetOption.getAttribute("data-name");
-                            const assetCategory = assetOption.getAttribute("data-category") || "Asset";
+                            const inventoryCode = inventoryOption.getAttribute("data-inventory");
+
+                            const assetCode = inventoryOption.getAttribute("data-code");
+
+                            const assetName = inventoryOption.getAttribute("data-name");
+
+                            const assetCategory = inventoryOption.getAttribute("data-category");
+
+                            const serialNumber = inventoryOption.getAttribute("data-serial");
 
                             if (emptyPlaceholder) emptyPlaceholder.style.display = "none";
 
@@ -471,22 +495,29 @@
                             rowElement.setAttribute("data-employee-id", empId);
                             rowElement.setAttribute("data-employee-code", empCode);
                             rowElement.setAttribute("data-employee-name", empName);
-                            rowElement.setAttribute("data-asset-id", assetId);
+                            rowElement.setAttribute("data-inventory-id", inventoryId);
                             rowElement.setAttribute("data-asset-code", assetCode);
                             rowElement.setAttribute("data-asset-name", assetName);
                             rowElement.setAttribute("data-asset-category", assetCategory);
+                            rowElement.setAttribute("data-inventory-code", inventoryCode);
+
+                            rowElement.setAttribute("data-serial-number", serialNumber);
 
                             rowElement.innerHTML = `
-                                <td style="font-weight: 700; color: var(--text-primary);">${empCode}</td>
-                                <td style="font-weight: 600;">${empName}</td>
-                                <td style="font-weight: 600; color: var(--text-secondary);">${assetCode}</td>
-                                <td>${assetName}</td>
-                                <td><span class="status-badge badge-category">${assetCategory}</span></td>
-                                <td style="text-align: center;">
-                                    <button type="button" class="btn-remove-row" data-key="${matrixKey}">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
+                            <td>${empCode}</td>
+                            <td>${empName}</td>
+                            <td>${inventoryCode}</td>
+                            <td>${assetCode}</td>
+                            <td>${assetName}</td>
+                            <td>${serialNumber}</td>
+                            <td><span class="status-badge badge-category">${assetCategory}</span></td>
+                            <td style="text-align:center;">
+                                <button type="button"
+                                        class="btn-remove-row"
+                                        data-key="${matrixKey}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
                             `;
 
                             gridBody.appendChild(rowElement);
@@ -503,7 +534,7 @@
                             });
 
                             // Clear single asset input for swift loops
-                            ddlAsset.value = "";
+                           ddlInventory.value = "";
 
                         } catch (err) {
                             showVqSystemAlert("System Breakdown", "Fatal background communication processing pipeline failure.");
@@ -526,15 +557,19 @@
                         // Package data array into standard JSON schema layout matching model classes
                         let payloadItems = [];
                         rowElements.forEach(row => {
-                            payloadItems.push({
-                                EmployeeId: parseInt(row.getAttribute("data-employee-id")),
-                                EmployeeCode: row.getAttribute("data-employee-code"),
-                                EmployeeName: row.getAttribute("data-employee-name"),
-                                AssetMasterId: parseInt(row.getAttribute("data-asset-id")),
-                                AssetCode: row.getAttribute("data-asset-code"),
-                                AssetName: row.getAttribute("data-asset-name"),
-                                AssetCategory: row.getAttribute("data-asset-category")
-                            });
+                                payloadItems.push({
+                                    EmployeeId: parseInt(row.getAttribute("data-employee-id")),
+                                    EmployeeCode: row.getAttribute("data-employee-code"),
+                                    EmployeeName: row.getAttribute("data-employee-name"),
+
+                                    AssetInventoryId: parseInt(row.getAttribute("data-inventory-id")),
+                                    InventoryCode: row.getAttribute("data-inventory-code"),
+
+                                    AssetCode: row.getAttribute("data-asset-code"),
+                                    AssetName: row.getAttribute("data-asset-name"),
+                                    SerialNumber: row.getAttribute("data-serial-number"),
+                                    AssetCategory: row.getAttribute("data-asset-category")
+                                });
                         });
 
                         const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';

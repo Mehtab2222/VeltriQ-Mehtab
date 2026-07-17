@@ -1,0 +1,299 @@
+﻿@model VeltriQ.ViewModels.AssetReturn.AssetReturnCreateViewModel
+
+@{
+    ViewData["Title"] = "Process Asset Return";
+}
+
+<style>
+    .return-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .return-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .btn-cancel-theme {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .15s ease-in-out;
+    }
+
+        .btn-cancel-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    .return-form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .return-card-top {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .return-card-title h3 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .return-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .workspace-form-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* ── HIGH DENSITY DUAL READ ONLY PANELS ── */
+    .metadata-panel-deck {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 14px;
+        background: var(--hover-bg);
+        border: 1px dashed var(--border);
+    }
+
+    .metadata-sub-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .metadata-info-line {
+        font-size: 12.5px;
+        color: var(--text-primary);
+    }
+
+        .metadata-info-line strong {
+            color: var(--purple);
+        }
+
+    .metadata-panel-title {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4px;
+    }
+
+    .form-grid-deck {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-deck-input, .select-deck-input {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+    select.select-deck-input {
+        cursor: pointer;
+        padding-right: 24px;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .form-deck-input:focus, .select-deck-input:focus {
+        border-color: var(--purple);
+    }
+
+    .form-deck-textarea {
+        width: 100%;
+        height: 64px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 8px 12px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        resize: none;
+        transition: border-color 0.2s ease;
+    }
+
+        .form-deck-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .panel-footer-deck {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.01);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-submit-return {
+        height: 36px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #d97706, #eab308);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: transform 0.2s ease;
+    }
+
+        .btn-submit-return:hover {
+            transform: translateY(-1px);
+        }
+
+    .text-danger {
+        color: #ef4444;
+        font-size: 11px;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+</style>
+
+<div class="return-container">
+
+    <div class="return-header">
+        <a asp-action="Index" class="btn-cancel-theme">
+            <i class="bi bi-arrow-left"></i> Back to Registries
+        </a>
+    </div>
+
+    <form asp-action="Return" method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="EmployeeAssetId" />
+        <input type="hidden" asp-for="EmployeeId" />
+        <input type="hidden" asp-for="AssetInventoryId" />
+        <input type="hidden" asp-for="EmployeeCode" />
+        <input type="hidden" asp-for="EmployeeName" />
+        <input type="hidden" asp-for="InventoryCode" />
+        <input type="hidden" asp-for="AssetCode" />
+        <input type="hidden" asp-for="AssetName" />
+        <input type="hidden" asp-for="SerialNumber" />
+        <input type="hidden" asp-for="IssueDate" />
+
+        <div class="return-form-card">
+            <div class="return-card-top">
+                <div class="return-card-title">
+                    <h3>Process Asset Return Handover</h3>
+                    <p>Log incoming physical parameters, condition audits, and return timestamps into stock ledgers.</p>
+                </div>
+            </div>
+
+            <div class="workspace-form-body">
+
+                <div class="metadata-panel-deck">
+                    <div class="metadata-sub-group">
+                        <div class="metadata-panel-title">Custodian Employee Info</div>
+                        <div class="metadata-info-line">Name: <strong>@Model.EmployeeName</strong></div>
+                        <div class="metadata-info-line">Code: <strong>@Model.EmployeeCode</strong></div>
+                        <div class="metadata-info-line">Handover On: <strong>@(Model.IssueDate?.ToString("dd MMM yyyy") ?? "-")</strong></div>
+                    </div>
+                    <div class="metadata-sub-group">
+                        <div class="metadata-panel-title">Asset Specification Metrics</div>
+                        <div class="metadata-info-line">Asset Item: <strong>@Model.AssetName (@Model.AssetCode)</strong></div>
+                        <div class="metadata-info-line">Inventory ID: <strong>@Model.InventoryCode</strong></div>
+                        <div class="metadata-info-line">Serial Label: <strong style="font-family: monospace;">@(string.IsNullOrWhiteSpace(Model.SerialNumber) ? "N/A" : Model.SerialNumber)</strong></div>
+                    </div>
+                </div>
+
+                <div class="form-grid-deck">
+                    <div class="form-group-block">
+                        <label>Warehouse Return Date <span class="text-danger">*</span></label>
+                        <input asp-for="ReturnDate" type="date" class="form-deck-input" />
+                        <span asp-validation-for="ReturnDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-block">
+                        <label>Incoming Condition State <span class="text-danger">*</span></label>
+                        <select asp-for="ConditionStatus" class="select-deck-input">
+                            <option value="Excellent">Excellent Condition</option>
+                            <option value="Good">Good / Working State</option>
+                            <option value="Damaged">Damaged / Needs Maintenance</option>
+                            <option value="Scrapped">Scrapped / Dead on Arrival</option>
+                        </select>
+                        <span asp-validation-for="ConditionStatus" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group-block">
+                    <label>Audit Handover Remarks</label>
+                    <textarea asp-for="Remarks" class="form-deck-textarea" placeholder="Provide extra log condition comments, missing components checklist or storage descriptions..."></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="panel-footer-deck">
+                <button type="submit" class="btn-submit-return">
+                    <i class="bi bi-arrow-counterclockwise"></i> Process Handover Confirmation
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
