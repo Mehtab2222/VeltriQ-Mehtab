@@ -111,6 +111,9 @@ namespace VeltriQ.Data
         public DbSet<EmployeeDependent> EmployeeDependents { get; set; }
 
         public DbSet<EmployeeQualification> EmployeeQualifications { get; set; }
+        public DbSet<InductionProgramMaster> InductionProgramMasters { get; set; }
+        public DbSet<InductionSessionMaster> InductionSessionMasters { get; set; }
+        public DbSet<InductionSessionTopicMaster> InductionSessionTopicMasters { get; set; }
 
         // =========================
         // MAP SCHEMAS
@@ -125,7 +128,42 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+            //============================================================
+            // Induction Session Topic Master
+            //============================================================
 
+            modelBuilder.Entity<InductionSessionTopicMaster>()
+                .ToTable("InductionSessionTopicMaster", "HR");
+
+            modelBuilder.Entity<InductionSessionTopicMaster>()
+                .HasOne(x => x.InductionSessionMaster)
+                .WithMany()
+                .HasForeignKey(x => x.InductionSessionMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<InductionSessionMaster>()
+                .ToTable("InductionSessionMaster", "HR");
+
+            modelBuilder.Entity<InductionSessionMaster>()
+                .HasOne(x => x.InductionProgramMaster)
+                .WithMany()
+                .HasForeignKey(x => x.InductionProgramMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<InductionSessionMaster>()
+                .HasIndex(x => x.SessionCode)
+                .IsUnique();
+
+            modelBuilder.Entity<InductionProgramMaster>()
+                .ToTable("InductionProgramMaster", "HR");
+
+            modelBuilder.Entity<InductionProgramMaster>()
+                .HasIndex(x => x.ProgramCode)
+                .IsUnique();
+
+            modelBuilder.Entity<InductionProgramMaster>()
+                .HasIndex(x => x.ProgramName)
+                .IsUnique();
             modelBuilder.Entity<OnboardingCandidateInvitation>()
                 .HasOne(x => x.OnboardingCandidate)
                 .WithMany()

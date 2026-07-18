@@ -1,0 +1,347 @@
+﻿
+@model VeltriQ.ViewModels.EmployeeAssets.EmployeeAssetAllocateViewModel
+
+@{
+    ViewData["Title"] = "Allocate Asset";
+    bool isGlobal = ViewBag.IsGlobalMode ?? false;
+}
+ <style>
+                    .asset-page {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .asset-header {
+                        display: flex;
+                        justify-content: flex-end;
+                        align-items: center;
+                        margin-bottom: 12px;
+                        gap: 12px;
+                    }
+
+                    .btn-cancel-theme {
+                        height: 34px;
+                        padding: 0 14px;
+                        border-radius: 6px;
+                        border: 1px solid var(--border);
+                        background: var(--hover-bg);
+                        color: var(--text-primary);
+                        font-size: 12px;
+                        font-weight: 600;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        text-decoration: none;
+                        transition: .15s ease-in-out;
+                    }
+
+                        .btn-cancel-theme:hover {
+                            background: rgba(124, 58, 237, 0.15);
+                            color: var(--purple);
+                        }
+
+                    .asset-master-card {
+                        background: var(--card-bg);
+                        border: 1px solid var(--border);
+                        border-radius: 0px;
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .asset-card-top {
+                        padding: 10px 16px;
+                        border-bottom: 1px solid var(--border);
+                    }
+
+                    .asset-card-title h3 {
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: var(--text-primary);
+                        margin: 0;
+                    }
+
+                    .asset-card-title p {
+                        font-size: 11px;
+                        color: var(--text-secondary);
+                        margin: 2px 0 0 0;
+                    }
+
+                    .workspace-form-body {
+                        padding: 16px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 16px;
+                    }
+
+                    .form-grid-deck {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 16px;
+                    }
+
+                    .form-group-block {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 6px;
+                    }
+
+                        .form-group-block label {
+                            font-size: 11px;
+                            font-weight: 700;
+                            color: var(--text-secondary);
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+
+                    .form-deck-input, .select-deck-input {
+                        width: 100%;
+                        height: 36px;
+                        border-radius: 6px;
+                        border: 1px solid var(--border);
+                        background: var(--input-bg);
+                        color: var(--text-primary);
+                        padding: 0 12px;
+                        font-size: 13px;
+                        font-family: inherit;
+                        outline: none;
+                        transition: border-color 0.2s ease;
+                    }
+
+                    select.select-deck-input {
+                        cursor: pointer;
+                        padding-right: 24px;
+                        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+                        background-repeat: no-repeat;
+                        background-position: right 12px center;
+                        background-size: 12px;
+                        appearance: none;
+                    }
+
+                    .form-deck-input:focus, .select-deck-input:focus {
+                        border-color: var(--purple);
+                    }
+
+                    .form-deck-textarea {
+                        width: 100%;
+                        height: 64px;
+                        border-radius: 6px;
+                        border: 1px solid var(--border);
+                        background: var(--input-bg);
+                        color: var(--text-primary);
+                        padding: 8px 12px;
+                        font-size: 13px;
+                        font-family: inherit;
+                        outline: none;
+                        resize: none;
+                        transition: border-color 0.2s ease;
+                    }
+
+                        .form-deck-textarea:focus {
+                            border-color: var(--purple);
+                        }
+
+                    .metadata-panel-deck {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 16px;
+                        padding: 12px 14px;
+                        background: var(--hover-bg);
+                        border: 1px dashed var(--border);
+                    }
+
+                    .info-card-strip {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr 1fr;
+                        gap: 12px;
+                        padding: 12px 14px;
+                        background: rgba(255,255,255,0.01);
+                        border: 1px dashed var(--border);
+                        margin-top: 4px;
+                    }
+
+                    .metadata-info-card {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                    }
+
+                    .metadata-card-label {
+                        font-size: 9.5px;
+                        font-weight: 700;
+                        color: var(--text-muted);
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+
+                    .metadata-card-value {
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--text-primary);
+                    }
+
+                    .panel-footer-deck {
+                        padding: 16px;
+                        border-top: 1px solid var(--border);
+                        background: rgba(255, 255, 255, 0.01);
+                        display: flex;
+                        justify-content: flex-end;
+                    }
+
+                    .btn-submit-stock {
+                        height: 36px;
+                        padding: 0 20px;
+                        border-radius: 6px;
+                        border: none;
+                        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+                        color: #fff;
+                        font-size: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                    }
+
+                        .btn-submit-stock:hover {
+                            transform: translateY(-1px);
+                        }
+
+                    .text-danger {
+                        color: #ef4444;
+                        font-size: 11px;
+                        font-weight: 600;
+                    }
+ </style>
+
+<div class="asset-page">
+
+                    <div class="asset-header">
+                        <a asp-action="Index" class="btn-cancel-theme">
+                            <i class="bi bi-arrow-left"></i> Back to Employee Assets
+                        </a>
+                    </div>
+
+                    <form asp-action="Allocate" method="post" id="allocationSubmitForm">
+                        @Html.AntiForgeryToken()
+
+                        <div class="asset-master-card">
+                            <div class="asset-card-top">
+                                <div class="asset-card-title">
+                                    <h3>Allocate Corporate Asset</h3>
+                                    <p>Assign available stock tracking codes directly to an organization staff profile.</p>
+                                </div>
+                            </div>
+
+                            <div class="workspace-form-body">
+
+                                <div asp-validation-summary="ModelOnly" class="text-danger" style="list-style:none; padding:0; margin:0 0 4px 0;"></div>
+
+                                @if (isGlobal)
+                                {
+                                    <div class="form-group-block" style="margin-bottom: 4px;">
+                                        <label>Target Employee Profile Account <span class="text-danger">*</span></label>
+                                        <select asp-for="EmployeeId" class="select-deck-input" asp-items="Model.Employees"></select>
+                                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" asp-for="EmployeeId" />
+                                    <div class="metadata-panel-deck">
+                                        <div class="metadata-info-card">
+                                            <span class="metadata-card-label">Target Custodian Employee</span>
+                                            <span class="metadata-card-value" style="color: var(--purple);">@Model.EmployeeCode - @Model.EmployeeName</span>
+                                        </div>
+                                        <div class="metadata-info-card">
+                                            <span class="metadata-card-label">Assigned Department</span>
+                                            <span class="metadata-card-value">@(string.IsNullOrWhiteSpace(Model.Department) ? "-" : Model.Department)</span>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="form-grid-deck">
+                                    <div class="form-group-block">
+                                        <label>Select Available Stock Unit <span class="text-danger">*</span></label>
+                                        <select asp-for="AssetInventoryId" id="ddlInventoryItem" class="select-deck-input" asp-items="Model.AvailableAssets"></select>
+                                        <span asp-validation-for="AssetInventoryId" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group-block">
+                                        <label>Handover Issue Date <span class="text-danger">*</span></label>
+                                        <input asp-for="IssueDate" type="date" class="form-deck-input" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                        <span asp-validation-for="IssueDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="info-card-strip" id="panelStockBlueprint" style="display: none;">
+                                    <div class="metadata-info-card">
+                                        <span class="metadata-card-label">Category / Asset Code</span>
+                                        <span class="metadata-card-value" id="lblCategory">-</span>
+                                    </div>
+                                    <div class="metadata-info-card">
+                                        <span class="metadata-card-label">Manufacturer Brand / Model</span>
+                                        <span class="metadata-card-value" id="lblBrandModel">-</span>
+                                    </div>
+                                    <div class="metadata-info-card">
+                                        <span class="metadata-card-label">Serial / Condition</span>
+                                        <span class="metadata-card-value" id="lblSerialCondition">-</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-block">
+                                    <label>Internal Technical Remarks</label>
+                                    <textarea asp-for="Remarks" class="form-deck-textarea" placeholder="Provide extra log configuration details or storage references..."></textarea>
+                                    <span asp-validation-for="Remarks" class="text-danger"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="panel-footer-deck">
+                                <button type="submit" class="btn-submit-stock">
+                                    <i class="bi bi-check-circle"></i> Allocate Asset
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+ </div>
+
+<script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const ddlInventory = document.getElementById("ddlInventoryItem");
+                        const panelBlueprint = document.getElementById("panelStockBlueprint");
+
+                        const lblCategory = document.getElementById("lblCategory");
+                        const lblBrandModel = document.getElementById("lblBrandModel");
+                        const lblSerialCondition = document.getElementById("lblSerialCondition");
+
+                        if (!ddlInventory) return;
+
+                        ddlInventory.addEventListener("change", async function () {
+                            const assetInventoryId = this.value;
+
+                            if (!assetInventoryId) {
+                                panelBlueprint.style.display = "none";
+                                return;
+                            }
+
+                            try {
+                                const url = `/EmployeeAssets/GetInventoryDetails?assetInventoryId=${assetInventoryId}`;
+                                const stream = await fetch(url, { method: 'GET' });
+                                if (!stream.ok) throw new Error("API Error");
+                                const data = await stream.json();
+
+                                if (data) {
+                                    lblCategory.innerHTML = `<span class="status-badge" style="background:rgba(124,58,237,.12); color:var(--purple); height:16px; font-size:9.5px; padding:0 6px;">${data.category}</span><br/><code style="font-size:11px; color:var(--text-muted);">${data.assetCode}</code>`;
+                                    lblBrandModel.innerText = `${data.brand} / ${data.model}`;
+                                    lblSerialCondition.innerHTML = `<span style="font-family:monospace; font-weight:700;">${data.serial}</span><br/><span style="font-size:11px; color:var(--text-secondary); font-weight:600;">Cond: ${data.condition}</span>`;
+
+                                    panelBlueprint.style.display = "grid";
+                                }
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        });
+                    });
+</script>

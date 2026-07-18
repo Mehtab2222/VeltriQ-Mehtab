@@ -719,6 +719,11 @@
                                 </a>
                             </li>
                             <li>
+                                <a asp-controller="EmployeeAssets" asp-action="Index">
+                                    <i class="bi bi-people"></i>Employee Asset
+                                </a>
+                            </li>
+                            <li>
                                 <a asp-controller="AssetReturn" asp-action="Index">
                                     <i class="bi bi-arrow-counterclockwise"></i>Return
                                 </a>
@@ -878,8 +883,8 @@
                             <i class="bi bi-chevron-down dropdown-icon"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="#"><i class="bi bi-journal-bookmark"></i>Induction Program</a></li>
-                            <li><a href="#"><i class="bi bi-calendar-week"></i>Training Schedule</a></li>
+                            <li><a href="/InductionProgram/Index"><i class="bi bi-journal-bookmark"></i>Induction Program</a></li>
+                            <li><a href="/InductionSession/Index"><i class="bi bi-calendar-week"></i>Program Sessions</a></li>
                             <li><a href="#"><i class="bi bi-clipboard-check"></i>Assessment</a></li>
                             <li><a href="#"><i class="bi bi-person-video3"></i>Orientation Session</a></li>
                         </ul>

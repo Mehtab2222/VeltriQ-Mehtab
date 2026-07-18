@@ -39,22 +39,35 @@ namespace VeltriQ.Controllers
             var model = new AssetAllocationIndexViewModel();
 
             model.Items = await _context.Employees
+
                 .Include(x => x.Department)
-                .Where(x => x.IsActive)
+
+                .Where(x =>
+                    x.IsActive &&
+                    !_context.EmployeeAssets.Any(a =>
+                        a.EmployeeId == x.EmployeeId))
+
                 .OrderByDescending(x => x.EmployeeId)
+
                 .Select(x => new AssetAllocationListItemViewModel
                 {
                     EmployeeId = x.EmployeeId,
+
                     EmployeeCode = x.EmployeeCode,
+
                     EmployeeName = x.FirstName + " " + x.LastName,
-                    Department = x.Department != null ? x.Department.DepartmentName : "",
+
+                    Department = x.Department != null
+                        ? x.Department.DepartmentName
+                        : "",
+
                     JoiningDate = x.JoiningDate,
-                    TotalAssets = _context.EmployeeAssets
-                        .Count(a => a.EmployeeId == x.EmployeeId && a.IsActive),
-                    AllocationStatus = _context.EmployeeAssets.Any(a => a.EmployeeId == x.EmployeeId && a.IsActive)
-                        ? "Allocated"
-                        : "Pending"
+
+                    TotalAssets = 0,
+
+                    AllocationStatus = "Pending"
                 })
+
                 .ToListAsync();
 
             return View(model);
@@ -266,72 +279,6 @@ namespace VeltriQ.Controllers
                 Text = "-- Select Inventory Item --"
             });
         }
-        //====================================================
-        // DETAILS
-        //====================================================
-        public async Task<IActionResult> Details(int id)
-        {
-            var employee = await _context.Employees
-                .Include(x => x.Department)
-                .Include(x => x.Designation)
-                .Include(x => x.Branch)
-                .FirstOrDefaultAsync(x => x.EmployeeId == id);
-
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            var model = new AssetAllocationDetailsViewModel
-            {
-                EmployeeId = employee.EmployeeId,
-                EmployeeCode = employee.EmployeeCode,
-                EmployeeName = employee.FirstName + " " + employee.LastName,
-                Department = employee.Department?.DepartmentName ?? "-",
-                Designation = employee.Designation?.DesignationName ?? "-",
-                Branch = employee.Branch?.BranchName ?? "-",
-                JoiningDate = employee.JoiningDate
-            };
-
-            //====================================================
-            // LOAD ALLOCATED INVENTORY ITEMS
-            //====================================================
-            model.AllocatedAssets = await _context.EmployeeAssets
-                .Include(x => x.AssetInventory)
-                    .ThenInclude(x => x.AssetMaster)
-                .Where(x => x.EmployeeId == id && x.IsActive)
-                .OrderByDescending(x => x.EmployeeAssetId)
-                .Select(x => new AllocatedAssetItemViewModel
-                {
-                    EmployeeAssetId = x.EmployeeAssetId,
-
-                    AssetCode = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
-                        ? x.AssetInventory.AssetMaster.AssetCode
-                        : "",
-
-                    AssetName = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
-                        ? x.AssetInventory.AssetMaster.AssetName
-                        : "",
-
-                    AssetCategory = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
-                        ? x.AssetInventory.AssetMaster.AssetCategory
-                        : "",
-
-                    BrandName = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
-                        ? x.AssetInventory.AssetMaster.BrandName
-                        : "",
-
-                    ModelName = x.AssetInventory != null && x.AssetInventory.AssetMaster != null
-                        ? x.AssetInventory.AssetMaster.ModelName
-                        : "",
-
-                    AllocatedOn = x.CreatedOn,
-
-                    AllocatedBy = "System Admin"
-                })
-                .ToListAsync();
-
-            return View(model);
-        }
+        
     }
 }

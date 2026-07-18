@@ -1,0 +1,418 @@
+﻿@model IEnumerable<VeltriQ.ViewModels.EmployeeAssets.EmployeeAssetsIndexViewModel>
+
+@{
+    ViewData["Title"] = "Employee Custody Directories";
+}
+
+<style>
+    .asset-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .asset-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    /* ── COMPACT ALLOCATE BUTTON ── */
+    .asset-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .asset-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .asset-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .asset-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .asset-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .asset-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .asset-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .asset-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .asset-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .asset-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .asset-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .asset-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .asset-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .asset-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .asset-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── PROFILE DESCRIPTORS ── */
+    .emp-info-block {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .emp-avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7c3aed, #9333ea);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+    .emp-master-name {
+        font-weight: 600;
+        margin-bottom: 1px;
+        line-height: 1.2;
+    }
+
+    .emp-profile-link {
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+        .emp-profile-link:hover {
+            color: var(--purple);
+        }
+
+    .emp-sub-code {
+        font-size: 10.5px;
+        color: var(--text-muted);
+        line-height: 1;
+        font-weight: 700;
+    }
+
+    /* ── HIGH-DENSITY COMPACT BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .badge-holding {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .badge-clear {
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+    }
+
+    /* ── INLINE ACTIONS ── */
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+</style>
+
+<div class="asset-page">
+
+    <div class="asset-header">
+        <a href="/EmployeeAssets/Allocate" class="asset-add-btn">
+            <i class="bi bi-plus-lg"></i> Allocate New
+        </a>
+    </div>
+
+    <div class="asset-master-card">
+
+        <div class="asset-card-top">
+            <div class="asset-card-title">
+                <h3>Employee Assets</h3>
+                <p>Total Records: <span id="assetCounter">@Model.Count()</span></p>
+            </div>
+
+            <div class="asset-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="assetSearchInput" placeholder="Search assets..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="asset-table" id="assetGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Employee Staff Profile</th>
+                        <th>Department</th>
+                        <th style="text-align: center;">Active Handover Assets</th>
+                        <th style="text-align: center;">Total Lifetime Issued</th>
+                        <th>Last Allocation Stamp</th>
+                        <th>Custody Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="emp-info-block">
+                                        <div class="emp-avatar-circle">
+                                            @if (!string.IsNullOrWhiteSpace(item.EmployeeName) && item.EmployeeName.Contains(" "))
+                                            {
+                                                var components = item.EmployeeName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                                var firstInitial = components[0][0];
+                                                var secondInitial = components.Length > 1 ? components[1][0] : components[0][0];
+
+                                                @($"{firstInitial}{secondInitial}".ToUpper())
+                                            }
+                                            else
+                                            {
+                                                @("EM")
+                                            }
+                                        </div>
+                                        <div>
+                                            <div class="emp-master-name">
+                                                <a href="/EmployeeAssets/Details/@item.EmployeeId" class="emp-profile-link">
+                                                    @item.EmployeeName
+                                                </a>
+                                            </div>
+                                            <div class="emp-sub-code">@item.EmployeeCode</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.Department) ? "-" : item.Department)
+                                </td>
+
+                                <td style="text-align: center; font-weight: 700; color: var(--purple);">
+                                    @item.ActiveAssets
+                                </td>
+                                <td style="text-align: center; font-weight: 600; color: var(--text-secondary);">
+                                    @item.TotalAssetsIssued
+                                </td>
+
+                                <td style="color: var(--text-secondary);">
+                                    @(item.LastAllocationDate?.ToString("dd MMM yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @if (item.HasActiveAssets)
+                                    {
+                                        <span class="status-badge badge-holding">
+                                            Holding Assets
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge badge-clear">
+                                            Clear Registry
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="/EmployeeAssets/Details/@item.EmployeeId" class="action-btn" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="emptyMatrixFallback">
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No records found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("assetSearchInput");
+        const matrixGrid = document.getElementById("assetGridMatrix");
+        const counterTracker = document.getElementById("assetCounter");
+
+        if (!searchInput || !matrixGrid)
+            return;
+
+        const dataRows = matrixGrid.querySelectorAll("tbody tr:not(#emptyMatrixFallback)");
+        let inlineFallbackRow = document.getElementById("emptyMatrixFallback");
+
+        if (!inlineFallbackRow) {
+            inlineFallbackRow = document.createElement("tr");
+            inlineFallbackRow.id = "emptyMatrixFallback";
+            inlineFallbackRow.innerHTML =
+                `<td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">
+                    No matching records found.
+                 </td>`;
+            inlineFallbackRow.style.display = "none";
+            matrixGrid.querySelector("tbody").appendChild(inlineFallbackRow);
+        }
+
+        // Search engine matching reference page algorithm
+        searchInput.addEventListener("input", function () {
+            const criteria = this.value.trim().toLowerCase();
+            let matchedCount = 0;
+
+            dataRows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(criteria)) {
+                    row.style.display = "";
+                    matchedCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            inlineFallbackRow.style.display = matchedCount === 0 ? "" : "none";
+            counterTracker.textContent = matchedCount;
+        });
+    });
+</script>

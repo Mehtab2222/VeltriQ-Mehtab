@@ -1,0 +1,808 @@
+﻿
+@model VeltriQ.ViewModels.InductionSessions.InductionSessionIndexViewModel
+
+@{
+    ViewData["Title"] = "Induction Program Sessions";
+}
+
+<style>
+    .session-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 16px;
+    }
+
+    .program-filter-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .program-filter-wrap label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+        }
+
+    .select-session-filter {
+        height: 34px;
+        min-width: 260px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 24px 0 12px;
+        font-size: 12.5px;
+        font-weight: 600;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px;
+    }
+
+    .btn-add-session {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+        .btn-add-session:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .session-matrix-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .session-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .session-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .session-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .matrix-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .matrix-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .matrix-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .matrix-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .btn-manage-topics {
+        color: var(--purple);
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 12px;
+        border-bottom: 1px dashed var(--purple);
+    }
+
+        .btn-manage-topics:hover {
+            color: var(--text-primary);
+            border-bottom-color: var(--text-primary);
+        }
+
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .action-btn.toggle-deactivate-btn {
+            color: #22c55e;
+        }
+
+            .action-btn.toggle-deactivate-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        .action-btn.toggle-activate-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.toggle-activate-btn:hover {
+                background: #22c55e;
+                color: #fff;
+            }
+
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        width: 500px;
+        max-width: 92%;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .modal-card.modal-wide {
+            width: 680px;
+        }
+
+    .modal-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+    }
+
+        .modal-card-header h4 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 12px;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    .form-deck-input, .form-deck-textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        border-radius: 6px;
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .form-deck-input {
+        height: 36px;
+    }
+
+    .form-deck-textarea {
+        height: 64px;
+        padding: 8px 12px;
+        resize: none;
+    }
+
+        .form-deck-input:focus, .form-deck-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .modal-card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .btn-modal-cancel {
+        height: 34px;
+        padding: 0 14px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .topic-form-inline {
+        padding: 12px;
+        background: var(--hover-bg);
+        border: 1px dashed var(--border);
+        margin-bottom: 14px;
+    }
+
+    .topic-list-scroll {
+        max-height: 240px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="session-page">
+    <div class="session-header">
+        <div class="program-filter-wrap">
+            <label>Active Program Target:</label>
+            <select asp-for="SelectedProgramId" id="ddlProgramFilter" class="select-session-filter" asp-items="ViewBag.Programs" onchange="handleProgramSelectionChange()">
+                <option value="">-- Choose Induction Program --</option>
+            </select>
+        </div>
+        <button type="button" class="btn-add-session" id="btnAddSessionTrigger" style="display: none;" onclick="openCreateModal()">
+            <i class="bi bi-plus-lg"></i> Add Session
+        </button>
+    </div>
+
+    <div class="session-matrix-card">
+        <div class="session-card-top">
+            <div class="session-card-title">
+                <h3>Curriculum Structure Registry</h3>
+                <p>Sequential operational module sessions for the active target deployment selection.</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="matrix-table" id="sessionTableMatrix">
+                <thead>
+                    <tr>
+                        <th style="width: 70px; text-align: center;">Seq #</th>
+                        <th>Session Code</th>
+                        <th>Session Title</th>
+                        <th>Duration</th>
+                        <th>Session Topics</th>
+                        <th>Constraint Rule</th>
+                        <th>Status</th>
+                        <th class="text-end" style="width: 100px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionGridBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Syncing data blocks...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="sessionModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4 id="modalHeadingTitle">Add Curriculum Session</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer;" onclick="closeSessionModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="sessionWorkspaceForm" onsubmit="submitSessionForm(event)">
+            <input type="hidden" id="txtInductionSessionMasterId" name="InductionSessionMasterId" value="0" />
+            <input type="hidden" id="hiddenProgramId" name="InductionProgramMasterId" value="0" />
+
+            <div style="padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+                <div class="form-group-block">
+                    <label>Target Program Context</label>
+                    <input type="text" id="txtTargetProgramNameReadOnly" class="form-deck-input" style="opacity: 0.7; background: var(--hover-bg);" readonly />
+                </div>
+                <div class="form-group-block">
+                    <label>Session Title *</label>
+                    <input type="text" id="txtSessionTitle" name="SessionTitle" class="form-deck-input" placeholder="e.g. Identity badging setup" maxlength="150" required />
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                    <div class="form-group-block">
+                        <label>Sequence Order *</label>
+                        <input type="number" id="numSessionOrder" name="SessionOrder" class="form-deck-input" min="1" max="100" required />
+                    </div>
+                    <div class="form-group-block">
+                        <label>Duration (Minutes) *</label>
+                        <input type="number" id="numDurationInMinutes" name="DurationInMinutes" class="form-deck-input" min="1" max="1440" value="45" required />
+                    </div>
+                </div>
+                <div class="form-group-block">
+                    <label>Session Overview Notes</label>
+                    <textarea id="txtDescription" name="Description" class="form-deck-textarea" placeholder="Provide breakdown timeline items..." maxlength="500"></textarea>
+                </div>
+                <div style="display: flex; gap: 20px; padding-top: 6px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="chkIsMandatory" name="IsMandatory" value="true" checked style="cursor: pointer;" />
+                        <label for="chkIsMandatory" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); cursor: pointer; text-transform: uppercase;">Mandatory Asset</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="chkIsActive" name="IsActive" value="true" checked style="cursor: pointer;" />
+                        <label for="chkIsActive" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); cursor: pointer; text-transform: uppercase;">Active Session</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-card-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeSessionModal()">Cancel</button>
+                <button type="submit" class="btn-action-trigger" id="btnSubmitForm">Save Block</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="topicModalLayer">
+    <div class="modal-card modal-wide">
+        <div class="modal-card-header">
+            <h4>Manage Session Topics</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer;" onclick="closeTopicModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="font-size: 13px; margin-bottom: 8px; color: var(--text-secondary);">
+                Program: <strong id="lblTopicProgramName" style="color:var(--text-primary);"></strong> <br />
+                Session: <strong id="lblTopicSessionTitle" style="color:var(--purple);"></strong>
+            </div>
+
+            <form id="topicEntryForm" onsubmit="submitTopicForm(event)" class="topic-form-inline">
+                <input type="hidden" id="txtTopicSessionId" name="InductionSessionMasterId" value="0" />
+                <input type="hidden" id="txtInductionSessionTopicMasterId" name="InductionSessionTopicMasterId" value="0" />
+
+                <div style="display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: flex-end;">
+                    <div class="form-group-block" style="margin:0;">
+                        <label>Topic Heading Name *</label>
+                        <input type="text" id="txtTopicName" name="TopicName" class="form-deck-input" placeholder="Enter topic checklist title..." maxlength="250" required />
+                    </div>
+                    <button type="submit" class="btn-action-trigger" id="btnSaveTopic" style="height:36px; justify-content:center; width:100%;">Add Topic</button>
+                </div>
+            </form>
+
+            <div style="font-size: 11px; font-weight: 700; color: var(--purple); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+                <i class="bi bi-info-circle"></i> Tip: Drag rows up or down to re-order the display sequence.
+            </div>
+
+            <div class="topic-list-scroll">
+                <table class="matrix-table" style="background: var(--input-bg);" id="tblTopicsSortableMatrix">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;"></th>
+                            <th style="width: 60px; text-align: center;">Order</th>
+                            <th>Topic Title Checklist Parameter</th>
+                            <th>Status</th>
+                            <th class="text-end" style="width: 90px; padding-right:16px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topicGridBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-card-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeTopicModal()">Close Window</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeCacheSessions = [];
+    let activeCacheTopics = [];
+
+    // ✅ AUTOMATED PAGE LOAD ACCELERATION INTERCEPTOR
+    document.addEventListener("DOMContentLoaded", function () {
+        const programId = document.getElementById("ddlProgramFilter").value;
+        if (programId && programId !== "") {
+            document.getElementById("btnAddSessionTrigger").style.display = "inline-flex";
+            fetchAndRenderSessionsList(programId);
+        } else {
+            document.getElementById("sessionGridBody").innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                    No active induction programs found in standard libraries.
+                </td>
+            </tr>`;
+        }
+    });
+
+    function handleProgramSelectionChange() {
+        const programId = document.getElementById("ddlProgramFilter").value;
+        const btnAdd = document.getElementById("btnAddSessionTrigger");
+
+        if (!programId) {
+            btnAdd.style.display = "none";
+            document.getElementById("sessionGridBody").innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                    Please choose an induction program target filter above to view structural curriculum records.
+                </td>
+            </tr>`;
+            return;
+        }
+
+        btnAdd.style.display = "inline-flex";
+        fetchAndRenderSessionsList(programId);
+    }
+
+    async function fetchAndRenderSessionsList(programId) {
+        const tbody = document.getElementById("sessionGridBody");
+        try {
+            const res = await fetch(`/InductionSession/GetSessions?inductionProgramMasterId=${programId}`, { method: 'GET' });
+            const result = await res.json();
+
+            if (result.success) {
+                activeCacheSessions = result.data || [];
+                renderGridRows(activeCacheSessions);
+            }
+        } catch {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red; padding:24px;">Logistical lookup error.</td></tr>`;
+        }
+    }
+
+    function renderGridRows(dataset) {
+        const tbody = document.getElementById("sessionGridBody");
+        if (dataset.length === 0) {
+            tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                    No operational curriculum sessions currently configured inside this program blueprint master track.
+                </td>
+            </tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(item => `
+        <tr>
+            <td style="text-align: center; font-weight: 700; color: var(--text-secondary);">${item.sessionOrder}</td>
+            <td style="font-family: monospace; font-weight: 700; color: var(--purple);">${item.sessionCode}</td>
+            <td style="font-weight: 600;">${item.sessionTitle}</td>
+            <td style="font-weight: 500; color: var(--text-secondary);">${item.durationInMinutes} Mins</td>
+            <td>
+                <a href="javascript:void(0);" class="btn-manage-topics" onclick="openTopicsWorkspace(${item.inductionSessionMasterId})">
+                    <i class="bi bi-list-nested"></i> Manage Topics
+                </a>
+            </td>
+            <td style="font-weight: 600; color: ${item.isMandatory ? '#ef4444' : 'var(--text-secondary)'};">
+                ${item.isMandatory ? 'Mandatory' : 'Optional'}
+            </td>
+            <td style="font-weight: 600; color: ${item.isActive ? '#22c55e' : '#f87171'};">
+                ${item.isActive ? 'Active' : 'Inactive'}
+            </td>
+            <td>
+                <div class="table-actions">
+                    <button type="button" class="action-btn" title="Modify Session Parameters" onclick="openEditModal(${item.inductionSessionMasterId})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="action-btn ${item.isActive ? 'toggle-deactivate-btn' : 'toggle-activate-btn'}"
+                            title="${item.isActive ? 'Deactivate' : 'Activate'}"
+                            onclick="executeStatusToggle(${item.inductionSessionMasterId}, ${item.isActive})">
+                        <i class="bi ${item.isActive ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>`).join('');
+    }
+
+    async function openCreateModal() {
+        const ddlFilter = document.getElementById("ddlProgramFilter");
+        const programId = ddlFilter.value;
+        const programText = ddlFilter.options[ddlFilter.selectedIndex].text;
+
+        document.getElementById("sessionWorkspaceForm").reset();
+        document.getElementById("txtInductionSessionMasterId").value = "0";
+        document.getElementById("hiddenProgramId").value = programId;
+        document.getElementById("txtTargetProgramNameReadOnly").value = programText;
+        document.getElementById("chkIsMandatory").checked = true;
+        document.getElementById("chkIsActive").checked = true;
+
+        try {
+            const res = await fetch(`/InductionSession/GetNextSessionOrder?programId=${programId}`);
+            const data = await res.json();
+            document.getElementById("numSessionOrder").value = data.nextOrder;
+        } catch {
+            document.getElementById("numSessionOrder").value = 1;
+        }
+
+        document.getElementById("modalHeadingTitle").innerText = "Add Curriculum Session";
+        document.getElementById("btnSubmitForm").innerHTML = '<i class="bi bi-check-circle"></i> Add Session';
+        document.getElementById("sessionModalLayer").style.display = "flex";
+    }
+
+    function openEditModal(sessionId) {
+        const item = activeCacheSessions.find(x => x.inductionSessionMasterId === sessionId);
+        if (!item) return;
+
+        document.getElementById("txtInductionSessionMasterId").value = item.inductionSessionMasterId;
+        document.getElementById("hiddenProgramId").value = item.inductionProgramMasterId;
+        document.getElementById("txtTargetProgramNameReadOnly").value = item.programName;
+        document.getElementById("txtSessionTitle").value = item.sessionTitle;
+        document.getElementById("numSessionOrder").value = item.sessionOrder;
+        document.getElementById("numDurationInMinutes").value = item.durationInMinutes;
+        document.getElementById("txtDescription").value = item.description || "";
+        document.getElementById("chkIsMandatory").checked = item.isMandatory;
+        document.getElementById("chkIsActive").checked = item.isActive;
+
+        document.getElementById("modalHeadingTitle").innerText = "Modify Session Block";
+        document.getElementById("btnSubmitForm").innerHTML = '<i class="bi bi-check-circle"></i> Save Changes';
+        document.getElementById("sessionModalLayer").style.display = "flex";
+    }
+
+    function closeSessionModal() { document.getElementById("sessionModalLayer").style.display = "none"; }
+
+    async function submitSessionForm(e) {
+        e.preventDefault();
+        const sessionId = parseInt(document.getElementById("txtInductionSessionMasterId").value);
+        const actionUrl = sessionId === 0 ? "/InductionSession/Create" : "/InductionSession/Edit";
+        const programId = document.getElementById("hiddenProgramId").value;
+
+        const formData = new URLSearchParams();
+        formData.append("InductionSessionMasterId", sessionId);
+        formData.append("InductionProgramMasterId", programId);
+        formData.append("SessionTitle", document.getElementById("txtSessionTitle").value);
+        formData.append("SessionOrder", document.getElementById("numSessionOrder").value);
+        formData.append("DurationInMinutes", document.getElementById("numDurationInMinutes").value);
+        formData.append("Description", document.getElementById("txtDescription").value);
+        formData.append("IsMandatory", document.getElementById("chkIsMandatory").checked);
+        formData.append("IsActive", document.getElementById("chkIsActive").checked);
+
+        const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch(actionUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "RequestVerificationToken": antiForgeryToken
+                },
+                body: formData.toString()
+            });
+            const result = await res.json();
+            if (result.success) {
+                closeSessionModal();
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+                fetchAndRenderSessionsList(programId);
+            } else {
+                if (window.showVqError) window.showVqError(result.message);
+            }
+        } catch { alert("Error parsing session context."); }
+    }
+
+    function executeStatusToggle(sessionId, currentStatus) {
+        const programId = document.getElementById("ddlProgramFilter").value;
+        const message = `Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this induction curriculum session configuration?`;
+
+        const actionExecution = async function() {
+            const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            try {
+                const res = await fetch("/InductionSession/ToggleStatus", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "RequestVerificationToken": antiForgeryToken
+                    },
+                    body: "id=" + encodeURIComponent(sessionId)
+                });
+                const result = await res.json();
+                if (result.success) fetchAndRenderSessionsList(programId);
+            } catch { alert("Communication execution fault."); }
+        };
+
+        if (window.showVqConfirm) window.showVqConfirm(currentStatus ? "Deactivate Session" : "Activate Session", message, actionExecution);
+        else if (confirm(message)) actionExecution();
+    }
+
+    /* ── TOPICS SYSTEM DRAG & DROP ── */
+    async function openTopicsWorkspace(sessionId) {
+        document.getElementById("topicEntryForm").reset();
+        document.getElementById("txtTopicSessionId").value = sessionId;
+        document.getElementById("txtInductionSessionTopicMasterId").value = "0";
+        document.getElementById("btnSaveTopic").innerText = "Add Topic";
+
+        await reloadTopicsGridStream(sessionId);
+        document.getElementById("topicModalLayer").style.display = "flex";
+    }
+
+    function closeTopicModal() { document.getElementById("topicModalLayer").style.display = "none"; }
+
+    async function reloadTopicsGridStream(sessionId) {
+        const tbody = document.getElementById("topicGridBody");
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Syncing topic registers...</td></tr>`;
+
+        try {
+            const res = await fetch(`/InductionSession/GetTopics?sessionId=${sessionId}`, { method: 'GET' });
+            const result = await res.json();
+
+            if (result.success) {
+                document.getElementById("lblTopicProgramName").innerText = result.programName;
+                document.getElementById("lblTopicSessionTitle").innerText = result.sessionTitle;
+
+                activeCacheTopics = result.topics || [];
+
+                if (activeCacheTopics.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:16px; font-style:italic;">No checklist topics assigned to this structural block.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = activeCacheTopics.map((t, idx) => `
+                <tr class="draggable-topic-row" draggable="true" data-id="${t.inductionSessionTopicMasterId}" style="cursor: grab; transition: background-color 0.15s ease;" ondragstart="handleRowDragStart(event)" ondragover="handleRowDragOver(event)" onend="handleRowDragEnd(event)">
+                    <td style="text-align:center; color:var(--text-muted); font-size:14px;"><i class="bi bi-grip-vertical"></i></td>
+                    <td style="text-align:center; font-weight:700; color:var(--purple);" class="col-display-order">${idx + 1}</td>
+                    <td style="font-weight:600;" class="col-topic-name">${t.topicName}</td>
+                    <td><span class="status-badge ${t.isActive ? 'badge-active' : 'badge-inactive'}">${t.isActive ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <div class="table-actions" style="padding-right:8px;">
+                            <button type="button" class="action-btn" title="Edit Topic Name" onclick="loadSingleTopicForEdit(${t.inductionSessionTopicMasterId})"><i class="bi bi-pencil"></i></button>
+                            <button type="button" class="action-btn ${t.isActive ? 'toggle-deactivate-btn' : 'toggle-activate-btn'}" title="${t.isActive ? 'Deactivate' : 'Activate'}" onclick="executeTopicToggle(${t.inductionSessionTopicMasterId})"><i class="bi ${t.isActive ? 'bi-toggle-on' : 'bi-toggle-off'}"></i></button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+            }
+        } catch { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Topics tracking handshake failed.</td></tr>`; }
+    }
+
+    let draggedRowSource = null;
+    function handleRowDragStart(e) { draggedRowSource = e.currentTarget; e.currentTarget.style.backgroundColor = "rgba(124, 58, 237, 0.1)"; e.dataTransfer.effectAllowed = "move"; }
+    function handleRowDragOver(e) {
+        e.preventDefault();
+        const targetRow = e.currentTarget;
+        if (targetRow && targetRow !== draggedRowSource) {
+            const tbody = document.getElementById("topicGridBody");
+            const rowsArray = Array.from(tbody.children);
+            const sourceIndex = rowsArray.indexOf(draggedRowSource);
+            const targetIndex = rowsArray.indexOf(targetRow);
+            if (sourceIndex < targetIndex) tbody.insertBefore(draggedRowSource, targetRow.nextSibling);
+            else tbody.insertBefore(draggedRowSource, targetRow);
+            recalculateVisualOrders();
+        }
+    }
+    function handleRowDragEnd(e) { e.currentTarget.style.backgroundColor = ""; draggedRowSource = null; sendUpdatedOrderToDatabase(); }
+    document.addEventListener("dragend", function() { document.querySelectorAll('.draggable-topic-row').forEach(r => r.style.backgroundColor = ""); if (draggedRowSource) { sendUpdatedOrderToDatabase(); draggedRowSource = null; } });
+
+    function recalculateVisualOrders() { document.querySelectorAll(".draggable-topic-row").forEach((row, index) => { row.querySelector(".col-display-order").innerText = index + 1; }); }
+
+    async function sendUpdatedOrderToDatabase() {
+        const sessionId = document.getElementById("txtTopicSessionId").value;
+        const sortedIds = Array.from(document.querySelectorAll(".draggable-topic-row")).map(row => parseInt(row.getAttribute("data-id")));
+        const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const formData = new URLSearchParams();
+        sortedIds.forEach(id => formData.append("sortedTopicIds", id));
+        try {
+            const res = await fetch("/InductionSession/UpdateTopicsOrder", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded", "RequestVerificationToken": antiForgeryToken }, body: formData.toString() });
+            const result = await res.json();
+            if (!result.success) { alert(result.message); await reloadTopicsGridStream(sessionId); }
+        } catch { console.error("Failed to commit sort updates."); }
+    }
+
+    async function submitTopicForm(e) {
+        e.preventDefault();
+        const topicMasterId = parseInt(document.getElementById("txtInductionSessionTopicMasterId").value);
+        const sessionId = document.getElementById("txtTopicSessionId").value;
+        const actionUrl = topicMasterId === 0 ? "/InductionSession/AddTopic" : "/InductionSession/UpdateTopic";
+        const assignedOrder = topicMasterId === 0 ? (document.querySelectorAll(".draggable-topic-row").length + 1) : 1;
+
+        const formData = new URLSearchParams();
+        formData.append("InductionSessionTopicMasterId", topicMasterId);
+        formData.append("InductionSessionMasterId", sessionId);
+        formData.append("TopicName", document.getElementById("txtTopicName").value);
+        formData.append("DisplayOrder", assignedOrder);
+
+        const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch(actionUrl, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded", "RequestVerificationToken": antiForgeryToken }, body: formData.toString() });
+            const result = await res.json();
+            if (result.success) {
+                document.getElementById("topicEntryForm").reset();
+                document.getElementById("txtTopicSessionId").value = sessionId;
+                document.getElementById("txtInductionSessionTopicMasterId").value = "0";
+                document.getElementById("btnSaveTopic").innerText = "Add Topic";
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+                await reloadTopicsGridStream(sessionId);
+            } else { if (window.showVqError) window.showVqError(result.message); else alert(result.message); }
+        } catch { alert("Topic submission error."); }
+    }
+
+    async function loadSingleTopicForEdit(topicId) {
+        try {
+            const res = await fetch(`/InductionSession/GetTopic?topicId=${topicId}`, { method: 'GET' });
+            const result = await res.json();
+            if (result.success && result.data) { document.getElementById("txtInductionSessionTopicMasterId").value = result.data.inductionSessionTopicMasterId; document.getElementById("txtTopicName").value = result.data.topicName; document.getElementById("btnSaveTopic").innerText = "Update Topic"; }
+        } catch { alert("Failed to load topic configuration."); }
+    }
+
+    async function executeTopicToggle(topicId) {
+        const sessionId = document.getElementById("txtTopicSessionId").value;
+        const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch("/InductionSession/ToggleTopicStatus", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded", "RequestVerificationToken": antiForgeryToken }, body: "topicId=" + encodeURIComponent(topicId) });
+            const result = await res.json();
+            if (result.success) await reloadTopicsGridStream(sessionId);
+        } catch { alert("Network status update failure."); }
+    }
+</script>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VeltriQ.Data;
 
@@ -11,9 +12,11 @@ using VeltriQ.Data;
 namespace VeltriQ.Migrations.TenantDb
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260718213637_AddInductionSessionMaster")]
+    partial class AddInductionSessionMaster
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1614,49 +1617,6 @@ namespace VeltriQ.Migrations.TenantDb
                     b.ToTable("InductionProgramMaster", "HR");
                 });
 
-            modelBuilder.Entity("VeltriQ.Models.HR.InductionSessionTopicMaster", b =>
-                {
-                    b.Property<int>("InductionSessionTopicMasterId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InductionSessionTopicMasterId"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InductionSessionMasterId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TopicName")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.HasKey("InductionSessionTopicMasterId");
-
-                    b.HasIndex("InductionSessionMasterId");
-
-                    b.ToTable("InductionSessionTopicMaster", "HR");
-                });
-
             modelBuilder.Entity("VeltriQ.Models.HR.Nationality", b =>
                 {
                     b.Property<int>("NationalityId")
@@ -2625,7 +2585,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4942),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5215),
                             Description = "Permanent Employee",
                             DisplayOrder = 1,
                             EmploymentTypeCode = "PERM",
@@ -2635,7 +2595,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 2,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4962),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5229),
                             Description = "Employee on Probation",
                             DisplayOrder = 2,
                             EmploymentTypeCode = "PROB",
@@ -2645,7 +2605,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 3,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4964),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5231),
                             Description = "Contract Employee",
                             DisplayOrder = 3,
                             EmploymentTypeCode = "CONT",
@@ -2655,7 +2615,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 4,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4966),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5233),
                             Description = "Internship",
                             DisplayOrder = 4,
                             EmploymentTypeCode = "INTERN",
@@ -2665,7 +2625,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 5,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4968),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5234),
                             Description = "Consultant",
                             DisplayOrder = 5,
                             EmploymentTypeCode = "CONSULT",
@@ -2675,7 +2635,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 6,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4973),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5238),
                             Description = "Trainee",
                             DisplayOrder = 6,
                             EmploymentTypeCode = "TRAINEE",
@@ -2685,7 +2645,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 7,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4974),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5239),
                             Description = "Apprenticeship",
                             DisplayOrder = 7,
                             EmploymentTypeCode = "APPRENTICE",
@@ -2695,7 +2655,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             EmploymentTypeMasterId = 8,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(4976),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5241),
                             Description = "Part Time Employee",
                             DisplayOrder = 8,
                             EmploymentTypeCode = "PARTTIME",
@@ -2770,7 +2730,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             IdentityDocumentMasterId = 1,
                             CountryId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5398),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8018),
                             DisplayOrder = 1,
                             DocumentCode = "AADHAAR",
                             DocumentName = "Aadhaar Card",
@@ -2782,7 +2742,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             IdentityDocumentMasterId = 2,
                             CountryId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5453),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8045),
                             DisplayOrder = 2,
                             DocumentCode = "PAN",
                             DocumentName = "PAN Card",
@@ -2794,7 +2754,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             IdentityDocumentMasterId = 3,
                             CountryId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5456),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8048),
                             DisplayOrder = 3,
                             DocumentCode = "PASSPORT",
                             DocumentName = "Passport",
@@ -2806,7 +2766,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             IdentityDocumentMasterId = 4,
                             CountryId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5458),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8050),
                             DisplayOrder = 4,
                             DocumentCode = "DL",
                             DocumentName = "Driving License",
@@ -2817,7 +2777,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             IdentityDocumentMasterId = 5,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5460),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8052),
                             DisplayOrder = 5,
                             DocumentCode = "NATIONALID",
                             DocumentName = "National Identity Card",
@@ -2828,7 +2788,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             IdentityDocumentMasterId = 6,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5464),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8065),
                             DisplayOrder = 6,
                             DocumentCode = "WORKPERMIT",
                             DocumentName = "Work Permit",
@@ -2839,7 +2799,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             IdentityDocumentMasterId = 7,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5466),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8067),
                             DisplayOrder = 7,
                             DocumentCode = "VISA",
                             DocumentName = "Visa",
@@ -2901,7 +2861,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingActivityCategoryMasterId = 1,
                             CategoryCode = "PREJOIN",
                             CategoryName = "Pre Joining",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6568),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8806),
                             Description = "Activities before the joining date.",
                             DisplayOrder = 1,
                             IsActive = true
@@ -2911,7 +2871,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingActivityCategoryMasterId = 2,
                             CategoryCode = "DAYONE",
                             CategoryName = "Day One",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6579),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8810),
                             Description = "Activities to be completed on the first day.",
                             DisplayOrder = 2,
                             IsActive = true
@@ -2921,7 +2881,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingActivityCategoryMasterId = 3,
                             CategoryCode = "FIRSTWEEK",
                             CategoryName = "First Week",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6581),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8812),
                             Description = "Activities planned during the first week.",
                             DisplayOrder = 3,
                             IsActive = true
@@ -2931,7 +2891,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingActivityCategoryMasterId = 4,
                             CategoryCode = "FIRSTMONTH",
                             CategoryName = "First Month",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6583),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8813),
                             Description = "Activities planned during the first month.",
                             DisplayOrder = 4,
                             IsActive = true
@@ -3008,7 +2968,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 0,
                             ActivityName = "Document Verification",
                             ActivityOwner = "HR",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6684),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8864),
                             Description = "Verify submitted onboarding documents.",
                             DisplayOrder = 1,
                             IsActive = true,
@@ -3022,7 +2982,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 1,
                             ActivityName = "Welcome Session",
                             ActivityOwner = "HR",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6704),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8871),
                             Description = "Welcome session conducted by HR.",
                             DisplayOrder = 2,
                             IsActive = true,
@@ -3036,7 +2996,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 1,
                             ActivityName = "Official Email Creation",
                             ActivityOwner = "IT",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6708),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8873),
                             Description = "Create official email account.",
                             DisplayOrder = 3,
                             IsActive = true,
@@ -3050,7 +3010,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 1,
                             ActivityName = "ID Card Allocation",
                             ActivityOwner = "Admin",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6711),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8875),
                             Description = "Generate and issue employee ID card.",
                             DisplayOrder = 4,
                             IsActive = true,
@@ -3064,7 +3024,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 1,
                             ActivityName = "Asset Allocation",
                             ActivityOwner = "IT",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6714),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8878),
                             Description = "Allocate laptop and other assets.",
                             DisplayOrder = 5,
                             IsActive = true,
@@ -3078,7 +3038,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 1,
                             ActivityName = "Payroll Setup",
                             ActivityOwner = "Finance",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6718),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8881),
                             Description = "Create payroll profile.",
                             DisplayOrder = 6,
                             IsActive = true,
@@ -3092,7 +3052,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 2,
                             ActivityName = "Manager Introduction",
                             ActivityOwner = "Manager",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6721),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8883),
                             Description = "Introduction with reporting manager.",
                             DisplayOrder = 7,
                             IsActive = true,
@@ -3106,7 +3066,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 2,
                             ActivityName = "Team Introduction",
                             ActivityOwner = "Manager",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6723),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8885),
                             Description = "Meet team members.",
                             DisplayOrder = 8,
                             IsActive = true,
@@ -3120,7 +3080,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 3,
                             ActivityName = "Department Orientation",
                             ActivityOwner = "Manager",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6726),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8887),
                             Description = "Department orientation session.",
                             DisplayOrder = 9,
                             IsActive = true,
@@ -3134,7 +3094,7 @@ namespace VeltriQ.Migrations.TenantDb
                             ActivityDay = 30,
                             ActivityName = "First Month Review",
                             ActivityOwner = "HR",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6729),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8890),
                             Description = "Review employee onboarding progress.",
                             DisplayOrder = 10,
                             IsActive = true,
@@ -3349,7 +3309,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingDocumentCategoryMasterId = 1,
                             CategoryCode = "IDENTITY",
                             CategoryName = "Identity Documents",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5430),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5614),
                             Description = "Government issued identity documents.",
                             DisplayOrder = 1,
                             IsActive = true
@@ -3359,7 +3319,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingDocumentCategoryMasterId = 2,
                             CategoryCode = "ADDRESS",
                             CategoryName = "Address Proof",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5444),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5622),
                             Description = "Documents used as address proof.",
                             DisplayOrder = 2,
                             IsActive = true
@@ -3369,7 +3329,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingDocumentCategoryMasterId = 3,
                             CategoryCode = "EDUCATION",
                             CategoryName = "Educational Documents",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5446),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5623),
                             Description = "Academic certificates and mark sheets.",
                             DisplayOrder = 3,
                             IsActive = true
@@ -3379,7 +3339,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingDocumentCategoryMasterId = 4,
                             CategoryCode = "EMPLOYMENT",
                             CategoryName = "Employment Documents",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5448),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5625),
                             Description = "Previous employment related documents.",
                             DisplayOrder = 4,
                             IsActive = true
@@ -3389,7 +3349,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingDocumentCategoryMasterId = 5,
                             CategoryCode = "FINANCIAL",
                             CategoryName = "Financial Documents",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5449),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5627),
                             Description = "Bank and financial related documents.",
                             DisplayOrder = 5,
                             IsActive = true
@@ -3399,7 +3359,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingDocumentCategoryMasterId = 6,
                             CategoryCode = "MEDICAL",
                             CategoryName = "Medical Documents",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5451),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5629),
                             Description = "Medical certificates and health records.",
                             DisplayOrder = 6,
                             IsActive = true
@@ -3409,7 +3369,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingDocumentCategoryMasterId = 7,
                             CategoryCode = "OTHER",
                             CategoryName = "Other Documents",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5453),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5639),
                             Description = "Miscellaneous documents.",
                             DisplayOrder = 7,
                             IsActive = true
@@ -3503,7 +3463,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(599),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(521),
                             Description = "Recent passport size photograph.",
                             DisplayOrder = 1,
                             DocumentCode = "PHOTO",
@@ -3522,7 +3482,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(752),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(534),
                             Description = "Government issued Aadhaar card.",
                             DisplayOrder = 2,
                             DocumentCode = "AADHAAR",
@@ -3541,7 +3501,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(758),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(538),
                             Description = "Permanent Account Number card.",
                             DisplayOrder = 3,
                             DocumentCode = "PAN",
@@ -3560,7 +3520,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(762),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(541),
                             Description = "Passport document.",
                             DisplayOrder = 4,
                             DocumentCode = "PASSPORT",
@@ -3580,7 +3540,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(766),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(544),
                             Description = "Proof of current residential address.",
                             DisplayOrder = 5,
                             DocumentCode = "ADDRESS",
@@ -3599,7 +3559,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = true,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(772),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(548),
                             Description = "Educational certificates and mark sheets.",
                             DisplayOrder = 6,
                             DocumentCode = "EDUCATION",
@@ -3618,7 +3578,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf,doc,docx",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(775),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(551),
                             Description = "Latest resume or CV.",
                             DisplayOrder = 7,
                             DocumentCode = "RESUME",
@@ -3637,7 +3597,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = true,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(779),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(554),
                             Description = "Previous employment experience certificate.",
                             DisplayOrder = 8,
                             DocumentCode = "EXPERIENCE",
@@ -3657,7 +3617,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(783),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(557),
                             Description = "Bank account verification document.",
                             DisplayOrder = 9,
                             DocumentCode = "BANK",
@@ -3676,7 +3636,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = false,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf,jpg,jpeg,png",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(787),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(561),
                             Description = "Medical fitness certificate.",
                             DisplayOrder = 10,
                             DocumentCode = "MEDICAL",
@@ -3695,7 +3655,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = true,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(790),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(564),
                             Description = "Offer letter issued by HR.",
                             DisplayOrder = 11,
                             DocumentCode = "OFFER",
@@ -3714,7 +3674,7 @@ namespace VeltriQ.Migrations.TenantDb
                             AllowDownloadByCandidate = true,
                             AllowMultipleFiles = false,
                             AllowedFileTypes = "pdf",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(794),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(567),
                             Description = "Appointment letter generated after approval.",
                             DisplayOrder = 12,
                             DocumentCode = "APPOINTMENT",
@@ -3893,7 +3853,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingPolicyCategoryMasterId = 1,
                             CategoryCode = "HR",
                             CategoryName = "HR Policies",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6903),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8983),
                             Description = "Human Resource related policies.",
                             DisplayOrder = 1,
                             IsActive = true
@@ -3903,7 +3863,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingPolicyCategoryMasterId = 2,
                             CategoryCode = "IT",
                             CategoryName = "IT Policies",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6915),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8990),
                             Description = "Information Technology policies.",
                             DisplayOrder = 2,
                             IsActive = true
@@ -3913,7 +3873,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingPolicyCategoryMasterId = 3,
                             CategoryCode = "LEGAL",
                             CategoryName = "Legal Policies",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6917),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8992),
                             Description = "Legal agreements and compliance.",
                             DisplayOrder = 3,
                             IsActive = true
@@ -3923,7 +3883,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingPolicyCategoryMasterId = 4,
                             CategoryCode = "SECURITY",
                             CategoryName = "Security Policies",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6919),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8993),
                             Description = "Information security policies.",
                             DisplayOrder = 4,
                             IsActive = true
@@ -3933,7 +3893,7 @@ namespace VeltriQ.Migrations.TenantDb
                             OnboardingPolicyCategoryMasterId = 5,
                             CategoryCode = "FINANCE",
                             CategoryName = "Finance Policies",
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6921),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8995),
                             Description = "Finance and reimbursement policies.",
                             DisplayOrder = 5,
                             IsActive = true
@@ -4021,7 +3981,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 1,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7003),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9049),
                             Description = "Company HR policy.",
                             DisplayOrder = 1,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4037,7 +3997,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 2,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7019),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9059),
                             Description = "Employee leave policy.",
                             DisplayOrder = 2,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4053,7 +4013,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 3,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7023),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9063),
                             Description = "Acceptable use of company IT resources.",
                             DisplayOrder = 3,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4069,7 +4029,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 4,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7026),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9066),
                             Description = "Password management policy.",
                             DisplayOrder = 4,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4085,7 +4045,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 5,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7030),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9069),
                             Description = "Employee code of conduct.",
                             DisplayOrder = 5,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4101,7 +4061,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 6,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7033),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9074),
                             Description = "Confidentiality agreement.",
                             DisplayOrder = 6,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4117,7 +4077,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 7,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7036),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9077),
                             Description = "Information security guidelines.",
                             DisplayOrder = 7,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4133,7 +4093,7 @@ namespace VeltriQ.Migrations.TenantDb
                         {
                             OnboardingPolicyMasterId = 8,
                             AllowDownload = true,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(7039),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(9080),
                             Description = "Expense reimbursement process.",
                             DisplayOrder = 8,
                             EffectiveDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -4207,7 +4167,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(42),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(138),
                             DisplayOrder = 1,
                             IconCss = "",
                             IsActive = true,
@@ -4219,7 +4179,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 2,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(78),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(164),
                             DisplayOrder = 2,
                             IconCss = "",
                             IsActive = true,
@@ -4231,7 +4191,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 3,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(80),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(166),
                             DisplayOrder = 3,
                             IconCss = "",
                             IsActive = true,
@@ -4243,7 +4203,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 4,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(82),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(168),
                             DisplayOrder = 4,
                             IconCss = "",
                             IsActive = true,
@@ -4255,7 +4215,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 5,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(84),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(170),
                             DisplayOrder = 5,
                             IconCss = "",
                             IsActive = true,
@@ -4267,7 +4227,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 6,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(86),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(171),
                             DisplayOrder = 6,
                             IconCss = "",
                             IsActive = true,
@@ -4279,7 +4239,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 7,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(88),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(173),
                             DisplayOrder = 7,
                             IconCss = "",
                             IsActive = true,
@@ -4291,7 +4251,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 8,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(89),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(174),
                             DisplayOrder = 8,
                             IconCss = "",
                             IsActive = true,
@@ -4303,7 +4263,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 9,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(91),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(175),
                             DisplayOrder = 9,
                             IconCss = "",
                             IsActive = true,
@@ -4315,7 +4275,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingSectionMasterId = 10,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 235, DateTimeKind.Local).AddTicks(93),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 496, DateTimeKind.Local).AddTicks(177),
                             DisplayOrder = 10,
                             IconCss = "",
                             IsActive = true,
@@ -4376,7 +4336,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5095),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5340),
                             Description = "Onboarding initiated but invitation not sent.",
                             DisplayOrder = 1,
                             IsActive = true,
@@ -4386,7 +4346,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 2,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5110),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5350),
                             Description = "Invitation has been sent to the candidate.",
                             DisplayOrder = 2,
                             IsActive = true,
@@ -4396,7 +4356,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 3,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5112),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5352),
                             Description = "Candidate is filling the onboarding information.",
                             DisplayOrder = 3,
                             IsActive = true,
@@ -4406,7 +4366,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 4,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5114),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5354),
                             Description = "Candidate has submitted the onboarding form.",
                             DisplayOrder = 4,
                             IsActive = true,
@@ -4416,7 +4376,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 5,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5115),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5355),
                             Description = "HR is reviewing the submitted onboarding details.",
                             DisplayOrder = 5,
                             IsActive = true,
@@ -4426,7 +4386,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 6,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5118),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5358),
                             Description = "Candidate needs to correct or update the submitted information.",
                             DisplayOrder = 6,
                             IsActive = true,
@@ -4436,7 +4396,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 7,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5119),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5360),
                             Description = "Onboarding has been approved by HR.",
                             DisplayOrder = 7,
                             IsActive = true,
@@ -4446,7 +4406,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 8,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5121),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5361),
                             Description = "Candidate has been converted into an employee.",
                             DisplayOrder = 8,
                             IsActive = true,
@@ -4456,7 +4416,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 9,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5123),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5363),
                             Description = "Onboarding process has been cancelled.",
                             DisplayOrder = 9,
                             IsActive = true,
@@ -4466,7 +4426,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             OnboardingStatusMasterId = 10,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 258, DateTimeKind.Local).AddTicks(5125),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 514, DateTimeKind.Local).AddTicks(5365),
                             Description = "Onboarding invitation has expired.",
                             DisplayOrder = 10,
                             IsActive = true,
@@ -4803,7 +4763,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6069),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8452),
                             DisplayOrder = 1,
                             EducationLevel = "Secondary",
                             IsActive = true,
@@ -4818,7 +4778,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 2,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6082),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8461),
                             DisplayOrder = 2,
                             EducationLevel = "Higher Secondary",
                             IsActive = true,
@@ -4833,7 +4793,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 3,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6084),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8463),
                             DisplayOrder = 3,
                             EducationLevel = "Diploma",
                             IsActive = true,
@@ -4848,7 +4808,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 4,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6086),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8465),
                             DisplayOrder = 4,
                             EducationLevel = "Graduation",
                             IsActive = true,
@@ -4863,7 +4823,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 5,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6088),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8467),
                             DisplayOrder = 5,
                             EducationLevel = "Post Graduation",
                             IsActive = true,
@@ -4878,7 +4838,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 6,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6091),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8470),
                             DisplayOrder = 6,
                             EducationLevel = "Doctorate",
                             IsActive = true,
@@ -4893,7 +4853,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 7,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6093),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8472),
                             DisplayOrder = 7,
                             EducationLevel = "Certification",
                             IsActive = true,
@@ -4908,7 +4868,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 8,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6095),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8475),
                             DisplayOrder = 8,
                             EducationLevel = "Certification",
                             IsActive = true,
@@ -4923,7 +4883,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 9,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6097),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8477),
                             DisplayOrder = 9,
                             EducationLevel = "Certification",
                             IsActive = true,
@@ -4938,7 +4898,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 10,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6100),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8480),
                             DisplayOrder = 10,
                             EducationLevel = "Certification",
                             IsActive = true,
@@ -4953,7 +4913,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 11,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6102),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8482),
                             DisplayOrder = 11,
                             EducationLevel = "License",
                             IsActive = true,
@@ -4968,7 +4928,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 12,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6174),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8484),
                             DisplayOrder = 12,
                             EducationLevel = "Training",
                             IsActive = true,
@@ -4983,7 +4943,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationMasterId = 13,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(6177),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8486),
                             DisplayOrder = 13,
                             EducationLevel = "Training",
                             IsActive = true,
@@ -5055,7 +5015,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5632),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8203),
                             DisplayOrder = 1,
                             IsActive = true,
                             IsDefault = true,
@@ -5066,7 +5026,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 2,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5686),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8227),
                             DisplayOrder = 2,
                             IsActive = true,
                             IsDefault = true,
@@ -5077,7 +5037,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 3,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5690),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8230),
                             DisplayOrder = 3,
                             IsActive = true,
                             IsDefault = true,
@@ -5088,7 +5048,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 4,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5692),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8232),
                             DisplayOrder = 4,
                             IsActive = true,
                             IsDefault = true,
@@ -5099,7 +5059,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 5,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5694),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8233),
                             DisplayOrder = 5,
                             IsActive = true,
                             IsDefault = true,
@@ -5110,7 +5070,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 6,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5697),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8236),
                             DisplayOrder = 6,
                             IsActive = true,
                             IsDefault = true,
@@ -5121,7 +5081,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 7,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5699),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8238),
                             DisplayOrder = 7,
                             IsActive = true,
                             IsDefault = true,
@@ -5132,7 +5092,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 8,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5701),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8247),
                             DisplayOrder = 8,
                             IsActive = true,
                             IsDefault = true,
@@ -5143,7 +5103,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 9,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5703),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8249),
                             DisplayOrder = 9,
                             IsActive = true,
                             IsDefault = true,
@@ -5154,7 +5114,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 10,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5706),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8252),
                             DisplayOrder = 10,
                             IsActive = true,
                             IsDefault = true,
@@ -5165,7 +5125,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 11,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5708),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8253),
                             DisplayOrder = 11,
                             IsActive = true,
                             IsDefault = true,
@@ -5176,7 +5136,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationSpecializationMasterId = 12,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5710),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8255),
                             DisplayOrder = 12,
                             IsActive = true,
                             IsDefault = true,
@@ -5236,7 +5196,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationTypeMasterId = 1,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5900),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8362),
                             Description = "Formal educational qualifications.",
                             DisplayOrder = 1,
                             IsActive = true,
@@ -5246,7 +5206,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationTypeMasterId = 2,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5915),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8367),
                             Description = "Professional certifications issued by recognized organizations.",
                             DisplayOrder = 2,
                             IsActive = true,
@@ -5256,7 +5216,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationTypeMasterId = 3,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5917),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8368),
                             Description = "Government or industry issued licenses.",
                             DisplayOrder = 3,
                             IsActive = true,
@@ -5266,7 +5226,7 @@ namespace VeltriQ.Migrations.TenantDb
                         new
                         {
                             QualificationTypeMasterId = 4,
-                            CreatedOn = new DateTime(2026, 7, 19, 3, 44, 55, 257, DateTimeKind.Local).AddTicks(5920),
+                            CreatedOn = new DateTime(2026, 7, 19, 3, 6, 35, 513, DateTimeKind.Local).AddTicks(8370),
                             Description = "Professional or internal training programs.",
                             DisplayOrder = 4,
                             IsActive = true,
@@ -5824,17 +5784,6 @@ namespace VeltriQ.Migrations.TenantDb
                     b.Navigation("Employee");
 
                     b.Navigation("NewBranch");
-                });
-
-            modelBuilder.Entity("VeltriQ.Models.HR.InductionSessionTopicMaster", b =>
-                {
-                    b.HasOne("InductionSessionMaster", "InductionSessionMaster")
-                        .WithMany()
-                        .HasForeignKey("InductionSessionMasterId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("InductionSessionMaster");
                 });
 
             modelBuilder.Entity("VeltriQ.Models.HR.Onboarding.EmployeeOnboarding", b =>

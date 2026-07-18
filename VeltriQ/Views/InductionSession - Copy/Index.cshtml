@@ -1,0 +1,608 @@
+﻿@model VeltriQ.ViewModels.InductionProgram.InductionProgramIndexViewModel
+
+@{
+    ViewData["Title"] = "Induction Programs";
+}
+
+<style>
+    .program-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── TOP ACTION BAR DECK ── */
+    .program-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .btn-action-trigger {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .btn-action-trigger:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── CORE PANEL CARD WITH SQUARED EDGES ── */
+    .program-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .program-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .program-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .program-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .program-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .program-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .program-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .program-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE GRID CONTAINER ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .program-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .program-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .program-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .program-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    /* ── COMPACT SYSTEM PILLS ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-code {
+        background: rgba(124, 58, 237, 0.12);
+        color: var(--purple);
+        font-family: monospace;
+        font-weight: 700;
+    }
+
+    .badge-duration {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60a5fa;
+    }
+
+    .badge-active {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .badge-inactive {
+        background: rgba(239, 68, 68, 0.12);
+        color: #f87171;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .action-btn.toggle-deactivate-btn {
+            color: #22c55e;
+        }
+
+            .action-btn.toggle-deactivate-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        .action-btn.toggle-activate-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.toggle-activate-btn:hover {
+                background: #22c55e;
+                color: #fff;
+            }
+
+    /* ── INLINE MODAL WINDOW DECK ── */
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-workspace-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        width: 480px;
+        max-width: 90%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-workspace-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .modal-workspace-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .modal-close-trigger {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .modal-workspace-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    .form-deck-input, .form-deck-textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        border-radius: 6px;
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .form-deck-input {
+        height: 36px;
+    }
+
+    .form-deck-textarea {
+        height: 70px;
+        padding: 8px 12px;
+        resize: none;
+    }
+
+        .form-deck-input:focus, .form-deck-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .modal-workspace-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .btn-modal-cancel {
+        height: 34px;
+        padding: 0 14px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="program-page">
+    <div class="program-header">
+        <button type="button" class="btn-action-trigger" onclick="openCreateModal()">
+            <i class="bi bi-plus-lg"></i> Add Program
+        </button>
+    </div>
+
+    <div class="program-card">
+        <div class="program-card-top">
+            <div class="program-card-title">
+                <h3>Induction Program Master</h3>
+                <p>Total Managed Templates: <span id="recordsCounter">0</span></p>
+            </div>
+            <div class="program-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="programSearchInput" placeholder="Search parameters..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="program-table" id="programGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Program Code</th>
+                        <th>Program Name</th>
+                        <th>Description / Overview</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="programGridBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming program registers...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="programModalLayer">
+    <div class="modal-workspace-card">
+        <div class="modal-workspace-header">
+            <h4 id="modalContextTitle">Create Induction Blueprint</h4>
+            <button type="button" class="modal-close-trigger" onclick="closeProgramModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="programWorkspaceForm" onsubmit="handleFormSubmission(event)">
+            <input type="hidden" id="txtInductionProgramMasterId" name="InductionProgramMasterId" value="0" />
+            <div class="modal-workspace-body">
+                <div class="form-group-block">
+                    <label>Program Name *</label>
+                    <input type="text" id="txtProgramName" name="ProgramName" class="form-deck-input" placeholder="e.g. Corporate Orientation Blueprint" maxlength="150" required />
+                </div>
+                <div class="form-group-block">
+                    <label>Duration (In Days) *</label>
+                    <input type="number" id="numDurationInDays" name="DurationInDays" class="form-deck-input" min="1" max="365" value="1" required />
+                </div>
+                <div class="form-group-block">
+                    <label>Program Description / Overview</label>
+                    <textarea id="txtDescription" name="Description" class="form-deck-textarea" placeholder="Provide training objectives or curriculum timeline notes..." maxlength="500"></textarea>
+                </div>
+                <div class="form-group-block" style="flex-direction:row; gap:8px; align-items:center; padding-top:4px;">
+                    <input type="checkbox" id="chkIsActive" name="IsActive" value="true" checked style="cursor:pointer;" />
+                    <label for="chkIsActive" style="cursor:pointer; margin:0; text-transform:none;">Mark this program template as active</label>
+                </div>
+            </div>
+            <div class="modal-workspace-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeProgramModal()">Cancel</button>
+                <button type="submit" class="btn-action-trigger" id="btnSubmitForm">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let localCacheRecords = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadProgramGridStream();
+
+        const searchInput = document.getElementById("programSearchInput");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                const criteria = this.value.trim().toLowerCase();
+                filterAndRenderGrid(criteria);
+            });
+        }
+    });
+
+    async function loadProgramGridStream() {
+        try {
+            const stream = await fetch('/InductionProgram/GetPrograms', { method: 'GET' });
+            const result = await stream.json();
+            if (result.success) {
+                localCacheRecords = result.data || [];
+                filterAndRenderGrid("");
+            }
+        } catch (err) {
+            console.error("Stream tracking break: ", err);
+        }
+    }
+
+    function filterAndRenderGrid(criteria) {
+        const tbody = document.getElementById("programGridBody");
+        const counter = document.getElementById("recordsCounter");
+        if (!tbody) return;
+
+        const matched = localCacheRecords.filter(x =>
+            x.programCode.toLowerCase().includes(criteria) ||
+            x.programName.toLowerCase().includes(criteria) ||
+            (x.description && x.description.toLowerCase().includes(criteria))
+        );
+
+        counter.textContent = matched.length;
+
+        if (matched.length === 0) {
+            tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                    No matching induction programs found inside standard libraries.
+                </td>
+            </tr>`;
+            return;
+        }
+
+        tbody.innerHTML = matched.map(item => `
+        <tr>
+            <td><span class="status-badge badge-code">${item.programCode}</span></td>
+            <td style="font-weight: 600;">${item.programName}</td>
+            <td style="color: var(--text-secondary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${item.description || '<span style="color:var(--text-muted); font-style:italic;">No description.</span>'}
+            </td>
+            <td><span class="status-badge badge-duration">${item.durationInDays} Days</span></td>
+            <td>
+                <span class="status-badge ${item.isActive ? 'badge-active' : 'badge-inactive'}">
+                    ${item.isActive ? 'Active' : 'Inactive'}
+                </span>
+            </td>
+            <td>
+                <div class="table-actions">
+                    <button type="button" class="action-btn" title="Modify Configuration Master" onclick="openEditModal(${item.inductionProgramMasterId})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="action-btn ${item.isActive ? 'toggle-deactivate-btn' : 'toggle-activate-btn'}"
+                            title="${item.isActive ? 'Deactivate Blueprint' : 'Activate Blueprint'}"
+                            onclick="executeStatusToggle(${item.inductionProgramMasterId}, ${item.isActive})">
+                        <i class="bi ${item.isActive ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>`).join('');
+    }
+
+    function openCreateModal() {
+        document.getElementById("programWorkspaceForm").reset();
+        document.getElementById("txtInductionProgramMasterId").value = "0";
+        document.getElementById("chkIsActive").checked = true;
+        document.getElementById("modalContextTitle").innerText = "Create Induction Blueprint";
+        document.getElementById("btnSubmitForm").innerHTML = '<i class="bi bi-check-circle"></i> Create Program';
+        document.getElementById("programModalLayer").style.display = "flex";
+    }
+
+    function openEditModal(masterId) {
+        const item = localCacheRecords.find(x => x.inductionProgramMasterId === masterId);
+        if (!item) return;
+
+        document.getElementById("txtInductionProgramMasterId").value = item.inductionProgramMasterId;
+        document.getElementById("txtProgramName").value = item.programName;
+        document.getElementById("numDurationInDays").value = item.durationInDays;
+        document.getElementById("txtDescription").value = item.description || "";
+        document.getElementById("chkIsActive").checked = item.isActive;
+
+        document.getElementById("modalContextTitle").innerText = "Modify Program Blueprint";
+        document.getElementById("btnSubmitForm").innerHTML = '<i class="bi bi-check-circle"></i> Save Changes';
+        document.getElementById("programModalLayer").style.display = "flex";
+    }
+
+    function closeProgramModal() {
+        document.getElementById("programModalLayer").style.display = "none";
+    }
+
+    async function handleFormSubmission(e) {
+        e.preventDefault();
+        const masterId = parseInt(document.getElementById("txtInductionProgramMasterId").value);
+        const actionUrl = masterId === 0 ? "/InductionProgram/Create" : "/InductionProgram/Edit";
+
+        const formData = new URLSearchParams();
+        formData.append("InductionProgramMasterId", masterId);
+        formData.append("ProgramName", document.getElementById("txtProgramName").value);
+        formData.append("DurationInDays", document.getElementById("numDurationInDays").value);
+        formData.append("Description", document.getElementById("txtDescription").value);
+        formData.append("IsActive", document.getElementById("chkIsActive").checked);
+
+        const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const response = await fetch(actionUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "RequestVerificationToken": antiForgeryToken
+                },
+                body: formData.toString()
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                closeProgramModal();
+                if (window.showVqSuccess) {
+                    window.showVqSuccess(result.message);
+                } else {
+                    alert(result.message);
+                }
+                loadProgramGridStream();
+            } else {
+                if (window.showVqError) {
+                    window.showVqError(result.message);
+                } else {
+                    alert(result.message);
+                }
+            }
+        } catch (err) {
+            alert("Unexpected form submission break.");
+        }
+    }
+
+    function executeStatusToggle(masterId, currentStatus) {
+        const title = currentStatus ? "Deactivate Program" : "Activate Program";
+        const message = `Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this program configuration block?`;
+
+        const executionBlock = async function() {
+            const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            try {
+                const response = await fetch("/InductionProgram/ToggleStatus", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "RequestVerificationToken": antiForgeryToken
+                    },
+                    body: "id=" + encodeURIComponent(masterId)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    loadProgramGridStream();
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                alert("Communication execution breakdown.");
+            }
+        };
+
+        if (window.showVqConfirm) {
+            window.showVqConfirm(title, message, executionBlock);
+        } else if (confirm(message)) {
+            executionBlock();
+        }
+    }
+</script>

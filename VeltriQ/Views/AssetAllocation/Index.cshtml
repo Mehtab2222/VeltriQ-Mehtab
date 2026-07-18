@@ -1,5 +1,4 @@
-﻿
-@model VeltriQ.ViewModels.AssetAllocation.AssetAllocationIndexViewModel
+﻿@model VeltriQ.ViewModels.AssetAllocation.AssetAllocationIndexViewModel
 
 @{
     ViewData["Title"] = "Asset Allocation";
@@ -194,12 +193,6 @@
             color: var(--purple);
         }
 
-    .employee-code {
-        font-size: 10.5px;
-        color: var(--text-muted);
-        line-height: 1;
-    }
-
     /* ── CUSTOM STATUS BADGES ── */
     .status-badge {
         display: inline-flex;
@@ -227,32 +220,6 @@
         background: rgba(59, 130, 246, 0.12);
         color: #3b82f6;
     }
-
-    /* ── ACTIONS WORKSPACE ── */
-    .table-actions {
-        display: flex;
-        gap: 4px;
-        justify-content: center;
-    }
-
-    .action-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 4px;
-        border: none;
-        background: var(--hover-bg);
-        color: var(--text-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        text-decoration: none;
-    }
-
-        .action-btn:hover {
-            background: var(--purple);
-            color: #fff;
-        }
 </style>
 
 <div class="asset-page">
@@ -286,9 +253,7 @@
                         <th>Employee Name</th>
                         <th>Department</th>
                         <th>Joining Date</th>
-                        <th>Assets</th>
                         <th>Status</th>
-                        <th style="text-align: center; width: 80px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -333,9 +298,6 @@
                                 <td style="color: var(--text-secondary);">
                                     @(item.JoiningDate?.ToString("dd MMM yyyy") ?? "-")
                                 </td>
-                                <td style="font-weight: 700; color: var(--purple);">
-                                    @item.TotalAssets
-                                </td>
                                 <td>
                                     @{
                                         string statusClass = (item.AllocationStatus ?? "").ToLower() switch
@@ -347,18 +309,13 @@
                                     }
                                     <span class="status-badge @statusClass">@item.AllocationStatus</span>
                                 </td>
-                                <td>
-                                    <div class="table-actions">
-                                        <a href="/AssetAllocation/Details/@item.EmployeeId" class="action-btn" title="View Configurations"><i class="bi bi-eye"></i></a>
-                                    </div>
-                                </td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
                                 No active framework allocations detected in data streams.
                             </td>
                         </tr>

@@ -19,6 +19,7 @@
   <ItemGroup>
     <Folder Include="Interfaces\" />
     <Folder Include="Views\AssetReturn - Copy\" />
+    <Folder Include="Views\InductionSession - Copy\" />
     <Folder Include="wwwroot\uploads\employees\documents\" />
   </ItemGroup>
 
