@@ -1,0 +1,434 @@
+﻿@model VeltriQ.ViewModels.EmployeeInduction.EmployeeInductionCreateViewModel
+
+@{
+    ViewData["Title"] = "Assign Induction";
+}
+
+<style>
+    .assign-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .assign-header {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 4px;
+    }
+
+    .btn-back-theme {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+
+        .btn-back-theme:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+        }
+
+    .assign-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+    }
+
+    .assign-card-top {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+        .assign-card-top h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .assign-card-top p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 2px 0 0 0;
+        }
+
+    .workspace-form-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow: visible;
+    }
+
+    .form-grid-3col {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+        overflow: visible;
+    }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+        overflow: visible;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    .form-deck-input, .select-deck-input {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+    }
+
+    select.select-deck-input {
+        cursor: pointer;
+        padding-right: 24px;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+        appearance: none;
+    }
+
+    .form-deck-input:focus, .select-deck-input:focus {
+        border-color: var(--purple);
+    }
+
+    /* ── ROSTER BUILDER SEARCH SUB-PANEL ── */
+    .roster-sub-panel {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.005);
+        display: flex;
+        flex-direction: column;
+        margin-top: 4px;
+    }
+
+    .roster-panel-header {
+        padding: 10px 14px;
+        background: var(--hover-bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .roster-panel-header h4 {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+    .roster-search {
+        position: relative;
+        width: 260px;
+    }
+
+        .roster-search input {
+            width: 100%;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 10px 0 30px;
+            color: var(--text-primary);
+            font-size: 11.5px;
+            outline: none;
+        }
+
+        .roster-search i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+    .roster-table-scroll {
+        max-height: 320px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .roster-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .roster-table th {
+            background: var(--card-bg);
+            padding: 8px 12px;
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .roster-table td {
+            padding: 6px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .roster-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .panel-footer-deck {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-submit-assignment {
+        height: 36px;
+        padding: 0 20px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .text-danger {
+        color: #ef4444;
+        font-size: 11px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="assign-page">
+    <div class="assign-header">
+        <a asp-action="Index" class="btn-back-theme"><i class="bi bi-arrow-left"></i> Back to Register</a>
+    </div>
+
+    <form asp-action="Create" method="post" id="assignInductionForm" onsubmit="interceptAssignmentSubmission(event)">
+        @Html.AntiForgeryToken()
+
+        <div class="assign-master-card">
+            <div class="assign-card-top">
+                <h3>Assign Program Induction</h3>
+                <p>Deploy batch structured learning modules with designated timelines across available active personnel.</p>
+            </div>
+
+            <div class="workspace-form-body">
+                @if (TempData["Error"] != null)
+                {
+                    <div class="text-danger" style="margin-bottom:10px;">@TempData["Error"]</div>
+                }
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-grid-3col">
+                    <div class="form-group-block">
+                        <label>Induction Target Program *</label>
+                        <select asp-for="InductionProgramMasterId" id="ddlInductionProgram" class="select-deck-input" asp-items="Model.Programs">
+                            <option value="">-- Choose Program --</option>
+                        </select>
+                        <span asp-validation-for="InductionProgramMasterId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-block">
+                        <label>Deployment Start Date *</label>
+                        <input asp-for="StartDate" type="date" class="form-deck-input" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-block">
+                        <label>Expected Completion Boundary</label>
+                        <input asp-for="ExpectedCompletionDate" type="date" class="form-deck-input" />
+                        <span asp-validation-for="ExpectedCompletionDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="roster-sub-panel">
+                    <div class="roster-panel-header">
+                        <h4>Select Eligible Personnel Candidates</h4>
+                        <div class="roster-search">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="rosterSearchInput" placeholder="Filter roster profiles..." oninput="filterRosterGrid()" />
+                        </div>
+                    </div>
+
+                    <div class="roster-table-scroll">
+                        <table class="roster-table" id="tblEligibleRoster">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;"><input type="checkbox" id="chkSelectAllRoster" onclick="toggleAllRosterCheckboxes(this)" style="cursor:pointer;" /></th>
+                                    <th>Staff Code</th>
+                                    <th>Employee Name</th>
+                                    <th>Department</th>
+                                    <th>Designation Roster</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rosterGridBody">
+                                <tr>
+                                    <td colspan="5" style="text-align:center; font-style:italic; color:var(--text-muted); padding:16px;">Querying eligible records database...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer-deck">
+                <button type="submit" class="btn-submit-assignment">
+                    <i class="bi bi-check-circle"></i> Assign Induction
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    let cacheRoster = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadEligibleEmployeesRoster();
+    });
+
+    async function loadEligibleEmployeesRoster() {
+        const tbody = document.getElementById("rosterGridBody");
+        try {
+            const res = await fetch('/EmployeeInduction/GetEligibleEmployees', { method: 'GET' });
+            const result = await res.json();
+            cacheRoster = result.data || [];
+            renderRosterRows(cacheRoster);
+        } catch {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:16px;"> Roster streaming error.</td></tr>`;
+        }
+    }
+
+    function renderRosterRows(dataset) {
+        const tbody = document.getElementById("rosterGridBody");
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; font-style:italic; color:var(--text-muted); padding:16px;">No outstanding personnel require allocation parameters. All clear.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map((emp, index) => `
+        <tr class="roster-data-row">
+            <td style="text-align: center;">
+                <input type="checkbox" name="EmployeeIds" value="${emp.employeeId}" class="chk-emp-select" style="cursor:pointer;" />
+            </td>
+            <td style="font-weight:700; font-family:monospace; color:var(--purple);">${emp.employeeCode}</td>
+            <td style="font-weight:600;" class="target-name">${emp.employeeName}</td>
+            <td>${emp.department || '-'}</td>
+            <td style="color:var(--text-secondary);">${emp.designation || '-'}</td>
+        </tr>`).join('');
+    }
+
+    function toggleAllRosterCheckboxes(master) {
+        const checkBoxes = document.querySelectorAll(".chk-emp-select");
+        checkBoxes.forEach(chk => {
+            if (chk.closest('tr').style.display !== 'none') {
+                chk.checked = master.checked;
+            }
+        });
+    }
+
+    function filterRosterGrid() {
+        const criteria = document.getElementById("rosterSearchInput").value.trim().toLowerCase();
+        const rows = document.querySelectorAll(".roster-data-row");
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            if (text.includes(criteria)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+                const chk = row.querySelector(".chk-emp-select");
+                if (chk) chk.checked = false;
+            }
+        });
+    }
+
+    /* ── ✅ NEW PRE-SUBMISSION CONFIRMATION MODAL INTERCEPTOR ENGINE ── */
+    function interceptAssignmentSubmission(e) {
+        e.preventDefault(); // Lock form submission sequence track
+
+        const ddlProgram = document.getElementById("ddlInductionProgram");
+        const programId = ddlProgram.value;
+        const programName = ddlProgram.options[ddlProgram.selectedIndex].text;
+
+        // Count total selected checkboxes
+        const checkedCount = document.querySelectorAll(".chk-emp-select:checked").length;
+
+        // Front-end UI guard validations before popping confirmation dialog
+        if (!programId) {
+            if (window.showVqError) window.showVqError("Please select an induction program template.");
+            else alert("Please select an induction program template.");
+            return;
+        }
+
+        if (checkedCount === 0) {
+            if (window.showVqError) window.showVqError("Please select at least one employee from the roster matrix.");
+            else alert("Please select at least one employee from the roster matrix.");
+            return;
+        }
+
+        const confirmTitle = "Confirm Induction Assignment";
+        const confirmMessage = `You are assigning (${checkedCount}) employee(s) to the "${programName}" induction program. Are you sure?`;
+
+        // Execution path sequence block upon pressing 'OK'
+        const handleSuccessConfirmation = function () {
+            // Trigger customized success overlay alerts matching framework definitions
+            if (window.showVqSuccess) {
+                window.showVqSuccess("Induction scheduled and assigned successfully.");
+                setTimeout(() => {
+                    document.getElementById("assignInductionForm").submit();
+                }, 1200);
+            } else {
+                alert("Induction assigned successfully.");
+                document.getElementById("assignInductionForm").submit();
+            }
+        };
+
+        // Trigger native browser confirmation fallbacks if customized layout components aren't loaded globally
+        if (window.showVqConfirm) {
+            window.showVqConfirm(confirmTitle, confirmMessage, handleSuccessConfirmation);
+        } else if (confirm(confirmMessage)) {
+            handleSuccessConfirmation();
+        }
+    }
+</script>

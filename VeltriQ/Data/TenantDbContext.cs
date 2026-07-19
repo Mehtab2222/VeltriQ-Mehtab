@@ -114,7 +114,9 @@ namespace VeltriQ.Data
         public DbSet<InductionProgramMaster> InductionProgramMasters { get; set; }
         public DbSet<InductionSessionMaster> InductionSessionMasters { get; set; }
         public DbSet<InductionSessionTopicMaster> InductionSessionTopicMasters { get; set; }
-
+        public DbSet<EmployeeInduction> EmployeeInductions { get; set; }
+        public DbSet<EmployeeInductionSession> EmployeeInductionSessions { get; set; }
+        public DbSet<EmployeeInductionSessionAttendance>EmployeeInductionSessionAttendances{ get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -131,6 +133,68 @@ namespace VeltriQ.Data
             //============================================================
             // Induction Session Topic Master
             //============================================================
+            //============================================================
+            // Employee Induction
+            //============================================================
+            //============================================================
+            // Employee Induction Session
+            //============================================================
+            modelBuilder.Entity<EmployeeInductionSessionAttendance>()
+    .HasOne(x => x.EmployeeInductionSession)
+    .WithMany()
+    .HasForeignKey(x => x.EmployeeInductionSessionId)
+    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeInductionSessionAttendance>()
+                .HasOne(x => x.Trainer)
+                .WithMany()
+                .HasForeignKey(x => x.TrainerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeInductionSession>()
+                .ToTable("EmployeeInductionSession", "HR");
+
+            modelBuilder.Entity<EmployeeInductionSession>()
+                .HasOne(x => x.EmployeeInduction)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeInductionId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeInductionSession>()
+                .HasOne(x => x.InductionSessionMaster)
+                .WithMany()
+                .HasForeignKey(x => x.InductionSessionMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeInductionSession>()
+                .HasIndex(x => new
+                {
+                    x.EmployeeInductionId,
+                    x.SessionOrder
+                });
+
+            modelBuilder.Entity<EmployeeInduction>()
+                .ToTable("EmployeeInduction", "HR");
+
+            modelBuilder.Entity<EmployeeInduction>()
+                .HasOne(x => x.Employee)
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeInduction>()
+                .HasOne(x => x.InductionProgramMaster)
+                .WithMany()
+                .HasForeignKey(x => x.InductionProgramMasterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EmployeeInduction>()
+                .HasIndex(x => new
+                {
+                    x.EmployeeId,
+                    x.InductionProgramMasterId,
+                    x.IsActive
+                });
 
             modelBuilder.Entity<InductionSessionTopicMaster>()
                 .ToTable("InductionSessionTopicMaster", "HR");

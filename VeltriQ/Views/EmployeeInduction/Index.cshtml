@@ -1,0 +1,312 @@
+﻿@model VeltriQ.ViewModels.EmployeeInduction.EmployeeInductionIndexViewModel
+
+@{
+    ViewData["Title"] = "Employee Induction";
+}
+
+<style>
+    .induction-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .induction-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .induction-assign-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .induction-assign-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── CORE GRID WORKSPACE PANEL CARD ── */
+    .induction-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .induction-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .induction-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .induction-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .induction-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .induction-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .induction-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .induction-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE GRID REGISTERS ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .induction-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .induction-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .induction-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .induction-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    /* ── CUSTOM RE-RENDER FLAT TEXT PILLS ── */
+    .col-status {
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+</style>
+
+<div class="induction-page">
+    <div class="induction-header">
+        <a href="/EmployeeInduction/Create" class="induction-assign-btn">
+            <i class="bi bi-plus-lg"></i> Assign Induction
+        </a>
+    </div>
+
+    <div class="induction-card">
+        <div class="induction-card-top">
+            <div class="induction-card-title">
+                <h3>Employee Induction</h3>
+                <p>Track assigned, active, and finalized onboarding learning pipelines across personnel rosters.</p>
+            </div>
+            <div class="induction-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="inductionSearchInput" placeholder="Search parameters (Code, Employee, Program)..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="induction-table" id="inductionGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Employee Code</th>
+                        <th>Employee Name</th>
+                        <th>Program Template</th>
+                        <th>Assigned On</th>
+                        <th>Start Date</th>
+                        <th>Status</th>
+                        <th class="text-end" style="width: 80px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="inductionGridBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming induction schedules...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cacheInductions = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadInductionGridData();
+
+        const searchInput = document.getElementById("inductionSearchInput");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                const criteria = this.value.trim().toLowerCase();
+                filterAndRenderGrid(criteria);
+            });
+        }
+    });
+
+    async function loadInductionGridData() {
+        try {
+            const stream = await fetch('/EmployeeInduction/GetEmployeeInductions', { method: 'GET' });
+            const result = await stream.json();
+            cacheInductions = result.data || [];
+            filterAndRenderGrid("");
+        } catch (err) {
+            console.error("Induction registry stream fault: ", err);
+        }
+    }
+
+    function formatDateStamp(dotNetDateStr) {
+        if (!dotNetDateStr) return "-";
+        const date = new Date(dotNetDateStr);
+        if (isNaN(date.getTime())) return "-";
+        const day = String(date.getDate()).padStart(2, '0');
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+    }
+
+    function filterAndRenderGrid(criteria) {
+        const tbody = document.getElementById("inductionGridBody");
+        if (!tbody) return;
+
+        const matched = cacheInductions.filter(x =>
+            x.employeeCode.toLowerCase().includes(criteria) ||
+            x.employeeName.toLowerCase().includes(criteria) ||
+            x.programName.toLowerCase().includes(criteria)
+        );
+
+        if (matched.length === 0) {
+            tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                    No matching employee induction schedules detected in libraries.
+                </td>
+            </tr>`;
+            return;
+        }
+
+        tbody.innerHTML = matched.map(item => {
+            let statusColor = "#3b82f6"; // Assigned
+            if (item.status === "In Progress") statusColor = "#eab308";
+            else if (item.status === "Completed") statusColor = "#22c55e";
+            else if (item.status === "Cancelled") statusColor = "#ef4444";
+
+            return `
+            <tr>
+                <td style="font-weight: 700; font-family: monospace;">${item.employeeCode}</td>
+                <td style="font-weight: 600;">${item.employeeName}</td>
+                <td>${item.programName}</td>
+                <td style="color: var(--text-secondary);">${formatDateStamp(item.assignedOn)}</td>
+                <td style="color: var(--text-secondary);">${formatDateStamp(item.startDate)}</td>
+                <td class="col-status" style="color: ${statusColor};">${item.status}</td>
+                <td>
+                    <div class="table-actions">
+                        <a href="/EmployeeInduction/View/${item.employeeInductionId}" class="action-btn" title="👁 View Details Track">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+</script>

@@ -180,6 +180,26 @@ namespace VeltriQ.Controllers
                         companies2;
                 }
             }
+
+        }
+        protected int? GetCurrentEmployeeId()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            return _context.Employees
+                .Where(x => x.UserId == userId)
+                .Select(x => (int?)x.EmployeeId)
+                .FirstOrDefault();
+        }
+
+        protected string? GetCurrentUserId()
+        {
+            return _userManager.GetUserId(User);
+        }
+
+        protected int? GetCurrentCompanyId()
+        {
+            return HttpContext.Session.GetInt32("ActiveCompanyId");
         }
     }
 }
