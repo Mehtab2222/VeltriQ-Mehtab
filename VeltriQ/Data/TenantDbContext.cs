@@ -5,6 +5,7 @@ using VeltriQ.Models.HR;
 using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.Models.Recruitment;
 using VeltriQ.SeedData;
+using VeltriQ.Models.EmployeeInductionAttendance;
 namespace VeltriQ.Data
 {
     public class TenantDbContext : DbContext
@@ -116,7 +117,9 @@ namespace VeltriQ.Data
         public DbSet<InductionSessionTopicMaster> InductionSessionTopicMasters { get; set; }
         public DbSet<EmployeeInduction> EmployeeInductions { get; set; }
         public DbSet<EmployeeInductionSession> EmployeeInductionSessions { get; set; }
-        public DbSet<EmployeeInductionSessionAttendance>EmployeeInductionSessionAttendances{ get; set; }
+        public DbSet<EmployeeInductionAttendance> EmployeeInductionAttendances { get; set; }
+
+        public DbSet<EmployeeInductionAttendanceDetail> EmployeeInductionAttendanceDetails { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -130,26 +133,61 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
-            //============================================================
-            // Induction Session Topic Master
-            //============================================================
-            //============================================================
-            // Employee Induction
-            //============================================================
-            //============================================================
-            // Employee Induction Session
-            //============================================================
-            modelBuilder.Entity<EmployeeInductionSessionAttendance>()
-    .HasOne(x => x.EmployeeInductionSession)
-    .WithMany()
-    .HasForeignKey(x => x.EmployeeInductionSessionId)
-    .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<EmployeeInductionAttendance>(entity =>
+            {
+                entity.HasKey(e => e.EmployeeInductionAttendanceId);
 
-            modelBuilder.Entity<EmployeeInductionSessionAttendance>()
-                .HasOne(x => x.Trainer)
-                .WithMany()
-                .HasForeignKey(x => x.TrainerId)
-                .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(e => e.InductionProgramMaster)
+                    .WithMany()
+                    .HasForeignKey(e => e.InductionProgramMasterId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.InductionSessionMaster)
+                    .WithMany()
+                    .HasForeignKey(e => e.InductionSessionMasterId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new
+                {
+                    e.InductionProgramMasterId,
+                    e.InductionSessionMasterId,
+                    e.AttendanceDate
+                }).IsUnique();
+
+                entity.Property(e => e.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.IsLocked)
+                    .HasDefaultValue(false);
+            });
+            modelBuilder.Entity<EmployeeInductionAttendanceDetail>(entity =>
+            {
+                entity.HasKey(e => e.EmployeeInductionAttendanceDetailId);
+
+                entity.HasOne(e => e.EmployeeInductionAttendance)
+                    .WithMany(a => a.AttendanceDetails)
+                    .HasForeignKey(e => e.EmployeeInductionAttendanceId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.EmployeeInduction)
+                    .WithMany()
+                    .HasForeignKey(e => e.EmployeeInductionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.EmployeeInductionSession)
+                    .WithMany()
+                    .HasForeignKey(e => e.EmployeeInductionSessionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new
+                {
+                    e.EmployeeInductionAttendanceId,
+                    e.EmployeeInductionId
+                }).IsUnique();
+
+                entity.Property(e => e.IsActive)
+                    .HasDefaultValue(true);
+            });
 
             modelBuilder.Entity<EmployeeInductionSession>()
                 .ToTable("EmployeeInductionSession", "HR");

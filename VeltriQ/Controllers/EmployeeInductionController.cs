@@ -167,7 +167,6 @@ public class EmployeeInductionController : BaseController
                         DurationInMinutes = session.DurationInMinutes,
                         IsMandatory = session.IsMandatory,
 
-                        AttendanceStatus = 1,
                         IsCompleted = false,
 
                         IsActive = true,
@@ -264,11 +263,10 @@ public class EmployeeInductionController : BaseController
                 SessionOrder = x.SessionOrder,
                 DurationInMinutes = x.DurationInMinutes,
                 IsMandatory = x.IsMandatory,
-                AttendanceStatus =
-                    x.AttendanceStatus == 1 ? "Pending" :
-                    x.AttendanceStatus == 2 ? "Present" :
-                    x.AttendanceStatus == 3 ? "Absent" :
-                    "Rescheduled",
+
+                // Temporary until Attendance module is rebuilt
+                AttendanceStatus = "Pending",
+
                 IsCompleted = x.IsCompleted
             })
             .ToList();

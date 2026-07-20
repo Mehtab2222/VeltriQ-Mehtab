@@ -2,12 +2,14 @@
 {
     public class AttendanceSaveViewModel
     {
+        public int? EmployeeInductionAttendanceId { get; set; }
+
         public int InductionProgramMasterId { get; set; }
 
         public int InductionSessionMasterId { get; set; }
 
         public DateTime AttendanceDate { get; set; }
 
-        public List<AttendanceSaveItemViewModel> Employees { get; set; } = new();
+        public List<AttendanceEmployeeViewModel> Employees { get; set; } = new();
     }
 }

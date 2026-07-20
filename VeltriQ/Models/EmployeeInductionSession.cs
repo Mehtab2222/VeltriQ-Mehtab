@@ -23,20 +23,11 @@ namespace VeltriQ.Models.HR
         public bool IsMandatory { get; set; }
 
         /// <summary>
-        /// 1 = Pending
-        /// 2 = Present
-        /// 3 = Absent
-        /// 4 = Rescheduled
-        /// </summary>
-        public int AttendanceStatus { get; set; } = 1;
 
-        public DateTime? LatestAttendanceDate { get; set; }
         public bool IsCompleted { get; set; } = false;
 
         public DateTime? CompletedOn { get; set; }
 
-        [StringLength(500)]
-        public string? TrainerRemarks { get; set; }
 
         public bool IsActive { get; set; } = true;
 

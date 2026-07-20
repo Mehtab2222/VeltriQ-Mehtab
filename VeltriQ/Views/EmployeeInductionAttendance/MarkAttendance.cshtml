@@ -1,0 +1,478 @@
+﻿@model VeltriQ.ViewModels.EmployeeInductionAttendance.MarkAttendanceViewModel
+
+@{
+    ViewData["Title"] = Model.IsViewMode ? "View Attendance" : "Mark Attendance";
+    bool isDisabled = Model.IsViewMode || Model.IsLocked;
+}
+
+<style>
+    /* ── CONTAINER SPACED FROM TOP BOUNDARY ── */
+    .attendance-mark-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+    }
+
+    /* ── UNIFIED MASTER CARD WITH EXTENDED HEIGHT PROTECTION ── */
+    .matrix-workspace-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+        min-height: 600px; /* ✅ tall frame footprint even with limited records */
+    }
+
+    /* CARD HERO DETAIL PARAMETERS HEADER BLOCK */
+    .attendance-hero-header {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.005);
+    }
+
+    .hero-meta-details {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .meta-item-line {
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+        .meta-item-line strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+    .form-deck-input {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+        outline: none;
+    }
+
+    /* AUTOMATICALLY EXTENDED SCROLLABLE VIEWPORT */
+    .table-wrapper {
+        max-height: 550px; /* ✅ Expanded to fit rows comfortably before scrolling */
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .matrix-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .matrix-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .matrix-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .matrix-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .col-staff-code {
+        font-weight: 700;
+        font-family: monospace;
+        color: var(--purple);
+    }
+
+    /* ── CLEAN RADIO BADGES STYLING (TEXT BECOMES COLORFUL ON INTENTIONAL SELECTION) ── */
+    .badges-cluster-deck {
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .switch-input-token {
+        display: none;
+    }
+
+    .switch-label-trigger {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: color 0.15s ease, font-weight 0.15s ease;
+        user-select: none;
+        padding: 2px 0;
+        background: none !important;
+        border: none !important;
+    }
+
+    .switch-input-token[value="1"]:checked + .switch-label-trigger {
+        color: #22c55e !important;
+        font-weight: 700;
+    }
+
+    .switch-input-token[value="2"]:checked + .switch-label-trigger {
+        color: #ef4444 !important;
+        font-weight: 700;
+    }
+
+    .switch-input-token[value="3"]:checked + .switch-label-trigger {
+        color: #f59e0b !important;
+        font-weight: 700;
+    }
+
+    .switch-label-trigger.disabled-view {
+        cursor: not-allowed;
+        opacity: 0.25;
+    }
+
+    .switch-input-token:checked + .switch-label-trigger.disabled-view {
+        opacity: 1;
+    }
+
+    .txt-remarks-input {
+        width: 100%;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+        .txt-remarks-input:focus {
+            border-color: var(--purple);
+        }
+
+        .txt-remarks-input:disabled {
+            background: transparent;
+            border-color: transparent;
+            padding: 0;
+            color: var(--text-secondary);
+        }
+
+    /* CORE ACTIONS FOOTER STRIP */
+    .panel-footer-deck {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.005);
+        margin-top: auto;
+    }
+
+    .summary-metrics-holder {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .metric-pill-count {
+        font-weight: 700;
+        margin-left: 2px;
+    }
+
+    .actions-cluster-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-action-cancel {
+        height: 36px;
+        padding: 0 16px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-action-save {
+        height: 36px;
+        padding: 0 16px;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        border: none;
+        color: #fff;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-action-lock {
+        height: 36px;
+        padding: 0 16px;
+        background: transparent;
+        border: 1px solid #ef4444;
+        color: #ef4444;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s ease;
+    }
+
+        .btn-action-lock:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+</style>
+
+<div class="attendance-mark-page">
+
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px; width: 100%;">
+        <a href="/EmployeeInductionAttendance/Index" class="btn-action-cancel" style="height: 34px; padding: 0 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; font-weight: 600;">
+            <i class="bi bi-arrow-left"></i> Back to Register
+        </a>
+    </div>
+
+    <form asp-action="SaveAttendance" method="post" id="attendanceSaveForm" onsubmit="handleAttendanceFormSubmission(event)">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="EmployeeInductionAttendanceId" />
+        <input type="hidden" asp-for="ProgramId" />
+        <input type="hidden" asp-for="SessionId" />
+
+        <div class="matrix-workspace-card">
+
+            <div class="attendance-hero-header">
+                <div class="hero-meta-details">
+                    <div class="meta-item-line">Induction Program Context: <strong>@Model.ProgramName</strong></div>
+                    <div class="meta-item-line">Target Session Name Block: <strong>@Model.SessionName</strong></div>
+                </div>
+                <div class="form-group-block">
+                    <label>Handover Attendance Date *</label>
+                    @if (isDisabled)
+                    {
+                        <input type="text" class="form-deck-input" value="@Model.AttendanceDate.ToString("dd-MMM-yyyy")" disabled style="background: var(--hover-bg); opacity: 0.7;" />
+                        <input type="hidden" asp-for="AttendanceDate" />
+                    }
+                    else
+                    {
+                        <input asp-for="AttendanceDate" type="date" class="form-deck-input" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    }
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">Sr #</th>
+                            <th style="width: 110px;">Staff Code</th>
+                            <th>Employee Name</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th style="width: 260px;">Attendance Status</th>
+                            <th>Internal Operation Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Employees.Count; i++)
+                        {
+                            var emp = Model.Employees[i];
+                            <tr>
+                                <td style="text-align: center; font-weight: 600; color: var(--text-muted);">@(i + 1)</td>
+                                <td class="col-staff-code">
+                                    @emp.EmployeeNo
+                                    <input type="hidden" name="Employees[@i].EmployeeInductionId" value="@emp.EmployeeInductionId" />
+                                    <input type="hidden" name="Employees[@i].EmployeeInductionSessionId" value="@emp.EmployeeInductionSessionId" />
+                                    <input type="hidden" name="Employees[@i].EmployeeId" value="@emp.EmployeeId" />
+                                    <input type="hidden" name="Employees[@i].EmployeeNo" value="@emp.EmployeeNo" />
+                                    <input type="hidden" name="Employees[@i].EmployeeName" value="@emp.EmployeeName" />
+                                    <input type="hidden" name="Employees[@i].DepartmentName" value="@emp.DepartmentName" />
+                                    <input type="hidden" name="Employees[@i].Designation" value="@emp.Designation" />
+                                </td>
+                                <td style="font-weight: 600;">@emp.EmployeeName</td>
+                                <td style="color: var(--text-secondary); font-weight: 500;">@emp.DepartmentName</td>
+                                <td style="color: var(--text-muted); font-weight: 500;">@(string.IsNullOrWhiteSpace(emp.Designation) ? "-" : emp.Designation)</td>
+
+                                <td>
+                                    <div class="badges-cluster-deck">
+                                        <input type="radio" id="status_p_@i" name="Employees[@i].AttendanceStatus" value="1" class="switch-input-token text-switch-node" checked="@(emp.AttendanceStatus == 1)" disabled="@isDisabled" onchange="runLiveMetricsRecomputation()" />
+                                        <label for="status_p_@i" class="switch-label-trigger @(isDisabled ? "disabled-view" : "")">🟢 Present</label>
+
+                                        <input type="radio" id="status_a_@i" name="Employees[@i].AttendanceStatus" value="2" class="switch-input-token text-switch-node" checked="@(emp.AttendanceStatus == 2)" disabled="@isDisabled" onchange="runLiveMetricsRecomputation()" />
+                                        <label for="status_a_@i" class="switch-label-trigger @(isDisabled ? "disabled-view" : "")">🔴 Absent</label>
+
+                                        <input type="radio" id="status_l_@i" name="Employees[@i].AttendanceStatus" value="3" class="switch-input-token text-switch-node" checked="@(emp.AttendanceStatus == 3)" disabled="@isDisabled" onchange="runLiveMetricsRecomputation()" />
+                                        <label for="status_l_@i" class="switch-label-trigger @(isDisabled ? "disabled-view" : "")">🟡 Late</label>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <input type="text" name="Employees[@i].Remarks" value="@emp.Remarks" class="txt-remarks-input" placeholder="Add logging details..." disabled="@isDisabled" autocomplete="off" maxlength="200" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel-footer-deck">
+                <div class="summary-metrics-holder">
+                    <span>Enrolled: <strong id="lblMetricTotal">@Model.Employees.Count</strong></span>
+                    <span style="color: #22c55e;">Present: <strong id="lblMetricPresent" class="metric-pill-count">0</strong></span>
+                    <span style="color: #ef4444;">Absent: <strong id="lblMetricAbsent" class="metric-pill-count">0</strong></span>
+                    <span style="color: #f59e0b;">Late: <strong id="lblMetricLate" class="metric-pill-count">0</strong></span>
+                </div>
+
+                <div class="actions-cluster-group">
+                    <a asp-action="Index" class="btn-action-cancel">Cancel</a>
+
+                    @if (!isDisabled)
+                    {
+                        <button type="button" class="btn-action-save" onclick="triggerFormSaveChanges()">
+                            <i class="bi bi-check-circle"></i> Save Changes
+                        </button>
+
+                        @if (Model.EmployeeInductionAttendanceId > 0)
+                        {
+                            <button type="button" class="btn-action-lock" onclick="triggerLockConfirmationSequence()">
+                                <i class="bi bi-lock"></i> Save &amp; Lock
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    let attendanceSubmitWorkflowAction = "save";
+
+    document.addEventListener("DOMContentLoaded", function() {
+        runLiveMetricsRecomputation();
+    });
+
+    function runLiveMetricsRecomputation() {
+        const totalPresent = document.querySelectorAll(".text-switch-node[value='1']:checked").length;
+        const totalAbsent = document.querySelectorAll(".text-switch-node[value='2']:checked").length;
+        const totalLate = document.querySelectorAll(".text-switch-node[value='3']:checked").length;
+
+        document.getElementById("lblMetricPresent").innerText = totalPresent;
+        document.getElementById("lblMetricAbsent").innerText = totalAbsent;
+        document.getElementById("lblMetricLate").innerText = totalLate;
+    }
+
+    function triggerFormSaveChanges() {
+        attendanceSubmitWorkflowAction = "save";
+        executeInterceptionPost();
+    }
+
+    function triggerLockConfirmationSequence() {
+        attendanceSubmitWorkflowAction = "lock";
+        executeInterceptionPost();
+    }
+
+    /* ── ✅ CENTRAL FORM CONFIRMATION INTERCEPTOR & FORM POST ENGINE ── */
+    function executeInterceptionPost() {
+        const form = document.getElementById("attendanceSaveForm");
+
+        if (attendanceSubmitWorkflowAction === "save") {
+            const title = "Save Attendance Records";
+            const message = "Are you sure you want to save the current employee attendance roster entries?";
+
+            const proceedSave = function () {
+                if (window.showVqSuccess) {
+                    window.showVqSuccess("Attendance changes recorded successfully.");
+                    setTimeout(() => { form.submit(); }, 1000);
+                } else {
+                    alert("Attendance saved successfully.");
+                    form.submit();
+                }
+            };
+
+            if (window.showVqConfirm) {
+                window.showVqConfirm(title, message, proceedSave);
+            } else if (confirm(message)) {
+                proceedSave();
+            }
+
+        } else if (attendanceSubmitWorkflowAction === "lock") {
+            const title = "Lock Attendance Record";
+            const message = "Are you sure you want to Save & Lock this attendance register? Once locked, data records become final and cannot be modified again.";
+
+            const proceedLock = function () {
+                const attendanceId = document.getElementById("EmployeeInductionAttendanceId").value;
+                form.action = `/EmployeeInductionAttendance/LockAttendance?attendanceId=${attendanceId}`;
+                form.submit();
+            };
+
+            if (window.showVqConfirm) {
+                window.showVqConfirm(title, message, proceedLock);
+            } else if (confirm(message)) {
+                proceedLock();
+            }
+        }
+    }
+
+    // Explicitly fallback catch block for native form key triggers
+    function handleAttendanceFormSubmission(e) {
+        e.preventDefault();
+    }
+</script>

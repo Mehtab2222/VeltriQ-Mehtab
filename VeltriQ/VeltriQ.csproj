@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\" />
+    <Folder Include="Models\NewFolder\" />
     <Folder Include="ViewModels\NewFolder\" />
     <Folder Include="Views\AssetReturn - Copy\" />
     <Folder Include="Views\InductionSession - Copy\" />

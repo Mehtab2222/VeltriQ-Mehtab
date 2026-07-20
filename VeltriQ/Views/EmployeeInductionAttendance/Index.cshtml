@@ -1,0 +1,349 @@
+﻿@model VeltriQ.ViewModels.EmployeeInductionAttendance.AttendanceRegisterViewModel
+
+@{
+    ViewData["Title"] = "Induction Attendance Register";
+}
+
+<style>
+    /* ── ✅ ADDED TOP SPACING TO CONTAINER ── */
+    .attendance-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 40px; /* Maintains professional distance from top boundary */
+    }
+
+    /* ── ✅ UNIFIED CORE GRID CARD MODULE ── */
+    .attendance-matrix-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 90px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* UNIFIED CARD SUB-HEADER BLOCK */
+    .attendance-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .filters-wrapper-deck {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .filter-group-block {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .filter-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+    /* VELTRIQ DROPDOWN TOKENS */
+    .select-matrix-filter {
+        height: 34px;
+        min-width: 220px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 24px 0 12px;
+        font-size: 12.5px;
+        font-weight: 600;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px;
+    }
+
+    /* REAL-TIME SEARCH COMPONENT DECK */
+    .attendance-search-wrapper {
+        position: relative;
+        width: 280px;
+    }
+
+        .attendance-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .attendance-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .attendance-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* SCROLLABLE GRID CONTAINERS */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .matrix-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .matrix-grid-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .matrix-grid-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .matrix-grid-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    /* ACTIONS INTERFACE LINKS */
+    .link-action-deck {
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 12.5px;
+        transition: color 0.1s ease-in-out;
+    }
+
+    .action-mark {
+        color: var(--purple);
+    }
+
+    .action-edit {
+        color: #eab308;
+    }
+
+    .action-view {
+        color: #3b82f6;
+    }
+
+    .link-action-deck:hover {
+        opacity: 0.8;
+    }
+</style>
+
+<div class="attendance-page">
+
+    <div class="attendance-matrix-card">
+
+        <div class="attendance-card-top">
+            <div class="filters-wrapper-deck">
+                <div class="filter-group-block">
+                    <label>Program:</label>
+                    <select asp-for="InductionProgramMasterId" id="ddlProgramFilter" class="select-matrix-filter" asp-items="Model.Programs" onchange="handleProgramCascadeChange()"></select>
+                </div>
+
+                <div class="filter-group-block">
+                    <label>Session:</label>
+                    <select asp-for="InductionSessionMasterId" id="ddlSessionFilter" class="select-matrix-filter" asp-items="Model.Sessions" onchange="loadAttendanceRegisterMatrix()"></select>
+                </div>
+            </div>
+
+            <div class="attendance-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="attendanceSearchInput" placeholder="Search program or session logs..." autocomplete="off" oninput="executeClientSideSearchFilter()" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="matrix-grid-table" id="tblAttendanceRegister">
+                <thead>
+                    <tr>
+                        <th>Program</th>
+                        <th>Session Name</th>
+                        <th>Attendance Date</th>
+                        <th style="text-align: center; width: 80px;">Total</th>
+                        <th style="text-align: center; width: 80px;">Present</th>
+                        <th style="text-align: center; width: 80px;">Absent</th>
+                        <th style="text-align: center; width: 80px;">Late</th>
+                        <th style="text-align: center; width: 80px;">Pending</th>
+                        <th style="width: 80px; text-align: right; padding-right: 24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceRegisterGridBody">
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming induction transaction log registers...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let rawAttendanceMatrixCache = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadAttendanceRegisterMatrix();
+    });
+
+    async function handleProgramCascadeChange() {
+        const programId = document.getElementById("ddlProgramFilter").value;
+        const ddlSession = document.getElementById("ddlSessionFilter");
+
+        ddlSession.innerHTML = '<option value="">-- Select Session --</option>';
+
+        if (programId) {
+            try {
+                const res = await fetch(`/EmployeeInductionAttendance/GetSessions?programId=${programId}`, { method: 'GET' });
+                const sessions = await res.json();
+
+                if (sessions && sessions.length > 0) {
+                    sessions.forEach(s => {
+                        const opt = document.createElement("option");
+                        opt.value = s.inductionSessionMasterId;
+                        opt.text = s.sessionTitle;
+                        ddlSession.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error("Cascade selection fault: ", err);
+            }
+        }
+        loadAttendanceRegisterMatrix();
+    }
+
+    // ✅ FIXED: Formats precisely to required short configuration metrics (e.g. 21 Jul 2026)
+    function formatDateStamp(dotNetDateStr) {
+        if (!dotNetDateStr) return "-";
+        const date = new Date(dotNetDateStr);
+        if (isNaN(date.getTime())) return "-";
+        const day = String(date.getDate()).padStart(2, '0');
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    }
+
+    async function loadAttendanceRegisterMatrix() {
+        const tbody = document.getElementById("attendanceRegisterGridBody");
+        const programId = document.getElementById("ddlProgramFilter").value || "";
+        const sessionId = document.getElementById("ddlSessionFilter").value || "";
+        document.getElementById("attendanceSearchInput").value = "";
+
+        try {
+            const url = `/EmployeeInductionAttendance/GetAttendanceRegister?programId=${programId}&sessionId=${sessionId}`;
+            const res = await fetch(url, { method: 'GET' });
+            const result = await res.json();
+
+            rawAttendanceMatrixCache = result.data || [];
+            renderRegisterGridRows(rawAttendanceMatrixCache);
+
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: red; padding: 24px;">Failed to process live stream data matrices.</td></tr>`;
+        }
+    }
+
+    function renderRegisterGridRows(dataset) {
+        const tbody = document.getElementById("attendanceRegisterGridBody");
+        if (!tbody) return;
+
+        if (dataset.length === 0) {
+            tbody.innerHTML = `
+            <tr>
+                <td colspan="9" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                    No assigned induction groups detected matching tracking configurations.
+                </td>
+            </tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(item => {
+            let actionClass = "action-mark";
+            if (item.action === "Edit") actionClass = "action-edit";
+            else if (item.action === "View") actionClass = "action-view";
+
+            let endpointUrl = "#";
+            if (item.action === "Mark") {
+                endpointUrl = `/EmployeeInductionAttendance/MarkAttendance?programId=${item.inductionProgramMasterId}&sessionId=${item.inductionSessionMasterId}`;
+            } else if (item.action === "Edit") {
+                endpointUrl = `/EmployeeInductionAttendance/EditAttendance?attendanceId=${item.employeeInductionAttendanceId}`;
+            } else if (item.action === "View") {
+                endpointUrl = `/EmployeeInductionAttendance/ViewAttendance?attendanceId=${item.employeeInductionAttendanceId}`;
+            }
+
+            return `
+            <tr class="attendance-record-row">
+                <td style="font-weight: 600;" class="col-program-name">${item.programName}</td>
+                <td class="col-session-name">${item.sessionName}</td>
+                <td style="color: var(--text-secondary); font-weight: 500;">${formatDateStamp(item.attendanceDate)}</td>
+                <td style="text-align: center; font-weight: 600; color: var(--text-secondary);">${item.totalEmployees}</td>
+                <td style="text-align: center; font-weight: 700; color: #22c55e;">${item.presentCount || 0}</td>
+                <td style="text-align: center; font-weight: 700; color: #ef4444;">${item.absentCount || 0}</td>
+                <td style="text-align: center; font-weight: 700; color: #eab308;">${item.lateCount || 0}</td>
+                <td style="text-align: center; font-weight: 600; color: var(--text-muted);">${item.pendingCount || 0}</td>
+                <td style="text-align: right; padding-right: 24px;">
+                    <a href="${endpointUrl}" class="link-action-deck ${actionClass}">${item.action}</a>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function executeClientSideSearchFilter() {
+        const criteria = document.getElementById("attendanceSearchInput").value.trim().toLowerCase();
+
+        const matched = rawAttendanceMatrixCache.filter(x =>
+            x.programName.toLowerCase().includes(criteria) ||
+            x.sessionName.toLowerCase().includes(criteria)
+        );
+
+        renderRegisterGridRows(matched);
+    }
+</script>
