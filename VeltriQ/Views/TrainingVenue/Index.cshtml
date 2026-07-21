@@ -1,0 +1,669 @@
+﻿@model VeltriQ.ViewModels.Training.TrainingVenueViewModel
+
+@{
+    ViewData["Title"] = "Training Venues";
+}
+
+<style>
+    .venue-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── HEADER (Optimized & Pushed Up) ── */
+    .venue-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    /* ── COMPACT ADD BUTTON ── */
+    .venue-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+        cursor: pointer;
+    }
+
+        .venue-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .venue-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .venue-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .venue-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .venue-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .venue-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .venue-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .venue-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .venue-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .venue-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .venue-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .venue-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .venue-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .venue-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── HIGH-DENSITY COMPACT BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .badge-category {
+        background: rgba(124, 58, 237, 0.12);
+        color: var(--purple);
+    }
+
+    .badge-internal {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60a5fa;
+    }
+
+    .badge-external {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+    }
+
+    .badge-online {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .col-code {
+        font-family: monospace;
+        font-weight: 700;
+        color: var(--purple);
+    }
+
+    /* ── INLINE ACTIONS ── */
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .action-btn.toggle-deactivate-btn {
+            color: #22c55e;
+        }
+
+            .action-btn.toggle-deactivate-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        .action-btn.toggle-activate-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.toggle-activate-btn:hover {
+                background: #22c55e;
+                color: #fff;
+            }
+
+    /* ── CENTERED POPUP MODAL CONTAINER ── */
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        width: 460px;
+        max-width: 92vw;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+    }
+
+        .modal-card-header h4 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .modal-body-form-fields {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    .form-deck-input {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+    }
+
+        .form-deck-input:focus {
+            border-color: var(--purple);
+        }
+
+        .form-deck-input:disabled {
+            background: var(--hover-bg);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+    .modal-card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .btn-modal-cancel {
+        height: 34px;
+        padding: 0 14px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-action-trigger {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="venue-page">
+
+    <div class="venue-header">
+        <button type="button" class="venue-add-btn" onclick="openCreateWorkspaceModal()">
+            <i class="bi bi-plus-lg"></i> Add Venue
+        </button>
+    </div>
+
+    <div class="venue-master-card">
+
+        <div class="venue-card-top">
+            <div class="venue-card-title">
+                <h3>Venue Registry Master</h3>
+                <p>Total Records: <span id="venueCounter">0</span></p>
+            </div>
+
+            <div class="venue-search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="venueSearchInput" placeholder="Search venues..." autocomplete="off" oninput="executeClientSideSearchFilter()" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="venue-table" id="venueGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Venue Name</th>
+                        <th>Venue Type</th>
+                        <th>Max Capacity</th>
+                        <th>Location/Address</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="venueMasterGridBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming training venue database registers...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="venueWorkspaceModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4 id="modalHeadingTitle">Add Venue</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeWorkspaceModal()">✕</button>
+        </div>
+        <form id="venueWorkspaceForm" onsubmit="submitVenueForm(event)">
+            <input type="hidden" id="txtTrainingVenueId" name="TrainingVenueId" value="0" />
+
+            <div class="modal-body-form-fields">
+                <div class="form-group-block" id="blockVenueCodeDisplay" style="display: none;">
+                    <label>Venue Code</label>
+                    <input type="text" id="txtVenueCode" class="form-deck-input" disabled style="opacity: 0.75; font-weight: 700; color: var(--purple);" />
+                </div>
+
+                <div class="form-group-block">
+                    <label>Venue Name *</label>
+                    <input type="text" id="txtVenueName" name="VenueName" class="form-deck-input" placeholder="e.g. Conference Room A" maxlength="200" required />
+                </div>
+
+                <div class="form-group-block">
+                    <label>Venue Class Structure *</label>
+                    <select id="ddlVenueType" name="VenueType" class="form-deck-input" asp-items="Model.VenueTypes" onchange="handleVenueTypeViewToggle()" required>
+                        <option value="">-- Select Type Scope --</option>
+                    </select>
+                </div>
+
+                <div class="form-group-block">
+                    <label>Max Seating Capacity</label>
+                    <input type="number" id="txtCapacity" name="Capacity" class="form-deck-input" min="1" placeholder="e.g. 25" />
+                </div>
+
+                <div class="form-group-block" id="blockAddressField" style="display: none;">
+                    <label>Location Physical Address *</label>
+                    <input type="text" id="txtAddress" name="Address" class="form-deck-input" placeholder="e.g. Building 4, 3rd Floor, Tech Park" maxlength="500" />
+                </div>
+            </div>
+
+            <div class="modal-card-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeWorkspaceModal()">Cancel</button>
+                <button type="submit" class="btn-action-trigger" id="btnSubmitForm">Save Venue</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let localVenueCache = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadVenueGridMatrix();
+    });
+
+    function openCreateWorkspaceModal() {
+        document.getElementById("venueWorkspaceForm").reset();
+        document.getElementById("txtTrainingVenueId").value = "0";
+        document.getElementById("blockVenueCodeDisplay").style.display = "none";
+
+        toggleFormInputStates(false);
+        handleVenueTypeViewToggle();
+
+        document.getElementById("modalHeadingTitle").innerText = "Add Venue";
+        document.getElementById("btnSubmitForm").innerText = "Save Venue";
+        document.getElementById("btnSubmitForm").style.display = "inline-flex";
+
+        document.getElementById("venueWorkspaceModalLayer").style.display = "flex";
+    }
+
+    function closeWorkspaceModal() {
+        document.getElementById("venueWorkspaceModalLayer").style.display = "none";
+    }
+
+    function handleVenueTypeViewToggle() {
+        const typeValue = document.getElementById("ddlVenueType").value;
+        const addressBlock = document.getElementById("blockAddressField");
+        const addressInput = document.getElementById("txtAddress");
+
+        if (typeValue === "2") { // External Venue
+            addressBlock.style.display = "flex";
+            addressInput.required = true;
+        } else {
+            addressBlock.style.display = "none";
+            addressInput.required = false;
+        }
+    }
+
+    function toggleFormInputStates(isDisable) {
+        document.getElementById("txtVenueName").disabled = isDisable;
+        document.getElementById("ddlVenueType").disabled = isDisable;
+        document.getElementById("txtCapacity").disabled = isDisable;
+        document.getElementById("txtAddress").disabled = isDisable;
+    }
+
+    async function loadVenueGridMatrix() {
+        try {
+            const res = await fetch('/TrainingVenue/GetVenueList', { method: 'GET' });
+            const result = await res.json();
+
+            localVenueCache = result.data || [];
+            renderVenueRows(localVenueCache);
+        } catch {
+            document.getElementById("venueMasterGridBody").innerHTML = `<tr><td colspan="6" style="text-align: center; color: red; padding: 24px;">Failed to refresh venue records.</td></tr>`;
+        }
+    }
+
+    function renderVenueRows(dataset) {
+        const tbody = document.getElementById("venueMasterGridBody");
+        document.getElementById("venueCounter").innerText = dataset.length;
+
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr id="emptyMatrixFallback"><td colspan="6" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No records found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(x => `
+            <tr>
+                <td class="col-code"><code>${x.venueCode}</code></td>
+                <td style="font-weight: 600;">${x.venueName}</td>
+                <td>
+                    <span class="status-badge ${x.venueType === 1 ? "badge-internal" : x.venueType === 2 ? "badge-external" : "badge-online"}">
+                        ${x.venueTypeText}
+                    </span>
+                </td>
+                <td style="font-weight: 600;">${x.capacity || "-"}</td>
+                <td style="color: var(--text-secondary); font-weight: 500;">${x.address || "-"}</td>
+                <td>
+                    <div class="table-actions">
+                        <button type="button" class="action-btn" title="View Details" onclick="fireViewDetails(${x.trainingVenueId})"><i class="bi bi-eye"></i></button>
+                        <button type="button" class="action-btn" title="Edit Parameters" onclick="fireEditWorkflow(${x.trainingVenueId})"><i class="bi bi-pencil"></i></button>
+                        <button type="button" class="action-btn toggle-status ${x.isActive ? "toggle-deactivate-btn" : "toggle-activate-btn"}"
+                                title="${x.isActive ? "Deactivate Venue" : "Activate Venue"}"
+                                onclick="executeToggleStatus(${x.trainingVenueId}, ${x.isActive})">
+                            <i class="bi ${x.isActive ? "bi-toggle-on" : "bi-toggle-off"}" style="font-size:14px;"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function fireViewDetails(id) {
+        document.getElementById("venueWorkspaceForm").reset();
+        try {
+            const res = await fetch(`/TrainingVenue/GetVenue/${id}`);
+            const result = await res.json();
+
+            if (result.success && result.data) {
+                populateFormFields(result.data);
+                toggleFormInputStates(true);
+
+                document.getElementById("blockVenueCodeDisplay").style.display = "flex";
+                document.getElementById("modalHeadingTitle").innerText = "View Venue Details";
+                document.getElementById("btnSubmitForm").style.display = "none";
+
+                document.getElementById("venueWorkspaceModalLayer").style.display = "flex";
+            }
+        } catch { alert("Failed to establish detailed channel fields."); }
+    }
+
+    async function fireEditWorkflow(id) {
+        document.getElementById("venueWorkspaceForm").reset();
+        try {
+            const res = await fetch(`/TrainingVenue/GetVenue/${id}`);
+            const result = await res.json();
+
+            if (result.success && result.data) {
+                populateFormFields(result.data);
+                toggleFormInputStates(false);
+
+                document.getElementById("blockVenueCodeDisplay").style.display = "flex";
+                document.getElementById("modalHeadingTitle").innerText = "Modify Venue Parameters";
+                document.getElementById("btnSubmitForm").innerText = "Save Changes";
+                document.getElementById("btnSubmitForm").style.display = "inline-flex";
+
+                document.getElementById("venueWorkspaceModalLayer").style.display = "flex";
+            }
+        } catch { alert("Failed to establish update channel fields."); }
+    }
+
+    function populateFormFields(d) {
+        document.getElementById("txtTrainingVenueId").value = d.trainingVenueId;
+        document.getElementById("txtVenueCode").value = d.venueCode;
+        document.getElementById("txtVenueName").value = d.venueName;
+        document.getElementById("ddlVenueType").value = d.venueType;
+        document.getElementById("txtCapacity").value = d.capacity;
+        document.getElementById("txtAddress").value = d.address;
+        handleVenueTypeViewToggle();
+    }
+
+    async function submitVenueForm(e) {
+        e.preventDefault();
+        const id = parseInt(document.getElementById("txtTrainingVenueId").value);
+        const url = id === 0 ? "/TrainingVenue/Create" : "/TrainingVenue/Update";
+
+        const formData = new URLSearchParams();
+        formData.append("TrainingVenueId", id);
+        formData.append("VenueName", document.getElementById("txtVenueName").value);
+        formData.append("VenueType", document.getElementById("ddlVenueType").value);
+        formData.append("Capacity", document.getElementById("txtCapacity").value);
+        formData.append("Address", document.getElementById("txtAddress").value);
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded", "RequestVerificationToken": token },
+                body: formData.toString()
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeWorkspaceModal();
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+
+                setTimeout(() => { loadVenueGridMatrix(); }, 500);
+            } else {
+                if (window.showVqError) window.showVqError(result.message);
+                else alert(result.message);
+            }
+        } catch { alert("Transmission synchronization fault."); }
+    }
+
+    function executeToggleStatus(id, currentStatus) {
+        const titleText = currentStatus ? "Deactivate" : "Activate";
+        const msg = `Are you sure you want to ${titleText.toLowerCase()} this training venue record?`;
+
+        showVqConfirm(
+            titleText + " Venue",
+            msg,
+            async function() {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                try {
+                    const res = await fetch(`/TrainingVenue/ToggleStatus/${id}`, {
+                        method: "POST", headers: { "RequestVerificationToken": token }
+                    });
+                    const result = await res.json();
+
+                    if (result.success) {
+                        if (window.showVqAlert) {
+                            showVqAlert("Success", "Venue status updated successfully.", true);
+                        }
+                        loadVenueGridMatrix();
+                    }
+                } catch { alert("Status toggling failure."); }
+            }
+        );
+    }
+
+    function executeClientSideSearchFilter() {
+        const query = document.getElementById("venueSearchInput").value.trim().toLowerCase();
+
+        const matched = localVenueCache.filter(x =>
+            x.venueName.toLowerCase().includes(query) ||
+            x.venueCode.toLowerCase().includes(query) ||
+            x.venueTypeText.toLowerCase().includes(query) ||
+            (x.address && x.address.toLowerCase().includes(query))
+        );
+
+        renderVenueRows(matched);
+    }
+</script>

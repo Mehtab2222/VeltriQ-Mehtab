@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VeltriQ.Data.SeedData.HR;
 using VeltriQ.Models;
+using VeltriQ.Models.EmployeeInductionAttendance;
 using VeltriQ.Models.HR;
 using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.Models.Recruitment;
+using VeltriQ.Models.Training;
 using VeltriQ.SeedData;
-using VeltriQ.Models.EmployeeInductionAttendance;
 namespace VeltriQ.Data
 {
     public class TenantDbContext : DbContext
@@ -120,6 +121,12 @@ namespace VeltriQ.Data
         public DbSet<EmployeeInductionAttendance> EmployeeInductionAttendances { get; set; }
 
         public DbSet<EmployeeInductionAttendanceDetail> EmployeeInductionAttendanceDetails { get; set; }
+        public DbSet<TrainingCategory> TrainingCategories { get; set; }
+        public DbSet<TrainingMaster> TrainingMasters { get; set; }
+        public DbSet<TrainingTrainer> TrainingTrainers { get; set; }
+        public DbSet<TrainingVenue> TrainingVenues { get; set; }
+        public DbSet<TrainingSchedule> TrainingSchedules { get; set; }
+        public DbSet<TrainingEnrollment> TrainingEnrollments { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -133,6 +140,109 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+
+            modelBuilder.Entity<TrainingSchedule>(entity =>
+            {
+                entity.HasKey(e => e.TrainingScheduleId);
+
+                entity.Property(e => e.ScheduleCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(e => e.Remarks)
+                      .HasMaxLength(500);
+
+                entity.HasIndex(e => e.ScheduleCode)
+                      .IsUnique();
+
+                // Training Master
+                entity.HasOne(e => e.TrainingMaster)
+                      .WithMany()
+                      .HasForeignKey(e => e.TrainingMasterId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Trainer
+                entity.HasOne(e => e.TrainingTrainer)
+                      .WithMany()
+                      .HasForeignKey(e => e.TrainingTrainerId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Venue
+                entity.HasOne(e => e.TrainingVenue)
+                      .WithMany()
+                      .HasForeignKey(e => e.TrainingVenueId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Department
+                entity.HasOne(e => e.Department)
+                      .WithMany()
+                      .HasForeignKey(e => e.DepartmentId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<TrainingVenue>(entity =>
+            {
+                entity.HasKey(e => e.TrainingVenueId);
+
+                entity.Property(e => e.VenueCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(e => e.VenueName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.Property(e => e.Address)
+                      .HasMaxLength(500);
+
+                entity.HasIndex(e => e.VenueCode)
+                      .IsUnique();
+
+                entity.HasIndex(e => e.VenueName)
+                      .IsUnique();
+            });
+            modelBuilder.Entity<TrainingTrainer>(entity =>
+            {
+                entity.HasKey(e => e.TrainingTrainerId);
+
+                entity.Property(e => e.TrainerCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(e => e.TrainerName)
+                      .HasMaxLength(200);
+
+                entity.Property(e => e.MobileNo)
+                      .HasMaxLength(20);
+
+                entity.Property(e => e.Email)
+                      .HasMaxLength(150);
+
+                entity.HasOne(e => e.Employee)
+                      .WithMany()
+                      .HasForeignKey(e => e.EmployeeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => e.TrainerCode)
+                      .IsUnique();
+            });
+            modelBuilder.Entity<TrainingMaster>()
+    .HasIndex(x => new { x.TrainingCategoryId, x.TrainingName })
+    .IsUnique();
+            modelBuilder.Entity<TrainingCategory>(entity =>
+            {
+                entity.HasKey(e => e.TrainingCategoryId);
+
+                entity.Property(e => e.CategoryCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(e => e.CategoryName)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.HasIndex(e => e.CategoryName)
+                      .IsUnique();
+            });
             modelBuilder.Entity<EmployeeInductionAttendance>(entity =>
             {
                 entity.HasKey(e => e.EmployeeInductionAttendanceId);

@@ -1,0 +1,541 @@
+﻿@model IEnumerable<VeltriQ.Models.Training.TrainingCategory>
+
+@{
+    ViewData["Title"] = "Training Categories";
+}
+
+<style>
+    .category-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+    }
+
+    /* ── HEADER NAVIGATION STRIP ── */
+    .category-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .btn-create-trigger {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+        .btn-create-trigger:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── CORE PANEL CARD WITH SQUARED DESIGN PROFILE ── */
+    .category-matrix-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .category-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .category-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .category-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── SCROLLABLE DATAGRID VIEWPORT ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .matrix-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .matrix-grid-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .matrix-grid-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .matrix-grid-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .col-code {
+        font-family: monospace;
+        font-weight: 700;
+        color: var(--purple);
+    }
+
+    .col-status {
+        font-weight: 600;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.15s, color 0.15s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .action-btn.toggle-deactivate-btn {
+            color: #22c55e;
+        }
+
+            .action-btn.toggle-deactivate-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        .action-btn.toggle-activate-btn {
+            color: #ef4444;
+        }
+
+            .action-btn.toggle-activate-btn:hover {
+                background: #22c55e;
+                color: #fff;
+            }
+
+    /* ── ✅ CENTERED WINDOW MODAL LAYER STYLING RESTORED ── */
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center; /* Opens cleanly directly in the center of the page viewport */
+    }
+
+    .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        width: 460px;
+        max-width: 92vw;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+    }
+
+        .modal-card-header h4 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    .form-deck-input {
+        width: 100%;
+        height: 38px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+    }
+
+        .form-deck-input:focus {
+            border-color: var(--purple);
+        }
+
+        .form-deck-input:disabled {
+            background: var(--hover-bg);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+    .modal-card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .btn-modal-cancel {
+        height: 36px;
+        padding: 0 14px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-action-trigger {
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .text-danger {
+        color: #ef4444;
+        font-size: 11px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="category-page">
+    <div class="category-header">
+        <button type="button" class="btn-create-trigger" onclick="openCreateWorkspaceModal()">
+            <i class="bi bi-plus-lg"></i> Add Category
+        </button>
+    </div>
+
+    <div class="category-matrix-card">
+        <div class="category-card-top">
+            <div class="category-card-title">
+                <h3>Training Category Registry</h3>
+                <p>Manage and map educational classification blueprints for curriculum frameworks.</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="matrix-grid-table" id="tblTrainingCategories">
+                <thead>
+                    <tr>
+                        <th style="width: 160px;">Category Code</th>
+                        <th>Category Name</th>
+                        <th style="width: 160px;">Status</th>
+                        <th class="text-end" style="width: 120px; padding-right: 24px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryGridBody">
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No training classifications currently configured inside the library logs.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr id="row_@item.TrainingCategoryId">
+                                <td class="col-code">@item.CategoryCode</td>
+                                <td class="col-name" style="font-weight: 600;">@item.CategoryName</td>
+                                <td class="col-status-text" style="font-weight: 600; color: @(item.IsActive ? "#22c55e" : "#ef4444");">
+                                    @(item.IsActive ? "Active" : "Inactive")
+                                </td>
+                                <td>
+                                    <div class="table-actions" style="padding-right: 8px;">
+                                        <button type="button" class="action-btn" title="View Category" onclick="fireFetchViewWorkflow(@item.TrainingCategoryId)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button type="button" class="action-btn" title="Edit Parameters" onclick="fireFetchEditWorkflow(@item.TrainingCategoryId)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="action-btn @(item.IsActive ? "toggle-deactivate-btn" : "toggle-activate-btn")"
+                                                id="toggle_@item.TrainingCategoryId"
+                                                title="@(item.IsActive ? "Deactivate" : "Activate")"
+                                                onclick="executeCategoryStatusToggle(@item.TrainingCategoryId, @item.IsActive.ToString().ToLower())">
+                                            <i class="bi @(item.IsActive ? "bi-toggle-on" : "bi-toggle-off")"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="categoryWorkspaceModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4 id="modalHeadingTitle">Add Category</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeWorkspaceModal()">✕</button>
+        </div>
+        <form id="categoryWorkspaceForm" onsubmit="submitCategoryForm(event)" style="display:flex; flex-direction:column; flex:1;">
+            <input type="hidden" id="txtTrainingCategoryId" name="TrainingCategoryId" value="0" />
+
+            <div style="padding: 20px; display: flex; flex-direction: column; gap: 4px;">
+                <div class="form-group-block" id="blockCategoryCodeDisplay" style="display: none;">
+                    <label>System Auto-Code</label>
+                    <input type="text" id="txtCategoryCode" class="form-deck-input" disabled style="opacity: 0.75; font-family: monospace; font-weight: 700; color: var(--purple);" />
+                </div>
+
+                <div class="form-group-block">
+                    <label>Category Classification Name *</label>
+                    <input type="text" id="txtCategoryName" name="CategoryName" class="form-deck-input" placeholder="e.g. Compliance & Safety" maxlength="100" required />
+                    <span id="validationCategoryName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-card-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeWorkspaceModal()">Cancel</button>
+                <button type="submit" class="btn-action-trigger" id="btnSubmitForm">Save Category</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCreateWorkspaceModal() {
+        document.getElementById("categoryWorkspaceForm").reset();
+        document.getElementById("txtTrainingCategoryId").value = "0";
+        document.getElementById("blockCategoryCodeDisplay").style.display = "none";
+        document.getElementById("txtCategoryName").disabled = false;
+
+        document.getElementById("modalHeadingTitle").innerText = "Add Category";
+        document.getElementById("btnSubmitForm").innerText = "Save Category";
+        document.getElementById("btnSubmitForm").style.display = "inline-flex";
+
+        document.getElementById("categoryWorkspaceModalLayer").style.display = "flex";
+    }
+
+    function closeWorkspaceModal() {
+        document.getElementById("categoryWorkspaceModalLayer").style.display = "none";
+    }
+
+    async function fireFetchViewWorkflow(id) {
+        document.getElementById("categoryWorkspaceForm").reset();
+        try {
+            const res = await fetch(`/TrainingCategory/GetCategory/${id}`, { method: 'GET' });
+            const result = await res.json();
+
+            if (result.success && result.data) {
+                document.getElementById("txtTrainingCategoryId").value = result.data.trainingCategoryId;
+                document.getElementById("txtCategoryCode").value = result.data.categoryCode;
+                document.getElementById("txtCategoryName").value = result.data.categoryName;
+
+                document.getElementById("txtCategoryName").disabled = true;
+                document.getElementById("blockCategoryCodeDisplay").style.display = "flex";
+
+                document.getElementById("modalHeadingTitle").innerText = "View Training Category";
+                document.getElementById("btnSubmitForm").style.display = "none";
+
+                document.getElementById("categoryWorkspaceModalLayer").style.display = "flex";
+            } else {
+                alert(result.message);
+            }
+        } catch { alert("Failed to fetch category detail blocks."); }
+    }
+
+    async function fireFetchEditWorkflow(id) {
+        document.getElementById("categoryWorkspaceForm").reset();
+        try {
+            const res = await fetch(`/TrainingCategory/GetCategory/${id}`, { method: 'GET' });
+            const result = await res.json();
+
+            if (result.success && result.data) {
+                document.getElementById("txtTrainingCategoryId").value = result.data.trainingCategoryId;
+                document.getElementById("txtCategoryCode").value = result.data.categoryCode;
+                document.getElementById("txtCategoryName").value = result.data.categoryName;
+
+                document.getElementById("txtCategoryName").disabled = false;
+                document.getElementById("blockCategoryCodeDisplay").style.display = "flex";
+
+                document.getElementById("modalHeadingTitle").innerText = "Modify Category Parameters";
+                document.getElementById("btnSubmitForm").innerText = "Save Changes";
+                document.getElementById("btnSubmitForm").style.display = "inline-flex";
+
+                document.getElementById("categoryWorkspaceModalLayer").style.display = "flex";
+            } else {
+                alert(result.message);
+            }
+        } catch { alert("Failed to open edit workspace channel."); }
+    }
+
+    async function submitCategoryForm(e) {
+        e.preventDefault();
+        const id = parseInt(document.getElementById("txtTrainingCategoryId").value);
+        const actionUrl = id === 0 ? "/TrainingCategory/Create" : "/TrainingCategory/Update";
+
+        const formData = new URLSearchParams();
+        formData.append("TrainingCategoryId", id);
+        formData.append("CategoryName", document.getElementById("txtCategoryName").value);
+
+        const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch(actionUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "RequestVerificationToken": antiForgeryToken
+                },
+                body: formData.toString()
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeWorkspaceModal();
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+                else alert(result.message);
+
+                setTimeout(() => { window.location.reload(); }, 1000);
+            } else {
+                if (window.showVqError) window.showVqError(result.message);
+                else alert(result.message);
+            }
+        } catch { alert("Transactional transmission error."); }
+    }
+
+    function executeCategoryStatusToggle(id, currentStatus) {
+        const message = `Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this training category classification module?`;
+
+        const statusCommitAction = async function() {
+            const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            try {
+                const res = await fetch(`/TrainingCategory/ToggleStatus/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "RequestVerificationToken": antiForgeryToken
+                    }
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    const row = document.getElementById(`row_${id}`);
+                    const toggleBtn = document.getElementById(`toggle_${id}`);
+                    const statusTd = row.querySelector(".col-status-text");
+
+                    if (result.isActive) {
+                        statusTd.innerText = "Active";
+                        statusTd.style.color = "#22c55e";
+                        toggleBtn.className = "action-btn toggle-deactivate-btn";
+                        toggleBtn.title = "Deactivate";
+                        toggleBtn.innerHTML = '<i class="bi bi-toggle-on"></i>';
+                        toggleBtn.setAttribute("onclick", `executeCategoryStatusToggle(${id}, true)`);
+                    } else {
+                        statusTd.innerText = "Inactive";
+                        statusTd.style.color = "#ef4444";
+                        toggleBtn.className = "action-btn toggle-activate-btn";
+                        toggleBtn.title = "Activate";
+                        toggleBtn.innerHTML = '<i class="bi bi-toggle-off"></i>';
+                        toggleBtn.setAttribute("onclick", `executeCategoryStatusToggle(${id}, false)`);
+                    }
+
+                    if (window.showVqSuccess) window.showVqSuccess(result.message);
+                } else {
+                    if (window.showVqError) window.showVqError(result.message);
+                    else alert(result.message);
+                }
+            } catch { alert("Network lookup status error."); }
+        };
+
+        if (window.showVqConfirm) {
+            window.showVqConfirm(currentStatus ? "Deactivate Category" : "Activate Category", message, statusCommitAction);
+        } else if (confirm(message)) {
+            statusCommitAction();
+        }
+    }
+</script>

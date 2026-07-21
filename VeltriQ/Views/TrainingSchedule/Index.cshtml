@@ -1,0 +1,1280 @@
+﻿@model VeltriQ.ViewModels.Training.TrainingScheduleViewModel
+
+@{
+    ViewData["Title"] = "Training Schedules";
+}
+
+<style>
+    .schedule-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    /* ── TOP OPERATION NAVIGATION STRIP ── */
+    .schedule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    .view-switcher-group {
+        display: inline-flex;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        padding: 2px;
+        border-radius: 6px;
+    }
+
+    .btn-switch-tab {
+        height: 30px;
+        padding: 0 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-switch-tab.active-view {
+            background: var(--card-bg);
+            color: var(--purple);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+    .schedule-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: .2s ease;
+        cursor: pointer;
+    }
+
+        .schedule-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* ── CORE PANEL CARD MODULE ── */
+    .schedule-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .schedule-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+        flex-shrink: 0;
+    }
+
+    .schedule-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .schedule-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .schedule-filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .schedule-select-filter {
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12px;
+        outline: none;
+        min-width: 180px;
+    }
+
+        .schedule-select-filter:focus {
+            border-color: var(--purple);
+        }
+
+    .schedule-search-wrapper {
+        position: relative;
+        width: 280px;
+    }
+
+        .schedule-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+        }
+
+            .schedule-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .schedule-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+    }
+
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .schedule-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .schedule-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .schedule-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .badge-category {
+        background: rgba(124, 58, 237, 0.12);
+        color: var(--purple);
+    }
+
+    .badge-returnable {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .badge-nonreturnable {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
+    .badge-warning {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+    /* ── CALENDAR VIEWPORT GRID BOUNDS ── */
+    .calendar-split-workspace {
+        display: none;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .calendar-grid-segment {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        overflow: hidden;
+    }
+
+    .calendar-navigation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    }
+
+        .calendar-navigation-header h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+    .calendar-nav-buttons {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-cal-nav {
+        height: 30px;
+        width: 30px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+        .btn-cal-nav:hover {
+            background: var(--hover-bg);
+        }
+
+    .calendar-matrix-board {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        flex: 1;
+    }
+
+    .calendar-day-label {
+        background: var(--hover-bg);
+        padding: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .calendar-date-cell {
+        background: var(--card-bg);
+        height: calc((100vh - 260px) / 6);
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: background-color 0.15s;
+    }
+
+        .calendar-date-cell:hover {
+            background: var(--hover-bg);
+        }
+
+        .calendar-date-cell.other-month {
+            opacity: 0.25;
+            background: var(--hover-bg);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .calendar-date-cell.today-cell {
+            background: rgba(124, 58, 237, 0.03);
+            box-shadow: inset 0 0 0 1px var(--purple);
+        }
+
+        .calendar-date-cell.selected-cell-focus {
+            box-shadow: inset 0 0 0 2px var(--purple);
+            background: var(--hover-bg);
+        }
+
+    .cell-date-number {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+    }
+
+    .calendar-date-cell.today-cell .cell-date-number {
+        color: var(--purple);
+    }
+
+    .calendar-micro-strip {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 4px;
+        border-radius: 4px;
+        background: rgba(124, 58, 237, 0.08);
+        color: var(--purple);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-left: 3px solid var(--purple);
+    }
+
+        .calendar-micro-strip.cancelled-strip {
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444;
+            border-left-color: #ef4444;
+        }
+
+    /* RIGHT SIDEBAR MONTHLY LEDGER STACK */
+    .calendar-sidebar-ledger {
+        width: 320px;
+        border-left: 1px solid var(--border);
+        background: rgba(255,255,255,0.005);
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        overflow-y: auto;
+    }
+
+        .calendar-sidebar-ledger h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin: 0 0 4px 0;
+        }
+
+        .calendar-sidebar-ledger .ledger-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+    .ledger-scroll-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ledger-item-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        border-radius: 4px;
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+
+        .ledger-item-card:hover {
+            transform: translateX(-2px);
+            border-color: var(--purple);
+        }
+
+        .ledger-item-card h5 {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+    .ledger-meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+
+    /* ── CENTERED POPUP MODAL DIALOGS ── */
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        width: 460px;
+        max-width: 92vw;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+    }
+
+        .modal-card-header h4 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .modal-body-form-fields {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+    .form-group-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group-block label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    .form-deck-input {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+    }
+
+        .form-deck-input:focus {
+            border-color: var(--purple);
+        }
+
+        .form-deck-input:disabled {
+            background: var(--hover-bg);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+    .form-split-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .modal-card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .btn-modal-cancel {
+        height: 34px;
+        padding: 0 14px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-action-trigger {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .col-code {
+        font-family: monospace;
+        font-weight: 700;
+        color: var(--purple);
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="schedule-page">
+
+    <div class="schedule-header">
+        <div class="view-switcher-group">
+            <button type="button" class="btn-switch-tab active-view" id="tabBtnList" onclick="switchTargetLayoutView('LIST')">
+                <i class="bi bi-list-ul"></i> List View
+            </button>
+            <button type="button" class="btn-switch-tab" id="tabBtnCalendar" onclick="switchTargetLayoutView('CALENDAR')">
+                <i class="bi bi-calendar3"></i> Calendar View
+            </button>
+        </div>
+
+        <button type="button" class="schedule-add-btn" onclick="openCreateWorkspaceModal()">
+            <i class="bi bi-plus-lg"></i> Add Schedule
+        </button>
+    </div>
+
+    <div class="schedule-master-card">
+
+        <div class="schedule-card-top">
+            <div class="schedule-card-title">
+                <h3>Training Schedule Master</h3>
+                <p>Total Records Located: <span id="scheduleCounter">0</span></p>
+            </div>
+
+            <div class="schedule-filter-controls">
+                <select id="departmentFilterDropdown" class="schedule-select-filter" onchange="executeCombinedFilters()">
+                    <option value="">All Departments</option>
+                    @foreach (var dept in Model.Departments)
+                    {
+                        <option value="@dept.Value">@dept.Text</option>
+                    }
+                </select>
+
+                <div class="schedule-search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="scheduleSearchInput" placeholder="Search schedules..." autocomplete="off" oninput="executeCombinedFilters()" />
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper" id="viewportLayoutList">
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Training Course Name</th>
+                        <th>Trainer</th>
+                        <th>Venue Location</th>
+                        <th>Department</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleMasterGridBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming training schedules registers...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="calendar-split-workspace" id="viewportLayoutCalendar">
+
+            <div class="calendar-grid-segment">
+                <div class="calendar-navigation-header">
+                    <h4 id="lblCalendarMonthTitle">July 2026</h4>
+                    <div class="calendar-nav-buttons">
+                        <button type="button" class="btn-cal-nav" onclick="offsetActiveCalendarMonth(-1)"><i class="bi bi-chevron-left"></i></button>
+                        <button type="button" class="btn-cal-nav" style="font-size:11px; font-weight:700; width:auto; padding:0 10px;" onclick="navigateToCurrentTodayMonth()">Today</button>
+                        <button type="button" class="btn-cal-nav" onclick="offsetActiveCalendarMonth(1)"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="calendar-matrix-board" id="calendarGridWrapperContainer">
+                </div>
+            </div>
+
+            <div class="calendar-sidebar-ledger">
+                <h4>Month Agenda</h4>
+                <div class="ledger-subtitle" id="lblAgendaSubtitle">Showing all courses scheduled this month</div>
+                <div class="ledger-scroll-stack" id="calendarMonthLedgerStack">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="scheduleWorkspaceModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4 id="modalHeadingTitle">Add Schedule</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeWorkspaceModal()">✕</button>
+        </div>
+        <form id="scheduleWorkspaceForm" onsubmit="submitScheduleForm(event)">
+            <input type="hidden" id="txtTrainingScheduleId" name="TrainingScheduleId" value="0" />
+
+            <div class="modal-body-form-fields">
+                <div class="form-group-block" id="blockScheduleCodeDisplay" style="display: none;">
+                    <label id="lblScheduleCodeDynamicLabel">Schedule Reference Code</label>
+                    <input type="text" id="txtScheduleCode" class="form-deck-input" disabled style="opacity: 0.75; font-weight: 700; color: var(--purple);" />
+                </div>
+
+                <div class="form-split-row">
+                    <div class="form-group-block">
+                        <label>Select Training Course *</label>
+                        <select id="ddlTrainingMasterId" name="TrainingMasterId" class="form-deck-input" asp-items="Model.Trainings" required>
+                            <option value="">-- Choose Course --</option>
+                        </select>
+                    </div>
+                    <div class="form-group-block">
+                        <label>Assigned Trainer *</label>
+                        <select id="ddlTrainingTrainerId" name="TrainingTrainerId" class="form-deck-input" asp-items="Model.Trainers" required>
+                            <option value="">-- Choose Trainer --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-split-row">
+                    <div class="form-group-block">
+                        <label>Target Venue Location *</label>
+                        <select id="ddlTrainingVenueId" name="TrainingVenueId" class="form-deck-input" asp-items="Model.Venues" required>
+                            <option value="">-- Choose Venue --</option>
+                        </select>
+                    </div>
+                    <div class="form-group-block">
+                        <label>Target Department Scope *</label>
+                        <select id="ddlDepartmentId" name="DepartmentId" class="form-deck-input" asp-items="Model.Departments" required>
+                            <option value="0">All Departments</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-split-row">
+                    <div class="form-group-block">
+                        <label>Start Date *</label>
+                        <input type="date" id="txtStartDate" name="StartDate" class="form-deck-input" required />
+                    </div>
+                    <div class="form-group-block">
+                        <label>End Date *</label>
+                        <input type="date" id="txtEndDate" name="EndDate" class="form-deck-input" required />
+                    </div>
+                </div>
+
+                <div class="form-split-row">
+                    <div class="form-group-block">
+                        <label>Start Time *</label>
+                        <input type="time" id="txtStartTime" name="StartTime" class="form-deck-input" required />
+                    </div>
+                    <div class="form-group-block">
+                        <label>End Time *</label>
+                        <input type="time" id="txtEndTime" name="EndTime" class="form-deck-input" required />
+                    </div>
+                </div>
+
+                <div class="form-split-row">
+                    <div class="form-group-block">
+                        <label>Enrollment Last Date</label>
+                        <input type="date" id="txtEnrollmentLastDate" name="EnrollmentLastDate" class="form-deck-input" />
+                    </div>
+                    <div class="form-group-block">
+                        <label>Participant Capacity *</label>
+                        <input type="number" id="txtCapacity" name="Capacity" class="form-deck-input" min="1" max="10000" placeholder="e.g. 50" required />
+                    </div>
+                </div>
+
+                <div class="form-group-block">
+                    <label>Additional Remarks/Notes</label>
+                    <input type="text" id="txtRemarks" name="Remarks" class="form-deck-input" placeholder="e.g. Bring laptops with IDE installed" maxlength="500" />
+                </div>
+            </div>
+
+            <div class="modal-card-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeWorkspaceModal()">Cancel</button>
+                <button type="submit" class="btn-action-trigger" id="btnSubmitForm">Save Schedule</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="scheduleMultiViewModalLayer">
+    <div class="modal-card" style="width: 500px;">
+        <div class="modal-card-header">
+            <h4>Multi-Course Agenda Viewer</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeMultiViewModal()">✕</button>
+        </div>
+        <div class="modal-body-form-fields">
+            <div class="form-group-block" style="border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 4px;">
+                <label style="color: var(--purple); font-weight: 800;">Select Scheduled Course to Read Details *</label>
+                <select id="ddlMultiViewSelector" class="form-deck-input" onchange="syncMultiViewModalDetailsPayload()" style="border-color: var(--purple); font-weight: 600;"></select>
+            </div>
+
+            <div class="form-group-block">
+                <label>Schedule Reference Code</label>
+                <input type="text" id="lblMvCode" class="form-deck-input" disabled style="font-family: monospace; font-weight: 700; color: var(--purple);" />
+            </div>
+
+            <div class="form-split-row">
+                <div class="form-group-block">
+                    <label>Trainer</label>
+                    <input type="text" id="lblMvTrainer" class="form-deck-input" disabled />
+                </div>
+                <div class="form-group-block">
+                    <label>Venue Location</label>
+                    <input type="text" id="lblMvVenue" class="form-deck-input" disabled />
+                </div>
+            </div>
+
+            <div class="form-split-row">
+                <div class="form-group-block">
+                    <label>Department Scope</label>
+                    <input type="text" id="lblMvDept" class="form-deck-input" disabled />
+                </div>
+                <div class="form-group-block">
+                    <label>Max Capacity</label>
+                    <input type="text" id="lblMvCapacity" class="form-deck-input" disabled />
+                </div>
+            </div>
+
+            <div class="form-split-row">
+                <div class="form-group-block">
+                    <label>Start Date</label>
+                    <input type="text" id="lblMvStartDate" class="form-deck-input" disabled />
+                </div>
+                <div class="form-group-block">
+                    <label>End Date</label>
+                    <input type="text" id="lblMvEndDate" class="form-deck-input" disabled />
+                </div>
+            </div>
+
+            <div class="form-split-row">
+                <div class="form-group-block">
+                    <label>Start Time</label>
+                    <input type="text" id="lblMvStartTime" class="form-deck-input" disabled />
+                </div>
+                <div class="form-group-block">
+                    <label>End Time</label>
+                    <input type="text" id="lblMvEndTime" class="form-deck-input" disabled />
+                </div>
+            </div>
+
+            <div class="form-group-block">
+                <label>Remarks / Guidelines</label>
+                <input type="text" id="lblMvRemarks" class="form-deck-input" disabled />
+            </div>
+        </div>
+        <div class="modal-card-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeMultiViewModal()">Close Viewer</button>
+            <button type="button" class="btn-action-trigger" id="btnMvDirectEditAction" onclick="transitionMultiViewToDirectEdit()">Edit This Program</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let localScheduleCache = [];
+    let currentActiveViewMode = 'LIST';
+    let calendarTargetDateCursor = new Date();
+    let runtimeFilteredDataset = [];
+    let selectedCellDateISO = null;
+    let dayLevelMvCacheList = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadTrainingGridMatrix();
+    });
+
+    function switchTargetLayoutView(targetMode) {
+        currentActiveViewMode = targetMode;
+        const btnList = document.getElementById("tabBtnList");
+        const btnCal = document.getElementById("tabBtnCalendar");
+        const viewList = document.getElementById("viewportLayoutList");
+        const viewCal = document.getElementById("viewportLayoutCalendar");
+
+        if (targetMode === 'LIST') {
+            btnList.classList.add("active-view");
+            btnCal.classList.remove("active-view");
+            viewList.style.display = "block";
+            viewCal.style.display = "none";
+        } else {
+            btnList.classList.remove("active-view");
+            btnCal.classList.add("active-view");
+            viewList.style.display = "none";
+            viewCal.style.display = "flex";
+            selectedCellDateISO = null;
+            renderProgrammaticCalendarEngine();
+        }
+    }
+
+    function openCreateWorkspaceModal() {
+        document.getElementById("scheduleWorkspaceForm").reset();
+        document.getElementById("txtTrainingScheduleId").value = "0";
+        document.getElementById("blockScheduleCodeDisplay").style.display = "none";
+        toggleFormInputStates(false);
+
+        document.getElementById("modalHeadingTitle").innerText = "Add Schedule";
+        document.getElementById("btnSubmitForm").innerText = "Save Training";
+        document.getElementById("btnSubmitForm").style.display = "inline-flex";
+        document.getElementById("scheduleWorkspaceModalLayer").style.display = "flex";
+    }
+
+    function openCreateWorkspaceModalWithDates(isoDateStr) {
+        openCreateWorkspaceModal();
+        document.getElementById("txtStartDate").value = isoDateStr;
+        document.getElementById("txtEndDate").value = isoDateStr;
+    }
+
+    function closeWorkspaceModal() {
+        document.getElementById("scheduleWorkspaceModalLayer").style.display = "none";
+    }
+
+    function closeMultiViewModal() {
+        document.getElementById("scheduleMultiViewModalLayer").style.display = "none";
+    }
+
+    function padZeroValueString(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function toggleFormInputStates(isDisable) {
+        document.getElementById("ddlTrainingMasterId").disabled = isDisable;
+        document.getElementById("ddlTrainingTrainerId").disabled = isDisable;
+        document.getElementById("ddlTrainingVenueId").disabled = isDisable;
+        document.getElementById("ddlDepartmentId").disabled = isDisable;
+        document.getElementById("txtStartDate").disabled = isDisable;
+        document.getElementById("txtEndDate").disabled = isDisable;
+        document.getElementById("txtStartTime").disabled = isDisable;
+        document.getElementById("txtEndTime").disabled = isDisable;
+        document.getElementById("txtEnrollmentLastDate").disabled = isDisable;
+        document.getElementById("txtCapacity").disabled = isDisable;
+        document.getElementById("txtRemarks").disabled = isDisable;
+    }
+
+    async function loadTrainingGridMatrix() {
+        try {
+            const res = await fetch('/TrainingSchedule/GetScheduleList', { method: 'GET' });
+            const result = await res.json();
+
+            localScheduleCache = result.data || [];
+            executeCombinedFilters();
+        } catch {
+            document.getElementById("scheduleMasterGridBody").innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 24px;">Failed to refresh schedule registers.</td></tr>`;
+        }
+    }
+
+    function renderScheduleRows(dataset) {
+        const tbody = document.getElementById("scheduleMasterGridBody");
+        document.getElementById("scheduleCounter").innerText = dataset.length;
+
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr id="emptyMatrixFallback"><td colspan="8" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No records found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(x => {
+            let statusBadge = `<span class="status-badge badge-returnable">Active</span>`;
+            if (x.isCancelled) {
+                statusBadge = `<span class="status-badge badge-nonreturnable">Cancelled</span>`;
+            } else if (!x.isActive) {
+                statusBadge = `<span class="status-badge badge-warning">Inactive</span>`;
+            }
+
+            return `
+                <tr>
+                    <td style="font-weight: 600;">${x.trainingName}</td>
+                    <td style="font-weight: 500;">${x.trainerName}</td>
+                    <td><span class="status-badge badge-category">${x.venueName}</span></td>
+                    <td style="font-weight: 500;">${x.departmentName}</td>
+                    <td style="font-weight: 600; font-size:12px; white-space:nowrap;">${x.startDateStr}</td>
+                    <td style="font-weight: 600; font-size:12px; white-space:nowrap;">${x.endDateStr}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button type="button" class="action-btn" title="View Details" onclick="fireViewDetails(${x.trainingScheduleId})"><i class="bi bi-eye"></i></button>
+                            <button type="button" class="action-btn" title="Edit Parameters" onclick="fireEditWorkflow(${x.trainingScheduleId}, '${x.trainingName}')"><i class="bi bi-pencil"></i></button>
+                            <button type="button" class="action-btn toggle-status ${x.isActive ? "toggle-deactivate-btn" : "toggle-activate-btn"}"
+                                    title="${x.isActive ? "Deactivate Schedule" : "Activate Schedule"}"
+                                    onclick="executeToggleStatus(${x.trainingScheduleId}, ${x.isActive})">
+                                <i class="bi ${x.isActive ? "bi-toggle-on" : "bi-toggle-off"}" style="font-size:14px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderProgrammaticCalendarEngine() {
+        const gridContainer = document.getElementById("calendarGridWrapperContainer");
+        const targetYear = calendarTargetDateCursor.getFullYear();
+        const targetMonth = calendarTargetDateCursor.getMonth();
+
+        const monthLongName = calendarTargetDateCursor.toLocaleString('default', { month: 'long' });
+        document.getElementById("lblCalendarMonthTitle").innerText = `${monthLongName} ${targetYear}`;
+
+        const dayLabelsArr = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        let htmlBuffer = dayLabelsArr.map(d => `<div class="calendar-day-label">${d}</div>`).join('');
+
+        const firstDayIndex = new Date(targetYear, targetMonth, 1).getDay();
+        const totalDaysCount = new Date(targetYear, targetMonth + 1, 0).getDate();
+        const lastDaysOfPrevMonth = new Date(targetYear, targetMonth, 0).getDate();
+
+        for (let i = firstDayIndex; i > 0; i--) {
+            const dateNum = lastDaysOfPrevMonth - i + 1;
+            htmlBuffer += `<div class="calendar-date-cell other-month"><div class="cell-date-number">${dateNum}</div></div>`;
+        }
+
+        const todayDateStamp = new Date();
+
+        for (let day = 1; day <= totalDaysCount; day++) {
+            const cellISO = `${targetYear}-${padZeroValueString(targetMonth + 1)}-${padZeroValueString(day)}`;
+
+            let cellIndicatorBuffer = '';
+            runtimeFilteredDataset.forEach(x => {
+                if (cellISO >= x.startDateStr && cellISO <= x.endDateStr) {
+                    const cancellationClass = x.isCancelled ? 'cancelled-strip' : '';
+                    cellIndicatorBuffer += `<div class="calendar-micro-strip ${cancellationClass}">${x.trainingName}</div>`;
+                }
+            });
+
+            const isTodayClass = todayDateStamp.getDate() === day && todayDateStamp.getMonth() === targetMonth && todayDateStamp.getFullYear() === targetYear ? 'today-cell' : '';
+            const isSelectedClass = selectedCellDateISO === cellISO ? 'selected-cell-focus' : '';
+
+            htmlBuffer += `
+                <div class="calendar-date-cell ${isTodayClass} ${isSelectedClass}" onclick="handleCalendarCellIntentRouter('${cellISO}')">
+                    <div class="cell-date-number">${day}</div>
+                    ${cellIndicatorBuffer}
+                </div>`;
+        }
+
+        const filledCellsTotal = firstDayIndex + totalDaysCount;
+        const remainingOffsetCells = filledCellsTotal % 7 === 0 ? 0 : 7 - (filledCellsTotal % 7);
+        for (let j = 1; j <= remainingOffsetCells; j++) {
+            htmlBuffer += `<div class="calendar-date-cell other-month"><div class="cell-date-number">${j}</div></div>`;
+        }
+
+        gridContainer.innerHTML = htmlBuffer;
+        populateSidebarLedgerStream();
+    }
+
+    function handleCalendarCellIntentRouter(isoDateStr) {
+        selectedCellDateISO = isoDateStr;
+        const dayMatchList = runtimeFilteredDataset.filter(x => isoDateStr >= x.startDateStr && isoDateStr <= x.endDateStr);
+
+        if (dayMatchList.length === 0) {
+            openCreateWorkspaceModalWithDates(isoDateStr);
+        } else if (dayMatchList.length === 1) {
+            fireEditWorkflow(dayMatchList[0].trainingScheduleId, dayMatchList[0].trainingName);
+        } else {
+            dayLevelMvCacheList = dayMatchList;
+            openMultiViewModalOverlayPanel();
+        }
+        renderProgrammaticCalendarEngine();
+    }
+
+    function openMultiViewModalOverlayPanel() {
+        const selector = document.getElementById("ddlMultiViewSelector");
+        selector.innerHTML = dayLevelMvCacheList.map(x => `<option value="${x.trainingScheduleId}">${x.trainingName}</option>`).join('');
+
+        syncMultiViewModalDetailsPayload();
+        document.getElementById("scheduleMultiViewModalLayer").style.display = "flex";
+    }
+
+    function syncMultiViewModalDetailsPayload() {
+        const selectedId = parseInt(document.getElementById("ddlMultiViewSelector").value);
+        const matchedObj = dayLevelMvCacheList.find(x => x.trainingScheduleId === selectedId);
+
+        if (matchedObj) {
+            document.getElementById("lblMvCode").value = matchedObj.scheduleCode || "-";
+            document.getElementById("lblMvTrainer").value = matchedObj.trainerName || "-";
+            document.getElementById("lblMvVenue").value = matchedObj.venueName || "-";
+            document.getElementById("lblMvDept").value = matchedObj.departmentName || "-";
+            document.getElementById("lblMvCapacity").value = matchedObj.capacity || "-";
+            document.getElementById("lblMvStartDate").value = matchedObj.startDateStr || "-";
+            document.getElementById("lblMvEndDate").value = matchedObj.endDateStr || "-";
+            document.getElementById("lblMvStartTime").value = matchedObj.startTimeStr || "-";
+            document.getElementById("lblMvEndTime").value = matchedObj.endTimeStr || "-";
+            document.getElementById("lblMvRemarks").value = matchedObj.remarks || "-";
+        }
+    }
+
+    function transitionMultiViewToDirectEdit() {
+        const selectedId = parseInt(document.getElementById("ddlMultiViewSelector").value);
+        const selectedText = document.getElementById("ddlMultiViewSelector").options[document.getElementById("ddlMultiViewSelector").selectedIndex].text;
+        closeMultiViewModal();
+        fireEditWorkflow(selectedId, selectedText);
+    }
+
+    /* ── ✅ UPDATED SIDEBAR LEDGER: RENDER MONTHLY INSTEAD OF CELL FILTERED DAYS ── */
+    function populateSidebarLedgerStream() {
+        const sidebarLedger = document.getElementById("calendarMonthLedgerStack");
+        let ledgerBufferHtml = '';
+
+        const targetYear = calendarTargetDateCursor.getFullYear();
+        const targetMonth = padZeroValueString(calendarTargetDateCursor.getMonth() + 1);
+        const matchPrefix = `${targetYear}-${targetMonth}`;
+
+        runtimeFilteredDataset.forEach(x => {
+            // Strictly pull and stack every course configured within this target active month block boundaries
+            if (x.startDateStr.startsWith(matchPrefix) || x.endDateStr.startsWith(matchPrefix)) {
+                ledgerBufferHtml += buildLedgerCardMarkup(x);
+            }
+        });
+
+        sidebarLedger.innerHTML = ledgerBufferHtml || `<div style="font-style:italic; color:var(--text-secondary); text-align:center; padding-top:24px; font-size:12px;">No agendas found this month.</div>`;
+    }
+
+    function buildLedgerCardMarkup(x) {
+        return `
+            <div class="ledger-item-card" onclick="fireEditWorkflow(${x.trainingScheduleId}, '${x.trainingName}')">
+                <h5>${x.trainingName}</h5>
+                <div class="ledger-meta-row"><span>Trainer: <b>${x.trainerName}</b></span></div>
+                <div class="ledger-meta-row" style="margin-top:2px;">
+                    <span style="color:var(--purple); font-weight:700;">${x.startDateStr} to ${x.endDateStr}</span>
+                    <span class="status-badge badge-category" style="height:16px; font-size:9.5px;">${x.venueName}</span>
+                </div>
+            </div>`;
+    }
+
+    async function fireViewDetails(id) {
+        document.getElementById("scheduleWorkspaceForm").reset();
+        try {
+            const res = await fetch(`/TrainingSchedule/GetSchedule/${id}`);
+            const result = await res.json();
+
+            if (result.success && result.data) {
+                populateFormFields(result.data);
+                toggleFormInputStates(true);
+                document.getElementById("modalHeadingTitle").innerText = "View Schedule Details";
+                document.getElementById("btnSubmitForm").style.display = "none";
+                document.getElementById("scheduleWorkspaceModalLayer").style.display = "flex";
+            }
+        } catch { alert("Failed to establish detailed channel fields."); }
+    }
+
+    async function fireEditWorkflow(id, courseTitle) {
+        document.getElementById("scheduleWorkspaceForm").reset();
+        try {
+            const res = await fetch(`/TrainingSchedule/GetSchedule/${id}`);
+            const result = await res.json();
+
+            if (result.success && result.data) {
+                populateFormFields(result.data);
+                toggleFormInputStates(false);
+
+                const nameLabel = courseTitle || result.data.trainingName || "Course Track";
+                document.getElementById("lblScheduleCodeDynamicLabel").innerHTML = `Schedule Reference Code &mdash; <b style="color:var(--text-primary);">[ ${nameLabel} ]</b>`;
+
+                document.getElementById("modalHeadingTitle").innerText = "Modify Schedule Parameters";
+                document.getElementById("btnSubmitForm").innerText = "Save Changes";
+                document.getElementById("btnSubmitForm").style.display = "inline-flex";
+                document.getElementById("scheduleWorkspaceModalLayer").style.display = "flex";
+            }
+        } catch { alert("Failed to establish update channel fields."); }
+    }
+
+    function populateFormFields(d) {
+        document.getElementById("txtTrainingScheduleId").value = d.trainingScheduleId;
+        document.getElementById("blockScheduleCodeDisplay").style.display = d.scheduleCode ? "flex" : "none";
+        document.getElementById("txtScheduleCode").value = d.scheduleCode || "";
+        document.getElementById("ddlTrainingMasterId").value = d.trainingMasterId;
+        document.getElementById("ddlTrainingTrainerId").value = d.trainingTrainerId;
+        document.getElementById("ddlTrainingVenueId").value = d.trainingVenueId;
+        document.getElementById("ddlDepartmentId").value = d.departmentId;
+
+        document.getElementById("txtStartDate").value = d.startDate ? d.startDate.split('T')[0] : "";
+        document.getElementById("txtEndDate").value = d.endDate ? d.endDate.split('T')[0] : "";
+        document.getElementById("txtStartTime").value = d.startTime ? d.startTime.substring(0,5) : "";
+        document.getElementById("txtEndTime").value = d.endTime ? d.endTime.substring(0,5) : "";
+        document.getElementById("txtEnrollmentLastDate").value = d.enrollmentLastDate ? d.enrollmentLastDate.split('T')[0] : "";
+
+        document.getElementById("txtCapacity").value = d.capacity;
+        document.getElementById("txtRemarks").value = d.remarks || "";
+    }
+
+    async function submitScheduleForm(e) {
+        e.preventDefault();
+        const id = parseInt(document.getElementById("txtTrainingScheduleId").value);
+        const url = id === 0 ? "/TrainingSchedule/Create" : "/TrainingSchedule/Update";
+
+        const formData = new URLSearchParams();
+        formData.append("TrainingScheduleId", id);
+        formData.append("TrainingMasterId", document.getElementById("ddlTrainingMasterId").value);
+        formData.append("TrainingTrainerId", document.getElementById("ddlTrainingTrainerId").value);
+        formData.append("TrainingVenueId", document.getElementById("ddlTrainingVenueId").value);
+        formData.append("DepartmentId", document.getElementById("ddlDepartmentId").value);
+        formData.append("StartDate", document.getElementById("txtStartDate").value);
+        formData.append("EndDate", document.getElementById("txtEndDate").value);
+        formData.append("StartTime", document.getElementById("txtStartTime").value);
+        formData.append("EndTime", document.getElementById("txtEndTime").value);
+        formData.append("EnrollmentLastDate", document.getElementById("txtEnrollmentLastDate").value);
+        formData.append("Capacity", document.getElementById("txtCapacity").value);
+        formData.append("Remarks", document.getElementById("txtRemarks").value);
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded", "RequestVerificationToken": token },
+                body: formData.toString()
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeWorkspaceModal();
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+                setTimeout(() => { loadTrainingGridMatrix(); }, 500);
+            } else {
+                if (window.showVqError) window.showVqError(result.message);
+                else alert(result.message);
+            }
+        } catch { alert("Transmission synchronization fault."); }
+    }
+
+    function executeToggleStatus(id, currentStatus) {
+        const titleText = currentStatus ? "Deactivate" : "Activate";
+        const msg = `Are you sure you want to ${titleText.toLowerCase()} this training schedule configuration block?`;
+
+        showVqConfirm(
+            titleText + " Schedule",
+            msg,
+            async function() {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                try {
+                    const res = await fetch(`/TrainingSchedule/ToggleStatus/${id}`, {
+                        method: "POST", headers: { "RequestVerificationToken": token }
+                    });
+                    const result = await res.json();
+
+                    if (result.success) {
+                        if (window.showVqAlert) {
+                            showVqAlert("Success", "Schedule status updated successfully.", true);
+                        }
+                        loadTrainingGridMatrix();
+                    }
+                } catch { alert("Status toggling failed."); }
+            }
+        );
+    }
+
+    function executeCombinedFilters() {
+        const textQuery = document.getElementById("scheduleSearchInput").value.trim().toLowerCase();
+        const selectedDeptId = document.getElementById("departmentFilterDropdown").value;
+
+        runtimeFilteredDataset = localScheduleCache.filter(x => {
+            const matchesText = x.trainingName.toLowerCase().includes(textQuery) ||
+                                x.trainerName.toLowerCase().includes(textQuery) ||
+                                x.venueName.toLowerCase().includes(textQuery);
+
+            const matchesDept = !selectedDeptId ||
+                                x.departmentId.toString() === selectedDeptId ||
+                                x.departmentId === 0;
+
+            return matchesText && matchesDept;
+        });
+
+        renderScheduleRows(runtimeFilteredDataset);
+        if (currentActiveViewMode === 'CALENDAR') {
+            renderProgrammaticCalendarEngine();
+        }
+    }
+</script>

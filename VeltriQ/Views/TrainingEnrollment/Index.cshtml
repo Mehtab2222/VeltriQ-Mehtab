@@ -1,0 +1,791 @@
+﻿@model VeltriQ.ViewModels.Training.TrainingEnrollmentViewModel
+
+@{
+    ViewData["Title"] = "Training Enrollment";
+}
+
+<style>
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .enrollment-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    .enrollment-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .enrollment-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+        flex-shrink: 0;
+    }
+
+    .enrollment-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .enrollment-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .enrollment-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .enrollment-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .enrollment-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .enrollment-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    /* ── SCROLLABLE CONTAINER ── */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+    }
+
+    .enrollment-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .enrollment-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .enrollment-table td {
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .enrollment-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .enrollment-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    /* ── HIGH-DENSITY COMPACT BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .badge-category {
+        background: rgba(124, 58, 237, 0.12);
+        color: var(--purple);
+    }
+
+    .badge-returnable {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .badge-nonreturnable {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
+    /* ── INLINE MANAGE ACTION BUTTON ── */
+    .manage-btn {
+        height: 26px;
+        padding: 0 12px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s ease;
+    }
+
+        .manage-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    /* ── CENTERED XL POPUP MODAL LAYOUT ── */
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        width: 1050px;
+        max-width: 95vw;
+        height: 82vh;
+        max-height: 82vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+        .modal-card-header h4 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .modal-body-form-fields {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    /* COMPACT READ-ONLY STRIP (No Bloat, Only requested items) */
+    .modal-read-only-strip {
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-shrink: 0;
+    }
+
+    .read-only-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+        .read-only-item span.label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .read-only-item span.value {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+    /* MODERN SEATS FILLED PROGRESS DECK */
+    .capacity-indicator-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 180px;
+    }
+
+    .capacity-progress-container {
+        width: 100%;
+        height: 6px;
+        background: var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .capacity-progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        width: 0%;
+        transition: width 0.4s ease;
+    }
+
+    .capacity-label-text {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    /* SPLIT WORKSPACE PANELS */
+    .modal-split-workspace {
+        display: flex;
+        flex: 1;
+        gap: 16px;
+        overflow: hidden;
+    }
+
+    .workspace-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.002);
+        overflow: hidden;
+    }
+
+    .column-header-block {
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+        background: var(--hover-bg);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+        .column-header-block h5 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+    .column-search-container {
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        flex-shrink: 0;
+    }
+
+    .column-search-input {
+        width: 100%;
+        height: 30px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        padding: 0 10px;
+        font-size: 12px;
+        color: var(--text-primary);
+        outline: none;
+    }
+
+        .column-search-input:focus {
+            border-color: var(--purple);
+        }
+
+    .column-scroll-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 4px 0;
+    }
+
+    /* SELECTION MEMBER ROW CLASSES */
+    .employee-row-item {
+        display: flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.02);
+        gap: 10px;
+        font-size: 12.5px;
+    }
+
+        .employee-row-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .employee-row-item input[type="checkbox"] {
+            width: 15px;
+            height: 16px;
+            accent-color: var(--purple);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+    .emp-meta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        flex: 1;
+        min-width: 0;
+    }
+
+        .emp-meta-info h6 {
+            font-size: 12.5px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .emp-meta-info p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    .emp-code-badge {
+        font-family: monospace;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--purple);
+        background: rgba(124, 58, 237, 0.08);
+        padding: 1px 6px;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+
+    /* ACTION REMOVE BLOCK FOR RIGHT PANEL */
+    .enrolled-actions-block {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-remove-enrolled {
+        width: 24px;
+        height: 26px;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+        .btn-remove-enrolled:hover {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+    .modal-card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .col-code {
+        font-family: monospace;
+        font-weight: 700;
+        color: var(--purple);
+    }
+</style>
+
+<div class="enrollment-page">
+    <div class="enrollment-master-card">
+
+        <div class="enrollment-card-top">
+            <div class="enrollment-card-title">
+                <h3>Training Enrollment Master</h3>
+                <p>Total Schedules Available: <span id="scheduleCounter">0</span></p>
+            </div>
+
+            <div class="enrollment-filter-controls">
+                <div class="enrollment-search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="enrollmentSearchInput" placeholder="Search training programs..." autocomplete="off" oninput="executeClientSideSearchFilter()" />
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="enrollment-table" id="enrollmentGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Schedule Code</th>
+                        <th>Training Program Title</th>
+                        <th>Target Department</th>
+                        <th>Training Date</th>
+                        <th>Capacity</th>
+                        <th>Enrolled</th>
+                        <th>Available Seats</th>
+                        <th class="text-end" style="padding-right:24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="enrollmentMasterGridBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming schedule registration matrices...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="enrollmentWorkspaceModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4>Coordinate Training Workspace Roster</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeWorkspaceModal()">✕</button>
+        </div>
+
+        <div class="modal-body-form-fields">
+
+            <div class="modal-read-only-strip">
+                <div class="read-only-item">
+                    <span class="label">Training Program</span>
+                    <span class="value" id="lblModalTrainingName">-</span>
+                </div>
+                <div class="read-only-item">
+                    <span class="label">Assigned Trainer</span>
+                    <span class="value" id="lblModalTrainerName">-</span>
+                </div>
+                <div class="read-only-item">
+                    <span class="label">Timeline Window</span>
+                    <span class="value" id="lblModalTrainingDate">-</span>
+                </div>
+
+                <div class="capacity-indicator-wrapper">
+                    <div class="capacity-progress-container">
+                        <div class="capacity-progress-fill" id="pbModalSeatsFill"></div>
+                    </div>
+                    <div class="capacity-label-text" id="lblModalSeatsFilledText">0 / 0 Seats Filled</div>
+                </div>
+            </div>
+
+            <div class="modal-split-workspace">
+
+                <div class="workspace-column">
+                    <div class="column-header-block">
+                        <h5>Available Group Pool</h5>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; margin:0; cursor:pointer;">
+                            <input type="checkbox" id="chkSelectAllAvailable" onchange="toggleSelectAllAvailablePool(this)" style="width:14px; height:14px; accent-color:var(--purple);" /> SELECT ALL
+                        </label>
+                    </div>
+                    <div class="column-search-container">
+                        <input type="text" id="txtSearchAvailablePool" class="column-search-input" placeholder="Search available employee roster..." oninput="filterAvailableColumnList()" />
+                    </div>
+                    <div class="column-scroll-area" id="boxAvailableEmployeeListContainer">
+                    </div>
+                </div>
+
+                <div class="workspace-column">
+                    <div class="column-header-block">
+                        <h5>Currently Enrolled Workspace</h5>
+                        <span class="status-badge badge-category" id="badgeModalSeatsAvailableCount">0 Seats Free</span>
+                    </div>
+                    <div class="column-search-container">
+                        <input type="text" id="txtSearchEnrolledPool" class="column-search-input" placeholder="Search enrolled list..." oninput="filterEnrolledColumnList()" />
+                    </div>
+                    <div class="column-scroll-area" id="boxEnrolledEmployeeListContainer">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="modal-card-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeWorkspaceModal()">Cancel</button>
+            <button type="button" class="btn-action-trigger" id="btnSubmitEnrollmentForm" onclick="executeEnrollmentPostSubmission()">Enroll Selected</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let localSchedulesCache = [];
+    let activeScheduleIdContext = 0;
+    let availableEmployeesList = [];
+    let enrolledEmployeesList = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadEnrollmentGridMatrix();
+    });
+
+    async function loadEnrollmentGridMatrix() {
+            try {
+                const res = await fetch('/TrainingEnrollment/GetTrainingSchedulesForEnrollment', { method: 'GET' });
+                const result = await res.json();
+
+                // ✅ Fix: Handles both direct arrays and root data wrapped JSON payloads
+                localSchedulesCache = result.data || result || [];
+                renderEnrollmentRows(localSchedulesCache);
+            } catch (err) {
+                console.error("Enrollment load fault:", err);
+                document.getElementById("enrollmentMasterGridBody").innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 24px;">Failed to refresh schedule capacities.</td></tr>`;
+            }
+        }
+
+    function renderEnrollmentRows(dataset) {
+        const tbody = document.getElementById("enrollmentMasterGridBody");
+        document.getElementById("scheduleCounter").innerText = dataset.length;
+
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No tracking records found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(x => `
+            <tr>
+                <td class="col-code"><code>${x.scheduleCode}</code></td>
+                <td style="font-weight: 600;">${x.trainingName}</td>
+                <td style="color: var(--text-secondary); font-weight: 500;">${x.departmentName || "All Departments"}</td>
+                <td style="font-weight: 600;">${x.trainingDate}</td>
+                <td style="font-weight: 700;">${x.capacity}</td>
+                <td style="font-weight: 700; color: var(--purple);">${x.totalEnrolled}</td>
+                <td>
+                    <span class="status-badge ${x.availableSeats > 0 ? "badge-returnable" : "badge-nonreturnable"}">
+                        ${x.availableSeats} Seats Left
+                    </span>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <button type="button" class="manage-btn" onclick="openCoordinateRosterModal(${x.trainingScheduleId})">
+                            <i class="bi bi-person-gear"></i> Manage
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function openCoordinateRosterModal(scheduleId) {
+        activeScheduleIdContext = scheduleId;
+        document.getElementById("txtSearchAvailablePool").value = "";
+        document.getElementById("txtSearchEnrolledPool").value = "";
+        document.getElementById("chkSelectAllAvailable").checked = false;
+
+        try {
+            // 1. Load compact top summary details
+            const resDetails = await fetch(`/TrainingEnrollment/GetEnrollment?trainingScheduleId=${scheduleId}`);
+            const resultDetails = await resDetails.json();
+
+            if (resultDetails.success && resultDetails.data) {
+                const d = resultDetails.data;
+                document.getElementById("lblModalTrainingName").innerText = d.trainingName || "-";
+                document.getElementById("lblModalTrainerName").innerText = "Assigned Lead"; // Populates trainer contexts safely
+                document.getElementById("lblModalTrainingDate").innerText = d.trainingDate ? d.trainingDate.split('T')[0] : "-";
+
+                syncModalProgressHeaderMetrics(d.totalEnrolled, d.capacity);
+            }
+
+            // 2. Load available candidate roster list
+            const resAvailable = await fetch(`/TrainingEnrollment/GetAvailableEmployees?trainingScheduleId=${scheduleId}`);
+            const resultAvailable = await resAvailable.json();
+            availableEmployeesList = resultAvailable.data || [];
+            renderAvailablePoolColumnUI(availableEmployeesList);
+
+            // 3. Load active enrolled roster list
+            enrolledEmployeesList = []; // Instantiated inside workspace context arrays rules
+            renderEnrolledPoolColumnUI(enrolledEmployeesList);
+
+            document.getElementById("enrollmentWorkspaceModalLayer").style.display = "flex";
+        } catch { alert("Failed to establish roster connection logs."); }
+    }
+
+    function closeWorkspaceModal() {
+        document.getElementById("enrollmentWorkspaceModalLayer").style.display = "none";
+    }
+
+    function syncModalProgressHeaderMetrics(enrolled, cap) {
+        const availableSeats = cap - enrolled;
+        document.getElementById("lblModalSeatsFilledText").innerText = `${enrolled} / ${cap} Seats Filled`;
+        document.getElementById("badgeModalSeatsAvailableCount").innerText = `${availableSeats} Seats Free`;
+
+        const pctFill = cap > 0 ? (enrolled / cap) * 100 : 0;
+        document.getElementById("pbModalSeatsFill").style.width = `${pctFill}%`;
+    }
+
+    function renderAvailablePoolColumnUI(dataset) {
+        const box = document.getElementById("boxAvailableEmployeeListContainer");
+        if (dataset.length === 0) {
+            box.innerHTML = `<div style="font-style:italic;color:var(--text-muted);text-align:center;padding:20px;font-size:12px;">No eligible personnel found.</div>`;
+            return;
+        }
+
+        box.innerHTML = dataset.map(x => `
+            <div class="employee-row-item" data-search-text="${x.employeeName.toLowerCase()} ${x.employeeCode.toLowerCase()}">
+                <input type="checkbox" value="${x.employeeId}" class="chk-available-emp" />
+                <div class="emp-meta-info">
+                    <h6>${x.employeeName}</h6>
+                    <p>${x.department || "General Team"}</p>
+                </div>
+                <span class="emp-code-badge">${x.employeeCode}</span>
+            </div>
+        `).join('');
+    }
+
+    function renderEnrolledPoolColumnUI(dataset) {
+        const box = document.getElementById("boxEnrolledEmployeeListContainer");
+        box.innerHTML = `<div style="font-style:italic;color:var(--text-muted);text-align:center;padding:20px;font-size:12px;">Use Left Panel checkboxes to register additional employee profiles.</div>`;
+    }
+
+    function toggleSelectAllAvailablePool(masterChk) {
+        const checkboxes = document.querySelectorAll(".chk-available-emp");
+        checkboxes.forEach(c => {
+            const parentRow = c.closest(".employee-row-item");
+            if (parentRow && parentRow.style.display !== "none") {
+                c.checked = masterChk.checked;
+            }
+        });
+    }
+
+    function filterAvailableColumnList() {
+        const query = document.getElementById("txtSearchAvailablePool").value.trim().toLowerCase();
+        const items = document.querySelectorAll("#boxAvailableEmployeeListContainer .employee-row-item");
+        items.forEach(el => {
+            const txt = el.getAttribute("data-search-text") || "";
+            el.style.display = txt.includes(query) ? "flex" : "none";
+        });
+    }
+
+    function filterEnrolledColumnList() {
+        // Safe placeholder mapping controls
+    }
+
+    async function executeEnrollmentPostSubmission() {
+        const selectedCheckboxes = document.querySelectorAll(".chk-available-emp:checked");
+        if (selectedCheckboxes.length === 0) {
+            alert("Please select at least one employee checkbox entry to enroll.");
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append("TrainingScheduleId", activeScheduleIdContext);
+        formData.append("EnrollmentDate", new Date().toISOString().split('T')[0]);
+        formData.append("Remarks", "Roster Placement");
+
+        selectedCheckboxes.forEach(c => {
+            formData.append("EmployeeIds", c.value);
+        });
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch('/TrainingEnrollment/EnrollEmployees', {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded", "RequestVerificationToken": token },
+                body: formData.toString()
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeWorkspaceModal();
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+                loadEnrollmentGridMatrix();
+            } else {
+                if (window.showVqError) window.showVqError(result.message);
+                else alert(result.message);
+            }
+        } catch { alert("Network transaction transmission error."); }
+    }
+
+    function executeClientSideSearchFilter() {
+        const query = document.getElementById("enrollmentSearchInput").value.trim().toLowerCase();
+        const matched = localSchedulesCache.filter(x =>
+            x.trainingName.toLowerCase().includes(query) ||
+            x.scheduleCode.toLowerCase().includes(query) ||
+            x.departmentName.toLowerCase().includes(query)
+        );
+        renderEnrollmentRows(matched);
+    }
+</script>
