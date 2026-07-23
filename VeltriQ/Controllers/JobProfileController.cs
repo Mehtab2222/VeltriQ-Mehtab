@@ -17,9 +17,43 @@ namespace VeltriQ.Controllers
             MasterDbContext masterContext,
             UserManager<ApplicationUser> userManager
         )
-
         : base(context, masterContext, userManager)
         {
+        }
+
+        // =========================
+        // SHARED DROPDOWN LOADERS
+        // =========================
+
+        private async Task<List<SelectListItem>> GetJobCategoryListAsync()
+        {
+            return await _context.JobCategories
+                .Where(x => x.IsActive)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.JobCategoryId.ToString(),
+                    Text = x.CategoryName
+                })
+                .ToListAsync();
+        }
+
+        private async Task<List<SelectListItem>> GetEmployeeListAsync()
+        {
+            return await _context.Employees
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.FirstName)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.EmployeeId.ToString(),
+                    Text = (x.FirstName + " " + x.LastName)
+                })
+                .ToListAsync();
+        }
+
+        private async Task LoadDropdownsAsync(JobProfileViewModel vm)
+        {
+            vm.JobCategoryList = await GetJobCategoryListAsync();
+            vm.EmployeeList = await GetEmployeeListAsync();
         }
 
         // =========================
@@ -28,10 +62,21 @@ namespace VeltriQ.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var profiles = await _context.JobProfiles
-                .Where(x => !x.IsDeleted)
-                .OrderByDescending(x => x.JobProfileId)
-                .ToListAsync();
+            var profiles = await (
+                from p in _context.JobProfiles
+                where !p.IsDeleted
+                join c in _context.JobCategories
+                    on p.JobCategoryId equals c.JobCategoryId into cj
+                from c in cj.DefaultIfEmpty()
+                orderby p.JobProfileId descending
+                select new JobProfileListItemViewModel
+                {
+                    JobProfileId = p.JobProfileId,
+                    JobTitle = p.JobTitle,
+                    CategoryName = c != null ? c.CategoryName : "-",
+                    IsActive = p.IsActive
+                }
+            ).ToListAsync();
 
             return View(profiles);
         }
@@ -43,32 +88,7 @@ namespace VeltriQ.Controllers
         public async Task<IActionResult> Create()
         {
             JobProfileViewModel vm = new();
-
-            vm.DepartmentList = await _context.Departments
-                .Select(x => new SelectListItem
-                {
-                    Value = x.DepartmentId.ToString(),
-                    Text = x.DepartmentName
-                })
-                .ToListAsync();
-
-            vm.DesignationList = await _context.Designations
-                .Select(x => new SelectListItem
-                {
-                    Value = x.DesignationId.ToString(),
-                    Text = x.DesignationName
-                })
-                .ToListAsync();
-
-            vm.JobCategoryList = await _context.JobCategories
-                .Where(x => x.IsActive)
-                .Select(x => new SelectListItem
-                {
-                    Value = x.JobCategoryId.ToString(),
-                    Text = x.CategoryName
-                })
-                .ToListAsync();
-
+            await LoadDropdownsAsync(vm);
             return View(vm);
         }
 
@@ -78,103 +98,61 @@ namespace VeltriQ.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create
-        (
-            JobProfileViewModel vm
-        )
+        public async Task<IActionResult> Create(JobProfileViewModel vm)
         {
             if (!ModelState.IsValid)
             {
-                vm.DepartmentList = await _context.Departments
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.DepartmentId.ToString(),
-                        Text = x.DepartmentName
-                    })
-                    .ToListAsync();
-
-                vm.DesignationList = await _context.Designations
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.DesignationId.ToString(),
-                        Text = x.DesignationName
-                    })
-                    .ToListAsync();
-
-                vm.JobCategoryList = await _context.JobCategories
-                    .Where(x => x.IsActive)
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.JobCategoryId.ToString(),
-                        Text = x.CategoryName
-                    })
-                    .ToListAsync();
-
+                await LoadDropdownsAsync(vm);
                 return View(vm);
             }
 
-            int createdBy =
-                Convert.ToInt32(
-                    HttpContext.Session.GetString("EmployeeId")
-                );
+            int createdBy = Convert.ToInt32(HttpContext.Session.GetString("EmployeeId"));
 
             JobProfile entity = new()
             {
                 JobTitle = vm.JobTitle,
-
-                DepartmentId = vm.DepartmentId,
-
-                DesignationId = vm.DesignationId,
-
                 JobCategoryId = vm.JobCategoryId,
-
                 JobDescription = vm.JobDescription,
-
-                MinSalary = vm.MinSalary,
-
-                MaxSalary = vm.MaxSalary,
-
-                MinExperience = vm.MinExperience,
-
-                MaxExperience = vm.MaxExperience,
-
+                ReportingToId = vm.ReportingToId,
+                HiringManagerId = vm.HiringManagerId,
                 CreatedBy = createdBy,
-
                 CreatedDate = DateTime.Now,
-
                 IsActive = true,
-
                 IsDeleted = false
             };
 
             _context.JobProfiles.Add(entity);
-
             await _context.SaveChangesAsync();
 
-            // =========================
             // SAVE SKILLS
-            // =========================
-
-            if (vm.SelectedSkillIds != null
-                && vm.SelectedSkillIds.Any())
+            if (vm.SelectedSkillIds != null && vm.SelectedSkillIds.Any())
             {
                 foreach (var skillId in vm.SelectedSkillIds)
                 {
-                    JobProfileSkill skill = new()
+                    _context.JobProfileSkills.Add(new JobProfileSkill
                     {
                         JobProfileId = entity.JobProfileId,
                         SkillId = skillId
-                    };
-
-                    _context.JobProfileSkills.Add(skill);
+                    });
                 }
-
-                await _context.SaveChangesAsync();
             }
 
-            TempData["Success"] =
-                "Job Profile created successfully.";
+            // SAVE REVIEWERS
+            if (vm.SelectedReviewerIds != null && vm.SelectedReviewerIds.Any())
+            {
+                foreach (var empId in vm.SelectedReviewerIds)
+                {
+                    _context.JobProfileReviewers.Add(new JobProfileReviewer
+                    {
+                        JobProfileId = entity.JobProfileId,
+                        EmployeeId = empId
+                    });
+                }
+            }
 
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Job Profile created successfully.";
             return RedirectToAction("Index");
         }
 
@@ -186,8 +164,7 @@ namespace VeltriQ.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var profile = await _context.JobProfiles
-                .FirstOrDefaultAsync(x =>
-                    x.JobProfileId == id);
+                .FirstOrDefaultAsync(x => x.JobProfileId == id);
 
             if (profile == null)
                 return NotFound();
@@ -195,59 +172,24 @@ namespace VeltriQ.Controllers
             JobProfileViewModel vm = new()
             {
                 JobProfileId = profile.JobProfileId,
-
                 JobTitle = profile.JobTitle,
-
-                DepartmentId = profile.DepartmentId,
-
-                DesignationId = profile.DesignationId,
-
                 JobCategoryId = profile.JobCategoryId,
-
                 JobDescription = profile.JobDescription,
-
-                MinSalary = profile.MinSalary,
-
-                MaxSalary = profile.MaxSalary,
-
-                MinExperience = profile.MinExperience,
-
-                MaxExperience = profile.MaxExperience,
+                ReportingToId = profile.ReportingToId,
+                HiringManagerId = profile.HiringManagerId,
 
                 SelectedSkillIds = await _context.JobProfileSkills
                     .Where(x => x.JobProfileId == id)
                     .Select(x => x.SkillId)
                     .ToListAsync(),
 
-                DepartmentList = await _context.Departments
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.DepartmentId.ToString(),
-                        Text = x.DepartmentName
-                    })
-                    .ToListAsync(),
-
-                DesignationList = await _context.Designations
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.DesignationId.ToString(),
-                        Text = x.DesignationName
-                    })
-                    .ToListAsync(),
-
-                JobCategoryList = await _context.JobCategories
-                    .Where(x => x.IsActive)
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.JobCategoryId.ToString(),
-                        Text = x.CategoryName
-                    })
+                SelectedReviewerIds = await _context.JobProfileReviewers
+                    .Where(x => x.JobProfileId == id)
+                    .Select(x => x.EmployeeId)
                     .ToListAsync(),
 
                 SkillList = await _context.SkillMasters
-                    .Where(x =>
-                        x.JobCategoryId ==
-                        profile.JobCategoryId)
+                    .Where(x => x.JobCategoryId == profile.JobCategoryId && x.IsActive)
                     .Select(x => new SelectListItem
                     {
                         Value = x.SkillId.ToString(),
@@ -255,6 +197,8 @@ namespace VeltriQ.Controllers
                     })
                     .ToListAsync()
             };
+
+            await LoadDropdownsAsync(vm);
 
             return View(vm);
         }
@@ -265,108 +209,80 @@ namespace VeltriQ.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit
-        (
-            int id,
-            JobProfileViewModel vm
-        )
+        public async Task<IActionResult> Edit(int id, JobProfileViewModel vm)
         {
             if (id != vm.JobProfileId)
                 return BadRequest();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var profile =
-                    await _context.JobProfiles
-                        .FindAsync(id);
-
-                if (profile == null)
-                    return NotFound();
-
-                profile.JobTitle = vm.JobTitle;
-
-                profile.DepartmentId = vm.DepartmentId;
-
-                profile.DesignationId = vm.DesignationId;
-
-                profile.JobCategoryId = vm.JobCategoryId;
-
-                profile.JobDescription = vm.JobDescription;
-
-                profile.MinSalary = vm.MinSalary;
-
-                profile.MaxSalary = vm.MaxSalary;
-
-                profile.MinExperience = vm.MinExperience;
-
-                profile.MaxExperience = vm.MaxExperience;
-
-                profile.ModifiedBy =
-                    Convert.ToInt32(
-                        HttpContext.Session.GetString("EmployeeId")
-                    );
-
-                profile.ModifiedDate =
-                    DateTime.Now;
-
-                _context.Update(profile);
-
-                // =========================
-                // UPDATE SKILLS
-                // =========================
-
-                var oldSkills =
-                    _context.JobProfileSkills
-                        .Where(x =>
-                            x.JobProfileId == id);
-
-                _context.JobProfileSkills
-                    .RemoveRange(oldSkills);
-
-                if (vm.SelectedSkillIds != null)
-                {
-                    foreach (var skillId
-                        in vm.SelectedSkillIds)
-                    {
-                        JobProfileSkill skill = new()
-                        {
-                            JobProfileId = id,
-                            SkillId = skillId
-                        };
-
-                        _context.JobProfileSkills
-                            .Add(skill);
-                    }
-                }
-
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] =
-                    "Job Profile updated successfully.";
-
-                return RedirectToAction(nameof(Index));
+                await LoadDropdownsAsync(vm);
+                return View(vm);
             }
 
-            return View(vm);
+            var profile = await _context.JobProfiles.FindAsync(id);
+
+            if (profile == null)
+                return NotFound();
+
+            profile.JobTitle = vm.JobTitle;
+            profile.JobCategoryId = vm.JobCategoryId;
+            profile.JobDescription = vm.JobDescription;
+            profile.ReportingToId = vm.ReportingToId;
+            profile.HiringManagerId = vm.HiringManagerId;
+            profile.ModifiedBy = Convert.ToInt32(HttpContext.Session.GetString("EmployeeId"));
+            profile.ModifiedDate = DateTime.Now;
+
+            _context.Update(profile);
+
+            // UPDATE SKILLS
+            var oldSkills = _context.JobProfileSkills.Where(x => x.JobProfileId == id);
+            _context.JobProfileSkills.RemoveRange(oldSkills);
+
+            if (vm.SelectedSkillIds != null)
+            {
+                foreach (var skillId in vm.SelectedSkillIds)
+                {
+                    _context.JobProfileSkills.Add(new JobProfileSkill
+                    {
+                        JobProfileId = id,
+                        SkillId = skillId
+                    });
+                }
+            }
+
+            // UPDATE REVIEWERS
+            var oldReviewers = _context.JobProfileReviewers.Where(x => x.JobProfileId == id);
+            _context.JobProfileReviewers.RemoveRange(oldReviewers);
+
+            if (vm.SelectedReviewerIds != null)
+            {
+                foreach (var empId in vm.SelectedReviewerIds)
+                {
+                    _context.JobProfileReviewers.Add(new JobProfileReviewer
+                    {
+                        JobProfileId = id,
+                        EmployeeId = empId
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Job Profile updated successfully.";
+            return RedirectToAction(nameof(Index));
         }
 
         // =========================
-        // LOAD SKILLS
+        // LOAD SKILLS (AJAX)
         // =========================
 
         [HttpGet]
-        public async Task<JsonResult>
-            GetSkillsByCategory(int categoryId)
+        public async Task<JsonResult> GetSkillsByCategory(int categoryId)
         {
             var skills = await _context.SkillMasters
-                .Where(x =>
-                    x.JobCategoryId == categoryId
-                    && x.IsActive)
-                .Select(x => new
-                {
-                    id = x.SkillId,
-                    text = x.SkillName
-                })
+                .Where(x => x.JobCategoryId == categoryId && x.IsActive)
+                .Select(x => new { id = x.SkillId, text = x.SkillName })
                 .ToListAsync();
 
             return Json(skills);

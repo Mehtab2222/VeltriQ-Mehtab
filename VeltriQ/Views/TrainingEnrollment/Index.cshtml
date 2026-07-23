@@ -1,4 +1,5 @@
-﻿@model VeltriQ.ViewModels.Training.TrainingEnrollmentViewModel
+﻿
+@model VeltriQ.ViewModels.Training.TrainingEnrollmentViewModel
 
 @{
     ViewData["Title"] = "Training Enrollment";
@@ -36,7 +37,46 @@
         flex-direction: column;
     }
 
-    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
+    /* ── TOP OPERATION NAVIGATION STRIP ── */
+    .enrollment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    .view-switcher-group {
+        display: inline-flex;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        padding: 2px;
+        border-radius: 6px;
+    }
+
+    .btn-switch-tab {
+        height: 30px;
+        padding: 0 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-switch-tab.active-view {
+            background: var(--card-bg);
+            color: var(--purple);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+    /* ── CORE PANEL CARD MODULE ── */
     .enrollment-master-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
@@ -71,7 +111,12 @@
         margin: 2px 0 0 0;
     }
 
-    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
+    .enrollment-filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
     .enrollment-search-wrapper {
         position: relative;
         width: 320px;
@@ -87,7 +132,6 @@
             color: var(--text-primary);
             font-size: 12px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
             .enrollment-search-wrapper input:focus {
@@ -103,7 +147,6 @@
             font-size: 13px;
         }
 
-    /* ── SCROLLABLE CONTAINER ── */
     .table-wrapper {
         overflow-y: auto;
         overflow-x: auto;
@@ -123,7 +166,6 @@
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: .5px;
-            white-space: nowrap;
             border-bottom: 1px solid var(--border);
             background: var(--card-bg);
             position: sticky;
@@ -132,22 +174,17 @@
         }
 
         .enrollment-table td {
-            padding: 6px 16px;
+            padding: 10px 16px;
             border-bottom: 1px solid var(--border);
             color: var(--text-primary);
             font-size: 12.5px;
             vertical-align: middle;
         }
 
-        .enrollment-table tbody tr {
-            transition: background-color .1s ease;
+        .enrollment-table tbody tr:hover {
+            background: var(--hover-bg);
         }
 
-            .enrollment-table tbody tr:hover {
-                background: var(--hover-bg);
-            }
-
-    /* ── HIGH-DENSITY COMPACT BADGES ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -174,7 +211,6 @@
         color: #ef4444;
     }
 
-    /* ── INLINE MANAGE ACTION BUTTON ── */
     .manage-btn {
         height: 26px;
         padding: 0 12px;
@@ -197,7 +233,204 @@
             border-color: var(--purple);
         }
 
-    /* ── CENTERED XL POPUP MODAL LAYOUT ── */
+    /* ── CALENDAR VIEWPORT LAYOUTS ── */
+    .calendar-split-workspace {
+        display: none;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .calendar-grid-segment {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        overflow: hidden;
+    }
+
+    .calendar-navigation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    }
+
+        .calendar-navigation-header h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+    .calendar-nav-buttons {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-cal-nav {
+        height: 30px;
+        width: 30px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+        .btn-cal-nav:hover {
+            background: var(--hover-bg);
+        }
+
+    .calendar-matrix-board {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        flex: 1;
+    }
+
+    .calendar-day-label {
+        background: var(--hover-bg);
+        padding: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .calendar-date-cell {
+        background: var(--card-bg);
+        height: calc((100vh - 260px) / 6);
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: background-color 0.15s;
+    }
+
+        .calendar-date-cell:hover {
+            background: var(--hover-bg);
+        }
+
+        .calendar-date-cell.other-month {
+            opacity: 0.25;
+            background: var(--hover-bg);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .calendar-date-cell.today-cell {
+            background: rgba(124, 58, 237, 0.03);
+            box-shadow: inset 0 0 0 1px var(--purple);
+        }
+
+        .calendar-date-cell.selected-cell-focus {
+            box-shadow: inset 0 0 0 2px var(--purple);
+            background: var(--hover-bg);
+        }
+
+    .cell-date-number {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+    }
+
+    .calendar-date-cell.today-cell .cell-date-number {
+        color: var(--purple);
+    }
+
+    .calendar-micro-strip {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 4px;
+        border-radius: 4px;
+        background: rgba(124, 58, 237, 0.08);
+        color: var(--purple);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-left: 3px solid var(--purple);
+    }
+
+    /* RIGHT SIDEBAR MONTHLY LEDGER STACK */
+    .calendar-sidebar-ledger {
+        width: 320px;
+        border-left: 1px solid var(--border);
+        background: rgba(255,255,255,0.005);
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        overflow-y: auto;
+    }
+
+        .calendar-sidebar-ledger h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin: 0 0 4px 0;
+        }
+
+        .calendar-sidebar-ledger .ledger-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+    .ledger-scroll-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ledger-item-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+        .ledger-item-card:hover {
+            transform: translateX(-2px);
+            border-color: var(--purple);
+        }
+
+        .ledger-item-card h5 {
+            font-size: 12.5px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+    .ledger-meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+
+    /* ── ROSTER MANAGEMENT MODAL LAYOUT ── */
     .modal-backdrop-layer {
         position: fixed;
         inset: 0;
@@ -248,7 +481,6 @@
         overflow: hidden;
     }
 
-    /* COMPACT READ-ONLY STRIP (No Bloat, Only requested items) */
     .modal-read-only-strip {
         background: var(--hover-bg);
         border: 1px solid var(--border);
@@ -281,7 +513,6 @@
             color: var(--text-primary);
         }
 
-    /* MODERN SEATS FILLED PROGRESS DECK */
     .capacity-indicator-wrapper {
         display: flex;
         flex-direction: column;
@@ -310,7 +541,6 @@
         color: var(--text-secondary);
     }
 
-    /* SPLIT WORKSPACE PANELS */
     .modal-split-workspace {
         display: flex;
         flex: 1;
@@ -374,7 +604,6 @@
         padding: 4px 0;
     }
 
-    /* SELECTION MEMBER ROW CLASSES */
     .employee-row-item {
         display: flex;
         align-items: center;
@@ -434,14 +663,6 @@
         flex-shrink: 0;
     }
 
-    /* ACTION REMOVE BLOCK FOR RIGHT PANEL */
-    .enrolled-actions-block {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-
     .btn-remove-enrolled {
         width: 24px;
         height: 26px;
@@ -475,9 +696,36 @@
         font-weight: 700;
         color: var(--purple);
     }
+
+    /* MULTI-VIEW OVERLAY SELECTOR */
+    .multiview-dropdown-bar {
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        padding: 10px 14px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-shrink: 0;
+    }
 </style>
 
 <div class="enrollment-page">
+
+    <!-- TOP OPERATION VIEW SWITCHER STRIP -->
+    <div class="enrollment-header">
+        <div class="view-switcher-group">
+            <button type="button" class="btn-switch-tab active-view" id="tabBtnList" onclick="switchTargetLayoutView('LIST')">
+                <i class="bi bi-list-ul"></i> List View
+            </button>
+            <button type="button" class="btn-switch-tab" id="tabBtnCalendar" onclick="switchTargetLayoutView('CALENDAR')">
+                <i class="bi bi-calendar3"></i> Calendar View
+            </button>
+        </div>
+    </div>
+
+    <!-- CORE PANEL CARD MODULE -->
     <div class="enrollment-master-card">
 
         <div class="enrollment-card-top">
@@ -494,7 +742,8 @@
             </div>
         </div>
 
-        <div class="table-wrapper">
+        <!-- ── TAB CONTEXT 1: STANDARD LIST VIEW ── -->
+        <div class="table-wrapper" id="viewportLayoutList">
             <table class="enrollment-table" id="enrollmentGridMatrix">
                 <thead>
                     <tr>
@@ -518,9 +767,39 @@
             </table>
         </div>
 
+        <!-- ── TAB CONTEXT 2: CALENDAR COMPOSITION VIEW ── -->
+        <div class="calendar-split-workspace" id="viewportLayoutCalendar">
+
+            <div class="calendar-grid-segment">
+                <div class="calendar-navigation-header">
+                    <h4 id="lblCalendarMonthTitle">July 2026</h4>
+                    <div class="calendar-nav-buttons">
+                        <button type="button" class="btn-cal-nav" onclick="offsetActiveCalendarMonth(-1)"><i class="bi bi-chevron-left"></i></button>
+                        <button type="button" class="btn-cal-nav" style="font-size:11px; font-weight:700; width:auto; padding:0 10px;" onclick="navigateToCurrentTodayMonth()">Today</button>
+                        <button type="button" class="btn-cal-nav" onclick="offsetActiveCalendarMonth(1)"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="calendar-matrix-board" id="calendarGridWrapperContainer">
+                    <!-- Populated programmatically by JavaScript -->
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR MONTHLY AGENDA LEDGER -->
+            <div class="calendar-sidebar-ledger">
+                <h4>Month Agenda</h4>
+                <div class="ledger-subtitle">Showing all available training schedules this month</div>
+                <div class="ledger-scroll-stack" id="calendarMonthLedgerStack">
+                    <!-- Agenda entries mapped here -->
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </div>
 
+<!-- ── ROSTER MANAGEMENT OVERLAY MODAL (Supports Single or Multi-Course Switching) ── -->
 <div class="modal-backdrop-layer" id="enrollmentWorkspaceModalLayer">
     <div class="modal-card">
         <div class="modal-card-header">
@@ -530,6 +809,13 @@
 
         <div class="modal-body-form-fields">
 
+            <!-- MULTI-COURSE DROPDOWN BAR (Visible ONLY if multiple courses on selected date) -->
+            <div class="multiview-dropdown-bar" id="multiCourseSelectorContainer" style="display: none;">
+                <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--purple);">Select Course Session *</label>
+                <select id="ddlMultiCourseSelector" class="column-search-input" style="font-weight:600; border-color:var(--purple); max-width: 320px;" onchange="switchActiveModalScheduleContext(this.value)"></select>
+            </div>
+
+            <!-- COMPACT META PANEL STRIP -->
             <div class="modal-read-only-strip">
                 <div class="read-only-item">
                     <span class="label">Training Program</span>
@@ -552,8 +838,10 @@
                 </div>
             </div>
 
+            <!-- WORKSPACE COLUMN CHANNELS -->
             <div class="modal-split-workspace">
 
+                <!-- AVAILABLE APPLICANTS POOL -->
                 <div class="workspace-column">
                     <div class="column-header-block">
                         <h5>Available Group Pool</h5>
@@ -564,10 +852,10 @@
                     <div class="column-search-container">
                         <input type="text" id="txtSearchAvailablePool" class="column-search-input" placeholder="Search available employee roster..." oninput="filterAvailableColumnList()" />
                     </div>
-                    <div class="column-scroll-area" id="boxAvailableEmployeeListContainer">
-                    </div>
+                    <div class="column-scroll-area" id="boxAvailableEmployeeListContainer"></div>
                 </div>
 
+                <!-- REGISTERED PARTICIPANTS SECTOR -->
                 <div class="workspace-column">
                     <div class="column-header-block">
                         <h5>Currently Enrolled Workspace</h5>
@@ -576,8 +864,7 @@
                     <div class="column-search-container">
                         <input type="text" id="txtSearchEnrolledPool" class="column-search-input" placeholder="Search enrolled list..." oninput="filterEnrolledColumnList()" />
                     </div>
-                    <div class="column-scroll-area" id="boxEnrolledEmployeeListContainer">
-                    </div>
+                    <div class="column-scroll-area" id="boxEnrolledEmployeeListContainer"></div>
                 </div>
 
             </div>
@@ -591,34 +878,76 @@
     </div>
 </div>
 
+
 <script>
     let localSchedulesCache = [];
+    let currentActiveViewMode = 'LIST';
+    let calendarTargetDateCursor = new Date();
     let activeScheduleIdContext = 0;
     let availableEmployeesList = [];
     let enrolledEmployeesList = [];
+    let dayLevelMultiCourseList = [];
 
     document.addEventListener("DOMContentLoaded", function () {
         loadEnrollmentGridMatrix();
     });
 
-    async function loadEnrollmentGridMatrix() {
-            try {
-                const res = await fetch('/TrainingEnrollment/GetTrainingSchedulesForEnrollment', { method: 'GET' });
-                const result = await res.json();
+    function switchTargetLayoutView(targetMode) {
+        currentActiveViewMode = targetMode;
+        const btnList = document.getElementById("tabBtnList");
+        const btnCal = document.getElementById("tabBtnCalendar");
+        const viewList = document.getElementById("viewportLayoutList");
+        const viewCal = document.getElementById("viewportLayoutCalendar");
 
-                // ✅ Fix: Handles both direct arrays and root data wrapped JSON payloads
-                localSchedulesCache = result.data || result || [];
-                renderEnrollmentRows(localSchedulesCache);
-            } catch (err) {
-                console.error("Enrollment load fault:", err);
-                document.getElementById("enrollmentMasterGridBody").innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 24px;">Failed to refresh schedule capacities.</td></tr>`;
-            }
+        if (targetMode === 'LIST') {
+            btnList.classList.add("active-view");
+            btnCal.classList.remove("active-view");
+            viewList.style.display = "block";
+            viewCal.style.display = "none";
+        } else {
+            btnList.classList.remove("active-view");
+            btnCal.classList.add("active-view");
+            viewList.style.display = "none";
+            viewCal.style.display = "flex";
+            renderProgrammaticCalendarEngine();
         }
+    }
+
+    async function loadEnrollmentGridMatrix() {
+        try {
+            const res = await fetch('/TrainingEnrollment/GetTrainingSchedulesForEnrollment', { method: 'GET' });
+            const result = await res.json();
+
+            localSchedulesCache = result.data || result || [];
+
+            // Standardize training dates into ISO strings (YYYY-MM-DD)
+            localSchedulesCache.forEach(x => {
+                if (x.trainingDate) {
+                    const parsed = new Date(x.trainingDate);
+                    if (!isNaN(parsed)) {
+                        x.isoDateStr = `${parsed.getFullYear()}-${padZeroValueString(parsed.getMonth() + 1)}-${padZeroValueString(parsed.getDate())}`;
+                    } else {
+                        x.isoDateStr = x.trainingDate.split('T')[0];
+                    }
+                } else {
+                    x.isoDateStr = "";
+                }
+            });
+
+            renderEnrollmentRows(localSchedulesCache);
+            document.getElementById("scheduleCounter").innerText = localSchedulesCache.length;
+
+            if (currentActiveViewMode === 'CALENDAR') {
+                renderProgrammaticCalendarEngine();
+            }
+        } catch (err) {
+            console.error("Enrollment load fault:", err);
+            document.getElementById("enrollmentMasterGridBody").innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 24px;">Failed to refresh schedule capacities.</td></tr>`;
+        }
+    }
 
     function renderEnrollmentRows(dataset) {
         const tbody = document.getElementById("enrollmentMasterGridBody");
-        document.getElementById("scheduleCounter").innerText = dataset.length;
-
         if (dataset.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No tracking records found.</td></tr>`;
             return;
@@ -648,42 +977,168 @@
         `).join('');
     }
 
+    /* ── CALENDAR RENDERING ENGINE ── */
+    function offsetActiveCalendarMonth(monthOffset) {
+        calendarTargetDateCursor.setMonth(calendarTargetDateCursor.getMonth() + monthOffset);
+        renderProgrammaticCalendarEngine();
+    }
+
+    function navigateToCurrentTodayMonth() {
+        calendarTargetDateCursor = new Date();
+        renderProgrammaticCalendarEngine();
+    }
+
+    function padZeroValueString(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function renderProgrammaticCalendarEngine() {
+        const gridContainer = document.getElementById("calendarGridWrapperContainer");
+        const targetYear = calendarTargetDateCursor.getFullYear();
+        const targetMonth = calendarTargetDateCursor.getMonth();
+
+        const monthLongName = calendarTargetDateCursor.toLocaleString('default', { month: 'long' });
+        document.getElementById("lblCalendarMonthTitle").innerText = `${monthLongName} ${targetYear}`;
+
+        const dayLabelsArr = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        let htmlBuffer = dayLabelsArr.map(d => `<div class="calendar-day-label">${d}</div>`).join('');
+
+        const firstDayIndex = new Date(targetYear, targetMonth, 1).getDay();
+        const totalDaysCount = new Date(targetYear, targetMonth + 1, 0).getDate();
+        const lastDaysOfPrevMonth = new Date(targetYear, targetMonth, 0).getDate();
+
+        for (let i = firstDayIndex; i > 0; i--) {
+            const dateNum = lastDaysOfPrevMonth - i + 1;
+            htmlBuffer += `<div class="calendar-date-cell other-month"><div class="cell-date-number">${dateNum}</div></div>`;
+        }
+
+        const todayDateStamp = new Date();
+
+        for (let day = 1; day <= totalDaysCount; day++) {
+            const cellISO = `${targetYear}-${padZeroValueString(targetMonth + 1)}-${padZeroValueString(day)}`;
+
+            let cellIndicatorBuffer = '';
+            localSchedulesCache.forEach(x => {
+                if (x.isoDateStr === cellISO) {
+                    cellIndicatorBuffer += `<div class="calendar-micro-strip">${x.trainingName}</div>`;
+                }
+            });
+
+            const isTodayClass = todayDateStamp.getDate() === day && todayDateStamp.getMonth() === targetMonth && todayDateStamp.getFullYear() === targetYear ? 'today-cell' : '';
+
+            htmlBuffer += `
+                <div class="calendar-date-cell ${isTodayClass}" onclick="handleCalendarCellIntentRouter('${cellISO}')">
+                    <div class="cell-date-number">${day}</div>
+                    ${cellIndicatorBuffer}
+                </div>`;
+        }
+
+        const filledCellsTotal = firstDayIndex + totalDaysCount;
+        const remainingOffsetCells = filledCellsTotal % 7 === 0 ? 0 : 7 - (filledCellsTotal % 7);
+        for (let j = 1; j <= remainingOffsetCells; j++) {
+            htmlBuffer += `<div class="calendar-date-cell other-month"><div class="cell-date-number">${j}</div></div>`;
+        }
+
+        gridContainer.innerHTML = htmlBuffer;
+        populateSidebarMonthlyLedger();
+    }
+
+    function handleCalendarCellIntentRouter(isoDateStr) {
+        const matchingSchedules = localSchedulesCache.filter(x => x.isoDateStr === isoDateStr);
+
+        if (matchingSchedules.length === 0) {
+            alert(`No training sessions scheduled on ${isoDateStr}.`);
+        } else if (matchingSchedules.length === 1) {
+            openCoordinateRosterModal(matchingSchedules[0].trainingScheduleId);
+        } else {
+            dayLevelMultiCourseList = matchingSchedules;
+            openMultiCourseModalWorkspace();
+        }
+    }
+
+    function openMultiCourseModalWorkspace() {
+        const dropdownBar = document.getElementById("multiCourseSelectorContainer");
+        const selector = document.getElementById("ddlMultiCourseSelector");
+
+        dropdownBar.style.display = "flex";
+        selector.innerHTML = dayLevelMultiCourseList.map(x => `<option value="${x.trainingScheduleId}">${x.trainingName} (${x.scheduleCode})</option>`).join('');
+
+        openCoordinateRosterModal(dayLevelMultiCourseList[0].trainingScheduleId);
+    }
+
+    function switchActiveModalScheduleContext(scheduleId) {
+        openCoordinateRosterModal(parseInt(scheduleId));
+    }
+
+    function populateSidebarMonthlyLedger() {
+        const sidebarLedger = document.getElementById("calendarMonthLedgerStack");
+        let ledgerBufferHtml = '';
+
+        const targetYear = calendarTargetDateCursor.getFullYear();
+        const targetMonth = padZeroValueString(calendarTargetDateCursor.getMonth() + 1);
+        const matchPrefix = `${targetYear}-${targetMonth}`;
+
+        localSchedulesCache.forEach(x => {
+            // Match using isoDateStr prefix for accurate month tracking
+            if (x.isoDateStr && x.isoDateStr.startsWith(matchPrefix)) {
+                ledgerBufferHtml += `
+                    <div class="ledger-item-card" onclick="openCoordinateRosterModal(${x.trainingScheduleId})">
+                        <h5>${x.trainingName}</h5>
+                        <div class="ledger-meta-row"><span>Code: <b>${x.scheduleCode}</b></span></div>
+                        <div class="ledger-meta-row" style="margin-top:2px;">
+                            <span style="color:var(--purple); font-weight:700;">${x.trainingDate}</span>
+                            <span class="status-badge badge-category" style="height:16px; font-size:9.5px;">${x.availableSeats} Seats Left</span>
+                        </div>
+                    </div>`;
+            }
+        });
+
+        sidebarLedger.innerHTML = ledgerBufferHtml || `<div style="font-style:italic; color:var(--text-secondary); text-align:center; padding-top:24px; font-size:12px;">No sessions scheduled this month.</div>`;
+    }
+
     async function openCoordinateRosterModal(scheduleId) {
         activeScheduleIdContext = scheduleId;
         document.getElementById("txtSearchAvailablePool").value = "";
         document.getElementById("txtSearchEnrolledPool").value = "";
         document.getElementById("chkSelectAllAvailable").checked = false;
 
+        if (!dayLevelMultiCourseList.some(x => x.trainingScheduleId === scheduleId)) {
+            document.getElementById("multiCourseSelectorContainer").style.display = "none";
+        }
+
         try {
-            // 1. Load compact top summary details
             const resDetails = await fetch(`/TrainingEnrollment/GetEnrollment?trainingScheduleId=${scheduleId}`);
             const resultDetails = await resDetails.json();
 
             if (resultDetails.success && resultDetails.data) {
                 const d = resultDetails.data;
                 document.getElementById("lblModalTrainingName").innerText = d.trainingName || "-";
-                document.getElementById("lblModalTrainerName").innerText = "Assigned Lead"; // Populates trainer contexts safely
+                document.getElementById("lblModalTrainerName").innerText = "Assigned Lead";
                 document.getElementById("lblModalTrainingDate").innerText = d.trainingDate ? d.trainingDate.split('T')[0] : "-";
 
                 syncModalProgressHeaderMetrics(d.totalEnrolled, d.capacity);
             }
 
-            // 2. Load available candidate roster list
             const resAvailable = await fetch(`/TrainingEnrollment/GetAvailableEmployees?trainingScheduleId=${scheduleId}`);
             const resultAvailable = await resAvailable.json();
             availableEmployeesList = resultAvailable.data || [];
             renderAvailablePoolColumnUI(availableEmployeesList);
 
-            // 3. Load active enrolled roster list
-            enrolledEmployeesList = []; // Instantiated inside workspace context arrays rules
+            const resEnrolled = await fetch(`/TrainingEnrollment/GetEnrolledEmployees?trainingScheduleId=${scheduleId}`);
+            const resultEnrolled = await resEnrolled.json();
+            enrolledEmployeesList = resultEnrolled.data || [];
             renderEnrolledPoolColumnUI(enrolledEmployeesList);
 
             document.getElementById("enrollmentWorkspaceModalLayer").style.display = "flex";
-        } catch { alert("Failed to establish roster connection logs."); }
+        } catch (err) {
+            console.error("Roster sync error:", err);
+            alert("Failed to establish roster connection logs.");
+        }
     }
 
     function closeWorkspaceModal() {
         document.getElementById("enrollmentWorkspaceModalLayer").style.display = "none";
+        dayLevelMultiCourseList = [];
     }
 
     function syncModalProgressHeaderMetrics(enrolled, cap) {
@@ -716,7 +1171,38 @@
 
     function renderEnrolledPoolColumnUI(dataset) {
         const box = document.getElementById("boxEnrolledEmployeeListContainer");
-        box.innerHTML = `<div style="font-style:italic;color:var(--text-muted);text-align:center;padding:20px;font-size:12px;">Use Left Panel checkboxes to register additional employee profiles.</div>`;
+        if (dataset.length === 0) {
+            box.innerHTML = `<div style="font-style:italic;color:var(--text-muted);text-align:center;padding:20px;font-size:12px;">No employees enrolled yet. Use Left Panel checkboxes to add participants.</div>`;
+            return;
+        }
+
+        box.innerHTML = dataset.map(x => `
+            <div class="employee-row-item" data-search-text="${x.employeeName.toLowerCase()} ${x.employeeCode.toLowerCase()}">
+                <div class="emp-meta-info">
+                    <h6>${x.employeeName}</h6>
+                    <p>${x.department || "General Team"} &bull; <span style="color:var(--purple);">${x.remarks || 'Enrolled'}</span></p>
+                </div>
+                <span class="emp-code-badge">${x.employeeCode}</span>
+                <button type="button" class="btn-remove-enrolled" title="Deactivate Enrollment" onclick="executeToggleEnrollmentStatus(${x.trainingEnrollmentId})">
+                    <i class="bi bi-x-circle-fill"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    async function executeToggleEnrollmentStatus(enrollmentId) {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch(`/TrainingEnrollment/ToggleStatus/${enrollmentId}`, {
+                method: "POST",
+                headers: { "RequestVerificationToken": token }
+            });
+            const result = await res.json();
+            if (result.success) {
+                openCoordinateRosterModal(activeScheduleIdContext);
+                loadEnrollmentGridMatrix();
+            }
+        } catch { alert("Status toggle execution failed."); }
     }
 
     function toggleSelectAllAvailablePool(masterChk) {
@@ -739,7 +1225,12 @@
     }
 
     function filterEnrolledColumnList() {
-        // Safe placeholder mapping controls
+        const query = document.getElementById("txtSearchEnrolledPool").value.trim().toLowerCase();
+        const items = document.querySelectorAll("#boxEnrolledEmployeeListContainer .employee-row-item");
+        items.forEach(el => {
+            const txt = el.getAttribute("data-search-text") || "";
+            el.style.display = txt.includes(query) ? "flex" : "none";
+        });
     }
 
     async function executeEnrollmentPostSubmission() {

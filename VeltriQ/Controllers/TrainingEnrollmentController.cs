@@ -344,5 +344,25 @@ namespace VeltriQ.Controllers
         }
 
         #endregion
+        [HttpGet]
+        public async Task<IActionResult> GetEnrolledEmployees(int trainingScheduleId)
+        {
+            var enrolled = await _context.TrainingEnrollments
+                .Include(x => x.Employee)
+                .ThenInclude(x => x.Department)
+                .Where(x => x.TrainingScheduleId == trainingScheduleId && x.IsActive && !x.IsCancelled)
+                .Select(x => new
+                {
+                    TrainingEnrollmentId = x.TrainingEnrollmentId,
+                    EmployeeId = x.EmployeeId,
+                    EmployeeCode = x.Employee != null ? x.Employee.EmployeeCode : "",
+                    EmployeeName = x.Employee != null ? (x.Employee.FirstName + " " + (x.Employee.LastName ?? "")).Trim() : "",
+                    Department = x.Employee != null && x.Employee.Department != null ? x.Employee.Department.DepartmentName : "",
+                    Remarks = x.Remarks
+                })
+                .ToListAsync();
+
+            return Json(new { success = true, data = enrolled });
+        }
     }
 }

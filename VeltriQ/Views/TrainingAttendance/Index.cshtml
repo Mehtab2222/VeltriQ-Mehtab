@@ -1,0 +1,519 @@
+﻿@model VeltriQ.ViewModels.Training.TrainingAttendanceViewModel
+
+@{
+    ViewData["Title"] = "Training Attendance";
+}
+
+<style>
+    *::-webkit-scrollbar { width: 4px !important; height: 4px !important; }
+    *::-webkit-scrollbar-track { background: transparent !important; }
+    *::-webkit-scrollbar-thumb { background: var(--border) !important; border-radius: 10px !important; }
+    *::-webkit-scrollbar-thumb:hover { background: var(--purple) !important; }
+    * { scrollbar-width: thin !important; scrollbar-color: var(--border) transparent !important; }
+
+    .attendance-page { width: 100%; height: 100%; display: flex; flex-direction: column; padding-top: 16px; }
+
+    .attendance-master-card {
+        background: var(--card-bg); border: 1px solid var(--border); border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px); max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    .attendance-card-top {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 16px; border-bottom: 1px solid var(--border); gap: 16px; flex-shrink: 0;
+    }
+
+    .attendance-card-title h3 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0; }
+    .attendance-card-title p { font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0; }
+
+    .attendance-filter-controls { display: flex; align-items: center; gap: 12px; }
+
+    .attendance-search-wrapper { position: relative; width: 320px; }
+    .attendance-search-wrapper input {
+        width: 100%; height: 34px; border-radius: 6px; border: 1px solid var(--border);
+        background: var(--input-bg); padding: 0 12px 0 36px; color: var(--text-primary); font-size: 12px; outline: none; transition: border-color 0.2s;
+    }
+    .attendance-search-wrapper input:focus { border-color: var(--purple); }
+    .attendance-search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; }
+
+    .table-wrapper { overflow-y: auto; overflow-x: auto; flex: 1; }
+
+    .attendance-table { width: 100%; border-collapse: collapse; }
+    .attendance-table th {
+        text-align: left; padding: 10px 16px; font-size: 10px; font-weight: 700; color: var(--text-secondary);
+        text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); background: var(--card-bg); position: sticky; top: 0; z-index: 10;
+    }
+    .attendance-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text-primary); font-size: 12.5px; vertical-align: middle; }
+    .attendance-table tbody tr { transition: background-color .1s ease; }
+    .attendance-table tbody tr:hover { background: var(--hover-bg); }
+
+    .status-badge { display: inline-flex; align-items: center; justify-content: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 10.5px; font-weight: 700; }
+    .badge-returnable { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+    .badge-nonreturnable { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+    .badge-warning { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+    .inline-date-picker {
+        height: 26px; padding: 0 6px; font-size: 11.5px; font-weight: 600; border-radius: 4px;
+        border: 1px solid var(--border); background: var(--input-bg); color: var(--purple); cursor: pointer; outline: none;
+    }
+    .inline-date-picker:focus { border-color: var(--purple); }
+
+    .manage-btn {
+        height: 26px; padding: 0 12px; border-radius: 4px; border: 1px solid var(--border);
+        background: var(--hover-bg); color: var(--text-primary); font-size: 11px; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s ease;
+    }
+    .manage-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+    /* MODAL LAYOUTS */
+    .modal-backdrop-layer { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--border); width: 1100px; max-width: 95vw; height: 85vh; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); }
+    .modal-card-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--hover-bg); flex-shrink: 0; }
+    .modal-card-header h4 { margin: 0; font-size: 13.5px; font-weight: 700; text-transform: uppercase; }
+    
+    .modal-body-form-fields { padding: 16px; display: flex; flex-direction: column; gap: 14px; flex: 1; overflow: hidden; }
+
+    .modal-read-only-strip {
+        background: var(--hover-bg); border: 1px solid var(--border); padding: 10px 14px;
+        display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 15px; flex-shrink: 0;
+    }
+    .read-only-item { display: flex; flex-direction: column; gap: 2px; }
+    .read-only-item span.label { font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+    .read-only-item span.value { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+
+    .roster-container { flex: 1; display: flex; flex-direction: column; border: 1px solid var(--border); background: rgba(255,255,255,0.002); overflow: hidden; }
+    .roster-header-bar { padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--hover-bg); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .roster-header-bar h5 { font-size: 12px; font-weight: 700; text-transform: uppercase; margin: 0; }
+
+    .roster-search-bar { padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0; display: flex; gap: 10px; align-items: center; }
+    .roster-search-input { width: 280px; height: 30px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); padding: 0 10px; font-size: 12px; color: var(--text-primary); outline: none; }
+    .roster-search-input:focus { border-color: var(--purple); }
+
+    .roster-table-wrapper { flex: 1; overflow-y: auto; }
+    .roster-table { width: 100%; border-collapse: collapse; }
+    .roster-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--card-bg); position: sticky; top: 0; z-index: 5; }
+    .roster-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text-primary); font-size: 12px; vertical-align: middle; }
+    .roster-table tbody tr:hover { background: var(--hover-bg); }
+
+    .status-pill-group { display: inline-flex; background: var(--hover-bg); border: 1px solid var(--border); padding: 2px; border-radius: 4px; gap: 2px; }
+    .btn-status-pill { height: 24px; padding: 0 10px; font-size: 11px; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; border-radius: 3px; cursor: pointer; }
+    .btn-status-pill.active-present { background: #22c55e; color: #fff; }
+    .btn-status-pill.active-absent { background: #ef4444; color: #fff; }
+    .btn-status-pill.active-late { background: #f59e0b; color: #fff; }
+
+    .roster-remarks-input { height: 26px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-primary); border-radius: 4px; padding: 0 8px; font-size: 11.5px; width: 100%; }
+    .roster-remarks-input:focus { border-color: var(--purple); outline: none; }
+
+    .modal-card-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="attendance-page">
+    <div class="attendance-master-card">
+        
+        <div class="attendance-card-top">
+            <div class="attendance-card-title">
+                <h3>Training Attendance Master</h3>
+                <p>Track participant attendance status across active training sessions.</p>
+            </div>
+
+            <div class="attendance-filter-controls">
+                <div class="attendance-search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="attendanceSearchInput" placeholder="Search training sessions..." autocomplete="off" oninput="executeClientSideSearchFilter()" />
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="attendance-table" id="attendanceGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Training Program Title</th>
+                        <th>Department</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Enrolled</th>
+                        <th>Attendance Day</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Late</th>
+                        <th class="text-end" style="padding-right:24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceMasterGridBody">
+                    <tr>
+                        <td colspan="10" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming attendance tracking registers...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── ATTENDANCE MANAGEMENT OVERLAY MODAL ── -->
+<div class="modal-backdrop-layer" id="attendanceWorkspaceModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4>Coordinate Session Attendance Roster</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeWorkspaceModal()">✕</button>
+        </div>
+        
+        <div class="modal-body-form-fields">
+            
+            <div class="modal-read-only-strip">
+                <div class="read-only-item">
+                    <span class="label">Training Program</span>
+                    <span class="value" id="lblModalTrainingName">-</span>
+                </div>
+                <div class="read-only-item">
+                    <span class="label">Trainer & Venue</span>
+                    <span class="value" id="lblModalTrainerVenue">-</span>
+                </div>
+                <div class="read-only-item">
+                    <span class="label">Duration Window</span>
+                    <span class="value" id="lblModalTrainingDate">-</span>
+                </div>
+                <div class="read-only-item" style="background: var(--input-bg); padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px;">
+                    <span class="label" style="color: var(--purple);">Attendance Day *</span>
+                    <input type="date" id="txtModalAttendanceDate" class="inline-date-picker" style="width: 140px; margin-top: 2px;" onchange="reloadAttendanceRosterForDate()" />
+                </div>
+            </div>
+
+            <div class="roster-container">
+                <div class="roster-header-bar">
+                    <h5>Enrolled Participants Roster</h5>
+                    <div style="display: flex; gap: 15px; font-size: 11.5px; font-weight: 700;">
+                        <span style="color: #22c55e;">Present: <span id="lblCountPresent">0</span></span>
+                        <span style="color: #ef4444;">Absent: <span id="lblCountAbsent">0</span></span>
+                        <span style="color: #f59e0b;">Late: <span id="lblCountLate">0</span></span>
+                    </div>
+                </div>
+
+                <div class="roster-search-bar">
+                    <input type="text" id="txtSearchAttendanceRoster" class="roster-search-input" placeholder="Search enrolled participant list..." oninput="filterAttendanceRosterList()" />
+                    <button type="button" class="manage-btn" onclick="setAllAttendanceStatus('Present')">Mark All Present</button>
+                    <button type="button" class="manage-btn" onclick="setAllAttendanceStatus('Absent')">Mark All Absent</button>
+                </div>
+
+                <div class="roster-table-wrapper">
+                    <table class="roster-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Emp Code</th>
+                                <th>Participant Full Name</th>
+                                <th style="width: 180px;">Department</th>
+                                <th style="width: 240px; text-align: center;">Attendance Status</th>
+                                <th>Remarks / Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="boxAttendanceRosterTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-card-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeWorkspaceModal()">Cancel</button>
+            <button type="button" class="btn-action-trigger" id="btnSubmitAttendanceForm" onclick="executeAttendancePostSubmission()">Save Attendance Register</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let localSchedulesCache = [];
+    let activeScheduleIdContext = 0;
+    let enrolledParticipantsArray = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadAttendanceGridMatrix();
+    });
+
+    async function loadAttendanceGridMatrix() {
+        try {
+            const res = await fetch('/TrainingAttendance/GetTrainingSchedulesForAttendance', { method: 'GET' });
+            const result = await res.json();
+            
+            localSchedulesCache = result.data || result || [];
+            renderAttendanceRows(localSchedulesCache);
+        } catch (err) {
+            console.error("Attendance load fault:", err);
+            document.getElementById("attendanceMasterGridBody").innerHTML = `<tr><td colspan="10" style="text-align: center; color: red; padding: 24px;">Failed to refresh session registers.</td></tr>`;
+        }
+    }
+
+    function renderAttendanceRows(dataset) {
+        const tbody = document.getElementById("attendanceMasterGridBody");
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No training attendance records found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(x => {
+            const minDate = x.availableDates[0];
+            const maxDate = x.availableDates[x.availableDates.length - 1];
+            
+            // Fallback safety if property naming differs
+            const trainingTitle = x.trainingName || x.TrainingName || "Unnamed Training";
+            const deptName = x.departmentName || x.DepartmentName || "All Departments";
+
+            return `
+                <tr data-schedule-id="${x.trainingScheduleId}">
+                    <td style="font-weight: 600;">${trainingTitle}</td>
+                    <td style="color: var(--text-secondary); font-weight: 500;">${deptName}</td>
+                    <td style="font-weight: 600;">${x.startDateStr}</td>
+                    <td style="font-weight: 600;">${x.endDateStr}</td>
+                    <td style="font-weight: 700; color: var(--purple);">${x.totalEnrolled}</td>
+                    <td>
+                        <input type="date" class="inline-date-picker" id="rowDate_${x.trainingScheduleId}" 
+                               value="${x.defaultDate}" min="${minDate}" max="${maxDate}" 
+                               onchange="updateRowAttendanceCounts(${x.trainingScheduleId})" title="Click to select training date" />
+                    </td>
+                    <td><span class="status-badge badge-returnable" id="rowPresent_${x.trainingScheduleId}">${x.presentCount}</span></td>
+                    <td><span class="status-badge badge-nonreturnable" id="rowAbsent_${x.trainingScheduleId}">${x.absentCount}</span></td>
+                    <td><span class="status-badge badge-warning" id="rowLate_${x.trainingScheduleId}">${x.lateCount}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button type="button" class="manage-btn" onclick="openCoordinateAttendanceModal(${x.trainingScheduleId})">
+                                <i class="bi bi-clipboard2-check"></i> Manage
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function updateRowAttendanceCounts(scheduleId) {
+        const dateInput = document.getElementById(`rowDate_${scheduleId}`);
+        if (!dateInput) return;
+        const selectedDate = dateInput.value;
+
+        try {
+            const res = await fetch(`/TrainingAttendance/GetAttendanceCountsForDate?trainingScheduleId=${scheduleId}&attendanceDate=${selectedDate}`);
+            const result = await res.json();
+            if (result.success) {
+                document.getElementById(`rowPresent_${scheduleId}`).innerText = result.present;
+                document.getElementById(`rowAbsent_${scheduleId}`).innerText = result.absent;
+                document.getElementById(`rowLate_${scheduleId}`).innerText = result.late;
+            }
+        } catch (err) {
+            console.error("Failed to update row counts:", err);
+        }
+    }
+
+    async function openCoordinateAttendanceModal(scheduleId) {
+        activeScheduleIdContext = scheduleId;
+        document.getElementById("txtSearchAttendanceRoster").value = "";
+
+        // Also grab the date currently selected in the row's inline date picker to pass into the modal!
+        const rowDateInput = document.getElementById(`rowDate_${scheduleId}`);
+        const chosenDate = rowDateInput ? rowDateInput.value : new Date().toISOString().split('T')[0];
+
+        try {
+            const resDetails = await fetch(`/TrainingAttendance/GetAttendance?trainingScheduleId=${scheduleId}`);
+            const resultDetails = await resDetails.json();
+
+            if (resultDetails.success && resultDetails.data) {
+                const d = resultDetails.data;
+                document.getElementById("lblModalTrainingName").innerText = d.trainingName || "-";
+                document.getElementById("lblModalTrainerVenue").innerText = `${d.trainerName || 'Lead'} @@ ${d.venueName || 'Venue'}`;
+                
+                const startStr = d.startDate ? d.startDate.split('T')[0] : "";
+                const endStr = d.endDate ? d.endDate.split('T')[0] : "";
+                document.getElementById("lblModalTrainingDate").innerText = `${d.startDateDisplay} to ${d.endDateDisplay}`;
+
+                const modalDateInput = document.getElementById("txtModalAttendanceDate");
+                modalDateInput.min = startStr;
+                modalDateInput.max = endStr;
+                modalDateInput.value = chosenDate; // Syncs with whichever date was picked in the table row
+            }
+
+            await reloadAttendanceRosterForDate();
+            document.getElementById("attendanceWorkspaceModalLayer").style.display = "flex";
+        } catch (err) {
+            console.error("Attendance roster sync error:", err);
+            alert("Failed to establish session attendance logs.");
+        }
+    }
+
+    async function reloadAttendanceRosterForDate() {
+        const selectedDate = document.getElementById("txtModalAttendanceDate").value;
+        if (!selectedDate) return;
+
+        try {
+            const resEmployees = await fetch(`/TrainingAttendance/GetEnrolledEmployeesForAttendance?trainingScheduleId=${activeScheduleIdContext}&attendanceDate=${selectedDate}`);
+            const resultEmployees = await resEmployees.json();
+            enrolledParticipantsArray = resultEmployees.data || [];
+            
+            renderAttendanceRosterTable(enrolledParticipantsArray);
+            updateAttendanceCountersSummary();
+        } catch (err) {
+            console.error("Failed to load roster for date:", err);
+        }
+    }
+
+    function closeWorkspaceModal() {
+        document.getElementById("attendanceWorkspaceModalLayer").style.display = "none";
+        loadAttendanceGridMatrix(); // Refresh master grid counts when modal closes
+    }
+
+    function renderAttendanceRosterTable(dataset) {
+        const tbody = document.getElementById("boxAttendanceRosterTableBody");
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="font-style:italic;color:var(--text-muted);text-align:center;padding:24px;font-size:12px;">No employees enrolled in this training schedule session.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map((x) => {
+            const currentStatus = x.attendance ? (x.attendance.attendanceStatus || "Present") : "Present";
+            const currentRemarks = x.attendance ? (x.attendance.remarks || "") : "";
+
+            return `
+                <tr class="roster-row-item" data-employee-id="${x.employeeId}" data-search-text="${x.employeeName.toLowerCase()} ${x.employeeCode.toLowerCase()}">
+                    <td class="col-code"><code>${x.employeeCode}</code></td>
+                    <td style="font-weight: 600;">${x.employeeName}</td>
+                    <td style="color: var(--text-secondary);">${x.department || "General Team"}</td>
+                    <td style="text-align: center;">
+                        <div class="status-pill-group" id="pillGroup_${x.employeeId}">
+                            <button type="button" class="btn-status-pill ${currentStatus === 'Present' ? 'active-present' : ''}" onclick="selectAttendanceStatus(${x.employeeId}, 'Present')">Present</button>
+                            <button type="button" class="btn-status-pill ${currentStatus === 'Absent' ? 'active-absent' : ''}" onclick="selectAttendanceStatus(${x.employeeId}, 'Absent')">Absent</button>
+                            <button type="button" class="btn-status-pill ${currentStatus === 'Late' ? 'active-late' : ''}" onclick="selectAttendanceStatus(${x.employeeId}, 'Late')">Late</button>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" class="roster-remarks-input" id="remarks_${x.employeeId}" value="${currentRemarks}" placeholder="Optional remarks..." maxlength="250" />
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function selectAttendanceStatus(employeeId, statusVal) {
+        const groupContainer = document.getElementById(`pillGroup_${employeeId}`);
+        if (!groupContainer) return;
+        const buttons = groupContainer.querySelectorAll(".btn-status-pill");
+        
+        buttons.forEach(b => {
+            b.className = "btn-status-pill";
+            if (b.innerText === statusVal) {
+                if (statusVal === 'Present') b.classList.add("active-present");
+                if (statusVal === 'Absent') b.classList.add("active-absent");
+                if (statusVal === 'Late') b.classList.add("active-late");
+            }
+        });
+
+        updateAttendanceCountersSummary();
+    }
+
+    function setAllAttendanceStatus(statusVal) {
+        enrolledParticipantsArray.forEach(x => {
+            selectAttendanceStatus(x.employeeId, statusVal);
+        });
+    }
+
+    function updateAttendanceCountersSummary() {
+        let p = 0, a = 0, l = 0;
+        enrolledParticipantsArray.forEach(x => {
+            const groupContainer = document.getElementById(`pillGroup_${x.employeeId}`);
+            if (groupContainer) {
+                const activeBtn = groupContainer.querySelector(".btn-status-pill.active-present, .btn-status-pill.active-absent, .btn-status-pill.active-late");
+                if (activeBtn) {
+                    const txt = activeBtn.innerText;
+                    if (txt === 'Present') p++;
+                    if (txt === 'Absent') a++;
+                    if (txt === 'Late') l++;
+                }
+            }
+        });
+
+        document.getElementById("lblCountPresent").innerText = p;
+        document.getElementById("lblCountAbsent").innerText = a;
+        document.getElementById("lblCountLate").innerText = l;
+    }
+
+    function filterAttendanceRosterList() {
+        const query = document.getElementById("txtSearchAttendanceRoster").value.trim().toLowerCase();
+        const items = document.querySelectorAll("#boxAttendanceRosterTableBody .roster-row-item");
+        items.forEach(el => {
+            const txt = el.getAttribute("data-search-text") || "";
+            el.style.display = txt.includes(query) ? "" : "none";
+        });
+    }
+
+    async function executeAttendancePostSubmission() {
+        const selectedDate = document.getElementById("txtModalAttendanceDate").value;
+        if (!selectedDate) {
+            alert("Please select the target attendance date.");
+            return;
+        }
+
+        const payloadList = [];
+
+        enrolledParticipantsArray.forEach(x => {
+            const groupContainer = document.getElementById(`pillGroup_${x.employeeId}`);
+            const remarksInput = document.getElementById(`remarks_${x.employeeId}`);
+            
+            if (groupContainer) {
+                const activeBtn = groupContainer.querySelector(".btn-status-pill.active-present, .btn-status-pill.active-absent, .btn-status-pill.active-late");
+                const statusVal = activeBtn ? activeBtn.innerText : "Present";
+                const remarksVal = remarksInput ? remarksInput.value : "";
+
+                payloadList.push({
+                    TrainingScheduleId: activeScheduleIdContext,
+                    EmployeeId: x.employeeId,
+                    SelectedAttendanceDate: selectedDate,
+                    AttendanceStatus: statusVal,
+                    Remarks: remarksVal,
+                    IsActive: true
+                });
+            }
+        });
+
+        if (payloadList.length === 0) {
+            alert("No attendance records generated to save.");
+            return;
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch('/TrainingAttendance/SaveAttendance', {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json", 
+                    "RequestVerificationToken": token 
+                },
+                body: JSON.stringify(payloadList)
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeWorkspaceModal();
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+                loadAttendanceGridMatrix();
+            } else {
+                if (window.showVqError) window.showVqError(result.message);
+                else alert(result.message);
+            }
+        } catch (err) {
+            console.error("Attendance transmission error:", err);
+            alert("Network transaction transmission error.");
+        }
+    }
+
+    function executeClientSideSearchFilter() {
+        const query = document.getElementById("attendanceSearchInput").value.trim().toLowerCase();
+        const matched = localSchedulesCache.filter(x =>
+            (x.trainingName && x.trainingName.toLowerCase().includes(query)) ||
+            (x.departmentName && x.departmentName.toLowerCase().includes(query))
+        );
+        renderAttendanceRows(matched);
+    }
+</script>

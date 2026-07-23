@@ -17,10 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\NewFolder\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Models\NewFolder\" />
     <Folder Include="Views\AssetReturn - Copy\" />
     <Folder Include="Views\InductionSession - Copy\" />
+    <Folder Include="Views\NewFolder1\" />
     <Folder Include="Views\NewFolder\" />
     <Folder Include="wwwroot\uploads\employees\documents\" />
   </ItemGroup>

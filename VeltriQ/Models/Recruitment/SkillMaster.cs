@@ -6,11 +6,8 @@ namespace VeltriQ.Models.Recruitment
     {
         [Key]
         public int SkillId { get; set; }
-
         public int JobCategoryId { get; set; }
-
         public string SkillName { get; set; }
-
         public bool IsActive { get; set; }
     }
 }

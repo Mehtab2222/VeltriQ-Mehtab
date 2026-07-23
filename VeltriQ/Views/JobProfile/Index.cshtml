@@ -1,4 +1,4 @@
-﻿@model IEnumerable<VeltriQ.Models.Recruitment.JobProfile>
+﻿@model IEnumerable<VeltriQ.ViewModels.JobProfileListItemViewModel>
 
 @{
     ViewData["Title"] = "Job Profiles";
@@ -12,7 +12,6 @@
         flex-direction: column;
     }
 
-    /* ── HEADER (Optimized & Pushed Up) ── */
     .job-profile-header {
         display: flex;
         justify-content: flex-end;
@@ -21,7 +20,6 @@
         gap: 12px;
     }
 
-    /* ── COMPACT ADD BUTTON ── */
     .job-profile-add-btn {
         height: 34px;
         padding: 0 14px;
@@ -43,7 +41,6 @@
             color: #fff;
         }
 
-    /* ── MAX HEIGHT CARD WITH HIDDEN SCROLLBAR ── */
     .job-profile-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
@@ -76,7 +73,6 @@
         margin: 2px 0 0 0;
     }
 
-    /* ── WIDER SEARCH BAR WITH EMBEDDED ICON ── */
     .job-profile-search-wrapper {
         position: relative;
         width: 320px;
@@ -108,7 +104,6 @@
             font-size: 13px;
         }
 
-    /* ── SCROLLABLE CONTAINER WITH HIDDEN SCROLLBAR ── */
     .table-wrapper {
         overflow-y: auto;
         overflow-x: auto;
@@ -158,7 +153,6 @@
                 background: var(--hover-bg);
             }
 
-    /* ── HIGH-DENSITY COMPACT BADGES ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -175,7 +169,11 @@
         color: #22c55e;
     }
 
-    /* ── INLINE ACTIONS (RIGHT ALIGNED) ── */
+    .status-inactive {
+        background: rgba(148, 163, 184, .12);
+        color: #94a3b8;
+    }
+
     .table-actions {
         display: flex;
         gap: 4px;
@@ -215,6 +213,9 @@
 <div class="job-profile-page">
 
     <div class="job-profile-header">
+        <a href="/Skill/Index" class="job-profile-add-btn" style="background: linear-gradient(135deg, #1e293b, #334155);">
+            <i class="bi bi-tools"></i> Add Skills
+        </a>
         <a href="/JobProfile/Create" class="job-profile-add-btn">
             <i class="bi bi-plus-lg"></i> Add Job Profile
         </a>
@@ -240,10 +241,7 @@
                     <tr>
                         <th>Job Title</th>
                         <th>Job Code</th>
-                        <th>Department</th>
-                        <th>Designation</th>
-                        <th>Experience</th>
-                        <th>Salary Range</th>
+                        <th>Skill Category</th>
                         <th>Status</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -262,20 +260,18 @@
                                         JP-@item.JobProfileId
                                     </span>
                                 </td>
-                                <td data-search="department">
-                                    @item.DepartmentId
-                                </td>
-                                <td data-search="designation">
-                                    @item.DesignationId
+                                <td data-search="category">
+                                    @item.CategoryName
                                 </td>
                                 <td>
-                                    @item.MinExperience - @item.MaxExperience Years
-                                </td>
-                                <td>
-                                    ₹@item.MinSalary - ₹@item.MaxSalary
-                                </td>
-                                <td>
-                                    <span class="status-badge status-active">Active</span>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="status-badge status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    }
                                 </td>
                                 <td>
                                     <div class="table-actions">
@@ -293,7 +289,7 @@
                     else
                     {
                         <tr id="emptyMatrixFallback">
-                            <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
                                 No records found.
                             </td>
                         </tr>
@@ -318,7 +314,7 @@
         if (!inlineFallbackRow) {
             inlineFallbackRow = document.createElement("tr");
             inlineFallbackRow.id = "emptyMatrixFallback";
-            inlineFallbackRow.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found.</td>`;
+            inlineFallbackRow.innerHTML = `<td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">No matching records found.</td>`;
             inlineFallbackRow.style.display = "none";
             matrixGrid.querySelector("tbody").appendChild(inlineFallbackRow);
         }
@@ -330,10 +326,9 @@
             dataRows.forEach(row => {
                 const titleText = row.querySelector('[data-search="title"]')?.textContent.toLowerCase() || "";
                 const codeText = row.querySelector('[data-search="code"]')?.textContent.toLowerCase() || "";
-                const deptText = row.querySelector('[data-search="department"]')?.textContent.toLowerCase() || "";
-                const desigText = row.querySelector('[data-search="designation"]')?.textContent.toLowerCase() || "";
+                const categoryText = row.querySelector('[data-search="category"]')?.textContent.toLowerCase() || "";
 
-                const compoundSourceText = `${titleText} ${codeText} ${deptText} ${desigText}`;
+                const compoundSourceText = `${titleText} ${codeText} ${categoryText}`;
 
                 if (compoundSourceText.includes(criteria)) {
                     row.style.display = "";

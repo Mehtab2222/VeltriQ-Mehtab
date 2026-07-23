@@ -1,0 +1,985 @@
+﻿@model VeltriQ.ViewModels.Training.TrainingRequestViewModel
+
+@{
+    ViewData["Title"] = "Training Requests";
+}
+
+<style>
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .req-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+    }
+
+    /* TOP OPERATION VIEW SWITCHER STRIP */
+    .req-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    .view-switcher-group {
+        display: inline-flex;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        padding: 2px;
+        border-radius: 6px;
+    }
+
+    .btn-switch-tab {
+        height: 30px;
+        padding: 0 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-switch-tab.active-view {
+            background: var(--card-bg);
+            color: var(--purple);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+    /* CORE PANEL CARD MODULE */
+    .req-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .req-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+        flex-shrink: 0;
+    }
+
+    .req-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .req-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .req-filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .req-search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+        .req-search-wrapper input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .req-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .req-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+    }
+
+    .req-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .req-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .req-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .req-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .req-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .badge-pending {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+    }
+
+    .badge-approved {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .badge-rejected, .badge-cancelled {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
+    .manage-btn {
+        height: 26px;
+        padding: 0 12px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s ease;
+    }
+
+        .manage-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    /* CALENDAR VIEWPORT LAYOUTS */
+    .calendar-split-workspace {
+        display: none;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .calendar-grid-segment {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        overflow: hidden;
+    }
+
+    .calendar-navigation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    }
+
+        .calendar-navigation-header h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+    .calendar-nav-buttons {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-cal-nav {
+        height: 30px;
+        width: 30px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+        .btn-cal-nav:hover {
+            background: var(--hover-bg);
+        }
+
+    .calendar-matrix-board {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        flex: 1;
+    }
+
+    .calendar-day-label {
+        background: var(--hover-bg);
+        padding: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .calendar-date-cell {
+        background: var(--card-bg);
+        height: calc((100vh - 260px) / 6);
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: background-color 0.15s;
+    }
+
+        .calendar-date-cell:hover {
+            background: var(--hover-bg);
+        }
+
+        .calendar-date-cell.other-month {
+            opacity: 0.25;
+            background: var(--hover-bg);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .calendar-date-cell.today-cell {
+            background: rgba(124, 58, 237, 0.03);
+            box-shadow: inset 0 0 0 1px var(--purple);
+        }
+
+    .cell-date-number {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+    }
+
+    .calendar-date-cell.today-cell .cell-date-number {
+        color: var(--purple);
+    }
+
+    .calendar-micro-strip {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 4px;
+        border-radius: 4px;
+        background: rgba(124, 58, 237, 0.08);
+        color: var(--purple);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-left: 3px solid var(--purple);
+    }
+
+    /* RIGHT SIDEBAR MONTHLY AGENDA LEDGER */
+    .calendar-sidebar-ledger {
+        width: 320px;
+        border-left: 1px solid var(--border);
+        background: rgba(255,255,255,0.005);
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        overflow-y: auto;
+    }
+
+        .calendar-sidebar-ledger h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin: 0 0 4px 0;
+        }
+
+        .calendar-sidebar-ledger .ledger-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+    .ledger-scroll-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ledger-item-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+        .ledger-item-card:hover {
+            transform: translateX(-2px);
+            border-color: var(--purple);
+        }
+
+        .ledger-item-card h5 {
+            font-size: 12.5px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+    .ledger-meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+
+    /* REQUEST CREATION SPLIT MODAL LAYOUT */
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        width: 1100px;
+        max-width: 95vw;
+        height: 85vh;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+        .modal-card-header h4 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+    .modal-body-form-fields {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .modal-card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .modal-split-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .modal-panel-box {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.002);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .modal-panel-header {
+        padding: 8px 12px;
+        background: var(--hover-bg);
+        border-bottom: 1px solid var(--border);
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-primary);
+    }
+
+    .modal-panel-content {
+        padding: 10px;
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .col-code {
+        font-family: monospace;
+        font-weight: 700;
+        color: var(--purple);
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="req-page">
+
+    <!-- TOP OPERATION VIEW SWITCHER STRIP -->
+    <div class="req-header">
+        <div class="view-switcher-group">
+            <button type="button" class="btn-switch-tab active-view" id="tabBtnList" onclick="switchTargetLayoutView('LIST')">
+                <i class="bi bi-list-ul"></i> Requests List
+            </button>
+            <button type="button" class="btn-switch-tab" id="tabBtnCalendar" onclick="switchTargetLayoutView('CALENDAR')">
+                <i class="bi bi-calendar3"></i> New Request
+            </button>
+        </div>
+    </div>
+
+    <!-- CORE PANEL CARD MODULE -->
+    <div class="req-master-card">
+
+        <div class="req-card-top">
+            <div class="req-card-title">
+                <h3>Training Requests Master</h3>
+                <p>Total Requests Logged: <span id="reqCounter">0</span></p>
+            </div>
+
+            <div class="req-filter-controls">
+                <div class="req-search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="reqSearchInput" placeholder="Search training requests..." autocomplete="off" oninput="executeClientSideSearchFilter()" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB CONTEXT 1: REQUESTS LIST VIEW (DEFAULT) ── -->
+        <div class="table-wrapper" id="viewportLayoutList">
+            <table class="req-table" id="reqGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Request No</th>
+                        <th>Schedule Code</th>
+                        <th>Training Program Title</th>
+                        <th>Requested By</th>
+                        <th>Employees Count</th>
+                        <th>Request Date</th>
+                        <th>Status</th>
+                        <th class="text-end" style="padding-right:24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="reqMasterGridBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming training requests...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── TAB CONTEXT 2: CALENDAR COMPOSITION VIEW ── -->
+        <div class="calendar-split-workspace" id="viewportLayoutCalendar">
+            <div class="calendar-grid-segment">
+                <div class="calendar-navigation-header">
+                    <h4 id="lblCalendarMonthTitle">July 2026</h4>
+                    <div class="calendar-nav-buttons">
+                        <button type="button" class="btn-cal-nav" onclick="offsetActiveCalendarMonth(-1)"><i class="bi bi-chevron-left"></i></button>
+                        <button type="button" class="btn-cal-nav" style="font-size:11px; font-weight:700; width:auto; padding:0 10px;" onclick="navigateToCurrentTodayMonth()">Today</button>
+                        <button type="button" class="btn-cal-nav" onclick="offsetActiveCalendarMonth(1)"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="calendar-matrix-board" id="calendarGridWrapperContainer">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR MONTHLY AGENDA LEDGER -->
+            <div class="calendar-sidebar-ledger">
+                <h4>Available Sessions</h4>
+                <div class="ledger-subtitle">Click a session to submit employee requests</div>
+                <div class="ledger-scroll-stack" id="calendarMonthLedgerStack">
+                    <!-- Agenda entries mapped here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── REQUEST WORKSPACE MODAL WITH SPLIT ENROLLED PANEL ── -->
+<div class="modal-backdrop-layer" id="requestWorkspaceModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4>Submit Training Request & Review Roster</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeWorkspaceModal()">✕</button>
+        </div>
+
+        <div class="modal-body-form-fields">
+            <input type="hidden" id="modalScheduleId" />
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; flex-shrink: 0;">
+                <div>
+                    <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Training Program</label>
+                    <input type="text" id="modalTrainingName" class="req-search-wrapper input" readonly style="width:100%; height:32px; background:var(--hover-bg); border:1px solid var(--border); padding:0 8px; border-radius:4px;" />
+                </div>
+                <div>
+                    <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Schedule Code</label>
+                    <input type="text" id="modalScheduleCode" class="req-search-wrapper input" readonly style="width:100%; height:32px; background:var(--hover-bg); border:1px solid var(--border); padding:0 8px; border-radius:4px;" />
+                </div>
+            </div>
+
+            <!-- SPLIT VIEW PANELS: ELIGIBLE EMPLOYEES VS ALREADY ENROLLED -->
+            <div class="modal-split-grid">
+
+                <!-- LEFT PANEL: SELECT EMPLOYEES TO ENROLL -->
+                <div class="modal-panel-box">
+                    <div class="modal-panel-header">Select Eligible Employees to Request *</div>
+                    <div class="modal-panel-content" id="modalEmployeeCheckboxesContainer">
+                        <!-- Checkboxes populated via JS -->
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL: ALREADY ENROLLED / REQUESTED CANDIDATES -->
+                <div class="modal-panel-box">
+                    <div class="modal-panel-header" style="color: var(--purple);">Currently Enrolled / Requested Candidates</div>
+                    <div class="modal-panel-content" id="modalAlreadyEnrolledContainer">
+                        <!-- Enrolled candidates populated via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="flex-shrink: 0;">
+                <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Reason / Notes</label>
+                <textarea id="modalReason" class="req-search-wrapper input" style="width:100%; height:50px; border:1px solid var(--border); padding:6px; border-radius:4px;" placeholder="Optional remarks..."></textarea>
+            </div>
+        </div>
+
+        <div class="modal-card-footer">
+            <button type="button" class="manage-btn" onclick="closeWorkspaceModal()">Cancel</button>
+            <button type="button" class="manage-btn" style="background:var(--purple); color:#fff;" onclick="submitTrainingRequestForm()">Submit Request</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let localRequestsCache = [];
+    let localSchedulesCache = [];
+    let currentActiveViewMode = 'LIST';
+    let calendarTargetDateCursor = new Date();
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadTrainingRequestsGrid();
+        loadAvailableSchedulesCache();
+    });
+
+    function switchTargetLayoutView(targetMode) {
+        currentActiveViewMode = targetMode;
+        const btnList = document.getElementById("tabBtnList");
+        const btnCal = document.getElementById("tabBtnCalendar");
+        const viewList = document.getElementById("viewportLayoutList");
+        const viewCal = document.getElementById("viewportLayoutCalendar");
+
+        if (targetMode === 'LIST') {
+            btnList.classList.add("active-view");
+            btnCal.classList.remove("active-view");
+            viewList.style.display = "block";
+            viewCal.style.display = "none";
+            loadTrainingRequestsGrid();
+        } else {
+            btnList.classList.remove("active-view");
+            btnCal.classList.add("active-view");
+            viewList.style.display = "none";
+            viewCal.style.display = "flex";
+            renderProgrammaticCalendarEngine();
+        }
+    }
+
+    async function loadTrainingRequestsGrid() {
+        try {
+            const res = await fetch('/TrainingRequest/GetTrainingRequests', { method: 'GET' });
+            const result = await res.json();
+
+            localRequestsCache = result.data || result || [];
+            renderTrainingRequestsRows(localRequestsCache);
+            document.getElementById("reqCounter").innerText = localRequestsCache.length;
+        } catch (err) {
+            console.error("Training requests load fault:", err);
+            document.getElementById("reqMasterGridBody").innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 24px;">Failed to load training requests.</td></tr>`;
+        }
+    }
+
+    async function loadAvailableSchedulesCache() {
+        try {
+            const res = await fetch('/TrainingRequest/GetTrainingSchedules', { method: 'GET' });
+            const result = await res.json();
+            localSchedulesCache = result.data || result || [];
+
+            localSchedulesCache.forEach(x => {
+                if (x.trainingDate) {
+                    const parsed = new Date(x.trainingDate);
+                    if (!isNaN(parsed)) {
+                        x.isoDateStr = `${parsed.getFullYear()}-${padZeroValueString(parsed.getMonth() + 1)}-${padZeroValueString(parsed.getDate())}`;
+                    } else {
+                        x.isoDateStr = x.trainingDate.split('T')[0];
+                    }
+                } else {
+                    x.isoDateStr = "";
+                }
+            });
+        } catch (err) {
+            console.error("Schedules cache load fault:", err);
+        }
+    }
+
+    function renderTrainingRequestsRows(dataset) {
+        const tbody = document.getElementById("reqMasterGridBody");
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No training requests found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(x => {
+            const statusClass = x.status === 'Approved' ? 'badge-approved' : (x.status === 'Pending' ? 'badge-pending' : 'badge-rejected');
+            const reqDateFormatted = x.requestDate ? new Date(x.requestDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+
+            return `
+                <tr>
+                    <td class="col-code"><code>${x.requestNo}</code></td>
+                    <td class="col-code"><code>${x.scheduleCode}</code></td>
+                    <td style="font-weight: 600;">${x.trainingName}</td>
+                    <td style="color: var(--text-secondary);">${x.requestedBy}</td>
+                    <td style="font-weight: 700; color: var(--purple);">${x.employeeCount} Enrolled</td>
+                    <td>${reqDateFormatted}</td>
+                    <td><span class="status-badge ${statusClass}">${x.status}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button type="button" class="manage-btn" onclick="viewRequestDetails(${x.trainingRequestId})">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    /* CALENDAR RENDERING ENGINE */
+    function offsetActiveCalendarMonth(monthOffset) {
+        calendarTargetDateCursor.setMonth(calendarTargetDateCursor.getMonth() + monthOffset);
+        renderProgrammaticCalendarEngine();
+    }
+
+    function navigateToCurrentTodayMonth() {
+        calendarTargetDateCursor = new Date();
+        renderProgrammaticCalendarEngine();
+    }
+
+    function padZeroValueString(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function renderProgrammaticCalendarEngine() {
+        const gridContainer = document.getElementById("calendarGridWrapperContainer");
+        const targetYear = calendarTargetDateCursor.getFullYear();
+        const targetMonth = calendarTargetDateCursor.getMonth();
+
+        const monthLongName = calendarTargetDateCursor.toLocaleString('default', { month: 'long' });
+        document.getElementById("lblCalendarMonthTitle").innerText = `${monthLongName} ${targetYear}`;
+
+        const dayLabelsArr = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        let htmlBuffer = dayLabelsArr.map(d => `<div class="calendar-day-label">${d}</div>`).join('');
+
+        const firstDayIndex = new Date(targetYear, targetMonth, 1).getDay();
+        const totalDaysCount = new Date(targetYear, targetMonth + 1, 0).getDate();
+        const lastDaysOfPrevMonth = new Date(targetYear, targetMonth, 0).getDate();
+
+        for (let i = firstDayIndex; i > 0; i--) {
+            const dateNum = lastDaysOfPrevMonth - i + 1;
+            htmlBuffer += `<div class="calendar-date-cell other-month"><div class="cell-date-number">${dateNum}</div></div>`;
+        }
+
+        const todayDateStamp = new Date();
+
+        for (let day = 1; day <= totalDaysCount; day++) {
+            const cellISO = `${targetYear}-${padZeroValueString(targetMonth + 1)}-${padZeroValueString(day)}`;
+
+            let cellIndicatorBuffer = '';
+            localSchedulesCache.forEach(x => {
+                if (x.isoDateStr === cellISO) {
+                    cellIndicatorBuffer += `<div class="calendar-micro-strip" onclick="openRequestModalForSchedule(${x.trainingScheduleId})">${x.trainingName}</div>`;
+                }
+            });
+
+            const isTodayClass = todayDateStamp.getDate() === day && todayDateStamp.getMonth() === targetMonth && todayDateStamp.getFullYear() === targetYear ? 'today-cell' : '';
+
+            htmlBuffer += `
+                <div class="calendar-date-cell ${isTodayClass}">
+                    <div class="cell-date-number">${day}</div>
+                    ${cellIndicatorBuffer}
+                </div>`;
+        }
+
+        const filledCellsTotal = firstDayIndex + totalDaysCount;
+        const remainingOffsetCells = filledCellsTotal % 7 === 0 ? 0 : 7 - (filledCellsTotal % 7);
+        for (let j = 1; j <= remainingOffsetCells; j++) {
+            htmlBuffer += `<div class="calendar-date-cell other-month"><div class="cell-date-number">${j}</div></div>`;
+        }
+
+        gridContainer.innerHTML = htmlBuffer;
+        populateSidebarMonthlyLedger();
+    }
+
+    function populateSidebarMonthlyLedger() {
+        const sidebarLedger = document.getElementById("calendarMonthLedgerStack");
+        let ledgerBufferHtml = '';
+
+        const targetYear = calendarTargetDateCursor.getFullYear();
+        const targetMonth = padZeroValueString(calendarTargetDateCursor.getMonth() + 1);
+        const matchPrefix = `${targetYear}-${targetMonth}`;
+
+        localSchedulesCache.forEach(x => {
+            if (x.isoDateStr && x.isoDateStr.startsWith(matchPrefix)) {
+                ledgerBufferHtml += `
+                    <div class="ledger-item-card" onclick="openRequestModalForSchedule(${x.trainingScheduleId})">
+                        <h5>${x.trainingName}</h5>
+                        <div class="ledger-meta-row"><span>Code: <b>${x.scheduleCode}</b></span></div>
+                        <div class="ledger-meta-row" style="margin-top:2px;">
+                            <span style="color:var(--purple); font-weight:700;">${x.trainingDate ? x.trainingDate.split('T')[0] : ''}</span>
+                            <span class="status-badge badge-pending" style="height:16px; font-size:9.5px;">Seats: ${x.availableSeats}</span>
+                        </div>
+                    </div>`;
+            }
+        });
+
+        sidebarLedger.innerHTML = ledgerBufferHtml || `<div style="font-style:italic; color:var(--text-secondary); text-align:center; padding-top:24px; font-size:12px;">No sessions scheduled this month.</div>`;
+    }
+
+    async function openRequestModalForSchedule(scheduleId) {
+        const schedule = localSchedulesCache.find(x => x.trainingScheduleId === scheduleId);
+        if (!schedule) return;
+
+        document.getElementById("modalScheduleId").value = schedule.trainingScheduleId;
+        document.getElementById("modalTrainingName").value = schedule.trainingName;
+        document.getElementById("modalScheduleCode").value = schedule.scheduleCode;
+        document.getElementById("modalReason").value = "";
+
+        try {
+            // Fetch eligible employees available for request
+            const resEmp = await fetch(`/TrainingRequest/GetAvailableEmployees?trainingScheduleId=${scheduleId}`);
+            const resultEmp = await resEmp.json();
+            const employees = resultEmp.data || [];
+
+            const container = document.getElementById("modalEmployeeCheckboxesContainer");
+            if (employees.length === 0) {
+                container.innerHTML = `<div style="font-style:italic; color:var(--text-muted); font-size:11.5px; padding:8px;">No eligible employees found.</div>`;
+            } else {
+                container.innerHTML = employees.map(e => `
+                    <label style="display:flex; align-items:center; gap:8px; font-size:12px; padding:3px 0; cursor:pointer;">
+                        <input type="checkbox" name="selectedEmployees" value="${e.employeeId}" />
+                        <b>${e.employeeCode}</b> - ${e.employeeName} (${e.departmentName || 'General'})
+                    </label>
+                `).join('');
+            }
+
+            // Fetch already enrolled / requested candidates to populate the right panel
+            const resEnrolled = await fetch(`/TrainingEnrollment/GetEnrolledEmployees?trainingScheduleId=${scheduleId}`);
+            const resultEnrolled = await resEnrolled.json();
+            const enrolledList = resultEnrolled.data || resultEnrolled || [];
+
+            const enrolledContainer = document.getElementById("modalAlreadyEnrolledContainer");
+            if (enrolledList.length === 0) {
+                enrolledContainer.innerHTML = `<div style="font-style:italic; color:var(--text-muted); font-size:11.5px; padding:8px;">No candidates currently enrolled/requested.</div>`;
+            } else {
+                enrolledContainer.innerHTML = enrolledList.map(en => `
+                    <div style="display:flex; align-items:center; justify-content:between; font-size:12px; padding:4px 6px; border-bottom:1px solid var(--border); background:var(--card-bg);">
+                        <div><b>${en.employeeCode || ''}</b> - ${en.employeeName || en.fullName || ''}</div>
+                        <span style="font-size:10px; color:var(--purple); font-weight:600;">Active</span>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById("requestWorkspaceModalLayer").style.display = "flex";
+        } catch (err) {
+            console.error("Failed to fetch modal rosters:", err);
+            alert("Failed to load schedule roster details.");
+        }
+    }
+
+    function closeWorkspaceModal() {
+        document.getElementById("requestWorkspaceModalLayer").style.display = "none";
+    }
+
+    async function submitTrainingRequestForm() {
+         const scheduleId = document.getElementById("modalScheduleId").value;
+         const reason = document.getElementById("modalReason").value;
+
+         const checkboxes = document.querySelectorAll("input[name='selectedEmployees']:checked");
+         const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+         if (selectedIds.length === 0) {
+             alert("Please select at least one employee.");
+             return;
+         }
+
+         const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+         // Comprehensive payload satisfying all potential [Required] properties on the ViewModel
+         const payload = {
+             TrainingScheduleId: parseInt(scheduleId),
+             SelectedEmployeeIds: selectedIds,
+             RequestedEmployeeIds: selectedIds.join(','),
+             Reason: reason || "",
+             Status: "Pending"
+         };
+
+         try {
+             const res = await fetch('/TrainingRequest/SaveTrainingRequest', {
+                 method: "POST",
+                 headers: {
+                     "Content-Type": "application/json",
+                     "RequestVerificationToken": token
+                 },
+                 body: JSON.stringify(payload)
+             });
+             const result = await res.json();
+
+             if (result.success) {
+                 closeWorkspaceModal();
+                 if (window.showVqSuccess) window.showVqSuccess(result.message);
+                 switchTargetLayoutView('LIST');
+             } else {
+                 alert(result.message || "Failed to submit request.");
+             }
+         } catch (err) {
+             console.error("Submission transmission error:", err);
+             alert("Network transaction transmission error.");
+         }
+     }
+
+    function viewRequestDetails(id) {
+        alert("Viewing training request details for ID: " + id);
+    }
+
+    function executeClientSideSearchFilter() {
+        const query = document.getElementById("reqSearchInput").value.trim().toLowerCase();
+        const matched = localRequestsCache.filter(x =>
+            (x.requestNo && x.requestNo.toLowerCase().includes(query)) ||
+            (x.trainingName && x.trainingName.toLowerCase().includes(query)) ||
+            (x.requestedBy && x.requestedBy.toLowerCase().includes(query))
+        );
+        renderTrainingRequestsRows(matched);
+    }
+</script>

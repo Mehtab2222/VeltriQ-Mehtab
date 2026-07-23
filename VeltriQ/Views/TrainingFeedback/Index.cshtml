@@ -1,0 +1,675 @@
+﻿@{
+    ViewData["Title"] = "Training Feedback";
+}
+
+<style>
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .fb-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+    }
+
+    .fb-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .fb-tab-group {
+        display: inline-flex;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        padding: 2px;
+        border-radius: 6px;
+    }
+
+    .fb-tab-btn {
+        height: 30px;
+        padding: 0 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .fb-tab-btn.active-tab {
+            background: var(--card-bg);
+            color: var(--purple);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .fb-tab-btn .fb-count-badge {
+            background: rgba(124,58,237,.12);
+            color: var(--purple);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+
+    .fb-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        overflow-y: auto;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 14px;
+        align-content: start;
+    }
+
+    /* TRAINING CARD */
+    .fb-training-card {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(255,255,255,0.005);
+        transition: border-color .15s ease;
+    }
+
+        .fb-training-card:hover {
+            border-color: var(--purple);
+        }
+
+    .fb-card-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .fb-card-title h4 {
+        margin: 0;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .fb-card-title p {
+        margin: 3px 0 0 0;
+        font-size: 10.5px;
+        color: var(--text-muted);
+        font-family: monospace;
+    }
+
+    .fb-status-chip {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .fb-chip-pending {
+        background: rgba(245,158,11,.12);
+        color: #f59e0b;
+    }
+
+    .fb-chip-done {
+        background: rgba(34,197,94,.12);
+        color: #22c55e;
+    }
+
+    .fb-card-meta {
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+        .fb-card-meta b {
+            color: var(--text-primary);
+        }
+
+    .fb-card-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 4px;
+    }
+
+    .fb-give-btn, .fb-view-btn {
+        height: 30px;
+        padding: 0 14px;
+        border-radius: 5px;
+        border: none;
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity .15s ease;
+    }
+
+        .fb-give-btn:hover, .fb-view-btn:hover {
+            opacity: .88;
+        }
+
+    .fb-give-btn {
+        background: var(--purple);
+        color: #fff;
+    }
+
+    .fb-view-btn {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border) !important;
+    }
+
+    .fb-mini-stars {
+        display: flex;
+        gap: 2px;
+        font-size: 12px;
+        color: #f59e0b;
+    }
+
+    .fb-empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 13px;
+        padding: 60px 20px;
+    }
+
+    /* MODAL */
+    .fb-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .fb-modal-card {
+        width: 560px;
+        max-width: 92vw;
+        max-height: 88vh;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 12px 30px rgba(0,0,0,.3);
+    }
+
+    .fb-modal-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        background: var(--hover-bg);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .fb-modal-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .fb-modal-header p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+    .fb-modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .fb-modal-body {
+        padding: 18px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .fb-rating-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .fb-rating-label {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .fb-star-input {
+        display: flex;
+        gap: 4px;
+        cursor: pointer;
+    }
+
+        .fb-star-input i {
+            font-size: 20px;
+            color: var(--border);
+            transition: color .1s ease;
+        }
+
+            .fb-star-input i.filled {
+                color: #f59e0b;
+            }
+
+    .fb-recommend-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .fb-recommend-toggle {
+        display: flex;
+        gap: 8px;
+    }
+
+    .fb-toggle-opt {
+        height: 30px;
+        padding: 0 14px;
+        border-radius: 5px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .fb-toggle-opt.selected-yes {
+            background: rgba(34,197,94,.15);
+            color: #22c55e;
+            border-color: #22c55e;
+        }
+
+        .fb-toggle-opt.selected-no {
+            background: rgba(239,68,68,.15);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+    .fb-comments-textarea {
+        width: 100%;
+        min-height: 80px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        padding: 10px;
+        color: var(--text-primary);
+        font-size: 12px;
+        outline: none;
+        resize: vertical;
+    }
+
+        .fb-comments-textarea:focus {
+            border-color: var(--purple);
+        }
+
+        .fb-comments-textarea:disabled {
+            opacity: .7;
+        }
+
+    .fb-modal-footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .fb-btn-cancel, .fb-btn-submit {
+        height: 32px;
+        padding: 0 16px;
+        border-radius: 5px;
+        border: none;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .fb-btn-cancel {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border) !important;
+    }
+
+    .fb-btn-submit {
+        background: var(--purple);
+        color: #fff;
+    }
+
+        .fb-btn-submit:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="fb-page">
+
+    <div class="fb-header">
+        <div class="fb-tab-group">
+            <button type="button" class="fb-tab-btn active-tab" id="fbTabPending" onclick="switchFeedbackTab('PENDING')">
+                Pending Feedback <span class="fb-count-badge" id="fbPendingCount">0</span>
+            </button>
+            <button type="button" class="fb-tab-btn" id="fbTabSubmitted" onclick="switchFeedbackTab('SUBMITTED')">
+                Submitted <span class="fb-count-badge" id="fbSubmittedCount">0</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="fb-master-card" id="fbMasterGrid">
+        <div class="fb-empty-state">Loading your completed trainings...</div>
+    </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="fb-modal-backdrop" id="fbModalBackdrop">
+    <div class="fb-modal-card">
+        <div class="fb-modal-header">
+            <div>
+                <h4 id="fbModalTitle">Training Feedback</h4>
+                <p id="fbModalSub"></p>
+            </div>
+            <button type="button" class="fb-modal-close" onclick="closeFeedbackModal()">✕</button>
+        </div>
+
+        <div class="fb-modal-body">
+            <div class="fb-rating-row">
+                <span class="fb-rating-label">Trainer Effectiveness</span>
+                <div class="fb-star-input" data-category="trainer"></div>
+            </div>
+            <div class="fb-rating-row">
+                <span class="fb-rating-label">Content Quality</span>
+                <div class="fb-star-input" data-category="content"></div>
+            </div>
+            <div class="fb-rating-row">
+                <span class="fb-rating-label">Venue & Logistics</span>
+                <div class="fb-star-input" data-category="venue"></div>
+            </div>
+            <div class="fb-rating-row">
+                <span class="fb-rating-label">Overall Experience</span>
+                <div class="fb-star-input" data-category="overall"></div>
+            </div>
+
+            <div class="fb-recommend-row">
+                <span class="fb-rating-label">Would you recommend this training?</span>
+                <div class="fb-recommend-toggle">
+                    <button type="button" class="fb-toggle-opt" id="fbRecommendYes" onclick="setRecommend(true)">Yes</button>
+                    <button type="button" class="fb-toggle-opt" id="fbRecommendNo" onclick="setRecommend(false)">No</button>
+                </div>
+            </div>
+
+            <div>
+                <label style="font-size:11px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">Comments</label>
+                <textarea id="fbCommentsInput" class="fb-comments-textarea" placeholder="Share your thoughts about this training..."></textarea>
+            </div>
+        </div>
+
+        <div class="fb-modal-footer">
+            <button type="button" class="fb-btn-cancel" onclick="closeFeedbackModal()">Cancel</button>
+            <button type="button" class="fb-btn-submit" id="fbSubmitBtn" onclick="submitFeedback()">Submit Feedback</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allTrainingsCache = [];
+    let currentTab = 'PENDING';
+    let activeEnrollmentId = null;
+    let starRatings = { trainer: 0, content: 0, venue: 0, overall: 0 };
+    let recommendValue = null;
+    let modalIsReadOnly = false;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        buildStarInputs();
+        loadMyTrainings();
+    });
+
+    function buildStarInputs() {
+        document.querySelectorAll(".fb-star-input").forEach(container => {
+            const category = container.dataset.category;
+            container.innerHTML = "";
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement("i");
+                star.className = "bi bi-star-fill";
+                star.dataset.value = i;
+                star.onclick = () => { if (!modalIsReadOnly) setStarRating(category, i); };
+                container.appendChild(star);
+            }
+        });
+    }
+
+    function setStarRating(category, value) {
+        starRatings[category] = value;
+        renderStars(category);
+    }
+
+    function renderStars(category) {
+        const container = document.querySelector(`.fb-star-input[data-category="${category}"]`);
+        container.querySelectorAll("i").forEach(star => {
+            star.classList.toggle("filled", parseInt(star.dataset.value) <= starRatings[category]);
+        });
+    }
+
+    function setRecommend(value) {
+        if (modalIsReadOnly) return;
+        recommendValue = value;
+        document.getElementById("fbRecommendYes").classList.toggle("selected-yes", value === true);
+        document.getElementById("fbRecommendNo").classList.toggle("selected-no", value === false);
+    }
+
+    async function loadMyTrainings() {
+        try {
+            const res = await fetch('/TrainingFeedback/GetMyTrainingsForFeedback');
+            const result = await res.json();
+
+            allTrainingsCache = result.data || [];
+
+            const pendingCount = allTrainingsCache.filter(x => !x.isSubmitted).length;
+            const submittedCount = allTrainingsCache.filter(x => x.isSubmitted).length;
+            document.getElementById("fbPendingCount").innerText = pendingCount;
+            document.getElementById("fbSubmittedCount").innerText = submittedCount;
+
+            renderGrid();
+        } catch (err) {
+            console.error("Load trainings fault:", err);
+            document.getElementById("fbMasterGrid").innerHTML = `<div class="fb-empty-state" style="color:red;">Failed to load your trainings.</div>`;
+        }
+    }
+
+    function switchFeedbackTab(tab) {
+        currentTab = tab;
+        document.getElementById("fbTabPending").classList.toggle("active-tab", tab === 'PENDING');
+        document.getElementById("fbTabSubmitted").classList.toggle("active-tab", tab === 'SUBMITTED');
+        renderGrid();
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById("fbMasterGrid");
+        const filtered = allTrainingsCache.filter(x => currentTab === 'PENDING' ? !x.isSubmitted : x.isSubmitted);
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="fb-empty-state">${currentTab === 'PENDING' ? 'No trainings pending feedback. You\'re all caught up!' : 'You haven\'t submitted any feedback yet.'}</div>`;
+            return;
+        }
+
+        grid.innerHTML = filtered.map(x => {
+            const period = `${formatDate(x.startDate)} - ${formatDate(x.endDate)}`;
+            const chip = x.isSubmitted
+                ? `<span class="fb-status-chip fb-chip-done">Submitted</span>`
+                : `<span class="fb-status-chip fb-chip-pending">Awaiting Feedback</span>`;
+
+            const footer = x.isSubmitted
+                ? `<div class="fb-mini-stars">${starGlyphs(x.overallRating)}</div>
+                   <button type="button" class="fb-view-btn" onclick="openFeedbackModal(${x.trainingEnrollmentId}, true)"><i class="bi bi-eye"></i> View Feedback</button>`
+                : `<button type="button" class="fb-give-btn" onclick="openFeedbackModal(${x.trainingEnrollmentId}, false)"><i class="bi bi-star"></i> Give Feedback</button>`;
+
+            return `
+                <div class="fb-training-card">
+                    <div class="fb-card-top-row">
+                        <div class="fb-card-title">
+                            <h4>${x.trainingName}</h4>
+                            <p>${x.scheduleCode}</p>
+                        </div>
+                        ${chip}
+                    </div>
+                    <div class="fb-card-meta">
+                        <div>Trainer: <b>${x.trainerName || '—'}</b></div>
+                        <div>Venue: <b>${x.venueName || '—'}</b></div>
+                        <div>Period: <b>${period}</b></div>
+                    </div>
+                    <div class="fb-card-footer" style="justify-content:space-between; align-items:center;">
+                        ${footer}
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function starGlyphs(rating) {
+        rating = rating || 0;
+        let html = '';
+        for (let i = 1; i <= 5; i++) {
+            html += `<i class="bi ${i <= rating ? 'bi-star-fill' : 'bi-star'}"></i>`;
+        }
+        return html;
+    }
+
+    function formatDate(d) {
+        return d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+    }
+
+    function openFeedbackModal(enrollmentId, readOnly) {
+        const item = allTrainingsCache.find(x => x.trainingEnrollmentId === enrollmentId);
+        if (!item) return;
+
+        activeEnrollmentId = enrollmentId;
+        modalIsReadOnly = readOnly;
+
+        document.getElementById("fbModalTitle").innerText = readOnly ? "Your Feedback" : "Rate This Training";
+        document.getElementById("fbModalSub").innerText = `${item.trainingName} · ${item.scheduleCode}`;
+
+        starRatings = {
+            trainer: item.trainerRating || 0,
+            content: item.contentRating || 0,
+            venue: item.venueRating || 0,
+            overall: item.overallRating || 0
+        };
+        ['trainer', 'content', 'venue', 'overall'].forEach(renderStars);
+
+        recommendValue = item.wouldRecommend === undefined ? null : item.wouldRecommend;
+        document.getElementById("fbRecommendYes").classList.toggle("selected-yes", recommendValue === true);
+        document.getElementById("fbRecommendNo").classList.toggle("selected-no", recommendValue === false);
+
+        const commentsBox = document.getElementById("fbCommentsInput");
+        commentsBox.value = item.comments || "";
+        commentsBox.disabled = readOnly;
+
+        document.getElementById("fbSubmitBtn").style.display = readOnly ? "none" : "inline-flex";
+        document.querySelectorAll(".fb-toggle-opt").forEach(btn => btn.style.pointerEvents = readOnly ? "none" : "auto");
+
+        document.getElementById("fbModalBackdrop").style.display = "flex";
+    }
+
+    function closeFeedbackModal() {
+        document.getElementById("fbModalBackdrop").style.display = "none";
+        activeEnrollmentId = null;
+    }
+
+    async function submitFeedback() {
+        if (starRatings.trainer === 0 || starRatings.content === 0 || starRatings.venue === 0 || starRatings.overall === 0) {
+            alert("Please provide a rating for all four categories.");
+            return;
+        }
+        if (recommendValue === null) {
+            alert("Please indicate whether you'd recommend this training.");
+            return;
+        }
+
+        const submitBtn = document.getElementById("fbSubmitBtn");
+        submitBtn.disabled = true;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const payload = {
+            trainingEnrollmentId: activeEnrollmentId,
+            trainerRating: starRatings.trainer,
+            contentRating: starRatings.content,
+            venueRating: starRatings.venue,
+            overallRating: starRatings.overall,
+            wouldRecommend: recommendValue,
+            comments: document.getElementById("fbCommentsInput").value
+        };
+
+        try {
+            const res = await fetch('/TrainingFeedback/SaveFeedback', {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "RequestVerificationToken": token },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeFeedbackModal();
+                if (window.showVqSuccess) window.showVqSuccess(result.message);
+                await loadMyTrainings();
+                switchFeedbackTab('SUBMITTED');
+            } else {
+                alert(result.message || "Failed to submit feedback.");
+                submitBtn.disabled = false;
+            }
+        } catch (err) {
+            console.error("Feedback submit fault:", err);
+            alert("Network error while submitting feedback.");
+            submitBtn.disabled = false;
+        }
+    }
+</script>

@@ -6,6 +6,7 @@ using VeltriQ.Models.HR;
 using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.Models.Recruitment;
 using VeltriQ.Models.Training;
+using VeltriQ.Models.TransactionApproval;
 using VeltriQ.SeedData;
 namespace VeltriQ.Data
 {
@@ -127,6 +128,13 @@ namespace VeltriQ.Data
         public DbSet<TrainingVenue> TrainingVenues { get; set; }
         public DbSet<TrainingSchedule> TrainingSchedules { get; set; }
         public DbSet<TrainingEnrollment> TrainingEnrollments { get; set; }
+        public DbSet<TrainingAttendance> TrainingAttendances { get; set; }
+        public DbSet<TrainingRequest> TrainingRequests { get; set; }
+
+        public DbSet<TransactionApproval> TransactionApprovals { get; set; }
+        public DbSet<TrainingFeedback> TrainingFeedbacks { get; set; }
+
+        public DbSet<JobProfileReviewer> JobProfileReviewers { get; set; }   // <-- ADD THIS LINE
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -140,6 +148,129 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+            modelBuilder.Entity<JobProfileReviewer>()
+    .ToTable("JobProfileReviewer", "Recruitment");
+
+            modelBuilder.Entity<JobProfile>()
+                .HasOne<Employee>()
+                .WithMany()
+                .HasForeignKey(x => x.ReportingToId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<JobProfile>()
+                .HasOne<Employee>()
+                .WithMany()
+                .HasForeignKey(x => x.HiringManagerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<JobProfileReviewer>()
+                .HasOne<Employee>()
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<JobProfileReviewer>()
+                .HasOne<JobProfile>()
+                .WithMany()
+                .HasForeignKey(x => x.JobProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<TrainingFeedback>(entity =>
+            {
+                entity.HasKey(e => e.TrainingFeedbackId);
+
+                entity.Property(e => e.Comments)
+                    .HasMaxLength(1000);
+
+                entity.HasOne(e => e.TrainingEnrollment)
+                    .WithMany()
+                    .HasForeignKey(e => e.TrainingEnrollmentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.TrainingSchedule)
+                    .WithMany()
+                    .HasForeignKey(e => e.TrainingScheduleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Employee)
+                    .WithMany()
+                    .HasForeignKey(e => e.EmployeeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // One feedback per enrollment — enforce at the DB level too, not just app logic
+                entity.HasIndex(e => e.TrainingEnrollmentId)
+                    .IsUnique()
+                    .HasFilter("[IsActive] = 1");
+            });
+            modelBuilder.Entity<TrainingRequest>(entity =>
+            {
+                entity.HasKey(e => e.TrainingRequestId);
+
+                entity.Property(e => e.RequestNo)
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.RequestedEmployeeIds)
+                    .IsRequired();
+
+                entity.Property(e => e.Reason)
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20);
+
+                entity.HasIndex(e => e.RequestNo)
+                    .IsUnique();
+
+                entity.HasOne(e => e.TrainingSchedule)
+                    .WithMany()
+                    .HasForeignKey(e => e.TrainingScheduleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.RequestedByEmployee)
+                    .WithMany()
+                    .HasForeignKey(e => e.RequestedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<TransactionApproval>(entity =>
+            {
+                entity.HasKey(e => e.TransactionApprovalId);
+
+                entity.Property(e => e.ModuleName)
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(1000);
+            });
+            modelBuilder.Entity<TrainingAttendance>(entity =>
+            {
+                entity.HasKey(x => x.TrainingAttendanceId);
+
+                entity.Property(x => x.AttendanceStatus)
+                      .HasMaxLength(20);
+
+                entity.Property(x => x.Remarks)
+                      .HasMaxLength(500);
+
+                entity.HasOne(x => x.TrainingSchedule)
+                      .WithMany()
+                      .HasForeignKey(x => x.TrainingScheduleId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Employee)
+                      .WithMany()
+                      .HasForeignKey(x => x.EmployeeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // ✅ Updated Composite Unique Index: Schedule + Employee + Date
+                entity.HasIndex(x => new
+                {
+                    x.TrainingScheduleId,
+                    x.EmployeeId,
+                    x.AttendanceDate
+                }).IsUnique();
+            });
 
             modelBuilder.Entity<TrainingSchedule>(entity =>
             {

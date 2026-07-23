@@ -1,0 +1,313 @@
+﻿@model VeltriQ.ViewModels.TransactionApproval.TransactionApprovalViewModel
+
+@{
+    ViewData["Title"] = "Transaction Approvals";
+}
+
+<style>
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .approval-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+    }
+
+    .approval-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .approval-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+        flex-shrink: 0;
+    }
+
+    .approval-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .approval-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .approval-filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .approval-filter-select, .approval-search-input {
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        padding: 0 10px;
+        color: var(--text-primary);
+        font-size: 12px;
+        outline: none;
+    }
+
+        .approval-filter-select:focus, .approval-search-input:focus {
+            border-color: var(--purple);
+        }
+
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+    }
+
+    .approval-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .approval-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .approval-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .approval-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .approval-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .badge-pending {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+    }
+
+    .badge-approved {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+    }
+
+    .badge-rejected {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+    }
+
+    .manage-btn {
+        height: 26px;
+        padding: 0 12px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s ease;
+    }
+
+        .manage-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="approval-page">
+    <div class="approval-master-card">
+
+        <div class="approval-card-top">
+            <div class="approval-card-title">
+                <h3>Transaction Approvals</h3>
+                <p>Review and process pending transaction approvals across modules.</p>
+            </div>
+
+            <div class="approval-filter-controls">
+                <select id="filterModule" class="approval-filter-select" onchange="loadPendingTransactions()">
+                    <option value="">All Modules</option>
+                    <option value="Training" selected>Training</option>
+                </select>
+
+                <select id="filterStatus" class="approval-filter-select" onchange="loadPendingTransactions()">
+                    <option value="">All Statuses</option>
+                    <option value="Pending" selected>Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+
+                <div style="position: relative; width: 240px;">
+                    <input type="text" id="approvalSearchInput" class="approval-search-input" style="width: 100%; padding-left: 28px;" placeholder="Search requester..." oninput="executeClientSideSearchFilter()" />
+                    <i class="bi bi-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 12px;"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="approval-table" id="approvalGridMatrix">
+                <thead>
+                    <tr>
+                        <th>Module Name</th>
+                        <th>Transaction ID</th>
+                        <th>Requested By</th>
+                        <th>Status</th>
+                        <th>Action Date</th>
+                        <th>Remarks</th>
+                        <th class="text-end" style="padding-right:24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="approvalMasterGridBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming approval queues...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let localApprovalsCache = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadPendingTransactions();
+    });
+
+    async function loadPendingTransactions() {
+        const moduleName = document.getElementById("filterModule").value;
+        const status = document.getElementById("filterStatus").value;
+
+        let url = `/TransactionApproval/GetPendingTransactions?`;
+        if (moduleName) url += `moduleName=${encodeURIComponent(moduleName)}&`;
+        if (status) url += `status=${encodeURIComponent(status)}&`;
+
+        try {
+            const res = await fetch(url, { method: 'GET' });
+            const result = await res.json();
+
+            localApprovalsCache = result.data || result || [];
+            renderApprovalsRows(localApprovalsCache);
+        } catch (err) {
+            console.error("Approvals load fault:", err);
+            document.getElementById("approvalMasterGridBody").innerHTML = `<tr><td colspan="7" style="text-align: center; color: red; padding: 24px;">Failed to load transaction approvals.</td></tr>`;
+        }
+    }
+
+    function renderApprovalsRows(dataset) {
+        const tbody = document.getElementById("approvalMasterGridBody");
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No transaction approval records found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataset.map(x => {
+            const statusClass = x.status === 'Approved' ? 'badge-approved' : (x.status === 'Pending' ? 'badge-pending' : 'badge-rejected');
+            const actionDateFormatted = x.actionDate ? new Date(x.actionDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+
+            return `
+                <tr>
+                    <td style="font-weight: 700; color: var(--purple);">${x.moduleName}</td>
+                    <td style="font-family: monospace;">#${x.transactionId}</td>
+                    <td style="font-weight: 600;">${x.requestedByName}</td>
+                    <td><span class="status-badge ${statusClass}">${x.status}</span></td>
+                    <td>${actionDateFormatted}</td>
+                    <td style="color: var(--text-secondary);">${x.remarks || '-'}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button type="button" class="manage-btn" onclick="reviewApprovalItem(${x.transactionApprovalId}, '${x.moduleName}')">
+                                <i class="bi bi-check2-circle"></i> Review
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function reviewApprovalItem(approvalId, moduleName) {
+        // Convention: {ModuleName}Approval controller, Index action, approval id as query param
+        window.location.href = `/${moduleName}Approval/Index?id=${approvalId}`;
+    }
+
+    function executeClientSideSearchFilter() {
+        const query = document.getElementById("approvalSearchInput").value.trim().toLowerCase();
+        const matched = localApprovalsCache.filter(x =>
+            (x.requestedByName && x.requestedByName.toLowerCase().includes(query)) ||
+            (x.moduleName && x.moduleName.toLowerCase().includes(query))
+        );
+        renderApprovalsRows(matched);
+    }
+</script>
