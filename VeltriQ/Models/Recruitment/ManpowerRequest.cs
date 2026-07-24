@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using VeltriQ.Models.Core;
 using VeltriQ.Models.HR;
 
 namespace VeltriQ.Models.Recruitment
@@ -10,17 +11,27 @@ namespace VeltriQ.Models.Recruitment
         [Key]
         public int ManpowerRequestId { get; set; }
 
-        public string RequestCode { get; set; }
+        public string RequestCode { get; set; } = string.Empty;
+
+        [StringLength(150)]
+        public string? JobTitle { get; set; }
+
+        public string? HiringManagerId { get; set; }
+
+        [NotMapped]
+        public virtual ApplicationUser? HiringManager { get; set; }
 
         public DateTime RequestDate { get; set; }
 
         public int RecruitmentTypeId { get; set; }
 
         public int? HODId { get; set; }
+
         public int BranchId { get; set; }
 
         [ForeignKey(nameof(BranchId))]
         public virtual Branch? Branch { get; set; }
+
         public int DepartmentId { get; set; }
 
         public int DesignationId { get; set; }
@@ -46,7 +57,9 @@ namespace VeltriQ.Models.Recruitment
         public decimal? MinSalary { get; set; }
 
         public decimal? MaxSalary { get; set; }
+        public int? JobProfileId { get; set; }
 
+        public virtual JobProfile? JobProfile { get; set; }
         public int? PriorityId { get; set; }
 
         public string? JobDescription { get; set; }

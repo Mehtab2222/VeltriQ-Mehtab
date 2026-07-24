@@ -1,7 +1,5 @@
-﻿@model List<VeltriQ.ViewModels.SkillCategoryGroupViewModel>
-
-@{
-    ViewData["Title"] = "Skills & Categories";
+﻿@{
+    ViewData["Title"] = "Skills Master";
 }
 
 <style>
@@ -37,7 +35,7 @@
         padding-top: 16px;
     }
 
-    /* ── UNIFIED MASTER SQUARE CARD MODULE ── */
+    /* CORE PANEL CARD MODULE */
     .skill-master-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
@@ -53,11 +51,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px 16px;
+        padding: 12px 20px;
         border-bottom: 1px solid var(--border);
         gap: 16px;
         flex-shrink: 0;
-        background: var(--card-bg);
     }
 
     .skill-card-title h3 {
@@ -73,88 +70,89 @@
         margin: 2px 0 0 0;
     }
 
-    /* SPLIT TOP CREATION BAR WITH VERTICAL DIVIDER */
-    .skill-creation-strip {
-        background: var(--hover-bg);
-        border-bottom: 1px solid var(--border);
-        display: grid;
-        grid-template-columns: 1fr 1px 1.5fr;
-        align-items: center;
-        flex-shrink: 0;
-    }
-
-    .creation-section-pane {
-        padding: 12px 20px;
+    .skill-filter-controls {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
     }
 
-        .creation-section-pane label {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-            white-space: nowrap;
+    .skill-search-wrapper {
+        position: relative;
+        width: 260px;
+    }
+
+        .skill-search-wrapper input {
+            width: 100%;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 34px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-    .vertical-white-divider {
-        width: 1px;
-        height: 32px;
-        background: var(--border);
-    }
+            .skill-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
 
-    .skill-input, .skill-select {
-        height: 30px;
-        border-radius: 4px;
-        border: 1px solid var(--border);
-        background: var(--input-bg);
-        color: var(--text-primary);
-        padding: 0 10px;
-        font-size: 12px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-        .skill-input:focus, .skill-select:focus {
-            border-color: var(--purple);
+        .skill-search-wrapper i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
         }
 
-    .skill-btn {
+    .manage-btn {
         height: 30px;
         padding: 0 14px;
-        border: none;
         border-radius: 4px;
-        background: var(--purple);
-        color: #fff;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
         font-size: 11.5px;
         font-weight: 600;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: opacity 0.2s;
-        white-space: nowrap;
+        transition: all 0.2s ease;
+        text-decoration: none;
     }
 
-        .skill-btn:hover {
+        .manage-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .manage-btn-primary {
+        background: var(--purple);
+        color: #fff;
+        border-color: var(--purple);
+    }
+
+        .manage-btn-primary:hover {
             opacity: 0.9;
         }
 
-    /* TABLE CONTAINER & EXPANSIVE SPACING */
     .table-wrapper {
         overflow-y: auto;
         overflow-x: auto;
         flex: 1;
     }
 
-    .skills-table {
+    .skill-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
     }
 
-        .skills-table th {
+        .skill-table th {
             text-align: left;
             padding: 12px 20px;
             font-size: 10px;
@@ -169,19 +167,22 @@
             z-index: 10;
         }
 
-        .skills-table td {
-            padding: 14px 20px;
+        .skill-table td {
+            padding: 12px 20px;
             border-bottom: 1px solid var(--border);
             color: var(--text-primary);
             font-size: 12.5px;
             vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .skills-table tbody tr {
+        .skill-table tbody tr {
             transition: background-color .1s ease;
         }
 
-            .skills-table tbody tr:hover {
+            .skill-table tbody tr:hover {
                 background: var(--hover-bg);
             }
 
@@ -197,191 +198,189 @@
         color: var(--purple);
     }
 
-    /* RELAXED, UNCONGESTED SKILL CHIPS */
-    .skill-chips-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .skill-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--hover-bg);
-        border: 1px solid var(--border);
-        padding: 5px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        color: var(--text-primary);
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    }
-
-    .action-btns {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-    }
-
-    .btn-icon {
-        height: 28px;
-        width: 28px;
-        border-radius: 4px;
-        border: 1px solid var(--border);
-        background: var(--hover-bg);
-        color: var(--text-primary);
-        display: inline-flex;
+    /* MODAL LAYOUTS */
+    .modal-backdrop-layer {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2000;
+        display: none;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        font-size: 11.5px;
-        transition: all 0.2s;
-        text-decoration: none;
     }
 
-        .btn-icon:hover {
-            border-color: var(--purple);
-            color: #fff;
-            background: var(--purple);
+    .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        width: 620px;
+        max-width: 95vw;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        border-radius: 0px;
+    }
+
+    .modal-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+        .modal-card-header h4 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
-    .btn-icon-danger:hover {
-        border-color: #ef4444;
-        background: #ef4444;
-        color: #fff;
+    .modal-body-form-fields {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-height: 70vh;
+        overflow-y: auto;
     }
 
-    /* Inline Edit Inputs */
-    .edit-input-field {
-        height: 28px;
+    .modal-card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+        background: var(--card-bg);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .form-group label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+    .form-control {
+        height: 34px;
         border-radius: 4px;
-        border: 1px solid var(--purple);
+        border: 1px solid var(--border);
         background: var(--input-bg);
         color: var(--text-primary);
-        padding: 0 8px;
+        padding: 0 10px;
         font-size: 12px;
-        width: 100%;
-        display: none;
         outline: none;
+        width: 100%;
+    }
+
+        .form-control:focus {
+            border-color: var(--purple);
+        }
+
+    /* AUTOCOMPLETE DROPDOWN WRAPPER */
+    .autocomplete-wrap {
+        position: relative;
+    }
+
+    .autocomplete-dropdown {
+        position: absolute;
+        top: 36px;
+        left: 0;
+        right: 0;
+        max-height: 150px;
+        overflow-y: auto;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        box-shadow: 0 6px 16px rgba(0,0,0,.25);
+        z-index: 50;
+        display: none;
+    }
+
+    .autocomplete-option {
+        padding: 7px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-primary);
+    }
+
+        .autocomplete-option:hover {
+            background: var(--hover-bg);
+            color: var(--purple);
+        }
+
+    .existing-tags-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        border-radius: 4px;
+        max-height: 90px;
+        overflow-y: auto;
+    }
+
+    .existing-tag-chip {
+        font-size: 11px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: var(--text-secondary);
     }
 </style>
+
+@Html.AntiForgeryToken()
 
 <div class="skill-page">
     <div class="skill-master-card">
 
         <div class="skill-card-top">
             <div class="skill-card-title">
-                <h3>Manage Skills & Categories</h3>
-                <p>Create categories and assign individual skills or bulk create them efficiently.</p>
-            </div>
-        </div>
-
-        <div class="skill-creation-strip">
-            <div class="creation-section-pane">
-                <label>Add Category</label>
-                <form asp-action="AddCategory" asp-controller="Skill" method="post" style="display: flex; gap: 8px; align-items: center; flex: 1;">
-                    <input type="text" name="categoryName" class="skill-input" placeholder="Category Name..." style="flex: 1;" required />
-                    <button type="submit" class="skill-btn"><i class="bi bi-folder-plus"></i> Create</button>
-                </form>
+                <h3>Skills Master Directory</h3>
+                <p>Manage individual skills mapped across specific professional categories.</p>
             </div>
 
-            <div class="vertical-white-divider"></div>
-
-            <div class="creation-section-pane">
-                <label>Add Skill(s)</label>
-                <form asp-action="AddSkill" asp-controller="Skill" method="post" style="display: flex; gap: 8px; align-items: center; flex: 1;">
-                    <select name="jobCategoryId" class="skill-select" style="width: 160px;" required>
-                        <option value="">Select Category</option>
-                        @if (Model != null)
-                        {
-                            foreach (var cat in Model)
-                            {
-                                <option value="@cat.JobCategoryId">@cat.CategoryName</option>
-                            }
-                        }
-                    </select>
-                    <input type="text" name="skillName" class="skill-input" placeholder="Skill Name (comma-separated for bulk)" style="flex: 1;" required />
-                    <button type="submit" class="skill-btn"><i class="bi bi-code-square"></i> Add Skill(s)</button>
-                </form>
+            <div class="skill-filter-controls">
+                <div class="skill-search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="skillSearchInput" placeholder="Search skills or categories..." autocomplete="off" oninput="executeClientSideSearchFilter()" />
+                </div>
+                <button type="button" class="manage-btn" onclick="openAddCategoryModal()">
+                    <i class="bi bi-folder-plus"></i> Add Category
+                </button>
+                <button type="button" class="manage-btn manage-btn-primary" onclick="openAddSkillModal()">
+                    <i class="bi bi-plus-lg"></i> Add Skills
+                </button>
             </div>
         </div>
 
         <div class="table-wrapper">
-            <table class="skills-table">
+            <table class="skill-table" id="skillGridMatrix">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">Category Name</th>
-                        <th style="width: 60%;">Skills Available</th>
-                        <th style="width: 15%; text-align: right; padding-right: 24px;">Actions</th>
+                        <th style="width: 28%;">Skill Name</th>
+                        <th style="width: 25%;">Skill Category</th>
+                        <th style="width: 18%;">Added On</th>
+                        <th style="width: 18%;">Added By</th>
+                        <th style="width: 11%; text-align: right; padding-right: 24px;">Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var cat in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <span class="category-display-text-@cat.JobCategoryId">
-                                        <span class="badge-category">@cat.CategoryName</span>
-                                    </span>
-                                    <form asp-action="EditCategory" asp-controller="Skill" method="post" style="display:inline;">
-                                        <input type="hidden" name="jobCategoryId" value="@cat.JobCategoryId" />
-                                        <input type="text" name="categoryName" value="@cat.CategoryName" class="edit-input-field category-edit-input-@cat.JobCategoryId" required />
-                                    </form>
-                                </td>
-
-                                <td>
-                                    @if (cat.Skills != null && cat.Skills.Any())
-                                    {
-                                        <div class="skill-chips-container">
-                                            @foreach (var skill in cat.Skills)
-                                            {
-                                                <span class="skill-chip" id="skill-badge-@skill.SkillId">
-                                                    <span class="skill-text-@skill.SkillId">@skill.SkillName</span>
-
-                                                    <form asp-action="EditSkill" asp-controller="Skill" method="post" style="display:none;" id="skill-edit-form-@skill.SkillId">
-                                                        <input type="hidden" name="skillId" value="@skill.SkillId" />
-                                                        <input type="text" name="skillName" value="@skill.SkillName" class="edit-input-field" style="display:inline-block; width:100px; height:24px; font-size:11px;" required />
-                                                        <button type="submit" style="background:none; border:none; color:#22c55e; cursor:pointer; padding:0 4px;"><i class="bi bi-check" style="font-size:14px;"></i></button>
-                                                    </form>
-
-                                                    <span style="display:inline-flex; gap:3px; margin-left:4px;">
-                                                        <button type="button" class="btn-icon" style="height:22px; width:22px; font-size:10px;" onclick="toggleEditSkill(@skill.SkillId)" title="Edit Skill"><i class="bi bi-pencil"></i></button>
-                                                        <a href="@Url.Action("DeleteSkill", "Skill", new { id = skill.SkillId })" class="btn-icon btn-icon-danger" style="height:22px; width:22px; font-size:10px;" onclick="return confirm('Are you sure you want to delete this skill?');" title="Delete Skill"><i class="bi bi-x"></i></a>
-                                                    </span>
-                                                </span>
-                                            }
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span style="color: var(--text-muted); font-style: italic; font-size: 12px;">No skills added under this category.</span>
-                                    }
-                                </td>
-
-                                <td style="text-align: right; padding-right: 24px;">
-                                    <div class="action-btns" style="justify-content: flex-end;">
-                                        <button type="button" class="btn-icon" onclick="toggleEditCategory(@cat.JobCategoryId)" title="Edit Category Name">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <a href="@Url.Action("DeleteCategory", "Skill", new { id = cat.JobCategoryId })" class="btn-icon btn-icon-danger" onclick="return confirm('Are you sure you want to delete this category and all its associated skills?');" title="Delete Category">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 40px 0; font-style: italic;">
-                                No skill categories found. Use the creation strip above to add new categories and skills.
-                            </td>
-                        </tr>
-                    }
+                <tbody id="skillMasterGridBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Streaming skills directory...
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -389,30 +388,403 @@
     </div>
 </div>
 
+<div class="modal-backdrop-layer" id="addCategoryModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4>Add New Category</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeModal('addCategoryModalLayer')">✕</button>
+        </div>
+        <div class="modal-body-form-fields">
+            <div class="form-group">
+                <label>Existing Categories (Reference)</label>
+                <div class="existing-tags-box" id="existingCategoriesListBox">Loading...</div>
+            </div>
+            <div class="form-group">
+                <label>New Category Name *</label>
+                <input type="text" id="txtNewCategoryName" class="form-control" placeholder="e.g. Cloud Engineering" autocomplete="off" />
+            </div>
+        </div>
+        <div class="modal-card-footer">
+            <button type="button" class="manage-btn" onclick="closeModal('addCategoryModalLayer')">Cancel</button>
+            <button type="button" class="manage-btn manage-btn-primary" onclick="submitNewCategory()">Save Category</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="addSkillModalLayer">
+    <div class="modal-card" style="width: 680px;">
+        <div class="modal-card-header">
+            <h4>Add Professional Skills</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeModal('addSkillModalLayer')">✕</button>
+        </div>
+        <div class="modal-body-form-fields">
+            <div class="form-group">
+                <label>Select Target Category *</label>
+                <select id="ddlTargetCategory" class="form-control" onchange="loadExistingSkillsForCategory()">
+                    <option value="">-- Choose Category --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Already Added Skills in this Category</label>
+                <div class="existing-tags-box" id="existingSkillsListBox"><span style="font-style:italic; color:var(--text-muted);">Select a category above...</span></div>
+            </div>
+            <div class="form-group">
+                <label>New Skills to Add *</label>
+                <div id="dynamicSkillRowsContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                    <div class="skill-input-row" style="display: flex; gap: 8px;">
+                        <div class="autocomplete-wrap" style="flex: 1;">
+                            <input type="text" class="form-control skill-name-input" placeholder="Type or select existing skill..." autocomplete="off" oninput="handleSkillInput(this)" onfocus="handleSkillInput(this)" />
+                            <div class="autocomplete-dropdown"></div>
+                        </div>
+                        <button type="button" class="manage-btn" style="background:#ef4444; border-color:#ef4444; color:#fff;" onclick="removeSkillRow(this)"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+                <button type="button" class="manage-btn" style="margin-top: 6px; align-self: flex-start;" onclick="addNewSkillInputRow()">
+                    <i class="bi bi-plus"></i> Add Another Skill Row
+                </button>
+            </div>
+        </div>
+        <div class="modal-card-footer">
+            <button type="button" class="manage-btn" onclick="closeModal('addSkillModalLayer')">Cancel</button>
+            <button type="button" class="manage-btn manage-btn-primary" onclick="submitNewSkillsBatch()">Save All Skills</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop-layer" id="editSkillModalLayer">
+    <div class="modal-card">
+        <div class="modal-card-header">
+            <h4>Edit Skill Information</h4>
+            <button type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size: 16px;" onclick="closeModal('editSkillModalLayer')">✕</button>
+        </div>
+        <div class="modal-body-form-fields">
+            <input type="hidden" id="editSkillId" />
+            <div class="form-group">
+                <label>Skill Category *</label>
+                <select id="editSkillCategory" class="form-control">
+                </select>
+            </div>
+            <div class="form-group autocomplete-wrap">
+                <label>Skill Name *</label>
+                <input type="text" id="editSkillName" class="form-control" autocomplete="off" oninput="handleEditSkillInput(this)" onfocus="handleEditSkillInput(this)" />
+                <div class="autocomplete-dropdown" id="editSkillAutocompleteDropdown"></div>
+            </div>
+        </div>
+        <div class="modal-card-footer">
+            <button type="button" class="manage-btn" onclick="closeModal('editSkillModalLayer')">Cancel</button>
+            <button type="button" class="manage-btn manage-btn-primary" onclick="submitEditSkill()">Update Skill</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    let localSkillsCache = [];
+    let globalCategoriesCache = [];
 
-    function toggleEditCategory(categoryId) {
-        var $displaySpan = $('.category-display-text-' + categoryId);
-        var $inputField = $('.category-edit-input-' + categoryId);
+    document.addEventListener("DOMContentLoaded", function () {
+        loadSkillsDirectory();
 
-        if ($inputField.is(':hidden')) {
-            $displaySpan.hide();
-            $inputField.show().focus();
-        } else {
-            $inputField.parent('form').submit();
+        // Global close autocomplete dropdowns on click outside
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest(".autocomplete-wrap")) {
+                document.querySelectorAll(".autocomplete-dropdown").forEach(d => d.style.display = "none");
+            }
+        });
+    });
+
+    async function loadSkillsDirectory() {
+        try {
+            const res = await fetch('/Skill/GetSkillsList', { method: 'GET' });
+            const result = await res.json();
+
+            localSkillsCache = result.data || result || [];
+            globalCategoriesCache = result.categories || [];
+            renderSkillsRows(localSkillsCache);
+        } catch (err) {
+            console.error("Skills load fault:", err);
+            document.getElementById("skillMasterGridBody").innerHTML = `<tr><td colspan="5" style="text-align: center; color: red; padding: 24px;">Failed to load skills directory.</td></tr>`;
         }
     }
 
-    function toggleEditSkill(skillId) {
-        var $textSpan = $('.skill-text-' + skillId);
-        var $editForm = $('#skill-edit-form-' + skillId);
-
-        if ($editForm.is(':hidden')) {
-            $textSpan.hide();
-            $editForm.show();
-            $editForm.find('input').focus();
-        } else {
-            $editForm.submit();
+    function renderSkillsRows(dataset) {
+        const tbody = document.getElementById("skillMasterGridBody");
+        if (dataset.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 24px;">No skills found in directory.</td></tr>`;
+            return;
         }
+
+        tbody.innerHTML = dataset.map(x => {
+            const addedDate = x.addedOn ? new Date(x.addedOn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+
+            return `
+                <tr>
+                    <td style="font-weight: 600;">${x.skillName}</td>
+                    <td><span class="badge-category">${x.categoryName}</span></td>
+                    <td style="color: var(--text-secondary);">${addedDate}</td>
+                    <td style="color: var(--text-secondary);">${x.addedBy || 'System'}</td>
+                    <td style="text-align: right; padding-right: 24px;">
+                        <div class="table-actions" style="display: inline-flex; gap: 6px;">
+                            <button type="button" class="manage-btn" onclick="openEditSkillModal(${x.skillId}, '${escapeQuotes(x.skillName)}', ${x.categoryId})">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            <button type="button" class="manage-btn" style="background:rgba(239,68,68,0.1); color:#ef4444; border-color:rgba(239,68,68,0.2);" onclick="deleteSkillRecord(${x.skillId})">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function escapeQuotes(str) {
+        return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    /* MODAL CONTROLS */
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+    }
+
+    async function openAddCategoryModal() {
+        document.getElementById("txtNewCategoryName").value = "";
+
+        const box = document.getElementById("existingCategoriesListBox");
+        box.innerHTML = globalCategoriesCache.length > 0
+            ? globalCategoriesCache.map(c => `<span class="existing-tag-chip">${c.categoryName}</span>`).join('')
+            : `<span style="font-style:italic; color:var(--text-muted);">No categories created yet.</span>`;
+
+        document.getElementById("addCategoryModalLayer").style.display = "flex";
+    }
+
+    async function submitNewCategory() {
+        const catName = document.getElementById("txtNewCategoryName").value.trim();
+        if (!catName) {
+            alert("Please enter a category name.");
+            return;
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch('/Skill/AddCategory', {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "RequestVerificationToken": token },
+                body: JSON.stringify({ categoryName: catName })
+            });
+            const result = await res.json();
+            if (result.success) {
+                closeModal('addCategoryModalLayer');
+                loadSkillsDirectory();
+            } else {
+                alert(result.message || "Failed to create category.");
+            }
+        } catch (err) {
+            console.error("Category save error:", err);
+            alert("Transmission error.");
+        }
+    }
+
+    function openAddSkillModal() {
+        document.getElementById("dynamicSkillRowsContainer").innerHTML = `
+            <div class="skill-input-row" style="display: flex; gap: 8px;">
+                <div class="autocomplete-wrap" style="flex: 1;">
+                    <input type="text" class="form-control skill-name-input" placeholder="Type or select existing skill..." autocomplete="off" oninput="handleSkillInput(this)" onfocus="handleSkillInput(this)" />
+                    <div class="autocomplete-dropdown"></div>
+                </div>
+                <button type="button" class="manage-btn" style="background:#ef4444; border-color:#ef4444; color:#fff;" onclick="removeSkillRow(this)"><i class="bi bi-trash"></i></button>
+            </div>`;
+
+        const ddl = document.getElementById("ddlTargetCategory");
+        ddl.innerHTML = `<option value="">-- Choose Category --</option>` + globalCategoriesCache.map(c => `<option value="${c.categoryId}">${c.categoryName}</option>`).join('');
+        document.getElementById("existingSkillsListBox").innerHTML = `<span style="font-style:italic; color:var(--text-muted);">Select a category above...</span>`;
+
+        document.getElementById("addSkillModalLayer").style.display = "flex";
+    }
+
+    function addNewSkillInputRow() {
+        const container = document.getElementById("dynamicSkillRowsContainer");
+        const div = document.createElement("div");
+        div.className = "skill-input-row";
+        div.style.cssText = "display: flex; gap: 8px;";
+        div.innerHTML = `
+            <div class="autocomplete-wrap" style="flex: 1;">
+                <input type="text" class="form-control skill-name-input" placeholder="Type or select existing skill..." autocomplete="off" oninput="handleSkillInput(this)" onfocus="handleSkillInput(this)" />
+                <div class="autocomplete-dropdown"></div>
+            </div>
+            <button type="button" class="manage-btn" style="background:#ef4444; border-color:#ef4444; color:#fff;" onclick="removeSkillRow(this)"><i class="bi bi-trash"></i></button>`;
+        container.appendChild(div);
+    }
+
+    function removeSkillRow(btn) {
+        const rows = document.querySelectorAll(".skill-input-row");
+        if (rows.length > 1) {
+            btn.closest(".skill-input-row").remove();
+        } else {
+            btn.querySelector("input").value = "";
+        }
+    }
+
+    function loadExistingSkillsForCategory() {
+        const catId = document.getElementById("ddlTargetCategory").value;
+        const box = document.getElementById("existingSkillsListBox");
+        if (!catId) {
+            box.innerHTML = `<span style="font-style:italic; color:var(--text-muted);">Select a category above...</span>`;
+            return;
+        }
+
+        const filtered = localSkillsCache.filter(x => x.categoryId == catId);
+        box.innerHTML = filtered.length > 0
+            ? filtered.map(s => `<span class="existing-tag-chip">${s.skillName}</span>`).join('')
+            : `<span style="font-style:italic; color:var(--text-muted);">No skills added in this category yet.</span>`;
+    }
+
+    function handleSkillInput(inputEl) {
+        const query = inputEl.value.trim().toLowerCase();
+        const dropdown = inputEl.nextElementSibling;
+        const catId = document.getElementById("ddlTargetCategory").value;
+
+        // Filter existing skills in cache
+        const matches = localSkillsCache.filter(s =>
+            s.skillName.toLowerCase().includes(query) && (!catId || s.categoryId == catId)
+        );
+
+        if (matches.length === 0) {
+            dropdown.style.display = "none";
+            return;
+        }
+
+        dropdown.innerHTML = matches.map(m => `<div class="autocomplete-option" onclick="selectAutocompleteSkill(this, '${escapeQuotes(m.skillName)}')">${m.skillName} <span style="font-size:10px; color:var(--text-muted);">(${m.categoryName})</span></div>`).join('');
+        dropdown.style.display = "block";
+    }
+
+    function selectAutocompleteSkill(optionEl, skillName) {
+        const wrap = optionEl.closest(".autocomplete-wrap");
+        wrap.querySelector("input").value = skillName;
+        optionEl.closest(".autocomplete-dropdown").style.display = "none";
+    }
+
+    async function submitNewSkillsBatch() {
+        const catId = document.getElementById("ddlTargetCategory").value;
+        if (!catId) {
+            alert("Please select a target category.");
+            return;
+        }
+
+        const inputs = document.querySelectorAll(".skill-name-input");
+        const skillNames = Array.from(inputs).map(i => i.value.trim()).filter(x => x.length > 0);
+
+        if (skillNames.length === 0) {
+            alert("Please enter at least one skill name.");
+            return;
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch('/Skill/AddSkillsBatch', {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "RequestVerificationToken": token },
+                body: JSON.stringify({ categoryId: parseInt(catId), skillNames: skillNames })
+            });
+            const result = await res.json();
+            if (result.success) {
+                closeModal('addSkillModalLayer');
+                loadSkillsDirectory();
+            } else {
+                alert(result.message || "Failed to save skills.");
+            }
+        } catch (err) {
+            console.error("Skills batch save error:", err);
+            alert("Transmission error.");
+        }
+    }
+
+    function openEditSkillModal(skillId, skillName, categoryId) {
+        document.getElementById("editSkillId").value = skillId;
+        document.getElementById("editSkillName").value = skillName;
+
+        const ddl = document.getElementById("editSkillCategory");
+        ddl.innerHTML = globalCategoriesCache.map(c => `<option value="${c.categoryId}" ${c.categoryId == categoryId ? 'selected' : ''}>${c.categoryName}</option>`).join('');
+
+        document.getElementById("editSkillModalLayer").style.display = "flex";
+    }
+
+    function handleEditSkillInput(inputEl) {
+        const query = inputEl.value.trim().toLowerCase();
+        const dropdown = document.getElementById("editSkillAutocompleteDropdown");
+
+        const matches = localSkillsCache.filter(s => s.skillName.toLowerCase().includes(query));
+
+        if (matches.length === 0) {
+            dropdown.style.display = "none";
+            return;
+        }
+
+        dropdown.innerHTML = matches.map(m => `<div class="autocomplete-option" onclick="selectEditAutocompleteSkill(this, '${escapeQuotes(m.skillName)}')">${m.skillName} <span style="font-size:10px; color:var(--text-muted);">(${m.categoryName})</span></div>`).join('');
+        dropdown.style.display = "block";
+    }
+
+    function selectEditAutocompleteSkill(optionEl, skillName) {
+        document.getElementById("editSkillName").value = skillName;
+        document.getElementById("editSkillAutocompleteDropdown").style.display = "none";
+    }
+
+    async function submitEditSkill() {
+        const skillId = document.getElementById("editSkillId").value;
+        const skillName = document.getElementById("editSkillName").value.trim();
+        const categoryId = document.getElementById("editSkillCategory").value;
+
+        if (!skillName) {
+            alert("Skill name cannot be empty.");
+            return;
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch('/Skill/UpdateSkill', {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "RequestVerificationToken": token },
+                body: JSON.stringify({ skillId: parseInt(skillId), skillName: skillName, categoryId: parseInt(categoryId) })
+            });
+            const result = await res.json();
+            if (result.success) {
+                closeModal('editSkillModalLayer');
+                loadSkillsDirectory();
+            } else {
+                alert(result.message || "Failed to update skill.");
+            }
+        } catch (err) {
+            console.error("Skill update error:", err);
+            alert("Transmission error.");
+        }
+    }
+
+    async function deleteSkillRecord(skillId) {
+        if (!confirm("Are you sure you want to delete this skill?")) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch(`/Skill/DeleteSkillRecord?id=${skillId}`, {
+                method: "POST",
+                headers: { "RequestVerificationToken": token }
+            });
+            const result = await res.json();
+            if (result.success) {
+                loadSkillsDirectory();
+            } else {
+                alert(result.message || "Failed to delete skill.");
+            }
+        } catch (err) {
+            console.error("Delete error:", err);
+            alert("Transmission error.");
+        }
+    }
+
+    function executeClientSideSearchFilter() {
+        const query = document.getElementById("skillSearchInput").value.trim().toLowerCase();
+        const matched = localSkillsCache.filter(x =>
+            (x.skillName && x.skillName.toLowerCase().includes(query)) ||
+            (x.categoryName && x.categoryName.toLowerCase().includes(query))
+        );
+        renderSkillsRows(matched);
     }
 </script>

@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\NewFolder\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Models\NewFolder\" />
     <Folder Include="Views\AssetReturn - Copy\" />

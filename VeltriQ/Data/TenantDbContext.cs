@@ -135,6 +135,7 @@ namespace VeltriQ.Data
         public DbSet<TrainingFeedback> TrainingFeedbacks { get; set; }
 
         public DbSet<JobProfileReviewer> JobProfileReviewers { get; set; }   // <-- ADD THIS LINE
+        public DbSet<Applicant> Applicants { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -148,8 +149,24 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+            modelBuilder.Entity<Applicant>(entity =>
+            {
+                entity.HasKey(e => e.ApplicantId);
+
+                entity.Property(e => e.ApplicantCode).HasMaxLength(20);
+                entity.HasIndex(e => e.ApplicantCode).IsUnique();
+
+                entity.HasOne(e => e.ManpowerRequest)
+                    .WithMany()
+                    .HasForeignKey(e => e.ManpowerRequestId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(e => e.TotalExperience).HasColumnType("decimal(4,1)");
+                entity.Property(e => e.RelevantExperience).HasColumnType("decimal(4,1)");
+            });
             modelBuilder.Entity<JobProfileReviewer>()
-    .ToTable("JobProfileReviewer", "Recruitment");
+           .ToTable("JobProfileReviewer", "Recruitment");
+
 
             modelBuilder.Entity<JobProfile>()
                 .HasOne<Employee>()
@@ -167,6 +184,12 @@ namespace VeltriQ.Data
                 .HasOne<Employee>()
                 .WithMany()
                 .HasForeignKey(x => x.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ManpowerRequest>()
+                .HasOne(x => x.JobProfile)
+                .WithMany()
+                .HasForeignKey(x => x.JobProfileId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<JobProfileReviewer>()

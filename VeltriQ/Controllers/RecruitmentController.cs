@@ -109,7 +109,15 @@ namespace VeltriQ.Controllers
             {
                 vm.DesignationList = new List<SelectListItem>();
             }
-
+            vm.JobProfileList = await _context.JobProfiles
+    .Where(x => x.IsActive && !x.IsDeleted)
+    .OrderBy(x => x.JobTitle)
+    .Select(x => new SelectListItem
+    {
+        Value = x.JobProfileId.ToString(),
+        Text = x.JobTitle
+    })
+    .ToListAsync();
             //====================================================
             // NATIONALITY
             //====================================================
@@ -138,19 +146,23 @@ namespace VeltriQ.Controllers
 
             return View(vm);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Create
-            (
-                ManpowerRequestViewModel vm
-            )
+        public async Task<IActionResult> Create(ManpowerRequestViewModel vm)
         {
             if (!ModelState.IsValid)
             {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
+
+                TempData["Error"] = "Validation failed → " + string.Join(" | ", errors);
+
                 await LoadDropdowns(
                     vm,
                     vm.BranchId,
                     vm.DepartmentId);
-
                 return View(vm);
             }
 
@@ -161,91 +173,54 @@ namespace VeltriQ.Controllers
                 DateTime.Now.Ticks
                     .ToString()
                     .Substring(10);
-
-            int createdBy =
-                Convert.ToInt32(
-                    HttpContext.Session.GetString("EmployeeId")
-                );
+            var currentEmployeeId = GetCurrentEmployeeId();
 
             ManpowerRequest entity = new()
             {
                 RequestCode = requestCode,
-
                 RequestDate = vm.RequestDate,
-
+                JobProfileId = vm.JobProfileId,
                 RecruitmentTypeId = vm.RecruitmentTypeId,
-
                 HODId = vm.HODId,
                 BranchId = vm.BranchId,
-
                 DepartmentId = vm.DepartmentId,
-
                 DesignationId = vm.DesignationId,
-
-                ReplacementEmployeeId =
-                    vm.ReplacementEmployeeId,
-
-                NumberOfPositions =
-                    vm.NumberOfPositions,
-
-                RequiredJoiningDate =
-                    vm.RequiredJoiningDate,
-
-                MinExperience =
-                    vm.MinExperience,
-
-                MaxExperience =
-                    vm.MaxExperience,
-
-                MinAge =
-                    vm.MinAge,
-
-                MaxAge =
-                    vm.MaxAge,
-
-                EducationId =
-                    vm.EducationId,
-
-                NationalityId =
-                    vm.NationalityId,
-
-                MinSalary =
-                    vm.MinSalary,
-
-                MaxSalary =
-                    vm.MaxSalary,
-
-                PriorityId =
-                    vm.PriorityId,
-
-                JobDescription =
-                    vm.JobDescription,
-
-                RequiredSkills =
-                    vm.RequiredSkills,
-
-                Remarks =
-                    vm.Remarks,
-
+                ReplacementEmployeeId = vm.ReplacementEmployeeId,
+                NumberOfPositions = vm.NumberOfPositions,
+                RequiredJoiningDate = vm.RequiredJoiningDate,
+                MinExperience = vm.MinExperience,
+                MaxExperience = vm.MaxExperience,
+                MinAge = vm.MinAge,
+                MaxAge = vm.MaxAge,
+                EducationId = vm.EducationId,
+                NationalityId = vm.NationalityId,
+                MinSalary = vm.MinSalary,
+                MaxSalary = vm.MaxSalary,
+                PriorityId = vm.PriorityId,
+                Remarks = vm.Remarks,
                 StatusId = 1,
-
-                CreatedBy = createdBy,
-
+                CreatedBy = currentEmployeeId.Value,
                 CreatedDate = DateTime.Now,
-
                 IsActive = true,
-
                 IsDeleted = false
             };
 
             _context.ManpowerRequests.Add(entity);
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Save failed → " + ex.Message +
+                    (ex.InnerException != null ? " | Inner: " + ex.InnerException.Message : "");
+                await LoadDropdowns(vm, vm.BranchId, vm.DepartmentId);
+                return View(vm);
+            }
 
-            TempData["Success"] =
-                "Recruitment request created successfully.";
-
-            return RedirectToAction("Index");
+            TempData["Success"] = "Recruitment request created successfully.";
+            return RedirectToAction(nameof(Index));
         }
         [HttpGet]
         public async Task<IActionResult> GetDepartments(int branchId)
@@ -339,9 +314,6 @@ namespace VeltriQ.Controllers
 
                 PriorityId = request.PriorityId,
 
-                JobDescription = request.JobDescription,
-
-                RequiredSkills = request.RequiredSkills,
 
                 Remarks = request.Remarks
             };
@@ -405,9 +377,6 @@ namespace VeltriQ.Controllers
 
                 request.PriorityId = viewModel.PriorityId;
 
-                request.JobDescription = viewModel.JobDescription;
-
-                request.RequiredSkills = viewModel.RequiredSkills;
 
                 request.Remarks = viewModel.Remarks;
 

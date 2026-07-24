@@ -1,0 +1,294 @@
+﻿@{
+    ViewData["Title"] = "Add Applicant";
+}
+
+<style>
+    .apc-page {
+        width: 100%;
+        max-width: 720px;
+        margin: 16px auto 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .apc-back-btn {
+        height: 30px;
+        width: fit-content;
+        padding: 0 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .apc-back-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .apc-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+        .apc-card h4 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .apc-card p {
+            margin: 3px 0 0 0;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+    .apc-field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .apc-field label {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+
+    .apc-field input, .apc-field select {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 11px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+        .apc-field input:focus, .apc-field select:focus {
+            border-color: var(--purple);
+        }
+
+    .apc-resume-drop {
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+        .apc-resume-drop:hover {
+            border-color: var(--purple);
+        }
+
+        .apc-resume-drop i {
+            font-size: 20px;
+            color: var(--purple);
+        }
+
+        .apc-resume-drop p {
+            margin: 6px 0 0 0;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+    .apc-resume-name {
+        font-size: 11.5px;
+        color: var(--purple);
+        font-weight: 600;
+        margin-top: 6px;
+    }
+
+    .apc-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .apc-btn {
+        height: 38px;
+        padding: 0 18px;
+        border-radius: 7px;
+        border: none;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .apc-btn-cancel {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border) !important;
+    }
+
+    .apc-btn-submit {
+        background: var(--purple);
+        color: #fff;
+    }
+
+        .apc-btn-submit:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="apc-page">
+    <button type="button" class="apc-back-btn" onclick="window.location.href='/Applicant/Index'">
+        <i class="bi bi-arrow-left"></i> Back to Applicants
+    </button>
+
+    <div class="apc-card">
+        <div>
+            <h4>Add New Applicant</h4>
+            <p>Register a candidate against an open manpower request.</p>
+        </div>
+
+        <div class="apc-field">
+            <label>Manpower Request *</label>
+            <select id="cManpowerRequestId"></select>
+        </div>
+
+        <div class="apc-field-row">
+            <div class="apc-field"><label>First Name *</label><input type="text" id="cFirstName" /></div>
+            <div class="apc-field"><label>Last Name</label><input type="text" id="cLastName" /></div>
+        </div>
+
+        <div class="apc-field-row">
+            <div class="apc-field"><label>Email *</label><input type="email" id="cEmail" /></div>
+            <div class="apc-field"><label>Phone *</label><input type="text" id="cPhone" /></div>
+        </div>
+
+        <div class="apc-field-row">
+            <div class="apc-field">
+                <label>Source</label>
+                <select id="cSourceType">
+                    <option>Portal</option>
+                    <option>Indeed</option>
+                    <option>LinkedIn</option>
+                    <option>Referral</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="apc-field"><label>Match % (optional)</label><input type="number" id="cMatchPercentage" min="0" max="100" /></div>
+        </div>
+
+        <div class="apc-field-row">
+            <div class="apc-field"><label>Total Experience (yrs) *</label><input type="number" step="0.1" id="cTotalExperience" /></div>
+            <div class="apc-field"><label>Relevant Experience (yrs)</label><input type="number" step="0.1" id="cRelevantExperience" /></div>
+        </div>
+
+        <div class="apc-field">
+            <label>Resume</label>
+            <div class="apc-resume-drop" onclick="document.getElementById('cResumeFile').click()">
+                <i class="bi bi-cloud-upload"></i>
+                <p>Click to upload resume (PDF/DOC)</p>
+                <div class="apc-resume-name" id="cResumeFileName"></div>
+            </div>
+            <input type="file" id="cResumeFile" accept=".pdf,.doc,.docx" style="display:none;" onchange="onResumeSelected()" />
+        </div>
+
+        <div class="apc-footer">
+            <button type="button" class="apc-btn apc-btn-cancel" onclick="window.location.href='/Applicant/Index'">Cancel</button>
+            <button type="button" class="apc-btn apc-btn-submit" id="cSubmitBtn" onclick="submitApplicant()">Add Applicant</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', loadManpowerRequests);
+
+    async function loadManpowerRequests() {
+        try {
+            const res = await fetch('/Applicant/GetManpowerRequestsForApplicant');
+            const result = await res.json();
+            const select = document.getElementById('cManpowerRequestId');
+            select.innerHTML = '<option value="">Select manpower request...</option>';
+            (result.data || []).forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.manpowerRequestId;
+                opt.innerText = `${m.requestCode} — ${m.jobTitle}`;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('MPR load fault:', err);
+        }
+    }
+
+    function onResumeSelected() {
+        const file = document.getElementById('cResumeFile').files[0];
+        document.getElementById('cResumeFileName').innerText = file ? file.name : '';
+    }
+
+    async function submitApplicant() {
+        const mprId = document.getElementById('cManpowerRequestId').value;
+        const firstName = document.getElementById('cFirstName').value.trim();
+        const email = document.getElementById('cEmail').value.trim();
+        const phone = document.getElementById('cPhone').value.trim();
+        const totalExp = document.getElementById('cTotalExperience').value;
+
+        if (!mprId || !firstName || !email || !phone || !totalExp) {
+            alert('Please fill all required fields (marked with *).');
+            return;
+        }
+
+        const submitBtn = document.getElementById('cSubmitBtn');
+        submitBtn.disabled = true;
+
+        // multipart/form-data — because of the resume file, this is FormData, NOT JSON.
+        const formData = new FormData();
+        formData.append('ManpowerRequestId', mprId);
+        formData.append('FirstName', firstName);
+        formData.append('LastName', document.getElementById('cLastName').value.trim());
+        formData.append('Email', email);
+        formData.append('Phone', phone);
+        formData.append('SourceType', document.getElementById('cSourceType').value);
+        formData.append('TotalExperience', totalExp);
+        formData.append('RelevantExperience', document.getElementById('cRelevantExperience').value || '');
+        formData.append('MatchPercentage', document.getElementById('cMatchPercentage').value || '');
+
+        const resumeFile = document.getElementById('cResumeFile').files[0];
+        if (resumeFile) formData.append('ResumeFile', resumeFile);
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch('/Applicant/SaveApplicant', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }, // NOTE: no Content-Type header — browser sets multipart boundary automatically
+                body: formData
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                window.location.href = '/Applicant/Index';
+            } else {
+                alert(result.message || 'Failed to add applicant.');
+                submitBtn.disabled = false;
+            }
+        } catch (err) {
+            console.error('Save applicant fault:', err);
+            alert('Network error while saving applicant.');
+            submitBtn.disabled = false;
+        }
+    }
+</script>

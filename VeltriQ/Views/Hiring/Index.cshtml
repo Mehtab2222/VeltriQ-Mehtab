@@ -1,0 +1,1033 @@
+﻿
+@{
+    ViewData["Title"] = "Hiring Pipeline";
+}
+
+<style>
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .hir-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+        gap: 12px;
+    }
+
+    /* CORE PANEL CARD MODULE (Squared 0px layout consistency) */
+    .hir-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 150px);
+        max-height: calc(100vh - var(--topbar-h) - 150px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* PILL STAGE STRIP */
+    .hir-pill-strip {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        padding: 6px 12px;
+        flex-shrink: 0;
+    }
+
+    .hir-pill-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+    }
+
+    .hir-pill {
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .hir-pill.active {
+            color: #fff;
+        }
+
+        .hir-pill:not(.active):hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+    /* ACTIONS BUTTON + DROPDOWN (top-right of the pill strip) */
+    .hir-actions-wrap {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .hir-actions-btn {
+        height: 30px;
+        padding: 0 12px 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+        .hir-actions-btn .hir-actions-count {
+            background: var(--purple);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 20px;
+        }
+
+        .hir-actions-btn:not(:disabled):hover {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: #fff;
+        }
+
+        .hir-actions-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+    .hir-actions-menu {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        min-width: 210px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        box-shadow: 0 10px 26px rgba(0,0,0,.4);
+        z-index: 200;
+        display: none;
+        overflow: hidden;
+    }
+
+        .hir-actions-menu.open {
+            display: block;
+        }
+
+    .hir-actions-menu-item {
+        padding: 9px 13px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        transition: background .1s ease;
+    }
+
+        .hir-actions-menu-item:hover {
+            background: var(--hover-bg);
+            color: var(--purple);
+        }
+
+        .hir-actions-menu-item.danger:hover {
+            color: #ef4444;
+        }
+
+    .hir-actions-menu-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 2px 0;
+    }
+
+    .hir-actions-menu-empty {
+        padding: 12px 13px;
+        font-size: 11.5px;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* TOOLBAR */
+    .hir-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .hir-search-wrap {
+        position: relative;
+        width: 260px;
+    }
+
+        .hir-search-wrap input {
+            width: 100%;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 10px 0 32px;
+            color: var(--text-primary);
+            font-size: 11.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .hir-search-wrap input:focus {
+                border-color: var(--purple);
+            }
+
+        .hir-search-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+    .hir-mpr-filter {
+        height: 30px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 11.5px;
+        min-width: 220px;
+        outline: none;
+    }
+
+        .hir-mpr-filter:focus {
+            border-color: var(--purple);
+        }
+
+    /* TABLE SCROLL CONTAINER & ALIGNMENT */
+    .hir-table-scroll {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+    }
+
+    table.hir-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+        table.hir-table th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        table.hir-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12.5px;
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-primary);
+        }
+
+        table.hir-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            table.hir-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    .hir-chk {
+        width: 14px;
+        height: 14px;
+        accent-color: var(--purple);
+        cursor: pointer;
+    }
+
+    .hir-cand-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .hir-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(124, 58, 237, 0.15);
+        color: var(--purple);
+        font-size: 10px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .hir-mini-ring {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: conic-gradient(var(--ring-color) calc(var(--pct) * 3.6deg), var(--border) 0deg);
+    }
+
+    .hir-mini-ring-inner {
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9.5px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .hir-mpr-code {
+        font-family: monospace;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--purple);
+        background: rgba(124, 58, 237, 0.1);
+        padding: 1px 5px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+    .action-btn {
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    /* ===================== STAGE ACTION MODAL ===================== */
+    .hir-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.5);
+        z-index: 3000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .hir-modal-backdrop.open {
+            display: flex;
+        }
+
+    .hir-modal-box {
+        width: 480px;
+        max-width: 92vw;
+        max-height: 88vh;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0,0,0,.5);
+        overflow: hidden;
+    }
+
+    .hir-modal-head {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        background: var(--hover-bg);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+        .hir-modal-head h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .hir-modal-head p {
+            margin: 3px 0 0 0;
+            font-size: 11.5px;
+            color: var(--text-secondary);
+        }
+
+    .hir-modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+        .hir-modal-close:hover {
+            color: var(--text-primary);
+        }
+
+    .hir-modal-body {
+        padding: 18px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .hir-field-group label {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+
+    .hir-field-group input,
+    .hir-field-group select,
+    .hir-field-group textarea {
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 8px 10px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+        .hir-field-group input:focus,
+        .hir-field-group select:focus,
+        .hir-field-group textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .hir-field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .hir-field-group textarea {
+        resize: vertical;
+        min-height: 64px;
+    }
+
+    .hir-selected-list {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        max-height: 90px;
+        overflow-y: auto;
+    }
+
+        .hir-selected-list b {
+            color: var(--text-primary);
+        }
+
+    .hir-modal-footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .hir-btn {
+        height: 34px;
+        padding: 0 15px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .hir-btn:hover {
+            opacity: .88;
+        }
+
+        .hir-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+    .hir-btn-ghost {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border) !important;
+    }
+
+    .hir-btn-primary {
+        background: var(--purple);
+        color: #fff;
+    }
+
+    .hir-btn-danger {
+        background: #ef4444;
+        color: #fff;
+    }
+
+    .hir-btn-success {
+        background: #22c55e;
+        color: #fff;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="hir-page">
+
+    <div class="hir-toolbar">
+        <div class="hir-search-wrap">
+            <i class="bi bi-search"></i>
+            <input type="text" id="hirSearchInput" placeholder="Search candidates..." oninput="loadPipelineCandidates()" autocomplete="off" />
+        </div>
+        <select class="hir-mpr-filter" id="hirMprFilter" onchange="loadPipelineCandidates()">
+            <option value="">All Manpower Requests</option>
+        </select>
+    </div>
+
+    <div class="hir-pill-strip">
+        <div class="hir-pill-group" id="hirPillStrip"></div>
+
+        <div class="hir-actions-wrap">
+            <button type="button" class="hir-actions-btn" id="hirActionsBtn" onclick="toggleActionsMenu(event)" disabled>
+                Action <span class="hir-actions-count" id="hirActionsCount" style="display:none;">0</span>
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <div class="hir-actions-menu" id="hirActionsMenu"></div>
+        </div>
+    </div>
+
+    <div class="hir-master-card">
+        <div class="hir-table-scroll">
+            <table class="hir-table">
+                <thead>
+                    <tr>
+                        <th style="width: 3%;"><input type="checkbox" class="hir-chk" id="hirSelectAllChk" onclick="toggleSelectAll(this)"></th>
+                        <th style="width: 24%;">Candidate</th>
+                        <th style="width: 23%;">Applied For</th>
+                        <th style="width: 11%;">Match</th>
+                        <th style="width: 10%;">Experience</th>
+                        <th style="width: 14%;">Hiring Manager</th>
+                        <th style="width: 12%; text-align: right; padding-right: 24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="hirTableBody">
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted); font-style:italic; padding:24px;">Loading pipeline...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="hir-modal-backdrop" id="hirActionModalBackdrop">
+    <div class="hir-modal-box">
+        <div class="hir-modal-head">
+            <div>
+                <h4 id="hirModalTitle">Action</h4>
+                <p id="hirModalSubtitle"></p>
+            </div>
+            <button type="button" class="hir-modal-close" onclick="closeStageModal()">✕</button>
+        </div>
+        <div class="hir-modal-body" id="hirModalBody"></div>
+        <div class="hir-modal-footer" id="hirModalFooter"></div>
+    </div>
+</div>
+
+<script>
+    const HIRING_STAGES = [
+        { key: 'New', color: '#64748b' },
+        { key: 'Screening', color: '#f59e0b' },
+        { key: 'Evaluating', color: '#7c3aed' },
+        { key: 'Offered', color: '#06b6d4' },
+        { key: 'Hired', color: '#22c55e' },
+        { key: 'Rejected', color: '#ef4444' },
+        { key: 'Dropout', color: '#94a3b8' },
+    ];
+
+    let activeHiringStage = 'New';
+    let stageCountsCache = {};
+    let currentPipelineList = [];
+    let selectedApplicantIds = new Set();
+
+    function ringColor(pct) {
+        if (pct === null || pct === undefined) return '#5f6577';
+        if (pct >= 80) return '#22c55e';
+        if (pct >= 50) return '#f59e0b';
+        return '#ef4444';
+    }
+
+    function initials(name) {
+        const p = (name || '').trim().split(' ');
+        return ((p[0]?.[0] || '') + (p[1]?.[0] || '')).toUpperCase();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadManpowerRequestFilter();
+        loadStageCounts();
+    });
+
+    async function loadManpowerRequestFilter() {
+        try {
+            const res = await fetch('/Applicant/GetManpowerRequestsForApplicant');
+            const result = await res.json();
+            const select = document.getElementById('hirMprFilter');
+            (result.data || []).forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.manpowerRequestId;
+                opt.innerText = `${m.requestCode} — ${m.jobTitle}`;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('MPR filter load fault:', err);
+        }
+    }
+
+    async function loadStageCounts() {
+        const mprId = document.getElementById('hirMprFilter').value;
+        try {
+            const res = await fetch(`/Hiring/GetStageCounts${mprId ? '?manpowerRequestId=' + mprId : ''}`);
+            const result = await res.json();
+            stageCountsCache = {};
+            (result.data || []).forEach(x => stageCountsCache[x.stage] = x.count);
+            renderPillStrip();
+            loadPipelineCandidates();
+        } catch (err) {
+            console.error('Stage counts load fault:', err);
+        }
+    }
+
+    function renderPillStrip() {
+        const strip = document.getElementById('hirPillStrip');
+        strip.innerHTML = HIRING_STAGES.map(s => {
+            const count = stageCountsCache[s.key] || 0;
+            const isActive = s.key === activeHiringStage;
+            return `
+                <button class="hir-pill ${isActive ? 'active' : ''}" style="${isActive ? `background:${s.color}; border-color:${s.color};` : ''}" onclick="setHiringStage('${s.key}')">
+                    ${s.key} <span style="opacity:.8;">(${count})</span>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function setHiringStage(stage) {
+        activeHiringStage = stage;
+        document.getElementById('hirSearchInput').value = '';
+        selectedApplicantIds.clear();
+        closeActionsMenu();
+        renderPillStrip();
+        loadPipelineCandidates();
+    }
+
+    async function loadPipelineCandidates() {
+        const search = document.getElementById('hirSearchInput').value.trim();
+        const mprId = document.getElementById('hirMprFilter').value;
+
+        let url = `/Hiring/GetCandidatesByStage?stage=${encodeURIComponent(activeHiringStage)}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (mprId) url += `&manpowerRequestId=${mprId}`;
+
+        try {
+            const res = await fetch(url);
+            const result = await res.json();
+            currentPipelineList = result.data || [];
+            selectedApplicantIds.clear();
+            renderPipelineTable();
+            updateActionsButtonState();
+        } catch (err) {
+            console.error('Pipeline candidates load fault:', err);
+            document.getElementById('hirTableBody').innerHTML = `<tr><td colspan="7" style="text-align:center; color:red; padding:24px;">Failed to load candidates.</td></tr>`;
+        }
+    }
+
+    function renderPipelineTable() {
+        const tbody = document.getElementById('hirTableBody');
+        const list = currentPipelineList;
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-secondary); font-style:italic; padding:24px;">No candidates found in "${activeHiringStage}".</td></tr>`;
+            document.getElementById('hirSelectAllChk').checked = false;
+            return;
+        }
+
+        tbody.innerHTML = list.map(x => {
+            const rc = ringColor(x.matchPercentage);
+            const isChecked = selectedApplicantIds.has(x.applicantId);
+            return `
+                <tr>
+                    <td><input type="checkbox" class="hir-chk hir-row-chk" data-id="${x.applicantId}" ${isChecked ? 'checked' : ''} onchange="toggleRowCheckbox(${x.applicantId}, this.checked)"></td>
+                    <td>
+                        <div class="hir-cand-cell">
+                            <div class="hir-avatar">${initials(x.fullName)}</div>
+                            <div style="overflow:hidden;">
+                                <div style="font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${x.fullName}</div>
+                                <div style="font-size:10.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${x.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${x.mprTitle || 'Untitled Request'}</div>
+                        <div class="hir-mpr-code">${x.mprCode}</div>
+                    </td>
+                    <td>
+                        <div class="hir-mini-ring" style="--pct:${x.matchPercentage || 0}; --ring-color:${rc};">
+                            <div class="hir-mini-ring-inner">${x.matchPercentage !== null ? x.matchPercentage + '%' : '—'}</div>
+                        </div>
+                    </td>
+                    <td>${x.totalExperience} yrs</td>
+                    <td>${x.hiringManagerName || '—'}</td>
+                    <td style="text-align: right; padding-right: 24px;">
+                        <button type="button" class="action-btn" onclick="viewCandidateDetails(${x.applicantId})">
+                            <i class="bi bi-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        syncSelectAllCheckboxState();
+    }
+
+    /* =========================================================
+       SELECTION HANDLING
+       ========================================================= */
+    function toggleSelectAll(headerChk) {
+        if (headerChk.checked) {
+            currentPipelineList.forEach(x => selectedApplicantIds.add(x.applicantId));
+        } else {
+            selectedApplicantIds.clear();
+        }
+        renderPipelineTable();
+        updateActionsButtonState();
+    }
+
+    function toggleRowCheckbox(applicantId, checked) {
+        if (checked) selectedApplicantIds.add(applicantId);
+        else selectedApplicantIds.delete(applicantId);
+        syncSelectAllCheckboxState();
+        updateActionsButtonState();
+    }
+
+    function syncSelectAllCheckboxState() {
+        const headerChk = document.getElementById('hirSelectAllChk');
+        if (!currentPipelineList.length) { headerChk.checked = false; headerChk.indeterminate = false; return; }
+        const selectedInView = currentPipelineList.filter(x => selectedApplicantIds.has(x.applicantId)).length;
+        headerChk.checked = selectedInView === currentPipelineList.length;
+        headerChk.indeterminate = selectedInView > 0 && selectedInView < currentPipelineList.length;
+    }
+
+    function updateActionsButtonState() {
+        const btn = document.getElementById('hirActionsBtn');
+        const countEl = document.getElementById('hirActionsCount');
+        const count = selectedApplicantIds.size;
+
+        btn.disabled = count === 0;
+        if (count > 0) {
+            countEl.style.display = 'inline-block';
+            countEl.innerText = count;
+        } else {
+            countEl.style.display = 'none';
+            closeActionsMenu();
+        }
+    }
+
+    /* =========================================================
+       ACTIONS DROPDOWN (Includes ALL options universally)
+       ========================================================= */
+    function toggleActionsMenu(e) {
+        e.stopPropagation();
+        if (selectedApplicantIds.size === 0) return;
+
+        const menu = document.getElementById('hirActionsMenu');
+        const willOpen = !menu.classList.contains('open');
+
+        if (willOpen) {
+            menu.innerHTML = buildActionsMenuItems();
+            menu.classList.add('open');
+        } else {
+            menu.classList.remove('open');
+        }
+    }
+
+    function closeActionsMenu() {
+        document.getElementById('hirActionsMenu').classList.remove('open');
+    }
+
+    document.addEventListener('click', closeActionsMenu);
+
+    function buildActionsMenuItems() {
+        return `
+            <div class="hir-actions-menu-item" onclick="openStageModal('screening')"><i class="bi bi-clipboard-check"></i> Send to Screening</div>
+            <div class="hir-actions-menu-item" onclick="openStageModal('interview')"><i class="bi bi-calendar-event"></i> Schedule Interview</div>
+            <div class="hir-actions-menu-item" onclick="openStageModal('offer')"><i class="bi bi-send-check"></i> Send Offer Letter</div>
+            <div class="hir-actions-menu-item" onclick="openStageModal('hire')"><i class="bi bi-check2-circle"></i> Mark as Hired</div>
+            <div class="hir-actions-menu-divider"></div>
+            <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
+        `;
+    }
+
+    /* =========================================================
+       STAGE ACTION MODAL
+       ========================================================= */
+    let pendingModalType = null;
+
+    function selectedNamesPreview() {
+        const names = currentPipelineList
+            .filter(x => selectedApplicantIds.has(x.applicantId))
+            .map(x => x.fullName);
+        return names.join(', ');
+    }
+
+    function openStageModal(type) {
+        closeActionsMenu();
+        pendingModalType = type;
+
+        const count = selectedApplicantIds.size;
+        const title = document.getElementById('hirModalTitle');
+        const subtitle = document.getElementById('hirModalSubtitle');
+        const body = document.getElementById('hirModalBody');
+        const footer = document.getElementById('hirModalFooter');
+
+        subtitle.innerText = `${count} candidate${count === 1 ? '' : 's'} selected: ${selectedNamesPreview()}`;
+
+        const selectedListBlock = `<div class="hir-selected-list"><b>${count}</b> candidate${count === 1 ? '' : 's'}: ${selectedNamesPreview()}</div>`;
+
+        if (type === 'screening') {
+            title.innerText = 'Send to Screening';
+            body.innerHTML = `
+                ${selectedListBlock}
+                <div class="hir-field-row">
+                    <div class="hir-field-group"><label>Screening Date</label><input type="date" id="hirScreeningDate" value="${new Date().toISOString().slice(0,10)}"></div>
+                    <div class="hir-field-group"><label>Screened By</label><select id="hirScreener"><option>Kedar Deshmukh</option><option>Neha Kulkarni</option><option>Amit Verma</option></select></div>
+                </div>
+                <div class="hir-field-group"><label>Notes</label><textarea id="hirScreeningNotes" placeholder="Optional screening instructions..."></textarea></div>
+            `;
+            footer.innerHTML = `
+                <button class="hir-btn hir-btn-ghost" onclick="closeStageModal()">Cancel</button>
+                <button class="hir-btn hir-btn-primary" onclick="submitStageAction()"><i class="bi bi-arrow-right-circle"></i> Move to Screening</button>
+            `;
+        }
+        else if (type === 'interview') {
+            title.innerText = 'Schedule Interview';
+            body.innerHTML = `
+                ${selectedListBlock}
+                <div class="hir-field-row">
+                    <div class="hir-field-group"><label>Round</label><select id="hirRound"><option>Technical Round 1</option><option>Technical Round 2</option><option>Managerial</option><option>HR Round</option></select></div>
+                    <div class="hir-field-group"><label>Mode</label><select id="hirMode"><option>Virtual</option><option>Onsite</option><option>Phone</option></select></div>
+                </div>
+                <div class="hir-field-row">
+                    <div class="hir-field-group"><label>Interview Date</label><input type="date" id="hirIntDate"></div>
+                    <div class="hir-field-group"><label>Time</label><input type="time" id="hirIntTime" value="11:00"></div>
+                </div>
+                <div class="hir-field-group"><label>Panel Members</label><input type="text" id="hirPanel" placeholder="e.g. Rohan Mehta, Sanjay Iyer"></div>
+                <div class="hir-field-group"><label>Location / Meeting Link</label><input type="text" id="hirLocation" placeholder="Google Meet link or office address"></div>
+            `;
+            footer.innerHTML = `
+                <button class="hir-btn hir-btn-ghost" onclick="closeStageModal()">Cancel</button>
+                <button class="hir-btn hir-btn-primary" onclick="submitStageAction()"><i class="bi bi-calendar-check"></i> Schedule & Move</button>
+            `;
+        }
+        else if (type === 'offer') {
+            title.innerText = 'Send Offer Letter';
+            body.innerHTML = `
+                ${selectedListBlock}
+                <div class="hir-field-row">
+                    <div class="hir-field-group"><label>Offered CTC (Annual)</label><input type="text" id="hirCtc" placeholder="e.g. 12,50,000"></div>
+                    <div class="hir-field-group"><label>Proposed Joining Date</label><input type="date" id="hirJoiningDate"></div>
+                </div>
+                <div class="hir-field-group"><label>Offer Valid Until</label><input type="date" id="hirValidUntil"></div>
+                <div class="hir-field-group"><label>Notes</label><textarea id="hirOfferNotes" placeholder="Special terms, relocation, sign-on bonus..."></textarea></div>
+            `;
+            footer.innerHTML = `
+                <button class="hir-btn hir-btn-ghost" onclick="closeStageModal()">Cancel</button>
+                <button class="hir-btn hir-btn-primary" onclick="submitStageAction()"><i class="bi bi-send-check"></i> Send Offer</button>
+            `;
+        }
+        else if (type === 'hire') {
+            title.innerText = 'Mark as Hired';
+            body.innerHTML = `
+                ${selectedListBlock}
+                <div class="hir-field-group"><label>Confirmed Joining Date</label><input type="date" id="hirConfirmedJoin"></div>
+                <div class="hir-field-group"><label>Notes</label><textarea id="hirHireNotes" placeholder="Any last-mile notes before onboarding..."></textarea></div>
+            `;
+            footer.innerHTML = `
+                <button class="hir-btn hir-btn-ghost" onclick="closeStageModal()">Cancel</button>
+                <button class="hir-btn hir-btn-success" onclick="submitStageAction()"><i class="bi bi-check2-circle"></i> Confirm Hired</button>
+            `;
+        }
+        else if (type === 'reject') {
+            title.innerText = 'Reject Candidate(s)';
+            body.innerHTML = `
+                ${selectedListBlock}
+                <div class="hir-field-group">
+                    <label>Rejection Reason</label>
+                    <select id="hirRejectReason">
+                        <option>Skill mismatch</option>
+                        <option>Salary mismatch</option>
+                        <option>Not interested / withdrew</option>
+                        <option>Failed interview</option>
+                        <option>Better candidate found</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="hir-field-group"><label>Notes</label><textarea id="hirRejectNotes" placeholder="Optional context for the record..."></textarea></div>
+            `;
+            footer.innerHTML = `
+                <button class="hir-btn hir-btn-ghost" onclick="closeStageModal()">Cancel</button>
+                <button class="hir-btn hir-btn-danger" onclick="submitStageAction()"><i class="bi bi-x-circle"></i> Confirm Rejection</button>
+            `;
+        }
+
+        document.getElementById('hirActionModalBackdrop').classList.add('open');
+    }
+
+    function closeStageModal() {
+        document.getElementById('hirActionModalBackdrop').classList.remove('open');
+        pendingModalType = null;
+    }
+
+    async function submitStageAction() {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const applicantIds = Array.from(selectedApplicantIds);
+
+        let newStage = '';
+        let payload = { applicantIds };
+
+        if (pendingModalType === 'screening') {
+            newStage = 'Screening';
+            payload.screeningDate = document.getElementById('hirScreeningDate').value;
+            payload.screener = document.getElementById('hirScreener').value;
+            payload.notes = document.getElementById('hirScreeningNotes').value;
+        } else if (pendingModalType === 'interview') {
+            newStage = 'Evaluating';
+            payload.round = document.getElementById('hirRound').value;
+            payload.mode = document.getElementById('hirMode').value;
+            payload.interviewDate = document.getElementById('hirIntDate').value;
+            payload.interviewTime = document.getElementById('hirIntTime').value;
+            payload.panel = document.getElementById('hirPanel').value;
+            payload.location = document.getElementById('hirLocation').value;
+        } else if (pendingModalType === 'offer') {
+            newStage = 'Offered';
+            payload.ctc = document.getElementById('hirCtc').value;
+            payload.joiningDate = document.getElementById('hirJoiningDate').value;
+            payload.validUntil = document.getElementById('hirValidUntil').value;
+            payload.notes = document.getElementById('hirOfferNotes').value;
+        } else if (pendingModalType === 'hire') {
+            newStage = 'Hired';
+            payload.confirmedJoiningDate = document.getElementById('hirConfirmedJoin').value;
+            payload.notes = document.getElementById('hirHireNotes').value;
+        } else if (pendingModalType === 'reject') {
+            newStage = 'Rejected';
+            payload.rejectReason = document.getElementById('hirRejectReason').value;
+            payload.rejectNotes = document.getElementById('hirRejectNotes').value;
+        }
+
+        payload.newStage = newStage;
+
+        try {
+            const res = await fetch('/Hiring/UpdateApplicantStage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeStageModal();
+                selectedApplicantIds.clear();
+                loadStageCounts();
+            } else {
+                alert(result.message || 'Action failed.');
+            }
+        } catch (err) {
+            console.error('Stage action submit fault:', err);
+            alert('Network error — please check server endpoint route implementation.');
+        }
+    }
+
+    function viewCandidateDetails(applicantId) {
+        window.location.href = `/Applicant/Details?id=${applicantId}`;
+    }
+</script>

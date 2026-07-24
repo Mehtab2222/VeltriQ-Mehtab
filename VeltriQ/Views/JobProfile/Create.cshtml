@@ -185,6 +185,107 @@
         .submit-btn:hover {
             opacity: 0.9;
         }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        min-height: 34px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background: var(--purple);
+            border: none;
+            color: #fff;
+            padding: 2px 6px;
+            margin-top: 3px;
+        }
+
+    .select2-dropdown {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+    }
+
+    .select2-results__option {
+        color: var(--text-primary);
+    }
+
+    .select2-search__field {
+        color: var(--text-primary) !important;
+    }
+    /* ── SELECT2 DARK THEME FIXES ── */
+    .select2-container--default .select2-selection--multiple {
+        min-height: 34px;
+        border: 1px solid var(--border) !important;
+        background: var(--input-bg) !important;
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background: var(--purple) !important;
+            border: none !important;
+            color: #fff !important;
+            padding: 2px 6px;
+            margin-top: 3px;
+            border-radius: 3px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #fff !important;
+            margin-right: 4px;
+        }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+                color: #ffcccc !important;
+            }
+
+    /* Dropdown panel background & border */
+    .select2-dropdown {
+        background-color: var(--card-bg) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text-primary) !important;
+        border-radius: 4px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+    }
+
+    /* Search input inside dropdown */
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        background-color: var(--input-bg) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text-primary) !important;
+        border-radius: 4px;
+        outline: none;
+    }
+
+    /* Options styling */
+    .select2-container--default .select2-results__option {
+        color: var(--text-primary) !important;
+        background-color: transparent !important;
+        font-size: 12px;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--purple) !important;
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: var(--hover-bg) !important;
+        color: var(--purple) !important;
+        font-weight: 600;
+    }
+
+    /* Placeholder text styling */
+    .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
+        color: var(--text-secondary) !important;
+        font-size: 12px;
+    }
 </style>
 
 <div class="jobprofile-page">
@@ -225,8 +326,11 @@
 
                     <div class="form-group">
                         <label>Reviewer</label>
-                        <select asp-for="SelectedReviewerIds" asp-items="Model.EmployeeList" class="form-control">
-                            <option value="">Select Reviewer</option>
+                        <select asp-for="SelectedReviewerIds"
+                                asp-items="Model.EmployeeList"
+                                id="reviewerDropdown"
+                                class="form-control"
+                                multiple>
                         </select>
                     </div>
 
@@ -246,8 +350,10 @@
 
                     <div class="form-group">
                         <label>Skill</label>
-                        <select asp-for="SelectedSkillIds" class="form-control" id="skillsDropdown">
-                            <option value="">Select Skill</option>
+                        <select asp-for="SelectedSkillIds"
+                                id="skillsDropdown"
+                                class="form-control"
+                                multiple>
                         </select>
                     </div>
 
@@ -273,29 +379,51 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function () {
+
+        // Reviewer Multi Select
+        $('#reviewerDropdown').select2({
+            placeholder: "Select Reviewer(s)",
+            width: '100%',
+            closeOnSelect: false
+        });
+
+        // Skills Multi Select
+        $('#skillsDropdown').select2({
+            placeholder: "Select Skill(s)",
+            width: '100%',
+            closeOnSelect: false
+        });
+
+        // Load skills on category change
         $('#jobCategoryDropdown').change(function () {
+
             var categoryId = $(this).val();
             var $skillsDropdown = $('#skillsDropdown');
 
             $skillsDropdown.empty();
-            $skillsDropdown.append('<option value="">Select Skill</option>');
 
             if (categoryId) {
                 $.get('/JobProfile/GetSkillsByCategory', { categoryId: categoryId }, function (data) {
-                    if (data && data.length > 0) {
-                        $.each(data, function (i, item) {
-                            var skillId = item.id !== undefined ? item.id : (item.value !== undefined ? item.value : item.Value);
-                            var skillName = item.text !== undefined ? item.text : (item.name !== undefined ? item.name : item.Name);
 
-                            $skillsDropdown.append($('<option></option>').val(skillId).text(skillName));
-                        });
-                    }
-                }).fail(function () {
-                    console.error("Failed to fetch skills for the selected category.");
+                    $.each(data, function (i, item) {
+                        $skillsDropdown.append(
+                            $('<option></option>')
+                                .val(item.id)
+                                .text(item.text)
+                        );
+                    });
+
+                    // Refresh Select2 after loading skills
+                    $skillsDropdown.trigger('change');
                 });
             }
+
         });
+
     });
 </script>

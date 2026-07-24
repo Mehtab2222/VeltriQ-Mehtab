@@ -1,22 +1,50 @@
-﻿
-@model VeltriQ.ViewModels.ManpowerRequestViewModel
+﻿@model VeltriQ.ViewModels.ManpowerRequestViewModel
 
 @{
     ViewData["Title"] = "Create Recruitment Request";
 }
 
 <style>
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
     .template-create-page {
         width: 100%;
         display: flex;
         flex-direction: column;
+        padding-bottom: 30px;
     }
 
     .validation-summary-box {
-        font-size: 12px;
+        font-size: 11.5px;
         color: #ef4444;
         margin-bottom: 12px;
-        font-weight: 500;
+        font-weight: 600;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        padding: 8px 12px;
+        border-radius: 4px;
     }
 
     /* ── HEADER BACK TO LIST NAVIGATION ACTION ── */
@@ -29,27 +57,27 @@
 
     /* ── COMPACT SYSTEM BUTTON CONTROLS ── */
     .form-action-btn {
-        height: 34px;
+        height: 32px;
         padding: 0 14px;
-        border-radius: 6px;
+        border-radius: 4px;
         border: none;
-        font-size: 12px;
+        font-size: 11.5px;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         text-decoration: none;
-        transition: .15s ease-in-out;
+        transition: all 0.2s ease-in-out;
         cursor: pointer;
     }
 
     .btn-submit-theme {
-        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        background: var(--purple);
         color: #fff;
     }
 
         .btn-submit-theme:hover {
-            transform: translateY(-1px);
+            opacity: 0.9;
             color: #fff;
         }
 
@@ -60,8 +88,9 @@
     }
 
         .btn-cancel-theme:hover {
-            background: rgba(124, 58, 237, 0.15);
-            color: var(--purple);
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
         }
 
     .form-footer-actions {
@@ -69,6 +98,8 @@
         align-items: center;
         gap: 8px;
         margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
     }
 
     /* ── SQUARED SINGLE-PANEL CONTAINER CARD DECK ── */
@@ -82,14 +113,14 @@
     }
 
     .custom-form-header {
-        padding: 12px 16px;
+        padding: 10px 16px;
         border-bottom: 1px solid var(--border);
         background: var(--card-bg);
     }
 
         .custom-form-header h5 {
             margin: 0;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-primary);
             text-transform: uppercase;
@@ -140,11 +171,11 @@
     .custom-form-label {
         display: inline-block;
         margin-bottom: 4px;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         color: var(--text-secondary);
         text-transform: uppercase;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.5px;
     }
 
         .custom-form-label span {
@@ -160,7 +191,7 @@
         background: var(--input-bg);
         color: var(--text-primary);
         padding: 0 10px;
-        font-size: 12.5px;
+        font-size: 12px;
         outline: none;
         transition: border-color 0.15s ease-in-out;
     }
@@ -171,8 +202,8 @@
 
     textarea.custom-form-control {
         height: auto;
-        padding: 6px 12px;
-        resize: none;
+        padding: 8px 10px;
+        resize: vertical;
     }
 
     select.custom-form-control {
@@ -185,7 +216,7 @@
     }
 
     .validation-err-text {
-        font-size: 11px;
+        font-size: 10.5px;
         color: #ef4444;
         font-weight: 500;
         margin-top: 2px;
@@ -193,22 +224,23 @@
     }
 
     @@media (max-width: 768px) {
-        .form-grid-col-3, .form-grid-col-4, .form-grid-col-6, .form-grid-col-12
-
-    {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-
+        .form-grid-col-3, .form-grid-col-4, .form-grid-col-6, .form-grid-col-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
     }
 </style>
 
 <div class="template-create-page">
-
+    @if (TempData["Error"] != null)
+    {
+        <div class="validation-summary-box" style="font-size:13px; margin-bottom:16px;">
+            @TempData["Error"]
+        </div>
+    }
     <div class="form-action-header">
         <a href="@Url.Action("Index")" class="form-action-btn btn-cancel-theme">
-            <i class="bi bi-arrow-left"></i>
-            Back to List
+            <i class="bi bi-arrow-left"></i> Back to List
         </a>
     </div>
 
@@ -217,7 +249,6 @@
 
         <div asp-validation-summary="ModelOnly" class="validation-summary-box"></div>
 
-        <!-- PANEL 1: Request Information -->
         <div class="custom-form-card">
             <div class="custom-form-header">
                 <h5>Request Information</h5>
@@ -231,96 +262,64 @@
                     </div>
 
                     <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="JobProfileId" class="custom-form-label">Job Profile <span>*</span></label>
+                        <select asp-for="JobProfileId" asp-items="Model.JobProfileList" class="custom-form-control">
+                            <option value="">-- Select Job Profile --</option>
+                        </select>
+                        <span asp-validation-for="JobProfileId" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
                         <label asp-for="RecruitmentTypeId" class="custom-form-label">Recruitment Type<span>*</span></label>
                         <select asp-for="RecruitmentTypeId" asp-items="Model.RecruitmentTypes" class="custom-form-control" id="recruitmentType">
                             <option value="">Select Type</option>
                         </select>
                         <span asp-validation-for="RecruitmentTypeId" class="validation-err-text"></span>
                     </div>
+                </div>
 
+                <div class="form-grid-row">
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="BranchId" class="custom-form-label">Branch<span>*</span></label>
+                        <select asp-for="BranchId" asp-items="Model.BranchList" class="custom-form-control" id="BranchId">
+                            <option value="">Select Branch</option>
+                        </select>
+                        <span asp-validation-for="BranchId" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="DepartmentId" class="custom-form-label">Department<span>*</span></label>
+                        <select asp-for="DepartmentId" asp-items="Model.DepartmentList" class="custom-form-control" id="DepartmentId">
+                            <option value="">Select Department</option>
+                        </select>
+                        <span asp-validation-for="DepartmentId" class="validation-err-text"></span>
+                    </div>
+
+                    <div class="form-grid-col-4 form-field-group">
+                        <label asp-for="DesignationId" class="custom-form-label">Designation<span>*</span></label>
+                        <select asp-for="DesignationId" asp-items="Model.DesignationList" class="custom-form-control" id="DesignationId">
+                            <option value="">Select Designation</option>
+                        </select>
+                        <span asp-validation-for="DesignationId" class="validation-err-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-row">
                     <div class="form-grid-col-4 form-field-group">
                         <label asp-for="NumberOfPositions" class="custom-form-label">Number Of Positions<span>*</span></label>
                         <input asp-for="NumberOfPositions" class="custom-form-control" type="number" min="1" />
                         <span asp-validation-for="NumberOfPositions" class="validation-err-text"></span>
                     </div>
-                </div>
-
-                <div class="form-grid-row">
 
                     <div class="form-grid-col-4 form-field-group">
-                        <label asp-for="BranchId" class="custom-form-label">
-                            Branch<span>*</span>
-                        </label>
-
-                        <select asp-for="BranchId"
-                                asp-items="Model.BranchList"
-                                class="custom-form-control">
-
-                            <option value="">Select Branch</option>
-
-                        </select>
-
-                        <span asp-validation-for="BranchId"
-                              class="validation-err-text"></span>
+                        <label asp-for="RequiredJoiningDate" class="custom-form-label">Required Joining Date<span>*</span></label>
+                        <input asp-for="RequiredJoiningDate" type="date" class="custom-form-control" />
+                        <span asp-validation-for="RequiredJoiningDate" class="validation-err-text"></span>
                     </div>
-
-                    <div class="form-grid-col-4 form-field-group">
-                        <label asp-for="DepartmentId" class="custom-form-label">
-                            Department<span>*</span>
-                        </label>
-
-                        <select asp-for="DepartmentId"
-                                asp-items="Model.DepartmentList"
-                                class="custom-form-control">
-
-                            <option value="">Select Department</option>
-
-                        </select>
-
-                        <span asp-validation-for="DepartmentId"
-                              class="validation-err-text"></span>
-                    </div>
-
-                    <div class="form-grid-col-4 form-field-group">
-                        <label asp-for="DesignationId" class="custom-form-label">
-                            Designation<span>*</span>
-                        </label>
-
-                        <select asp-for="DesignationId"
-                                asp-items="Model.DesignationList"
-                                class="custom-form-control">
-
-                            <option value="">Select Designation</option>
-
-                        </select>
-
-                        <span asp-validation-for="DesignationId"
-                              class="validation-err-text"></span>
-                    </div>
-
-                </div>
-
-                <div class="form-grid-row">
-
-                    <div class="form-grid-col-4 form-field-group">
-                        <label asp-for="RequiredJoiningDate"
-                               class="custom-form-label">
-                            Required Joining Date<span>*</span>
-                        </label>
-
-                        <input asp-for="RequiredJoiningDate"
-                               type="date"
-                               class="custom-form-control" />
-
-                        <span asp-validation-for="RequiredJoiningDate"
-                              class="validation-err-text"></span>
-                    </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- PANEL 2: Replacement Information (Conditional Section) -->
         <div class="custom-form-card" id="replacementSection" style="display:none;">
             <div class="custom-form-header" style="border-bottom-color: rgba(245, 158, 11, 0.15);">
                 <h5 style="color: #fbbf24;">Replacement Information</h5>
@@ -336,14 +335,13 @@
                     </div>
                     <div class="form-grid-col-6 form-field-group">
                         <label asp-for="Remarks" class="custom-form-label">Remarks</label>
-                        <input asp-for="Remarks" class="custom-form-control" placeholder="Enter context or justification details..." />
+                        <input asp-for="Remarks" class="custom-form-control" placeholder="Enter context or justification details..." autocomplete="off" />
                         <span asp-validation-for="Remarks" class="validation-err-text"></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- PANEL 3: Candidate Requirements -->
         <div class="custom-form-card">
             <div class="custom-form-header">
                 <h5>Candidate Requirements</h5>
@@ -417,43 +415,23 @@
             </div>
         </div>
 
-        <!-- PANEL 4: Job Details Description -->
-        <div class="custom-form-card">
-            <div class="custom-form-header">
-                <h5>Job Details Description</h5>
-            </div>
-            <div class="custom-form-body">
-                <div class="form-grid-row">
-                    <div class="form-grid-col-12 form-field-group">
-                        <label asp-for="RequiredSkills" class="custom-form-label">Required Skills</label>
-                        <textarea asp-for="RequiredSkills" class="custom-form-control" rows="2" placeholder="List core technical competencies..."></textarea>
-                        <span asp-validation-for="RequiredSkills" class="validation-err-text"></span>
-                    </div>
-                </div>
-
-                <div class="form-grid-row">
-                    <div class="form-grid-col-12 form-field-group">
-                        <label asp-for="JobDescription" class="custom-form-label">Job Description</label>
-                        <textarea asp-for="JobDescription" class="custom-form-control" rows="4" placeholder="Detail standard daily operations, key target expectations, and workflow responsibilities..."></textarea>
-                        <span asp-validation-for="JobDescription" class="validation-err-text"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
+  
 
         <div class="form-footer-actions">
             <button type="submit" class="form-action-btn btn-submit-theme">
-                <i class="bi bi-check-circle"></i>
-                Submit Request
+                <i class="bi bi-check-circle"></i> Submit Request
             </button>
 
             <a href="@Url.Action("Index")" class="form-action-btn btn-cancel-theme">
-                <i class="bi bi-x-circle"></i>
-                Cancel
+                <i class="bi bi-x-circle"></i> Cancel
             </a>
         </div>
     </form>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
 @section Scripts {
     @{
@@ -462,102 +440,61 @@
 
     <script>
         $(document).ready(function () {
+
+                    $("#recruitmentForm").on("submit", function (e) {
+            console.log("SUBMIT EVENT FIRED. defaultPrevented =", e.isDefaultPrevented());
+            console.log("jQuery Validate says form is valid:", $(this).valid());
+        });
             toggleReplacementSection();
 
             $("#recruitmentType").change(function () {
                 toggleReplacementSection();
             });
+
+            // Branch Changed -> Load Departments
+            $("#BranchId").change(function () {
+                var branchId = $(this).val();
+                $("#DepartmentId").html('<option value="">Select Department</option>');
+                $("#DesignationId").html('<option value="">Select Designation</option>');
+
+                if (branchId == "") return;
+
+                $.get("/Recruitment/GetDepartments", { branchId: branchId }, function (data) {
+                    $.each(data, function (i, item) {
+                        $("#DepartmentId").append(
+                            $("<option></option>").val(item.id).text(item.text)
+                        );
+                    });
+                });
+            });
+
+            // Department Changed -> Load Designations
+            $("#DepartmentId").change(function () {
+                var departmentId = $(this).val();
+                $("#DesignationId").html('<option value="">Select Designation</option>');
+
+                if (departmentId == "") return;
+
+                $.get('/Recruitment/GetDesignations', { departmentId: departmentId }, function (data) {
+                    $.each(data, function (i, item) {
+                        $("#DesignationId").append(
+                            $('<option></option>').val(item.id).text(item.text)
+                        );
+                    });
+                });
+            });
         });
 
         function toggleReplacementSection() {
             let type = $("#recruitmentType").val();
-
-            // Checks dynamic conditions matching target database primary keys
             if (type == "2" || type == "3") {
                 $("#replacementSection").slideDown();
                 $("#employeeDropdown").prop("disabled", false);
-            }
-            else {
+            } else {
                 $("#replacementSection").slideUp();
                 $("#employeeDropdown").prop("disabled", true);
                 $("#employeeDropdown").val("");
             }
         }
-                $(document).ready(function () {
-
-            //-------------------------------------------------------
-            // BRANCH CHANGED
-            //-------------------------------------------------------
-
-                   $("#BranchId").change(function () {
-
-            var branchId = $(this).val();
-
-            // Clear Department
-            $("#DepartmentId").html('<option value="">Select Department</option>');
-
-            // Clear Designation
-            $("#DesignationId").html('<option value="">Select Designation</option>');
-
-            if (branchId == "")
-                return;
-
-            $.get("/Recruitment/GetDepartments",
-                { branchId: branchId },
-                function (data) {
-
-                    $.each(data, function (i, item) {
-
-                        $("#DepartmentId").append(
-                            $("<option></option>")
-                                .val(item.id)
-                                .text(item.text)
-                        );
-
-                    });
-
-                });
-
-        });
-            //-------------------------------------------------------
-            // DEPARTMENT CHANGED
-            //-------------------------------------------------------
-
-            $("#DepartmentId").change(function () {
-
-                var departmentId = $(this).val();
-
-                $("#DesignationId").empty();
-
-                $("#DesignationId").append(
-                    '<option value="">Select Designation</option>'
-                );
-
-                if (departmentId == "")
-                    return;
-
-                $.get('/Recruitment/GetDesignations',
-                    { departmentId: departmentId },
-
-                    function (data) {
-
-                        $.each(data, function (i, item) {
-
-                            $("#DesignationId").append(
-
-                                $('<option></option>')
-                                    .val(item.id)
-                                    .text(item.text)
-
-                            );
-
-                        });
-
-                    });
-
-            });
-
-        });
     </script>
 }
-

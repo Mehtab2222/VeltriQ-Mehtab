@@ -1,0 +1,444 @@
+﻿@{
+    ViewData["Title"] = "Applicants Directory";
+}
+
+<style>
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .apl-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+    }
+
+    /* CORE PANEL CARD MODULE (Squared 0px layout consistency) */
+    .apl-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .apl-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+        flex-shrink: 0;
+        background: var(--card-bg);
+    }
+
+    .apl-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .apl-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .apl-toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .apl-search-wrapper {
+        position: relative;
+        width: 260px;
+    }
+
+        .apl-search-wrapper input {
+            width: 100%;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 10px 0 32px;
+            color: var(--text-primary);
+            font-size: 11.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .apl-search-wrapper input:focus {
+                border-color: var(--purple);
+            }
+
+        .apl-search-wrapper i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+    .apl-filter-select {
+        height: 30px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 11.5px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .apl-filter-select:focus {
+            border-color: var(--purple);
+        }
+
+    .apl-action-btn {
+        height: 30px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .apl-action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .apl-action-btn-primary {
+        background: var(--purple);
+        color: #fff;
+        border-color: var(--purple);
+    }
+
+        .apl-action-btn-primary:hover {
+            opacity: 0.9;
+        }
+
+    /* TABLE CONTAINER & ALIGNED WIDTHS */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+    }
+
+    .apl-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+        .apl-table th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .apl-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .apl-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .apl-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    .apl-cand-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .apl-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(124, 58, 237, 0.15);
+        color: var(--purple);
+        font-size: 10px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .apl-name {
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .apl-email {
+        font-size: 10.5px;
+        color: var(--text-muted);
+    }
+
+    .apl-mpr-code {
+        font-family: monospace;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--purple);
+        background: rgba(124, 58, 237, 0.1);
+        padding: 1px 5px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+    .apl-match-ring {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: conic-gradient(var(--ring-color) calc(var(--pct) * 3.6deg), var(--border) 0deg);
+    }
+
+    .apl-match-ring-inner {
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9.5px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .apl-stage-chip {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="apl-page">
+    <div class="apl-master-card">
+
+        <div class="apl-card-top">
+            <div class="apl-card-title">
+                <h3>Applicants Directory</h3>
+                <p>Track and manage all candidates who have applied against manpower requests.</p>
+            </div>
+
+            <div class="apl-toolbar-actions">
+                <div class="apl-search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="aplSearchInput" placeholder="Search name or email..." oninput="loadApplicants()" autocomplete="off" />
+                </div>
+
+                <select class="apl-filter-select" id="aplMprFilter" onchange="loadApplicants()" style="width: 180px;">
+                    <option value="">All Manpower Requests</option>
+                </select>
+
+                <select class="apl-filter-select" id="aplStageFilter" onchange="loadApplicants()" style="width: 140px;">
+                    <option value="">All Stages</option>
+                    <option value="New">New</option>
+                    <option value="Screening">Screening</option>
+                    <option value="Evaluating">Evaluating</option>
+                    <option value="Offered">Offered</option>
+                    <option value="Hired">Hired</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Dropout">Dropout</option>
+                </select>
+
+                <button type="button" class="apl-action-btn apl-action-btn-primary" onclick="window.location.href='/Applicant/Create'">
+                    <i class="bi bi-person-plus"></i> Add Applicant
+                </button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="apl-table">
+                <thead>
+                    <tr>
+                        <th style="width: 28%;">Candidate</th>
+                        <th style="width: 27%;">Applied For</th>
+                        <th style="width: 13%;">Match</th>
+                        <th style="width: 12%;">Experience</th>
+                        <th style="width: 12%;">Applied On</th>
+                        <th style="width: 8%; text-align: right; padding-right: 24px;">Stage</th>
+                    </tr>
+                </thead>
+                <tbody id="aplTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Loading applicants directory...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const stageColors = { New: '#64748b', Screening: '#f59e0b', Evaluating: '#7c3aed', Offered: '#06b6d4', Hired: '#22c55e', Rejected: '#ef4444', Dropout: '#94a3b8' };
+
+    function ringColor(pct) {
+        if (pct === null || pct === undefined) return '#5f6577';
+        if (pct >= 80) return '#22c55e';
+        if (pct >= 50) return '#f59e0b';
+        return '#ef4444';
+    }
+
+    function initials(name) {
+        const p = (name || '').trim().split(' ');
+        return ((p[0]?.[0] || '') + (p[1]?.[0] || '')).toUpperCase();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadManpowerRequestFilter();
+        loadApplicants();
+    });
+
+    async function loadManpowerRequestFilter() {
+        try {
+            const res = await fetch('/Applicant/GetManpowerRequestsForApplicant');
+            const result = await res.json();
+            if (!result.success) return;
+
+            const select = document.getElementById('aplMprFilter');
+            (result.data || []).forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.manpowerRequestId;
+                opt.innerText = `${m.requestCode} — ${m.jobTitle}`;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('MPR filter load fault:', err);
+        }
+    }
+
+    async function loadApplicants() {
+        const search = document.getElementById('aplSearchInput').value.trim();
+        const mprId = document.getElementById('aplMprFilter').value;
+        const stage = document.getElementById('aplStageFilter').value;
+
+        let url = `/Applicant/GetApplicants?`;
+        if (search) url += `search=${encodeURIComponent(search)}&`;
+        if (mprId) url += `manpowerRequestId=${mprId}&`;
+        if (stage) url += `stage=${encodeURIComponent(stage)}&`;
+
+        try {
+            const res = await fetch(url);
+            const result = await res.json();
+            renderApplicantsTable(result.data || []);
+        } catch (err) {
+            console.error('Applicants load fault:', err);
+            document.getElementById('aplTableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red; padding:24px;">Failed to load applicants.</td></tr>`;
+        }
+    }
+
+    function renderApplicantsTable(list) {
+        const tbody = document.getElementById('aplTableBody');
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); font-style:italic; padding:24px;">No applicants found matching filters.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = list.map(x => {
+            const rc = ringColor(x.matchPercentage);
+            const stageColor = stageColors[x.currentStage] || '#64748b';
+            const appliedFmt = new Date(x.appliedOn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            return `
+                <tr>
+                    <td>
+                        <div class="apl-cand-cell">
+                            <div class="apl-avatar">${initials(x.fullName)}</div>
+                            <div style="overflow:hidden;">
+                                <div class="apl-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${x.fullName}</div>
+                                <div class="apl-email" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${x.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${x.mprTitle}</div>
+                        <div class="apl-mpr-code">${x.mprCode}</div>
+                    </td>
+                    <td>
+                        <div class="apl-match-ring" style="--pct:${x.matchPercentage || 0}; --ring-color:${rc};">
+                            <div class="apl-match-ring-inner">${x.matchPercentage !== null ? x.matchPercentage + '%' : '—'}</div>
+                        </div>
+                    </td>
+                    <td>${x.totalExperience} yrs</td>
+                    <td>${appliedFmt}</td>
+                    <td style="text-align: right; padding-right: 24px;">
+                        <span class="apl-stage-chip" style="background:${stageColor}22; color:${stageColor};">${x.currentStage}</span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+</script>
