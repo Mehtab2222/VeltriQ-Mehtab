@@ -136,6 +136,11 @@ namespace VeltriQ.Data
 
         public DbSet<JobProfileReviewer> JobProfileReviewers { get; set; }   // <-- ADD THIS LINE
         public DbSet<Applicant> Applicants { get; set; }
+        public DbSet<RoundType> RoundTypes { get; set; }
+
+        public DbSet<InterviewPool> InterviewPools { get; set; }
+
+        public DbSet<InterviewPoolMember> InterviewPoolMembers { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -149,6 +154,136 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+            modelBuilder.Entity<RoundType>(entity =>
+            {
+                entity.HasKey(e => e.RoundTypeId);
+
+                entity.Property(e => e.RoundTypeName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(e => e.StageMapping)
+                    .HasMaxLength(20)
+                    .IsRequired();
+
+                entity.Property(e => e.DisplayOrder)
+                    .IsRequired();
+
+                entity.HasIndex(e => e.RoundTypeName)
+                    .IsUnique();
+            });
+            modelBuilder.Entity<InterviewPool>(entity =>
+            {
+                entity.HasKey(e => e.InterviewPoolId);
+
+                entity.Property(e => e.PoolName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(300);
+
+                entity.HasOne(e => e.RoundType)
+                    .WithMany()
+                    .HasForeignKey(e => e.RoundTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Department)
+                    .WithMany()
+                    .HasForeignKey(e => e.DepartmentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Branch)
+                    .WithMany()
+                    .HasForeignKey(e => e.BranchId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Prevent duplicate pools
+                entity.HasIndex(e => new
+                {
+                    e.PoolName,
+                    e.RoundTypeId,
+                    e.DepartmentId,
+                    e.BranchId
+                }).IsUnique();
+            });
+            modelBuilder.Entity<InterviewPoolMember>(entity =>
+            {
+                entity.HasKey(e => e.InterviewPoolMemberId);
+
+                entity.HasOne(e => e.InterviewPool)
+                    .WithMany(p => p.Members)
+                    .HasForeignKey(e => e.InterviewPoolId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Employee)
+                    .WithMany()
+                    .HasForeignKey(e => e.EmployeeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Same employee cannot exist twice in one pool
+                entity.HasIndex(e => new
+                {
+                    e.InterviewPoolId,
+                    e.EmployeeId
+                }).IsUnique();
+            });
+            modelBuilder.Entity<RoundType>().HasData(
+    new RoundType
+    {
+        RoundTypeId = 1,
+        RoundTypeName = "Screening Call",
+        StageMapping = "Screening",
+        DisplayOrder = 1,
+        IsActive = true,
+        CreatedOn = new DateTime(2026, 1, 1)
+    },
+    new RoundType
+    {
+        RoundTypeId = 2,
+        RoundTypeName = "Technical Round 1",
+        StageMapping = "Evaluating",
+        DisplayOrder = 2,
+        IsActive = true,
+        CreatedOn = new DateTime(2026, 1, 1)
+    },
+    new RoundType
+    {
+        RoundTypeId = 3,
+        RoundTypeName = "Technical Round 2",
+        StageMapping = "Evaluating",
+        DisplayOrder = 3,
+        IsActive = true,
+        CreatedOn = new DateTime(2026, 1, 1)
+    },
+    new RoundType
+    {
+        RoundTypeId = 4,
+        RoundTypeName = "Manager Round",
+        StageMapping = "Evaluating",
+        DisplayOrder = 4,
+        IsActive = true,
+        CreatedOn = new DateTime(2026, 1, 1)
+    },
+    new RoundType
+    {
+        RoundTypeId = 5,
+        RoundTypeName = "HR Discussion",
+        StageMapping = "Evaluating",
+        DisplayOrder = 5,
+        IsActive = true,
+        CreatedOn = new DateTime(2026, 1, 1)
+    },
+    new RoundType
+    {
+        RoundTypeId = 6,
+        RoundTypeName = "Final Discussion",
+        StageMapping = "Evaluating",
+        DisplayOrder = 6,
+        IsActive = true,
+        CreatedOn = new DateTime(2026, 1, 1)
+    }
+);
             modelBuilder.Entity<Applicant>(entity =>
             {
                 entity.HasKey(e => e.ApplicantId);

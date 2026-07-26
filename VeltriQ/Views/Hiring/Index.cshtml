@@ -619,7 +619,7 @@
 
 <script>
     const HIRING_STAGES = [
-        { key: 'New', color: '#64748b' },
+        { key: 'Shortlisted', color: '#6366f1' },
         { key: 'Screening', color: '#f59e0b' },
         { key: 'Evaluating', color: '#7c3aed' },
         { key: 'Offered', color: '#06b6d4' },
@@ -628,7 +628,8 @@
         { key: 'Dropout', color: '#94a3b8' },
     ];
 
-    let activeHiringStage = 'New';
+    let activeHiringStage = 'Shortlisted';
+
     let stageCountsCache = {};
     let currentPipelineList = [];
     let selectedApplicantIds = new Set();
@@ -839,14 +840,38 @@
     document.addEventListener('click', closeActionsMenu);
 
     function buildActionsMenuItems() {
-        return `
-            <div class="hir-actions-menu-item" onclick="openStageModal('screening')"><i class="bi bi-clipboard-check"></i> Send to Screening</div>
-            <div class="hir-actions-menu-item" onclick="openStageModal('interview')"><i class="bi bi-calendar-event"></i> Schedule Interview</div>
-            <div class="hir-actions-menu-item" onclick="openStageModal('offer')"><i class="bi bi-send-check"></i> Send Offer Letter</div>
-            <div class="hir-actions-menu-item" onclick="openStageModal('hire')"><i class="bi bi-check2-circle"></i> Mark as Hired</div>
-            <div class="hir-actions-menu-divider"></div>
-            <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
-        `;
+        switch (activeHiringStage) {
+            case 'Shortlisted':
+                return `
+                    <div class="hir-actions-menu-item" onclick="openStageModal('screening')"><i class="bi bi-clipboard-check"></i> Send to Screening</div>
+                    <div class="hir-actions-menu-divider"></div>
+                    <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
+                `;
+            case 'Screening':
+                return `
+                    <div class="hir-actions-menu-item" onclick="openStageModal('interview')"><i class="bi bi-calendar-event"></i> Schedule Interview</div>
+                    <div class="hir-actions-menu-divider"></div>
+                    <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
+                `;
+            case 'Evaluating':
+                return `
+                    <div class="hir-actions-menu-item" onclick="openStageModal('offer')"><i class="bi bi-send-check"></i> Send Offer Letter</div>
+                    <div class="hir-actions-menu-divider"></div>
+                    <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
+                `;
+            case 'Offered':
+                return `
+                    <div class="hir-actions-menu-item" onclick="openStageModal('hire')"><i class="bi bi-check2-circle"></i> Mark as Hired</div>
+                    <div class="hir-actions-menu-divider"></div>
+                    <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Offer Declined / Reject</div>
+                `;
+            case 'Hired':
+            case 'Rejected':
+            case 'Dropout':
+                return `<div class="hir-actions-menu-empty">No further actions for this stage.</div>`;
+            default:
+                return '';
+        }
     }
 
     /* =========================================================

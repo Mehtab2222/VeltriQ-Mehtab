@@ -303,6 +303,7 @@
                 <select class="apl-filter-select" id="aplStageFilter" onchange="loadApplicants()" style="width: 140px;">
                     <option value="">All Stages</option>
                     <option value="New">New</option>
+                    <option value="Shortlisted">Shortlisted</option>
                     <option value="Screening">Screening</option>
                     <option value="Evaluating">Evaluating</option>
                     <option value="Offered">Offered</option>
@@ -343,7 +344,7 @@
 </div>
 
 <script>
-    const stageColors = { New: '#64748b', Screening: '#f59e0b', Evaluating: '#7c3aed', Offered: '#06b6d4', Hired: '#22c55e', Rejected: '#ef4444', Dropout: '#94a3b8' };
+    const stageColors = { New: '#64748b', Shortlisted: '#6366f1', Screening: '#f59e0b', Evaluating: '#7c3aed', Offered: '#06b6d4', Hired: '#22c55e', Rejected: '#ef4444', Dropout: '#94a3b8' };
 
     function ringColor(pct) {
         if (pct === null || pct === undefined) return '#5f6577';

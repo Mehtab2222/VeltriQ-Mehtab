@@ -8,12 +8,15 @@ namespace VeltriQ.Models.Recruitment
     public static class ApplicantStages
     {
         public const string New = "New";
+        public const string Shortlisted = "Shortlisted";
         public const string Screening = "Screening";
         public const string Evaluating = "Evaluating";
         public const string Offered = "Offered";
         public const string Hired = "Hired";
         public const string Rejected = "Rejected";
         public const string Dropout = "Dropout";
+
+        public const int ShortlistThresholdPercent = 60;
     }
 
     public class Applicant

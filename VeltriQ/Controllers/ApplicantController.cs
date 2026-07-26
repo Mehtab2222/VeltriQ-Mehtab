@@ -181,6 +181,13 @@ namespace VeltriQ.Controllers
 
                 _context.Applicants.Add(applicant);
                 await _context.SaveChangesAsync();
+                // Auto-shortlist: below-threshold applicants simply stay at "New" on the Applicant page.
+                if (applicant.MatchPercentage.HasValue && applicant.MatchPercentage.Value >= ApplicantStages.ShortlistThresholdPercent)
+                {
+                    applicant.CurrentStage = ApplicantStages.Shortlisted;
+                    applicant.StageChangedOn = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                }
 
                 return Json(new { success = true, message = "Applicant added successfully.", applicantId = applicant.ApplicantId });
             }

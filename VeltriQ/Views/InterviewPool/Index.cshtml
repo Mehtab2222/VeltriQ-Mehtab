@@ -1,0 +1,781 @@
+﻿@{
+    ViewData["Title"] = "Interview Pools";
+}
+
+<style>
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .pool-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+    }
+
+    /* CORE PANEL CARD MODULE (Squared 0px layout consistency) */
+    .pool-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .pool-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+        flex-shrink: 0;
+        background: var(--card-bg);
+    }
+
+    .pool-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .pool-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .pool-toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pool-search-wrap {
+        position: relative;
+        width: 260px;
+    }
+
+        .pool-search-wrap input {
+            width: 100%;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 10px 0 32px;
+            color: var(--text-primary);
+            font-size: 11.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .pool-search-wrap input:focus {
+                border-color: var(--purple);
+            }
+
+        .pool-search-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+    .pool-action-btn {
+        height: 30px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .pool-action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .pool-action-btn-primary {
+        background: var(--purple);
+        color: #fff;
+        border-color: var(--purple);
+    }
+
+        .pool-action-btn-primary:hover {
+            opacity: 0.9;
+        }
+
+    /* TABLE CONTAINER & ALIGNED WIDTHS */
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+    }
+
+    .pool-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+        .pool-table th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .pool-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pool-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+            .pool-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+    .action-icon-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+        .action-icon-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+        .action-icon-btn.danger:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+    /* MODAL BACKDROP & BOX */
+    .pool-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.6);
+        z-index: 3000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .pool-modal-backdrop.open {
+            display: flex;
+        }
+
+    .pool-modal-box {
+        width: 560px;
+        max-width: 92vw;
+        max-height: 88vh;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0,0,0,.5);
+        overflow: hidden;
+    }
+
+    .pool-modal-head {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        background: var(--hover-bg);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .pool-modal-head h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+    .pool-modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+        .pool-modal-close:hover {
+            color: var(--text-primary);
+        }
+
+    .pool-modal-body {
+        padding: 18px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .form-group label {
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-control {
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: var(--purple);
+        }
+
+    textarea.form-control {
+        min-height: 70px;
+        padding-top: 6px;
+        resize: vertical;
+    }
+
+    .pool-modal-footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="pool-page">
+    <div class="pool-master-card">
+
+        <!-- HEADER TOP BAR -->
+        <div class="pool-card-top">
+            <div class="pool-card-title">
+                <h3>Interview Pools</h3>
+                <p>Configure reviewer groups and automation pools mapped to specific interview rounds.</p>
+            </div>
+
+            <div class="pool-toolbar-actions">
+                <div class="pool-search-wrap">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="poolSearchInput" placeholder="Search pool name..." oninput="filterPoolsTable()" autocomplete="off" />
+                </div>
+
+                <button type="button" class="pool-action-btn pool-action-btn-primary" onclick="openPoolModal(0)">
+                    <i class="bi bi-plus-lg"></i> Create Pool
+                </button>
+            </div>
+        </div>
+
+        <!-- MASTER DATA GRID -->
+        <div class="table-wrapper">
+            <table class="pool-table">
+                <thead>
+                    <tr>
+                        <th style="width: 28%;">Pool Name</th>
+                        <th style="width: 22%;">Round Type</th>
+                        <th style="width: 20%;">Department</th>
+                        <th style="width: 15%;">Branch</th>
+                        <th style="width: 15%; text-align: right; padding-right: 24px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="poolTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                            Loading interview pools...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- CREATE / EDIT POOL MODAL -->
+<div class="pool-modal-backdrop" id="poolModalBackdrop">
+    <div class="pool-modal-box">
+        <div class="pool-modal-head">
+            <h4 id="poolModalTitle">Create Interview Pool</h4>
+            <button type="button" class="pool-modal-close" onclick="closePoolModal()">✕</button>
+        </div>
+        <div class="pool-modal-body">
+            <input type="hidden" id="editPoolId" value="0" />
+            <div class="form-group">
+                <label>Pool Name *</label>
+                <input type="text" class="form-control" id="poolName" placeholder="e.g. Senior Backend Dev Panel" autocomplete="off" />
+            </div>
+            <div class="form-group">
+                <label>Round Type *</label>
+                <select class="form-control" id="modalRoundType">
+                    <option value="">Select Round Type</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <select class="form-control" id="modalDepartment">
+                    <option value="">All Departments</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Branch</label>
+                <select class="form-control" id="modalBranch">
+                    <option value="">All Branches</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" id="poolDescription" placeholder="Optional notes..."></textarea>
+            </div>
+        </div>
+        <div class="pool-modal-footer">
+            <button type="button" class="pool-action-btn" onclick="closePoolModal()">Cancel</button>
+            <button type="button" class="pool-action-btn pool-action-btn-primary" onclick="savePoolRecord()">Save Pool</button>
+        </div>
+    </div>
+</div>
+
+<!-- MEMBERS MANAGEMENT MODAL -->
+<div class="pool-modal-backdrop" id="membersModalBackdrop">
+    <div class="pool-modal-box" style="width: 650px; height: auto; max-height: 85vh;">
+        <div class="pool-modal-head">
+            <h4 id="membersModalTitle">Manage Pool Members</h4>
+            <button type="button" class="pool-modal-close" onclick="closeMembersModal()">✕</button>
+        </div>
+        <div class="pool-modal-body">
+            <input type="hidden" id="currentPoolId" value="0" />
+
+            <!-- Add Member Form Card -->
+            <div style="background: var(--hover-bg); padding: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;">
+                <div class="form-group" style="width: 100%;">
+                    <label>Select Employee *</label>
+                    <select class="form-control" id="eligibleEmployeeDropdown">
+                        <option value="">Search / Select Employee</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-end;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Priority</label>
+                        <input type="number" class="form-control" id="memberPriority" value="1" min="1" />
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Daily Cap</label>
+                        <input type="number" class="form-control" id="memberCapacity" value="8" min="1" />
+                    </div>
+                    <button type="button" class="pool-action-btn pool-action-btn-primary" style="height: 34px; padding: 0 20px; flex-shrink: 0;" onclick="addMemberToPool()">
+                        <i class="bi bi-plus-lg"></i> Add Member
+                    </button>
+                </div>
+            </div>
+
+            <!-- Members Table List -->
+            <div style="max-height: 240px; overflow-y: auto; border: 1px solid var(--border); margin-top: 4px;">
+                <table class="pool-table" style="font-size: 11.5px; table-layout: auto;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 8px 12px;">Employee</th>
+                            <th style="padding: 8px 12px;">Department</th>
+                            <th style="padding: 8px 12px; width: 75px; text-align: center;">Priority</th>
+                            <th style="padding: 8px 12px; width: 75px; text-align: center;">Cap</th>
+                            <th style="padding: 8px 12px; width: 65px; text-align: right; padding-right: 16px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="poolMembersTableBody">
+                        <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding: 16px; font-style:italic;">No members assigned.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pool-modal-footer">
+            <button type="button" class="pool-action-btn pool-action-btn-primary" onclick="closeMembersModal()">Done</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allPoolsCache = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadPoolsData();
+        loadDropdownOptions();
+    });
+
+    async function loadDropdownOptions() {
+        try {
+            const rtRes = await fetch('/InterviewPool/GetRoundTypes');
+            const rtData = await rtRes.json();
+            if (rtData.success) {
+                const sel = document.getElementById('modalRoundType');
+                rtData.data.forEach(x => {
+                    const opt = document.createElement('option');
+                    opt.value = x.roundTypeId;
+                    opt.innerText = x.roundTypeName;
+                    sel.appendChild(opt);
+                });
+            }
+
+            const deptRes = await fetch('/InterviewPool/GetDepartments');
+            const deptData = await deptRes.json();
+            if (deptData.success) {
+                const sel = document.getElementById('modalDepartment');
+                deptData.data.forEach(x => {
+                    const opt = document.createElement('option');
+                    opt.value = x.departmentId;
+                    opt.innerText = x.departmentName;
+                    sel.appendChild(opt);
+                });
+            }
+
+            const brRes = await fetch('/InterviewPool/GetBranches');
+            const brData = await brRes.json();
+            if (brData.success) {
+                const sel = document.getElementById('modalBranch');
+                brData.data.forEach(x => {
+                    const opt = document.createElement('option');
+                    opt.value = x.branchId;
+                    opt.innerText = x.branchName;
+                    sel.appendChild(opt);
+                });
+            }
+
+            const empRes = await fetch('/InterviewPool/GetEligibleEmployees');
+            const empData = await empRes.json();
+            if (empData.success) {
+                const sel = document.getElementById('eligibleEmployeeDropdown');
+                empData.data.forEach(x => {
+                    const opt = document.createElement('option');
+                    opt.value = x.employeeId;
+                    opt.innerText = `${x.employeeCode} - ${x.employeeName} (${x.department || 'General'})`;
+                    sel.appendChild(opt);
+                });
+            }
+        } catch (err) {
+            console.error('Dropdown load error:', err);
+        }
+    }
+
+    async function loadPoolsData() {
+        try {
+            const res = await fetch('/InterviewPool/GetPools');
+            const result = await res.json();
+            if (result.success) {
+                allPoolsCache = result.data || [];
+                renderPoolsTable(allPoolsCache);
+            }
+        } catch (err) {
+            console.error('Pools load error:', err);
+            document.getElementById('poolTableBody').innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:24px;">Failed to load pools.</td></tr>`;
+        }
+    }
+
+    function filterPoolsTable() {
+        const query = document.getElementById('poolSearchInput').value.toLowerCase().trim();
+        const filtered = allPoolsCache.filter(x => x.poolName.toLowerCase().includes(query) || x.roundTypeName.toLowerCase().includes(query));
+        renderPoolsTable(filtered);
+    }
+
+    function renderPoolsTable(list) {
+        const tbody = document.getElementById('poolTableBody');
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); font-style:italic; padding:24px;">No interview pools found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = list.map(x => `
+            <tr>
+                <td>
+                    <div style="font-weight: 700; color: var(--text-primary);">${x.poolName}</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">${x.description || ''}</div>
+                </td>
+                <td>${x.roundTypeName}</td>
+                <td>${x.departmentName}</td>
+                <td>${x.branchName}</td>
+                <td style="text-align: right; padding-right: 24px;">
+                    <div style="display: inline-flex; gap: 4px; align-items: center;">
+                        <button type="button" class="action-icon-btn" onclick="openMembersModal(${x.interviewPoolId}, '${x.poolName.replace(/'/g, "\\'")}')" title="Manage Pool Members (${x.memberCount} members)">
+                            <i class="bi bi-people"></i>
+                        </button>
+                        <button type="button" class="action-icon-btn" onclick="openPoolModal(${x.interviewPoolId})" title="Edit Pool">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="action-icon-btn danger" onclick="deletePoolRecord(${x.interviewPoolId})" title="Delete Pool">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    /* ── POOL CRUD MODAL LOGIC ── */
+    function openPoolModal(poolId) {
+        document.getElementById('editPoolId').value = poolId;
+        document.getElementById('poolName').value = '';
+        document.getElementById('modalRoundType').value = '';
+        document.getElementById('modalDepartment').value = '';
+        document.getElementById('modalBranch').value = '';
+        document.getElementById('poolDescription').value = '';
+
+        if (poolId > 0) {
+            document.getElementById('poolModalTitle').innerText = 'Edit Interview Pool';
+            fetch(`/InterviewPool/GetPoolById?poolId=${poolId}`)
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success) {
+                        const d = result.data;
+                        document.getElementById('poolName').value = d.poolName;
+                        document.getElementById('modalRoundType').value = d.roundTypeId;
+                        document.getElementById('modalDepartment').value = d.departmentId || '';
+                        document.getElementById('modalBranch').value = d.branchId || '';
+                        document.getElementById('poolDescription').value = d.description || '';
+                    }
+                });
+        } else {
+            document.getElementById('poolModalTitle').innerText = 'Create Interview Pool';
+        }
+
+        document.getElementById('poolModalBackdrop').classList.add('open');
+    }
+
+    function closePoolModal() {
+        document.getElementById('poolModalBackdrop').classList.remove('open');
+    }
+
+    async function savePoolRecord() {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const poolId = parseInt(document.getElementById('editPoolId').value) || 0;
+
+        const payload = {
+            interviewPoolId: poolId,
+            poolName: document.getElementById('poolName').value.trim(),
+            roundTypeId: parseInt(document.getElementById('modalRoundType').value) || 0,
+            departmentId: document.getElementById('modalDepartment').value ? parseInt(document.getElementById('modalDepartment').value) : null,
+            branchId: document.getElementById('modalBranch').value ? parseInt(document.getElementById('modalBranch').value) : null,
+            description: document.getElementById('poolDescription').value.trim()
+        };
+
+        if (!payload.poolName || !payload.roundTypeId) {
+            alert('Please fill in Pool Name and Round Type.');
+            return;
+        }
+
+        const url = poolId === 0 ? '/InterviewPool/CreatePool' : '/InterviewPool/UpdatePool';
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result.success) {
+                closePoolModal();
+                loadPoolsData();
+            } else {
+                alert(result.message || 'Operation failed.');
+            }
+        } catch (err) {
+            console.error('Save pool error:', err);
+            alert('Network error occurred.');
+        }
+    }
+
+    async function deletePoolRecord(poolId) {
+        if (!confirm('Are you sure you want to delete this interview pool?')) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch(`/InterviewPool/DeletePool?poolId=${poolId}`, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            });
+            const result = await res.json();
+            if (result.success) {
+                loadPoolsData();
+            } else {
+                alert(result.message || 'Deletion failed.');
+            }
+        } catch (err) {
+            console.error('Delete pool error:', err);
+        }
+    }
+
+    /* ── MEMBERS MANAGEMENT LOGIC ── */
+    function openMembersModal(poolId, poolName) {
+        document.getElementById('currentPoolId').value = poolId;
+        document.getElementById('membersModalTitle').innerText = `Manage Members — ${poolName}`;
+        loadPoolMembers(poolId);
+        document.getElementById('membersModalBackdrop').classList.add('open');
+    }
+
+    function closeMembersModal() {
+        document.getElementById('membersModalBackdrop').classList.remove('open');
+        loadPoolsData();
+    }
+
+    async function loadPoolMembers(poolId) {
+        try {
+            const res = await fetch(`/InterviewPool/GetPoolMembers?poolId=${poolId}`);
+            const result = await res.json();
+            const tbody = document.getElementById('poolMembersTableBody');
+
+            if (result.success && result.data.length > 0) {
+                tbody.innerHTML = result.data.map(m => `
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600;">${m.employeeName} <span style="font-size:10px; color:var(--text-muted); font-family:monospace;">(${m.employeeCode})</span></td>
+                        <td style="padding: 8px 12px;">${m.departmentName || '—'}</td>
+                        <td style="padding: 8px 12px; text-align: center;">${m.priority}</td>
+                        <td style="padding: 8px 12px; text-align: center;">${m.dailyCapacity}</td>
+                        <td style="padding: 8px 12px; text-align: right;">
+                            <button type="button" class="action-icon-btn danger" onclick="removeMember(${m.interviewPoolMemberId}, ${poolId})" style="width: 24px; height: 24px;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding: 16px; font-style:italic;">No members assigned to this pool.</td></tr>`;
+            }
+        } catch (err) {
+            console.error('Load members error:', err);
+        }
+    }
+
+    async function addMemberToPool() {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const poolId = parseInt(document.getElementById('currentPoolId').value);
+        const employeeId = parseInt(document.getElementById('eligibleEmployeeDropdown').value);
+        const priority = parseInt(document.getElementById('memberPriority').value) || 1;
+        const dailyCapacity = parseInt(document.getElementById('memberCapacity').value) || 8;
+
+        if (!employeeId) {
+            alert('Please select an employee.');
+            return;
+        }
+
+        const payload = { interviewPoolId: poolId, employeeId, priority, dailyCapacity };
+
+        try {
+            const res = await fetch('/InterviewPool/AddPoolMember', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result.success) {
+                loadPoolMembers(poolId);
+                document.getElementById('eligibleEmployeeDropdown').value = '';
+                document.getElementById('memberPriority').value = '1';
+                document.getElementById('memberCapacity').value = '8';
+            } else {
+                alert(result.message || 'Failed to add member.');
+            }
+        } catch (err) {
+            console.error('Add member error:', err);
+        }
+    }
+
+    async function removeMember(memberId, poolId) {
+        if (!confirm('Remove this employee from the interview pool?')) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        try {
+            const res = await fetch(`/InterviewPool/RemovePoolMember?memberId=${memberId}`, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            });
+            const result = await res.json();
+            if (result.success) {
+                loadPoolMembers(poolId);
+            } else {
+                alert(result.message || 'Failed to remove member.');
+            }
+        } catch (err) {
+            console.error('Remove member error:', err);
+        }
+    }
+</script>
