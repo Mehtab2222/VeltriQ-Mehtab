@@ -5,141 +5,268 @@
 }
 
 <style>
-
-    .city-card {
-        max-width: 900px;
-        background: rgba(30,35,44,.92);
-        border-radius: 18px;
-        overflow: hidden;
-        border: 1px solid rgba(255,255,255,.06);
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
     }
 
-    .city-card-body {
-        padding: 22px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .city-create-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+        padding-bottom: 30px;
+    }
+
+    /* TOPBAR */
+    .city-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
         gap: 16px;
     }
 
-    .form-field {
+    .city-breadcrumb {
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
     }
 
-    .full-width {
+        .city-breadcrumb a {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .city-breadcrumb i {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .city-breadcrumb span {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+    .city-top-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .cancel-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .cancel-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .save-btn {
+        height: 32px;
+        padding: 0 16px;
+        border: none;
+        border-radius: 4px;
+        background: var(--purple);
+        color: #fff;
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+    /* SINGLE COMPACT CARD MODULE (3 Columns per row) */
+    .city-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 20px;
+    }
+
+    .city-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .col-span-2 {
         grid-column: span 2;
     }
 
-    .form-field label {
-        margin-bottom: 7px;
-        color: #64748b;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
+    .col-span-3 {
+        grid-column: span 3;
     }
 
+    /* FIELD */
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .form-field label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    /* INPUT */
     .form-input,
     .form-select {
-        height: 42px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,.07);
-        background: rgba(15,20,30,.7);
-        color: #fff;
-        padding: 0 14px;
+        width: 100%;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12px;
         outline: none;
+        transition: border-color 0.2s ease;
     }
 
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--purple);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+    /* RESPONSIVE */
+    @@media(max-width: 1024px) {
+        .city-card-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .col-span-2, .col-span-3 {
+            grid-column: span 2;
+        }
+    }
+
+    @@media(max-width: 640px) {
+        .city-card-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .col-span-2, .col-span-3 {
+            grid-column: span 1;
+        }
+
+        .city-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .city-top-actions {
+            width: 100%;
+        }
+
+        .cancel-btn,
+        .save-btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
 </style>
 
-<form asp-action="Create"
-      method="post">
+<div class="city-create-page">
 
-    <div class="city-card">
-
-        <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.05);">
-
-            <h3 style="color:#fff;font-size:16px;font-weight:700;margin:0;">
-                City Information
-            </h3>
-
+    <div class="city-topbar">
+        <div class="city-breadcrumb">
+            <a href="/City/Index">Cities</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Create</span>
         </div>
 
-        <div class="city-card-body">
+        <div class="city-top-actions">
+            <a href="/City/Index" class="cancel-btn">
+                <i class="bi bi-x"></i> Cancel
+            </a>
 
-            <div class="form-field full-width">
-
-                <label>
-                    Country
-                </label>
-
-                <select asp-for="CountryId"
-                        asp-items="ViewBag.CountryList"
-                        class="form-select">
-
-                    <option value="">
-                        Select Country
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="form-field">
-
-                <label>
-                    City Name
-                </label>
-
-                <input asp-for="CityName"
-                       class="form-input"
-                       placeholder="Enter city name" />
-
-            </div>
-
-            <div class="form-field">
-
-                <label>
-                    City Code
-                </label>
-
-                <input asp-for="CityCode"
-                       class="form-input"
-                       placeholder="PUN" />
-
-            </div>
-
-            <div class="form-field full-width">
-
-                <label>
-                    State Name
-                </label>
-
-                <input asp-for="StateName"
-                       class="form-input"
-                       placeholder="Maharashtra" />
-
-            </div>
-
+            <button type="submit" form="cityForm" class="save-btn">
+                <i class="bi bi-building-add"></i> Save City
+            </button>
         </div>
-
     </div>
 
-    <div style="margin-top:18px;display:flex;gap:10px;">
+    <form id="cityForm" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
 
-        <button type="submit"
-                class="save-btn">
+        <div class="city-master-card">
+            <div class="city-card-grid">
 
-            Save City
+                <div class="form-field">
+                    <label>Country *</label>
+                    <select asp-for="CountryId" asp-items="ViewBag.CountryList" class="form-select">
+                        <option value="">Select Country</option>
+                    </select>
+                </div>
 
-        </button>
+                <div class="form-field">
+                    <label>City Name *</label>
+                    <input asp-for="CityName" class="form-input" placeholder="Enter city name" autocomplete="off" />
+                </div>
 
-        <a href="/City/Index"
-           class="cancel-btn">
+                <div class="form-field">
+                    <label>City Code *</label>
+                    <input asp-for="CityCode" class="form-input" placeholder="PUN" autocomplete="off" />
+                </div>
 
-            Cancel
+                <div class="form-field col-span-2">
+                    <label>State Name *</label>
+                    <input asp-for="StateName" class="form-input" placeholder="Maharashtra" autocomplete="off" />
+                </div>
 
-        </a>
-
-    </div>
-
-</form>
+            </div>
+        </div>
+    </form>
+</div>

@@ -141,6 +141,12 @@ namespace VeltriQ.Data
         public DbSet<InterviewPool> InterviewPools { get; set; }
 
         public DbSet<InterviewPoolMember> InterviewPoolMembers { get; set; }
+        public DbSet<AvailabilityRequest> AvailabilityRequests { get; set; }
+        public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
+        public DbSet<AvailabilitySlotResponse> AvailabilitySlotResponses { get; set; }
+        public DbSet<ScheduledInterview> ScheduledInterviews { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<LeaveApplication> LeaveApplications { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -154,6 +160,38 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+
+            modelBuilder.Entity<ScheduledInterview>(entity =>
+            {
+                entity.HasKey(e => e.ScheduledInterviewId);
+                entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.HasOne(e => e.Applicant).WithMany().HasForeignKey(e => e.ApplicantId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.AvailabilityRequest).WithMany().HasForeignKey(e => e.AvailabilityRequestId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.AvailabilitySlot).WithMany().HasForeignKey(e => e.AvailabilitySlotId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.InterviewerEmployee).WithMany().HasForeignKey(e => e.InterviewerEmployeeId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.RoundType).WithMany().HasForeignKey(e => e.RoundTypeId).OnDelete(DeleteBehavior.Restrict);
+
+                // Same interviewer can't be double-booked for the same slot
+                entity.HasIndex(e => new { e.AvailabilitySlotId, e.InterviewerEmployeeId }).IsUnique();
+            });
+            modelBuilder.Entity<AvailabilitySlotResponse>(entity =>
+            {
+                entity.HasKey(e => e.AvailabilitySlotResponseId);
+
+                entity.HasOne(e => e.AvailabilitySlot)
+                    .WithMany()
+                    .HasForeignKey(e => e.AvailabilitySlotId)
+                    .OnDelete(DeleteBehavior.Cascade); // deleting a slot removes its responses
+
+                entity.HasOne(e => e.Employee)
+                    .WithMany()
+                    .HasForeignKey(e => e.EmployeeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // One employee can't respond to the same slot twice
+                entity.HasIndex(e => new { e.AvailabilitySlotId, e.EmployeeId }).IsUnique();
+            });
             modelBuilder.Entity<RoundType>(entity =>
             {
                 entity.HasKey(e => e.RoundTypeId);
@@ -332,6 +370,7 @@ namespace VeltriQ.Data
                 .WithMany()
                 .HasForeignKey(x => x.JobProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<TrainingFeedback>(entity =>
             {
                 entity.HasKey(e => e.TrainingFeedbackId);
@@ -531,6 +570,31 @@ namespace VeltriQ.Data
 
                 entity.HasIndex(e => e.CategoryName)
                       .IsUnique();
+            });
+            modelBuilder.Entity<AvailabilityRequest>(entity =>
+            {
+                entity.HasKey(e => e.AvailabilityRequestId);
+                entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.HasOne(e => e.RoundType)
+                    .WithMany()
+                    .HasForeignKey(e => e.RoundTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.InterviewPool)
+                    .WithMany()
+                    .HasForeignKey(e => e.InterviewPoolId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<AvailabilitySlot>(entity =>
+            {
+                entity.HasKey(e => e.AvailabilitySlotId);
+
+                entity.HasOne(e => e.AvailabilityRequest)
+                    .WithMany(r => r.Slots)
+                    .HasForeignKey(e => e.AvailabilityRequestId)
+                    .OnDelete(DeleteBehavior.Cascade); // deleting a poll removes its offered slots
             });
             modelBuilder.Entity<EmployeeInductionAttendance>(entity =>
             {

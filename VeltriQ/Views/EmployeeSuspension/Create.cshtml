@@ -5,224 +5,291 @@
 }
 
 <style>
-    .suspension-page {
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
+    .suspension-create-page {
         width: 100%;
-        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+        padding-bottom: 30px;
     }
 
-    /* Header with Top-Right Buttons */
-    .suspension-header {
+    /* TOPBAR */
+    .suspension-topbar {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 24px;
+        margin-bottom: 14px;
+        gap: 16px;
     }
 
-    .suspension-header-text h2 {
-        font-size: 24px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 4px;
-    }
-
-    .suspension-header-text p {
-        font-size: 14px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    .header-actions {
+    .suspension-breadcrumb {
         display: flex;
-        gap: 12px;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
     }
 
-    /* Card Styling */
-    .suspension-card {
-        background: rgba(30, 35, 44, 0.94);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 24px;
+        .suspension-breadcrumb a {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .suspension-breadcrumb i {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .suspension-breadcrumb span {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+    .suspension-top-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        color: #94a3b8;
-        font-size: 12px;
+    .cancel-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11.5px;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
     }
 
-    .form-control, .form-select {
-        width: 100% !important;
-        height: 44px;
-        background-color: #0d1117 !important;
-        border: 1px solid #2a3441 !important;
-        color: #fff !important;
-        border-radius: 10px;
-        font-size: 14px;
+        .cancel-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .save-btn-danger {
+        height: 32px;
+        padding: 0 16px;
+        border: none;
+        border-radius: 4px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .save-btn-danger:hover {
+            opacity: 0.9;
+        }
+
+    /* SINGLE COMPACT CARD MODULE (3 Columns per row) */
+    .suspension-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 20px;
+    }
+
+    .suspension-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .col-span-2 {
+        grid-column: span 2;
+    }
+
+    .col-span-3 {
+        grid-column: span 3;
+    }
+
+    /* FIELD */
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .form-field label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+    /* INPUT */
+    .form-input, .form-select {
+        width: 100%;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12px;
         outline: none;
-        transition: border-color 0.2s;
+        transition: border-color 0.2s ease;
     }
 
-        .form-control:focus, .form-select:focus {
-            border-color: #ef4444 !important; /* Red focus for suspension action */
+        .form-input:focus, .form-select:focus {
+            border-color: #ef4444;
             box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
         }
 
-    textarea.form-control {
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+    textarea.form-input {
         height: auto;
-        padding-top: 12px;
+        min-height: 70px;
+        padding-top: 8px;
+        resize: vertical;
     }
 
-    /* Section Divider */
-    .section-title {
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #ef4444; /* Alert color */
-        margin-bottom: 20px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid rgba(239, 68, 68, 0.2);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    /* Button Styling */
-    .btn-back {
-        height: 42px;
-        display: flex;
-        align-items: center;
-        padding: 0 20px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.05);
-        color: #fff;
-        border: 1px solid rgba(255,255,255,0.1);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 13px;
-        transition: all 0.2s;
-    }
-
-        .btn-back:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+    /* RESPONSIVE */
+    @@media(max-width: 1024px) {
+        .suspension-card-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
 
-    .btn-submit-danger {
-        height: 42px;
-        padding: 0 25px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #dc2626, #ef4444);
-        color: #fff;
-        border: none;
-        font-weight: 700;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-        transition: transform 0.2s;
+        .col-span-2, .col-span-3 {
+            grid-column: span 2;
+        }
     }
 
-        .btn-submit-danger:hover {
-            transform: translateY(-1px);
-            color: #fff;
+    @@media(max-width: 640px) {
+        .suspension-card-grid {
+            grid-template-columns: 1fr;
         }
+
+        .col-span-2, .col-span-3 {
+            grid-column: span 1;
+        }
+
+        .suspension-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .suspension-top-actions {
+            width: 100%;
+        }
+
+        .cancel-btn,
+        .save-btn-danger {
+            flex: 1;
+            justify-content: center;
+        }
+    }
 </style>
 
-<div class="suspension-page">
-    <form asp-action="Create" method="post">
+<div class="suspension-create-page">
 
-        <!-- HEADER WITH ACTIONS -->
-        <div class="suspension-header">
-            <div class="suspension-header-text">
-                <h2>New Suspension Record</h2>
-                <p>Formalize disciplinary suspension and set expected timelines.</p>
-            </div>
-
-            <div class="header-actions">
-                <a href="/EmployeeSuspension/Index" class="btn-back">
-                    Cancel
-                </a>
-                <button type="submit" class="btn-submit-danger">
-                    <i class="bi bi-slash-circle"></i> Suspend Employee
-                </button>
-            </div>
+    <!-- TOPBAR -->
+    <div class="suspension-topbar">
+        <div class="suspension-breadcrumb">
+            <a href="/EmployeeSuspension/Index">Employee Suspensions</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Create</span>
         </div>
 
-        <div class="suspension-card">
-            <div class="row">
-                <!-- Section: Case Details -->
-                <div class="col-12">
-                    <div class="section-title">
-                        <i class="bi bi-exclamation-triangle"></i> Disciplinary Case Details
-                    </div>
+        <div class="suspension-top-actions">
+            <a href="/EmployeeSuspension/Index" class="cancel-btn">
+                <i class="bi bi-x"></i> Cancel
+            </a>
+            <button type="submit" form="suspensionForm" class="save-btn-danger">
+                <i class="bi bi-slash-circle"></i> Suspend Employee
+            </button>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="suspensionForm" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- SINGLE COMPACT CARD (3 Fields per row) -->
+        <div class="suspension-master-card">
+            <div class="suspension-card-grid">
+
+                <!-- EMPLOYEE -->
+                <div class="form-field">
+                    <label>Employee *</label>
+                    <select asp-for="EmployeeId" asp-items="ViewBag.EmployeeList" class="form-select" required>
+                        <option value="">-- Select Employee --</option>
+                    </select>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Employee</label>
-                        <select asp-for="EmployeeId" asp-items="ViewBag.EmployeeList" class="form-select" required>
-                            <option value="">-- Select Employee --</option>
-                        </select>
-                    </div>
+                <!-- SUSPENSION TYPE -->
+                <div class="form-field">
+                    <label>Suspension Type *</label>
+                    <select asp-for="SuspensionType" class="form-select" required>
+                        <option value="">Select Suspension Type</option>
+                        <option value="Disciplinary">Disciplinary</option>
+                        <option value="Investigation">Investigation</option>
+                        <option value="Policy Violation">Policy Violation</option>
+                        <option value="Misconduct">Misconduct</option>
+                    </select>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Suspension Type</label>
-                        <select asp-for="SuspensionType" class="form-select" required>
-                            <option value="">Select Suspension Type</option>
-                            <option value="Disciplinary">Disciplinary</option>
-                            <option value="Investigation">Investigation</option>
-                            <option value="Policy Violation">Policy Violation</option>
-                            <option value="Misconduct">Misconduct</option>
-                        </select>
-                    </div>
+                <!-- SUSPENSION DATE -->
+                <div class="form-field">
+                    <label>Suspension Date *</label>
+                    <input asp-for="SuspensionDate" type="date" class="form-input" required />
                 </div>
 
-                <!-- Section: Timeline -->
-                <div class="col-12 mt-3">
-                    <div class="section-title">
-                        <i class="bi bi-calendar-range"></i> Suspension Timeline
-                    </div>
+                <!-- EXPECTED END DATE -->
+                <div class="form-field">
+                    <label>Expected End Date</label>
+                    <input asp-for="EndDate" type="date" class="form-input" />
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Suspension Date</label>
-                        <input asp-for="SuspensionDate" type="date" class="form-control" required />
-                    </div>
+                <!-- SUSPENSION REASON -->
+                <div class="form-field col-span-2">
+                    <label>Suspension Reason</label>
+                    <textarea asp-for="SuspensionReason" rows="3" class="form-input" placeholder="Provide detailed documentation for the suspension..."></textarea>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Expected End Date</label>
-                        <input asp-for="EndDate" type="date" class="form-control" />
-                    </div>
-                </div>
-
-                <!-- Section: Reason -->
-                <div class="col-12 mt-3">
-                    <div class="section-title">
-                        <i class="bi bi-file-earmark-text"></i> Formal Reason
-                    </div>
-                </div>
-
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="form-label">Suspension Reason</label>
-                        <textarea asp-for="SuspensionReason" rows="5" class="form-control" placeholder="Provide detailed documentation for the suspension..."></textarea>
-                    </div>
-                </div>
             </div>
         </div>
     </form>

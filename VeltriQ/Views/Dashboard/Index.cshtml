@@ -647,6 +647,99 @@
             color: var(--purple);
             background: var(--pu-l);
         }
+
+    .avail-req-item {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+        .avail-req-item:last-child {
+            border-bottom: none;
+        }
+
+    .avail-req-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .avail-req-title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .avail-req-sub {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    .avail-req-deadline {
+        font-size: 10.5px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 20px;
+        background: var(--or-l);
+        color: var(--orange);
+        white-space: nowrap;
+    }
+
+    .avail-req-done {
+        font-size: 10.5px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 20px;
+        background: var(--gr-l);
+        color: var(--green);
+        white-space: nowrap;
+    }
+
+    .avail-slot-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .avail-slot-chip {
+        border: 1.5px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-secondary);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .avail-slot-chip.picked {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: #fff;
+        }
+
+        .avail-slot-chip:hover:not(.picked) {
+            border-color: var(--purple);
+        }
+
+    .avail-submit-btn {
+        height: 32px;
+        padding: 0 16px;
+        border-radius: 8px;
+        border: none;
+        background: var(--purple);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .avail-submit-btn:hover {
+            opacity: .9;
+        }
 </style>
 
 @* <div class="topbar">
@@ -739,7 +832,12 @@
         </div>
     </div>
 </div>
-
+<div class="card-box" id="availabilityWidgetCard" style="display:none; margin-bottom:12px;">
+    <div class="ch-row">
+        <span class="card-title"><i class="bi bi-calendar2-check" style="color:var(--purple); margin-right:6px;"></i>Interview Availability Requests</span>
+    </div>
+    <div id="availabilityWidgetBody"></div>
+</div>
 <div class="grid-3">
     <div class="card-box">
         <div class="ch-row"><span class="card-title">Leave Summary</span></div>
@@ -814,26 +912,45 @@
     // DATE
     const mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
     const nd=new Date();
-    document.getElementById('todayDate').textContent=mo[nd.getMonth()]+' '+nd.getDate()+', '+nd.getFullYear();
+        const todayDate = document.getElementById("todayDate");
 
+    if (todayDate) {
+        todayDate.textContent =
+            mo[nd.getMonth()] + ' ' + nd.getDate() + ', ' + nd.getFullYear();
+    }
+        // =========================
+    // CHART VARIABLES
+    // =========================
+    let eC, lC, dC, aC;
     // THEME
     let curT=localStorage.getItem('vqT')||'dark';
     applyT(curT);
-    function applyT(t){
-      let r=t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;
-      document.documentElement.setAttribute('data-theme',r);
-      document.getElementById('floatIcon').className=r==='dark'?'bi bi-moon-fill':'bi bi-sun-fill';
-      document.querySelectorAll('.theme-opt').forEach(e=>e.classList.remove('active'));
-      const m={light:'optLight',dark:'optDark',system:'optSystem'};
-      document.getElementById(m[t])?.classList.add('active');
-      if(typeof rCharts === 'function') rCharts();
+    function applyT(t) {
+
+        let r = t === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : t;
+
+        document.documentElement.setAttribute('data-theme', r);
+
+        document.getElementById('floatIcon')?.classList.remove('bi-sun-fill','bi-moon-fill');
+        document.getElementById('floatIcon')?.classList.add(r === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill');
+
+        document.querySelectorAll('.theme-opt').forEach(e => e.classList.remove('active'));
+
+        const m = { light: 'optLight', dark: 'optDark', system: 'optSystem' };
+
+        document.getElementById(m[t])?.classList.add('active');
+
+        if (typeof eC !== "undefined" && eC) {
+            rCharts();
+        }
     }
     function setTheme(t){curT=t;localStorage.setItem('vqT',t);applyT(t);}
     function togglePanel(){document.getElementById('appearPanel').classList.toggle('open');}
     document.addEventListener('click',e=>{if(!e.target.closest('.float-settings'))document.getElementById('appearPanel').classList.remove('open');});
 
-    // CHARTS
-    let eC,lC,dC,aC;
+
     function gc(){const dk=document.documentElement.getAttribute('data-theme')==='dark';return{g:dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.06)',t:dk?'#4b5563':'#94a3b8'};}
     function buildC(){
       const c=gc();
@@ -853,4 +970,91 @@
       });
     }
     window.addEventListener('load',buildC);
+
+        document.addEventListener('DOMContentLoaded', loadMyAvailabilityRequests);
+
+    async function loadMyAvailabilityRequests() {
+        try {
+            const res = await fetch('/Availability/GetMyPendingAvailabilityRequests');
+            const result = await res.json();
+            const list = result.data || [];
+
+            const card = document.getElementById('availabilityWidgetCard');
+            if (list.length === 0) { card.style.display = 'none'; return; }
+
+            card.style.display = 'block';
+            renderAvailabilityWidget(list);
+        } catch (err) {
+            console.error('Availability widget load fault:', err);
+        }
+    }
+
+    function renderAvailabilityWidget(list) {
+        const body = document.getElementById('availabilityWidgetBody');
+
+        body.innerHTML = list.map(req => {
+            const targetDateFmt = new Date(req.targetDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const deadlineFmt = new Date(req.replyDeadline).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+            const badge = req.alreadyResponded
+                ? `<span class="avail-req-done"><i class="bi bi-check-circle"></i> Responded</span>`
+                : `<span class="avail-req-deadline">Reply by ${deadlineFmt}</span>`;
+
+            const slotsHtml = req.slots.map(s => {
+                const timeFmt = new Date(s.slotDateTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                return `<button type="button" class="avail-slot-chip ${s.isSelectedByMe ? 'picked' : ''}" data-slot-id="${s.availabilitySlotId}" onclick="toggleWidgetSlot(this)">${timeFmt}</button>`;
+            }).join('');
+
+            return `
+                <div class="avail-req-item" data-request-id="${req.availabilityRequestId}">
+                    <div class="avail-req-top">
+                        <div>
+                            <div class="avail-req-title">${req.roundTypeName}</div>
+                            <div class="avail-req-sub">For ${targetDateFmt} — select all times you're free</div>
+                        </div>
+                        ${badge}
+                    </div>
+                    <div class="avail-slot-grid">${slotsHtml}</div>
+                    <button type="button" class="avail-submit-btn" onclick="submitWidgetAvailability(${req.availabilityRequestId})">
+                        <i class="bi bi-check2"></i> ${req.alreadyResponded ? 'Update Availability' : 'Submit Availability'}
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function toggleWidgetSlot(btn) {
+        btn.classList.toggle('picked');
+    }
+
+    async function submitWidgetAvailability(requestId) {
+        const container = document.querySelector(`.avail-req-item[data-request-id="${requestId}"]`);
+        const selectedSlotIds = Array.from(container.querySelectorAll('.avail-slot-chip.picked'))
+            .map(el => parseInt(el.dataset.slotId));
+
+        if (selectedSlotIds.length === 0) {
+            alert('Please select at least one time slot.');
+            return;
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch('/Availability/SubmitAvailabilityResponse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify({ availabilityRequestId: requestId, selectedSlotIds })
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                await loadMyAvailabilityRequests();
+            } else {
+                alert(result.message || 'Failed to submit availability.');
+            }
+        } catch (err) {
+            console.error('Submit availability fault:', err);
+            alert('Network error while submitting availability.');
+        }
+    }
 </script>

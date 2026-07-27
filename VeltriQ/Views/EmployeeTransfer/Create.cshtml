@@ -5,173 +5,257 @@
 }
 
 <style>
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
+
     .transfer-page {
         width: 100%;
-        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+        padding-bottom: 30px;
     }
 
-    /* Header with Top-Right Buttons */
-    .transfer-header {
+    /* TOPBAR */
+    .transfer-topbar {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 24px;
+        margin-bottom: 14px;
+        gap: 16px;
     }
 
-    .transfer-header-text h2 {
-        font-size: 24px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 4px;
-    }
-
-    .transfer-header-text p {
-        font-size: 14px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    .header-actions {
+    .transfer-breadcrumb {
         display: flex;
-        gap: 12px;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
     }
 
-    /* Card Styling */
-    .transfer-card {
-        background: rgba(30, 35, 44, 0.94);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 24px;
+        .transfer-breadcrumb a {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .transfer-breadcrumb i {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .transfer-breadcrumb span {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+    .transfer-top-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .cancel-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .cancel-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .save-btn {
+        height: 32px;
+        padding: 0 16px;
+        border: none;
+        border-radius: 4px;
+        background: var(--purple);
+        color: #fff;
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+    /* SINGLE UNIFIED CARD MODULE */
+    .transfer-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 20px;
     }
 
     .comparison-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-top: 10px;
+        gap: 24px;
+        margin-top: 6px;
     }
 
     .column-header {
-        font-size: 11px;
-        font-weight: 800;
+        font-size: 10px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #7c3aed;
-        margin-bottom: 20px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        letter-spacing: .5px;
+        color: var(--purple);
+        margin-bottom: 14px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
     }
 
     .form-group {
-        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 14px;
     }
 
     .form-label {
-        display: block;
-        color: #94a3b8;
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 8px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
     }
 
     .form-control, .form-select {
-        width: 100% !important;
-        height: 44px;
-        background-color: #0d1117 !important;
-        border: 1px solid #2a3441 !important;
-        color: #fff !important;
-        border-radius: 10px;
-        font-size: 14px;
+        width: 100%;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12px;
         outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--purple);
+        }
+
+    textarea.form-control {
+        height: auto;
+        min-height: 70px;
+        padding-top: 8px;
+        resize: vertical;
     }
 
     .readonly-col .form-control,
     .readonly-col .form-select {
-        background-color: rgba(255, 255, 255, 0.02) !important;
-        border: 1px dashed #2a3441 !important;
-        color: #64748b !important;
-        pointer-events: none; /* Crucial for "readonly" feel */
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px dashed var(--border);
+        color: var(--text-muted);
+        pointer-events: none;
     }
 
     .full-width-section {
         grid-column: span 2;
-        margin-top: 10px;
-        padding-top: 15px;
-        border-top: 1px solid rgba(255,255,255,0.05);
+        margin-top: 4px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
     }
 
-    /* Button Styling */
-    .btn-cancel {
-        height: 42px;
-        display: flex;
-        align-items: center;
-        padding: 0 20px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.05);
-        color: #fff;
-        border: 1px solid rgba(255,255,255,0.1);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 13px;
-    }
+    /* RESPONSIVE */
+    @@media(max-width: 900px) {
+        .comparison-grid {
+            grid-template-columns: 1fr;
+        }
 
-    .btn-submit {
-        height: 42px;
-        padding: 0 25px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #6d28d9, #7c3aed);
-        color: #fff;
-        border: none;
-        font-weight: 700;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
-        cursor: pointer;
+        .full-width-section {
+            grid-column: span 1;
+        }
     }
 </style>
 
 <div class="transfer-page">
-    @* ENSURE FORM ENCAPSULATES THE HEADER BUTTONS *@
-    <form asp-action="Create" method="post">
+    <form id="transferForm" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
 
-        <!-- HEADER WITH ACTIONS -->
-        <div class="transfer-header">
-            <div class="transfer-header-text">
-                <h2>New Transfer Request</h2>
-                <p>Assign employees to new branches or departments.</p>
+        <!-- TOPBAR -->
+        <div class="transfer-topbar">
+            <div class="transfer-breadcrumb">
+                <a href="/EmployeeTransfer/Index">Employee Transfers</a>
+                <i class="bi bi-chevron-right"></i>
+                <span>Create</span>
             </div>
 
-            <div class="header-actions">
-                <a href="/EmployeeTransfer/Index" class="btn-cancel">Cancel</a>
-                @* TYPE MUST BE SUBMIT *@
-                <button type="submit" class="btn-submit">
+            <div class="transfer-top-actions">
+                <a href="/EmployeeTransfer/Index" class="cancel-btn">
+                    <i class="bi bi-x"></i> Cancel
+                </a>
+                <button type="submit" class="save-btn">
                     <i class="bi bi-send"></i> Submit Transfer
                 </button>
             </div>
         </div>
 
-        <div class="transfer-card">
+        <!-- SINGLE UNIFIED CARD -->
+        <div class="transfer-master-card">
+
             <!-- Employee Search -->
-            <div class="form-group mb-4">
-                <label class="form-label">Search Employee</label>
+            <div class="form-group" style="max-width: 400px; margin-bottom: 20px;">
+                <label class="form-label">Search Employee *</label>
                 <select asp-for="EmployeeId" id="employeeDropdown" asp-items="ViewBag.EmployeeList" class="form-select" required>
                     <option value="">-- Select Employee --</option>
                 </select>
             </div>
 
             <div class="comparison-grid">
-                <!-- Left: Current (Readonly) -->
+                <!-- Left: Current Position (Readonly) -->
                 <div class="readonly-col">
                     <div class="column-header">
                         <i class="bi bi-person-badge"></i> Current Position
                     </div>
 
-                    @* Added Hidden Inputs to ensure current IDs are posted even if visually disabled *@
+                    <!-- Hidden Inputs for Form Submission -->
                     <input type="hidden" asp-for="CurrentBranchId" id="currentBranchHidden" />
                     <input type="hidden" asp-for="CurrentDepartmentId" id="currentDepartmentHidden" />
                     <input type="hidden" asp-for="CurrentDesignationId" id="currentDesignationHidden" />
@@ -202,19 +286,19 @@
                         <i class="bi bi-arrow-right-circle"></i> New Assignment
                     </div>
                     <div class="form-group">
-                        <label class="form-label">New Branch</label>
+                        <label class="form-label">New Branch *</label>
                         <select asp-for="NewBranchId" asp-items="ViewBag.BranchList" class="form-select" required>
                             <option value="">Select Branch</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">New Department</label>
+                        <label class="form-label">New Department *</label>
                         <select asp-for="NewDepartmentId" asp-items="ViewBag.DepartmentList" class="form-select" required>
                             <option value="">Select Department</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">New Designation</label>
+                        <label class="form-label">New Designation *</label>
                         <select asp-for="NewDesignationId" asp-items="ViewBag.DesignationList" class="form-select" required>
                             <option value="">Select Designation</option>
                         </select>
@@ -223,18 +307,14 @@
 
                 <!-- Footer Details -->
                 <div class="full-width-section">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">Effective Date</label>
-                                <input asp-for="EffectiveDate" type="date" class="form-control" required />
-                            </div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 14px;">
+                        <div class="form-group" style="max-width: 400px;">
+                            <label class="form-label">Effective Date *</label>
+                            <input asp-for="EffectiveDate" type="date" class="form-control" required />
                         </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label class="form-label">Transfer Reason</label>
-                                <textarea asp-for="TransferReason" rows="3" class="form-control" placeholder="Provide a brief explanation for the change..."></textarea>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Transfer Reason</label>
+                            <textarea asp-for="TransferReason" rows="3" class="form-control" placeholder="Provide a brief explanation for the change..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -258,7 +338,7 @@
                         document.getElementById("currentDepartment").value = d.departmentId;
                         document.getElementById("currentDesignation").value = d.designationId;
 
-                        // Set hidden inputs (so the data actually submits)
+                        // Set hidden inputs (so data submits properly)
                         document.getElementById("currentBranchHidden").value = d.branchId;
                         document.getElementById("currentDepartmentHidden").value = d.departmentId;
                         document.getElementById("currentDesignationHidden").value = d.designationId;

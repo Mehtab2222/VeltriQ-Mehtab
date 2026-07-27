@@ -5,307 +5,273 @@
 }
 
 <style>
+    /* ── ULTRA-THIN GLOBAL SCROLLBAR FORCE OVERRIDES ── */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--border) !important;
+        border-radius: 10px !important;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--purple) !important;
+        }
+
+    * {
+        scrollbar-width: thin !important;
+        scrollbar-color: var(--border) transparent !important;
+    }
 
     .department-create-page {
-        padding: 4px 0 32px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+        padding-bottom: 30px;
     }
 
     /* TOPBAR */
-
     .department-topbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 18px;
-        gap: 20px;
+        margin-bottom: 14px;
+        gap: 16px;
     }
 
     .department-breadcrumb {
         display: flex;
         align-items: center;
-        gap: 7px;
-        font-size: 13px;
+        gap: 8px;
+        font-size: 12.5px;
     }
 
         .department-breadcrumb a {
-            color: #8b5cf6;
+            color: var(--purple);
             text-decoration: none;
             font-weight: 600;
         }
 
+        .department-breadcrumb i {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
         .department-breadcrumb span {
-            color: #94a3b8;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
     .department-top-actions {
         display: flex;
-        gap: 10px;
+        align-items: center;
+        gap: 8px;
     }
 
     .cancel-btn {
-        height: 40px;
-        padding: 0 18px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.03);
-        color: #94a3b8;
-        font-size: 13px;
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        font-size: 11.5px;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 7px;
+        gap: 6px;
         text-decoration: none;
+        transition: all 0.2s ease;
     }
+
+        .cancel-btn:hover {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
 
     .save-btn {
-        height: 40px;
-        padding: 0 20px;
+        height: 32px;
+        padding: 0 16px;
         border: none;
-        border-radius: 10px;
-        background: linear-gradient(135deg,#6d28d9,#7c3aed);
+        border-radius: 4px;
+        background: var(--purple);
         color: #fff;
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 11.5px;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        box-shadow: 0 8px 22px rgba(124,58,237,.24);
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
-    /* CARD */
+        .save-btn:hover {
+            opacity: 0.9;
+        }
 
-    .department-card {
-        background: rgba(30,35,44,.92);
-        border: 1px solid rgba(255,255,255,.06);
-        border-radius: 18px;
+    /* SINGLE COMPACT CARD MODULE (3 Columns per row) */
+    .department-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
+        padding: 20px;
     }
 
-    .department-card-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 18px 22px;
-        border-bottom: 1px solid rgba(255,255,255,.05);
-    }
-
-    .department-card-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        background: rgba(124,58,237,.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #a78bfa;
-    }
-
-    .department-card-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #fff;
-    }
-
-    /* BODY */
-
-    .department-card-body {
-        padding: 22px;
+    .department-card-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(3, 1fr);
         gap: 16px;
     }
 
-    .full-width {
+    .col-span-2 {
         grid-column: span 2;
     }
 
-    /* FIELD */
+    .col-span-3 {
+        grid-column: span 3;
+    }
 
+    /* FIELD */
     .form-field {
         display: flex;
         flex-direction: column;
+        gap: 4px;
     }
 
         .form-field label {
-            margin-bottom: 7px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            color: #64748b;
-            letter-spacing: .7px;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
             text-transform: uppercase;
         }
 
     /* INPUT */
-
     .form-input,
     .form-select {
         width: 100%;
-        height: 42px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,.07);
-        background: rgba(15,20,30,.7);
-        color: #e2e8f0;
-        padding: 0 14px;
-        font-size: 13px;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 10px;
+        font-size: 12px;
         outline: none;
+        transition: border-color 0.2s ease;
     }
 
         .form-input:focus,
         .form-select:focus {
-            border-color: #7c3aed;
-            background: rgba(124,58,237,.06);
-            box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+            border-color: var(--purple);
         }
 
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+    /* RESPONSIVE */
+    @@media(max-width: 1024px) {
+        .department-card-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .col-span-2, .col-span-3 {
+            grid-column: span 2;
+        }
+    }
+
+    @@media(max-width: 640px) {
+        .department-card-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .col-span-2, .col-span-3 {
+            grid-column: span 1;
+        }
+
+        .department-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .department-top-actions {
+            width: 100%;
+        }
+
+        .cancel-btn,
+        .save-btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
 </style>
 
 <div class="department-create-page">
 
-    <!-- TOPBAR -->
-
     <div class="department-topbar">
-
         <div class="department-breadcrumb">
-
-            <a href="/Department/Index">
-                Departments
-            </a>
-
+            <a href="/Department/Index">Departments</a>
             <i class="bi bi-chevron-right"></i>
-
             <span>Create</span>
-
         </div>
 
         <div class="department-top-actions">
-
-            <a href="/Department/Index"
-               class="cancel-btn">
-
-                <i class="bi bi-x"></i>
-
-                Cancel
-
+            <a href="/Department/Index" class="cancel-btn">
+                <i class="bi bi-x"></i> Cancel
             </a>
 
-            <button type="submit"
-                    form="departmentForm"
-                    class="save-btn">
-
-                <i class="bi bi-building-add"></i>
-
-                Save Department
-
+            <button type="submit" form="departmentForm" class="save-btn">
+                <i class="bi bi-building-add"></i> Save Department
             </button>
-
         </div>
-
     </div>
 
-    <!-- FORM -->
+    <form id="departmentForm" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
 
-    <form id="departmentForm"
-          asp-action="Create"
-          method="post">
+        <div class="department-master-card">
+            <div class="department-card-grid">
 
-        <div class="department-card">
-
-            <div class="department-card-header">
-
-                <div class="department-card-icon">
-
-                    <i class="bi bi-diagram-3"></i>
-
-                </div>
-
-                <div class="department-card-title">
-                    Department Information
-                </div>
-
-            </div>
-
-            <div class="department-card-body">
-
-                <!-- BRANCH -->
-
-                <div class="form-field full-width">
-
-                    <label>
-                        Branch
-                    </label>
-
-                    <select asp-for="BranchId"
-                            asp-items="ViewBag.BranchList"
-                            class="form-select">
-
-                        <option value="">
-                            Select Branch
-                        </option>
-
+                <div class="form-field">
+                    <label>Branch *</label>
+                    <select asp-for="BranchId" asp-items="ViewBag.BranchList" class="form-select">
+                        <option value="">Select Branch</option>
                     </select>
-
                 </div>
-
-                <!-- NAME -->
-
-                <div class="form-field full-width">
-
-                    <label>
-                        Department Name
-                    </label>
-
-                    <input asp-for="DepartmentName"
-                           class="form-input"
-                           placeholder="Enter department name" />
-
-                </div>
-
-                <!-- CODE -->
 
                 <div class="form-field">
-
-                    <label>
-                        Department Code
-                    </label>
-
-                    <input asp-for="DepartmentCode"
-                           class="form-input"
-                           placeholder="DEP-001" />
-
+                    <label>Department Name *</label>
+                    <input asp-for="DepartmentName" class="form-input" placeholder="Enter department name" autocomplete="off" />
                 </div>
-
-                <!-- EMAIL -->
 
                 <div class="form-field">
-
-                    <label>
-                        Department Email
-                    </label>
-
-                    <input asp-for="Email"
-                           class="form-input"
-                           placeholder="department@company.com" />
-
+                    <label>Department Code *</label>
+                    <input asp-for="DepartmentCode" class="form-input" placeholder="DEP-001" autocomplete="off" />
                 </div>
 
-                <!-- DESCRIPTION -->
+                <div class="form-field">
+                    <label>Department Email</label>
+                    <input asp-for="Email" class="form-input" placeholder="department@company.com" autocomplete="off" />
+                </div>
 
-                <div class="form-field full-width">
-
-                    <label>
-                        Description
-                    </label>
-
-                    <input asp-for="Description"
-                           class="form-input"
-                           placeholder="Enter department description" />
-
+                <div class="form-field col-span-2">
+                    <label>Description</label>
+                    <input asp-for="Description" class="form-input" placeholder="Enter department description" autocomplete="off" />
                 </div>
 
             </div>
-
         </div>
-
     </form>
-
 </div>

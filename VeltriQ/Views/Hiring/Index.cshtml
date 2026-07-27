@@ -616,7 +616,64 @@
         <div class="hir-modal-footer" id="hirModalFooter"></div>
     </div>
 </div>
-
+<div class="hir-modal-backdrop" id="hirAvailModalBackdrop">
+    <div class="hir-modal-box" style="width:520px;">
+        <div class="hir-modal-head">
+            <div>
+                <h4>Request Availability</h4>
+                <p id="hirAvailModalSubtitle"></p>
+            </div>
+            <button type="button" class="hir-modal-close" onclick="closeAvailabilityModal()">✕</button>
+        </div>
+        <div class="hir-modal-body">
+            <div class="hir-field-row">
+                <div class="hir-field-group"><label>Round Type</label><select id="availRoundType" onchange="loadPoolsForRound()"></select></div>
+                <div class="hir-field-group"><label>Interviewer/Recruiter Pool</label><select id="availPool"></select></div>
+            </div>
+            <div class="hir-field-row">
+                <div class="hir-field-group"><label>Target Date</label><input type="date" id="availTargetDate"></div>
+                <div class="hir-field-group"><label>Reply Deadline</label><input type="datetime-local" id="availDeadline"></div>
+            </div>
+            <div class="hir-field-group">
+                <label>Offer These Time Slots</label>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;" id="availSlotChips"></div>
+            </div>
+        </div>
+        <div class="hir-modal-footer">
+            <button class="hir-btn hir-btn-ghost" onclick="closeAvailabilityModal()">Cancel</button>
+            <button class="hir-btn hir-btn-primary" onclick="submitAvailabilityRequest()"><i class="bi bi-broadcast"></i> Send Poll</button>
+        </div>
+    </div>
+</div>
+<div class="hir-modal-backdrop" id="hirAssignModalBackdrop">
+    <div class="hir-modal-box" style="width:960px;">
+        <div class="hir-modal-head">
+            <div>
+                <h4>Assign & Confirm — <span id="assignRoundName"></span></h4>
+                <p id="assignSubtitle"></p>
+            </div>
+            <button type="button" class="hir-modal-close" onclick="closeAssignModal()">✕</button>
+        </div>
+        <div class="hir-modal-body">
+            <table class="hir-table" style="table-layout:auto;">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Match</th>
+                        <th>Applied For</th>
+                        <th>Assigned Slot</th>
+                    </tr>
+                </thead>
+                <tbody id="assignMatchTableBody"></tbody>
+            </table>
+            <div class="hir-selected-list" id="assignRemainingNote" style="margin-top:12px;"></div>
+        </div>
+        <div class="hir-modal-footer">
+            <button class="hir-btn hir-btn-ghost" onclick="closeAssignModal()">Cancel</button>
+            <button class="hir-btn hir-btn-success" onclick="confirmAssignments()"><i class="bi bi-check2-circle"></i> Confirm All</button>
+        </div>
+    </div>
+</div>
 <script>
     const HIRING_STAGES = [
         { key: 'Shortlisted', color: '#6366f1' },
@@ -629,6 +686,8 @@
     ];
 
     let activeHiringStage = 'Shortlisted';
+        const STAGE_MAPPING = { Shortlisted: 'Screening', Screening: null, Evaluating: 'Evaluating', Offered: null };
+    let currentPollStatus = null;
 
     let stageCountsCache = {};
     let currentPipelineList = [];
@@ -649,6 +708,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         loadManpowerRequestFilter();
         loadStageCounts();
+        loadStagePollStatus();
     });
 
     async function loadManpowerRequestFilter() {
@@ -701,6 +761,21 @@
         closeActionsMenu();
         renderPillStrip();
         loadPipelineCandidates();
+        loadStagePollStatus();
+    }
+
+    async function loadStagePollStatus() {
+        const mapping = STAGE_MAPPING[activeHiringStage];
+        currentPollStatus = null;
+        if (!mapping) return;
+
+        try {
+            const res = await fetch(`/Availability/GetStagePollStatus?stageMapping=${mapping}`);
+            const result = await res.json();
+            currentPollStatus = result.data;
+        } catch (err) {
+            console.error('Poll status load fault:', err);
+        }
     }
 
     async function loadPipelineCandidates() {
@@ -804,14 +879,15 @@
         const btn = document.getElementById('hirActionsBtn');
         const countEl = document.getElementById('hirActionsCount');
         const count = selectedApplicantIds.size;
+        const mapping = STAGE_MAPPING[activeHiringStage];
 
-        btn.disabled = count === 0;
+        btn.disabled = count === 0 && !mapping;
         if (count > 0) {
             countEl.style.display = 'inline-block';
             countEl.innerText = count;
         } else {
             countEl.style.display = 'none';
-            closeActionsMenu();
+            if (count === 0 && !mapping) closeActionsMenu();
         }
     }
 
@@ -820,7 +896,8 @@
        ========================================================= */
     function toggleActionsMenu(e) {
         e.stopPropagation();
-        if (selectedApplicantIds.size === 0) return;
+        const mapping = STAGE_MAPPING[activeHiringStage];
+        if (selectedApplicantIds.size === 0 && !mapping) return;
 
         const menu = document.getElementById('hirActionsMenu');
         const willOpen = !menu.classList.contains('open');
@@ -839,10 +916,29 @@
 
     document.addEventListener('click', closeActionsMenu);
 
-    function buildActionsMenuItems() {
+      function buildActionsMenuItems() {
+        let pollItem = '';
+        const mapping = STAGE_MAPPING[activeHiringStage];
+
+    if (mapping) {
+        if (currentPollStatus && currentPollStatus.hasOpenRequest) {
+            pollItem = `
+                <div class="hir-actions-menu-item" onclick="openAssignConfirmModal(${currentPollStatus.availabilityRequestId})">
+                    <i class="bi bi-hourglass-split"></i> Poll Sent — ${currentPollStatus.roundTypeName}
+                </div>
+                <div class="hir-actions-menu-divider"></div>
+            `;
+        } else {
+            pollItem = `
+                <div class="hir-actions-menu-item" onclick="openAvailabilityModal()"><i class="bi bi-broadcast"></i> Request Availability</div>
+                <div class="hir-actions-menu-divider"></div>
+            `;
+        }
+    }
+
         switch (activeHiringStage) {
             case 'Shortlisted':
-                return `
+                return pollItem + `
                     <div class="hir-actions-menu-item" onclick="openStageModal('screening')"><i class="bi bi-clipboard-check"></i> Send to Screening</div>
                     <div class="hir-actions-menu-divider"></div>
                     <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
@@ -854,7 +950,7 @@
                     <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
                 `;
             case 'Evaluating':
-                return `
+                return pollItem + `
                     <div class="hir-actions-menu-item" onclick="openStageModal('offer')"><i class="bi bi-send-check"></i> Send Offer Letter</div>
                     <div class="hir-actions-menu-divider"></div>
                     <div class="hir-actions-menu-item danger" onclick="openStageModal('reject')"><i class="bi bi-x-circle"></i> Reject</div>
@@ -1052,8 +1148,177 @@
             alert('Network error — please check server endpoint route implementation.');
         }
     }
+        const DEFAULT_SLOT_OPTIONS = ['10:00', '11:00', '12:00', '14:00', '15:00', '16:00'];
 
+    async function openAvailabilityModal() {
+        closeActionsMenu();
+        const mapping = STAGE_MAPPING[activeHiringStage];
+        document.getElementById('hirAvailModalSubtitle').innerText = `For candidates in "${activeHiringStage}"`;
+
+        const roundRes = await fetch(`/Availability/GetRoundTypesForStage?stageMapping=${mapping}`);
+        const roundResult = await roundRes.json();
+        const roundSelect = document.getElementById('availRoundType');
+        roundSelect.innerHTML = (roundResult.data || []).map(r => `<option value="${r.roundTypeId}">${r.roundTypeName}</option>`).join('');
+
+        document.getElementById('availSlotChips').innerHTML = DEFAULT_SLOT_OPTIONS.map(t =>
+            `<div class="hir-selected-list" style="cursor:pointer; padding:6px 12px; display:inline-block;" data-time="${t}" onclick="toggleSlotChip(this)">${t}</div>`
+        ).join('');
+
+        await loadPoolsForRound();
+        document.getElementById('hirAvailModalBackdrop').classList.add('open');
+    }
+
+    function toggleSlotChip(el) {
+        el.classList.toggle('slot-picked');
+        el.style.background = el.classList.contains('slot-picked') ? 'var(--purple)' : 'var(--input-bg)';
+        el.style.color = el.classList.contains('slot-picked') ? '#fff' : 'var(--text-secondary)';
+    }
+
+    async function loadPoolsForRound() {
+        const roundTypeId = document.getElementById('availRoundType').value;
+        if (!roundTypeId) return;
+        const res = await fetch(`/Availability/GetPoolsForRoundType?roundTypeId=${roundTypeId}`);
+        const result = await res.json();
+        document.getElementById('availPool').innerHTML = (result.data || []).map(p => `<option value="${p.interviewPoolId}">${p.poolName} (${p.memberCount} members)</option>`).join('');
+    }
+
+    function closeAvailabilityModal() {
+        document.getElementById('hirAvailModalBackdrop').classList.remove('open');
+    }
+
+    async function submitAvailabilityRequest() {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const selectedTimes = Array.from(document.querySelectorAll('#availSlotChips .slot-picked')).map(el => el.dataset.time);
+
+        if (selectedTimes.length === 0) { alert('Pick at least one time slot to offer.'); return; }
+
+        const payload = {
+            roundTypeId: parseInt(document.getElementById('availRoundType').value),
+            interviewPoolId: parseInt(document.getElementById('availPool').value),
+            targetDate: document.getElementById('availTargetDate').value,
+            replyDeadline: document.getElementById('availDeadline').value,
+            slotTimes: selectedTimes
+        };
+
+        const res = await fetch('/Availability/CreateAvailabilityRequest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            closeAvailabilityModal();
+            await loadStagePollStatus();
+            alert('Poll sent successfully.');
+        } else {
+            alert(result.message || 'Failed to send poll.');
+        }
+    }
     function viewCandidateDetails(applicantId) {
         window.location.href = `/Applicant/Details?id=${applicantId}`;
+    }
+        let assignConfirmData = null;
+    let currentAssignments = []; // { applicantId, availabilitySlotId, employeeId }
+
+    async function openAssignConfirmModal(availabilityRequestId) {
+        closeActionsMenu();
+        const res = await fetch(`/Availability/GetAssignConfirmData?availabilityRequestId=${availabilityRequestId}`);
+        const result = await res.json();
+
+        if (!result.success) { alert(result.message || 'Failed to load data.'); return; }
+
+        assignConfirmData = result.data;
+        document.getElementById('assignRoundName').innerText = assignConfirmData.roundTypeName;
+        document.getElementById('assignSubtitle').innerText =
+            `${assignConfirmData.capacitySlots.length} interview slot(s) available · ${assignConfirmData.queuedCandidates.length} candidate(s) matched`;
+
+        currentAssignments = assignConfirmData.queuedCandidates.map((c, i) => ({
+            applicantId: c.applicantId,
+            availabilitySlotId: assignConfirmData.capacitySlots[i]?.availabilitySlotId,
+            employeeId: assignConfirmData.capacitySlots[i]?.employeeId
+        }));
+
+        renderAssignMatchTable();
+
+        document.getElementById('assignRemainingNote').innerText =
+            assignConfirmData.remainingInQueue > 0
+                ? `${assignConfirmData.remainingInQueue} remaining candidate(s) stay in queue for the next batch.`
+                : 'All eligible candidates matched.';
+
+        document.getElementById('hirAssignModalBackdrop').classList.add('open');
+    }
+
+    function renderAssignMatchTable() {
+        const tbody = document.getElementById('assignMatchTableBody');
+        const slotOptions = assignConfirmData.capacitySlots.map(s =>
+            `<option value="${s.availabilitySlotId}|${s.employeeId}">${new Date(s.slotDateTime).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} — ${s.employeeName}</option>`
+        ).join('');
+
+        tbody.innerHTML = assignConfirmData.queuedCandidates.map((c, i) => {
+            const assigned = currentAssignments[i];
+            const selectedVal = assigned.availabilitySlotId ? `${assigned.availabilitySlotId}|${assigned.employeeId}` : '';
+            return `
+                <tr>
+                    <td>${c.fullName}</td>
+                    <td>${c.matchPercentage !== null ? c.matchPercentage + '%' : '—'}</td>
+                    <td>${c.mprTitle}</td>
+                    <td>
+                        <select onchange="updateAssignment(${i}, this.value)">
+                            <option value="">-- unassigned --</option>
+                            ${slotOptions}
+                        </select>
+                    </td>
+                </tr>
+            `;
+        }).join('').replace(
+            new RegExp('<option value="' + '([^"]+)"', 'g'),
+            (m, val) => m // no-op placeholder, selection applied below
+        );
+
+        // set selected values after render
+        assignConfirmData.queuedCandidates.forEach((c, i) => {
+            const select = tbody.rows[i].querySelector('select');
+            const assigned = currentAssignments[i];
+            if (assigned.availabilitySlotId) select.value = `${assigned.availabilitySlotId}|${assigned.employeeId}`;
+        });
+    }
+
+    function updateAssignment(index, value) {
+        if (!value) {
+            currentAssignments[index].availabilitySlotId = null;
+            currentAssignments[index].employeeId = null;
+            return;
+        }
+        const [slotId, empId] = value.split('|').map(Number);
+        currentAssignments[index].availabilitySlotId = slotId;
+        currentAssignments[index].employeeId = empId;
+    }
+
+    function closeAssignModal() {
+        document.getElementById('hirAssignModalBackdrop').classList.remove('open');
+    }
+
+    async function confirmAssignments() {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const validAssignments = currentAssignments.filter(a => a.availabilitySlotId && a.employeeId);
+
+        if (validAssignments.length === 0) { alert('No valid assignments to confirm.'); return; }
+
+        const res = await fetch('/Availability/ConfirmAssignments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+           body: JSON.stringify({ availabilityRequestId: assignConfirmData.availabilityRequestId, assignments: validAssignments })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            closeAssignModal();
+            loadStageCounts();
+            loadStagePollStatus();
+            alert(result.message);
+        } else {
+            alert(result.message || 'Failed to confirm.');
+        }
     }
 </script>
