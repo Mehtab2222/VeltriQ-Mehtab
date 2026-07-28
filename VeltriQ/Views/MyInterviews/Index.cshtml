@@ -1,0 +1,670 @@
+﻿@{
+    ViewData["Title"] = "My Interviews";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .myi-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    .myi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+        .myi-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .myi-header p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 2px 0 0 0;
+        }
+
+    /* ── TAB GROUP ── */
+    .myi-tab-group {
+        display: inline-flex;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        padding: 3px;
+        border-radius: 6px;
+        gap: 2px;
+        margin-bottom: 12px;
+    }
+
+    .myi-tab-btn {
+        height: 30px;
+        padding: 0 14px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .myi-tab-btn.active {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .myi-tab-btn:not(.active):hover {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+    /* ── MAIN CONTENT CARD CONTAINER (MATCHING LEAVE / OTHER MODULES) ── */
+    .myi-card-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 140px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .myi-list-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+        .myi-list-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* ── LIST ITEM CARDS ── */
+    .myi-card {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        transition: border-color 0.2s;
+    }
+
+        .myi-card:hover {
+            border-color: var(--purple);
+        }
+
+    .myi-card-left h5 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .myi-card-left p {
+        margin: 2px 0 0 0;
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+
+    .myi-round-badge {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--purple);
+        background: rgba(124,58,237,.12);
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-top: 4px;
+    }
+
+    .myi-slot-time {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+    }
+
+    .myi-rate-btn {
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: transform .2s ease;
+    }
+
+        .myi-rate-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .myi-history-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .myi-history-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .myi-rec-chip {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+    }
+
+    .rec-strongyes, .rec-yes {
+        background: rgba(34,197,94,.15);
+        color: #22c55e;
+    }
+
+    .rec-no, .rec-strongno {
+        background: rgba(239,68,68,.15);
+        color: #ef4444;
+    }
+
+    .myi-stars-row {
+        display: flex;
+        gap: 16px;
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+
+        .myi-stars-row b {
+            color: var(--text-primary);
+        }
+
+    .myi-notes-preview {
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        font-style: italic;
+        background: var(--card-bg);
+        padding: 8px 12px;
+        border-radius: 4px;
+        border-left: 2px solid var(--purple);
+    }
+
+    .myi-empty {
+        text-align: center;
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 12.5px;
+        padding: 40px 10px;
+    }
+
+    /* ── MODAL SYSTEM ── */
+    .myi-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+        .myi-modal-backdrop.open {
+            display: flex;
+        }
+
+    .myi-modal-box {
+        width: 100%;
+        max-width: 500px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: modalShow .2s ease;
+    }
+
+    @@keyframes modalShow {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .myi-modal-head {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+        .myi-modal-head h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .myi-modal-head p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+    .myi-modal-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 4px;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .myi-modal-body {
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .myi-rating-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .myi-rating-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .myi-star-input {
+        display: flex;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+        .myi-star-input i {
+            font-size: 16px;
+            color: var(--border);
+            transition: color 0.15s;
+        }
+
+            .myi-star-input i.filled {
+                color: #f59e0b;
+            }
+
+    .myi-rec-group {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .myi-rec-opt {
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .myi-rec-opt.selected-strongyes, .myi-rec-opt.selected-yes {
+            background: rgba(34,197,94,.15);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .myi-rec-opt.selected-no, .myi-rec-opt.selected-strongno {
+            background: rgba(239,68,68,.15);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+    .myi-notes-textarea {
+        width: 100%;
+        min-height: 75px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 10px;
+        font-size: 12.5px;
+        outline: none;
+        resize: vertical;
+    }
+
+        .myi-notes-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .myi-modal-footer {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .myi-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .myi-btn-ghost {
+        background: transparent;
+        border: 1px solid var(--border) !important;
+        color: var(--text-primary);
+    }
+
+    .myi-btn-primary {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="myi-page">
+    <div class="myi-header">
+        <div>
+            <h3>My Interviews</h3>
+            <p>Rate candidates you've been scheduled to interview, and review your past feedback.</p>
+        </div>
+    </div>
+
+    <div class="myi-tab-group">
+        <button class="myi-tab-btn active" id="myiTabScheduled" onclick="switchMyiTab('scheduled')">Scheduled</button>
+        <button class="myi-tab-btn" id="myiTabHistory" onclick="switchMyiTab('history')">History</button>
+    </div>
+
+    <div class="myi-card-container">
+        <div class="myi-list-wrapper" id="myiList"></div>
+    </div>
+</div>
+
+<div class="myi-modal-backdrop" id="myiModalBackdrop">
+    <div class="myi-modal-box">
+        <div class="myi-modal-head">
+            <div>
+                <h4>Rate Interview</h4>
+                <p id="myiModalSubtitle"></p>
+            </div>
+            <button type="button" class="myi-modal-close" onclick="closeRateModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="myi-modal-body">
+            <div class="myi-rating-row"><span class="myi-rating-label">Skill / Technical Ability</span><div class="myi-star-input" data-cat="skill"></div></div>
+            <div class="myi-rating-row"><span class="myi-rating-label">Communication</span><div class="myi-star-input" data-cat="comm"></div></div>
+            <div class="myi-rating-row"><span class="myi-rating-label">Culture Fit</span><div class="myi-star-input" data-cat="culture"></div></div>
+
+            <div>
+                <label style="font-size:11px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:6px;">Overall Recommendation *</label>
+                <div class="myi-rec-group" id="myiRecGroup">
+                    <button type="button" class="myi-rec-opt" data-val="StrongYes" onclick="pickRecommendation(this)">Strong Yes</button>
+                    <button type="button" class="myi-rec-opt" data-val="Yes" onclick="pickRecommendation(this)">Yes</button>
+                    <button type="button" class="myi-rec-opt" data-val="No" onclick="pickRecommendation(this)">No</button>
+                    <button type="button" class="myi-rec-opt" data-val="StrongNo" onclick="pickRecommendation(this)">Strong No</button>
+                </div>
+            </div>
+
+            <div>
+                <label style="font-size:11px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:6px;">Interview Notes *</label>
+                <textarea class="myi-notes-textarea" id="myiNotesInput" placeholder="Explain your recommendation with specific, job-related reasons..."></textarea>
+            </div>
+        </div>
+        <div class="myi-modal-footer">
+            <button class="myi-btn myi-btn-ghost" onclick="closeRateModal()">Cancel</button>
+            <button class="myi-btn myi-btn-primary" id="myiSubmitBtn" onclick="submitFeedback()"><i class="bi bi-check2-circle"></i> Submit Feedback</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myiActiveTab = 'scheduled';
+    let myiScheduledCache = [];
+    let myiHistoryCache = [];
+    let myiRatings = { skill: 0, comm: 0, culture: 0 };
+    let myiRecommendation = null;
+    let myiActiveScheduledId = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        buildStarInputs();
+        loadMyScheduled();
+    });
+
+    function buildStarInputs() {
+        document.querySelectorAll('.myi-star-input').forEach(container => {
+            const cat = container.dataset.cat;
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = 'bi bi-star-fill';
+                star.dataset.value = i;
+                star.onclick = () => setStar(cat, i);
+                container.appendChild(star);
+            }
+        });
+    }
+
+    function setStar(cat, value) {
+        myiRatings[cat] = value;
+        const container = document.querySelector(`.myi-star-input[data-cat="${cat}"]`);
+        container.querySelectorAll('i').forEach(s => s.classList.toggle('filled', parseInt(s.dataset.value) <= value));
+    }
+
+    function pickRecommendation(btn) {
+        document.querySelectorAll('.myi-rec-opt').forEach(b => b.className = 'myi-rec-opt');
+        btn.classList.add('selected-' + btn.dataset.val.toLowerCase());
+        myiRecommendation = btn.dataset.val;
+    }
+
+    function switchMyiTab(tab) {
+        myiActiveTab = tab;
+        document.getElementById('myiTabScheduled').classList.toggle('active', tab === 'scheduled');
+        document.getElementById('myiTabHistory').classList.toggle('active', tab === 'history');
+        if (tab === 'scheduled') loadMyScheduled(); else loadMyHistory();
+    }
+
+    async function loadMyScheduled() {
+        try {
+            const res = await fetch('/MyInterviews/GetMyScheduledInterviews');
+            const result = await res.json();
+            myiScheduledCache = result.data || [];
+            renderScheduledList();
+        } catch (err) {
+            console.error('Scheduled load fault:', err);
+        }
+    }
+
+    function renderScheduledList() {
+        const list = document.getElementById('myiList');
+        if (myiScheduledCache.length === 0) {
+            list.innerHTML = `<div class="myi-empty">No scheduled interviews right now.</div>`;
+            return;
+        }
+
+        list.innerHTML = myiScheduledCache.map(x => {
+            const dt = new Date(x.slotDateTime);
+            const dateFmt = dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+            const timeFmt = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+            return `
+                <div class="myi-card">
+                    <div class="myi-card-left">
+                        <h5>${x.candidateName}</h5>
+                        <p>${x.mprTitle} ${x.matchPercentage !== null ? '· ' + x.matchPercentage + '% match' : ''}</p>
+                        <span class="myi-round-badge">${x.roundTypeName}</span>
+                    </div>
+                    <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+                        <span class="myi-slot-time">${dateFmt}, ${timeFmt}</span>
+                        <button class="myi-rate-btn" onclick="openRateModal(${x.scheduledInterviewId}, '${x.candidateName.replace(/'/g,"\\'")}', '${x.roundTypeName}')">
+                            <i class="bi bi-star"></i> Rate Interview
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function loadMyHistory() {
+        try {
+            const res = await fetch('/MyInterviews/GetMyInterviewHistory');
+            const result = await res.json();
+            myiHistoryCache = result.data || [];
+            renderHistoryList();
+        } catch (err) {
+            console.error('History load fault:', err);
+        }
+    }
+
+    function renderHistoryList() {
+        const list = document.getElementById('myiList');
+        if (myiHistoryCache.length === 0) {
+            list.innerHTML = `<div class="myi-empty">You haven't submitted any interview feedback yet.</div>`;
+            return;
+        }
+
+        list.innerHTML = myiHistoryCache.map(x => {
+            const dt = new Date(x.slotDateTime);
+            const dateFmt = dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const recClass = 'rec-' + x.overallRecommendation.toLowerCase();
+            const recLabel = x.overallRecommendation.replace(/([A-Z])/g, ' $1').trim();
+
+            return `
+                <div class="myi-card myi-history-card">
+                    <div class="myi-history-top">
+                        <div>
+                            <h5>${x.candidateName}</h5>
+                            <p>${x.mprTitle} · ${x.roundTypeName} · ${dateFmt}</p>
+                        </div>
+                        <span class="myi-rec-chip ${recClass}">${recLabel}</span>
+                    </div>
+                    <div class="myi-stars-row">
+                        <span>Skill: <b>${x.skillRating}/5</b></span>
+                        <span>Communication: <b>${x.communicationRating}/5</b></span>
+                        <span>Culture Fit: <b>${x.cultureFitRating}/5</b></span>
+                    </div>
+                    <div class="myi-notes-preview">${x.notes}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function openRateModal(scheduledInterviewId, candidateName, roundTypeName) {
+        myiActiveScheduledId = scheduledInterviewId;
+        myiRatings = { skill: 0, comm: 0, culture: 0 };
+        myiRecommendation = null;
+
+        document.getElementById('myiModalSubtitle').innerText = `${candidateName} · ${roundTypeName}`;
+        document.querySelectorAll('.myi-star-input i').forEach(s => s.classList.remove('filled'));
+        document.querySelectorAll('.myi-rec-opt').forEach(b => b.className = 'myi-rec-opt');
+        document.getElementById('myiNotesInput').value = '';
+
+        document.getElementById('myiModalBackdrop').classList.add('open');
+    }
+
+    function closeRateModal() {
+        document.getElementById('myiModalBackdrop').classList.remove('open');
+        myiActiveScheduledId = null;
+    }
+
+    async function submitFeedback() {
+        if (myiRatings.skill === 0 || myiRatings.comm === 0 || myiRatings.culture === 0) {
+            alert('Please rate all three categories.');
+            return;
+        }
+        if (!myiRecommendation) {
+            alert('Please select an overall recommendation.');
+            return;
+        }
+        const notes = document.getElementById('myiNotesInput').value.trim();
+        if (!notes) {
+            alert('Please provide notes explaining your recommendation.');
+            return;
+        }
+
+        const submitBtn = document.getElementById('myiSubmitBtn');
+        submitBtn.disabled = true;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const payload = {
+            scheduledInterviewId: myiActiveScheduledId,
+            skillRating: myiRatings.skill,
+            communicationRating: myiRatings.comm,
+            cultureFitRating: myiRatings.culture,
+            overallRecommendation: myiRecommendation,
+            notes: notes
+        };
+
+        try {
+            const res = await fetch('/MyInterviews/SubmitInterviewFeedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                closeRateModal();
+                await loadMyScheduled();
+            } else {
+                alert(result.message || 'Failed to submit feedback.');
+                submitBtn.disabled = false;
+            }
+        } catch (err) {
+            console.error('Submit feedback fault:', err);
+            alert('Network error while submitting feedback.');
+            submitBtn.disabled = false;
+        }
+    }
+</script>

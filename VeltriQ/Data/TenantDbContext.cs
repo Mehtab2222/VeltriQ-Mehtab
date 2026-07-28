@@ -147,6 +147,7 @@ namespace VeltriQ.Data
         public DbSet<ScheduledInterview> ScheduledInterviews { get; set; }
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveApplication> LeaveApplications { get; set; }
+        public DbSet<InterviewFeedback> InterviewFeedbacks { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -160,6 +161,20 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+            modelBuilder.Entity<InterviewFeedback>(entity =>
+            {
+                entity.HasKey(e => e.InterviewFeedbackId);
+                entity.Property(e => e.OverallRecommendation).HasMaxLength(20);
+                entity.Property(e => e.Notes).HasMaxLength(1000);
+
+                entity.HasOne(e => e.ScheduledInterview)
+                    .WithMany()
+                    .HasForeignKey(e => e.ScheduledInterviewId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // One feedback per scheduled interview — no duplicate submissions
+                entity.HasIndex(e => e.ScheduledInterviewId).IsUnique();
+            });
 
             modelBuilder.Entity<ScheduledInterview>(entity =>
             {
