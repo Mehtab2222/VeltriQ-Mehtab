@@ -49,5 +49,6 @@ namespace VeltriQ.ViewModels.Recruitment
         public string CurrentStage { get; set; } = string.Empty;
         public int DaysInStage { get; set; }
         public string? HiringManagerName { get; set; }
+        public string? CurrentRoundInfo { get; set; }
     }
 }

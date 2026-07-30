@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VeltriQ.Data;
+using VeltriQ.Helpers;
 using VeltriQ.Models.Core;
 using VeltriQ.Models.Recruitment;
 using VeltriQ.ViewModels.Recruitment;
@@ -125,6 +126,7 @@ namespace VeltriQ.Controllers
 
                 var scheduled = await _context.ScheduledInterviews
                     .Include(x => x.Applicant)
+                    .Include(x => x.RoundType)
                     .FirstOrDefaultAsync(x => x.ScheduledInterviewId == dto.ScheduledInterviewId
                                             && x.InterviewerEmployeeId == employeeId.Value
                                             && x.IsActive);
@@ -159,9 +161,11 @@ namespace VeltriQ.Controllers
 
                 // A clear "No" is safe to auto-apply — reject immediately.
                 // A "Yes" only marks the round complete; HR advances the stage manually.
-                if (dto.OverallRecommendation == RecommendationOptions.No || dto.OverallRecommendation == RecommendationOptions.StrongNo)
+                if (scheduled.Applicant != null)
                 {
-                    if (scheduled.Applicant != null)
+                    var stageMapping = scheduled.RoundType?.StageMapping;
+
+                    if (dto.OverallRecommendation == RecommendationOptions.No || dto.OverallRecommendation == RecommendationOptions.StrongNo)
                     {
                         scheduled.Applicant.CurrentStage = ApplicantStages.Rejected;
                         scheduled.Applicant.StageChangedOn = DateTime.Now;
@@ -169,6 +173,34 @@ namespace VeltriQ.Controllers
                         scheduled.Applicant.RejectNotes = dto.Notes;
                         scheduled.Applicant.ModifiedOn = DateTime.Now;
                         scheduled.Applicant.ModifiedBy = employeeId;
+                    }
+                    else if (dto.OverallRecommendation == RecommendationOptions.Yes || dto.OverallRecommendation == RecommendationOptions.StrongYes)
+                    {
+                        if (stageMapping == "Screening")
+                        {
+                            scheduled.Applicant.CurrentStage = ApplicantStages.Evaluating;
+                            scheduled.Applicant.StageChangedOn = DateTime.Now;
+                            scheduled.Applicant.ModifiedOn = DateTime.Now;
+                            scheduled.Applicant.ModifiedBy = employeeId;
+                        }
+                        else if (stageMapping == "Evaluating")
+                        {
+                            // Save changes so far so this round shows as Completed before we check the sequence
+                            await _context.SaveChangesAsync();
+
+                            var nextRoundTypeId = await RoundSequenceHelper.GetNextRequiredRoundTypeIdAsync(_context, scheduled.Applicant.ApplicantId);
+
+                            if (nextRoundTypeId == null)
+                            {
+                                // No more rounds required — ready for offer
+                                scheduled.Applicant.CurrentStage = ApplicantStages.Offered;
+                                scheduled.Applicant.StageChangedOn = DateTime.Now;
+                                scheduled.Applicant.ModifiedOn = DateTime.Now;
+                                scheduled.Applicant.ModifiedBy = employeeId;
+                            }
+                            // else: stay in Evaluating — HR will run "Request Availability" for the next round type,
+                            // and this applicant will now correctly appear in that round's queue (see AvailabilityController change below)
+                        }
                     }
                 }
 

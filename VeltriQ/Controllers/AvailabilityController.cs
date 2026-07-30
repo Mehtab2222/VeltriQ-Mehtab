@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VeltriQ.Data;
+using VeltriQ.Helpers;
 using VeltriQ.Models.Core;
 using VeltriQ.Models.Recruitment;
 using VeltriQ.Models.Recruitment.VeltriQ.ViewModels.Recruitment;
@@ -343,7 +344,7 @@ namespace VeltriQ.Controllers
                              && x.CurrentStage == (request.RoundType.StageMapping == "Screening" ? "Shortlisted" : "Evaluating")
                              && !alreadyScheduledApplicantIds.Contains(x.ApplicantId));
 
-                var fullQueue = await queueQuery
+                var candidatePool = await queueQuery
                     .OrderByDescending(x => x.MatchPercentage)
                     .Select(x => new CandidateQueueItemViewModel
                     {
@@ -353,6 +354,25 @@ namespace VeltriQ.Controllers
                         MatchPercentage = x.MatchPercentage
                     })
                     .ToListAsync();
+
+                List<CandidateQueueItemViewModel> fullQueue;
+
+                if (request.RoundType.StageMapping == "Evaluating")
+                {
+                    // Only include candidates whose NEXT required round is this exact round type —
+                    // stops offering "Technical Round 2" to someone who hasn't done Round 1 yet.
+                    fullQueue = new List<CandidateQueueItemViewModel>();
+                    foreach (var candidate in candidatePool)
+                    {
+                        var nextRoundTypeId = await RoundSequenceHelper.GetNextRequiredRoundTypeIdAsync(_context, candidate.ApplicantId);
+                        if (nextRoundTypeId == request.RoundTypeId)
+                            fullQueue.Add(candidate);
+                    }
+                }
+                else
+                {
+                    fullQueue = candidatePool;
+                }
 
                 var takeCount = capacitySlots.Count;
                 var topQueue = fullQueue.Take(takeCount).ToList();

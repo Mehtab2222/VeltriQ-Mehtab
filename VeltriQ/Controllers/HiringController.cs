@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using VeltriQ.Data;
+using VeltriQ.Helpers;
 using VeltriQ.Models.Core;
 using VeltriQ.Models.Recruitment;
 using VeltriQ.ViewModels.Recruitment;
@@ -125,7 +126,16 @@ namespace VeltriQ.Controllers
                             ? managers[x.ManpowerRequest.HiringManagerId]
                             : "—"
                 }).ToList();
+                if (stage == "Evaluating")
+                {
+                    var applicantIds = data.Select(x => x.ApplicantId).ToList();
+                    var roundLabels = await RoundSequenceHelper.GetCurrentRoundLabelsAsync(_context, applicantIds);
 
+                    foreach (var item in data)
+                    {
+                        item.CurrentRoundInfo = roundLabels.ContainsKey(item.ApplicantId) ? roundLabels[item.ApplicantId] : null;
+                    }
+                }
                 return Json(new
                 {
                     success = true,
