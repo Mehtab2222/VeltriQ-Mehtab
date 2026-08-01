@@ -1,1060 +1,1270 @@
-﻿@model dynamic
-
-@{
-    ViewData["Title"] = "VeltriQ Dashboard";
+﻿@{
+    ViewData["Title"] = "HRMS Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <style>
-    /* DASHBOARD SPECIFIC STYLES - Variables handled by Layout */
-    .topbar {
-        background: var(--topbar-bg);
-        border-radius: 13px;
-        padding: 10px 16px;
+    .dash-page {
+        width: 100%;
+        height: 100%;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: var(--card-shadow);
-        margin-bottom: 16px;
-        border: 1px solid var(--border);
+        flex-direction: column;
+        gap: 16px;
+        padding-bottom: 20px;
     }
 
-    .topbar-left {
+    /* MODULE NAV PILL TABS BAR */
+    .dash-module-tabs {
         display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .menu-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--text-secondary);
-        font-size: 18px;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background .15s;
-    }
-
-        .menu-btn:hover {
-            background: var(--hover-bg);
-        }
-
-    .search-box {
-        width: 330px;
-        position: relative;
-    }
-
-        .search-box input {
-            width: 100%;
-            border: 1.5px solid var(--border);
-            background: var(--input-bg);
-            border-radius: 10px;
-            padding: 8px 14px 8px 36px;
-            font-size: 13px;
-            color: var(--text-primary);
-            outline: none;
-            transition: border .2s;
-        }
-
-            .search-box input:focus {
-                border-color: #7c3aed;
-            }
-
-        .search-box i {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 12px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-    .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 3px;
-    }
-
-    .tb-icon {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--text-secondary);
-        width: 34px;
-        height: 34px;
-        border-radius: 9px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        position: relative;
-        transition: background .15s;
-    }
-
-        .tb-icon:hover {
-            background: var(--hover-bg);
-            color: var(--purple);
-        }
-
-    .notif-dot {
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        background: #7c3aed;
-        color: #fff;
-        font-size: 8px;
-        font-weight: 800;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid var(--topbar-bg);
-    }
-
-    .tb-sep {
-        width: 1px;
-        height: 24px;
-        background: var(--border);
-        margin: 0 4px;
-    }
-
-    .profile-pill {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        padding: 4px 9px;
-        border-radius: 9px;
-        cursor: pointer;
-        transition: background .15s;
-    }
-
-        .profile-pill:hover {
-            background: var(--hover-bg);
-        }
-
-        .profile-pill img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #7c3aed;
-        }
-
-    .p-name {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    .p-role {
-        font-size: 10.5px;
-        color: var(--text-muted);
-    }
-
-    /* ── GREETING ── */
-    .greeting-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 14px;
-    }
-
-    .greeting-section h2 {
-        font-size: 19px;
-        font-weight: 800;
-        margin-bottom: 3px;
-    }
-
-    .greeting-section p {
-        font-size: 12.5px;
-        color: var(--text-secondary);
-    }
-
-    .date-chip {
-        display: flex;
-        align-items: center;
-        gap: 7px;
+        gap: 6px;
         background: var(--card-bg);
         border: 1px solid var(--border);
-        border-radius: 9px;
-        padding: 6px 12px;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        cursor: pointer;
-        white-space: nowrap;
+        padding: 4px;
+        border-radius: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        flex-shrink: 0;
     }
 
-        .date-chip i {
-            color: var(--purple);
-            font-size: 12px;
+        .dash-module-tabs::-webkit-scrollbar {
+            display: none;
         }
 
-    /* ── STATS ── */
-    .stats-row {
-        display: grid;
-        grid-template-columns: repeat(5,1fr);
-        gap: 11px;
-        margin-bottom: 14px;
+    .dash-tab-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 5px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
     }
+
+        .dash-tab-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .dash-tab-btn.active {
+            background: var(--purple);
+            color: #fff;
+        }
+
+    .tab-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.18);
+        font-size: 9.5px;
+        font-weight: 800;
+    }
+
+    .dash-tab-btn:not(.active) .tab-count {
+        background: var(--hover-bg);
+        color: var(--text-secondary);
+    }
+
+    /* METRICS STATS CARDS */
+    .dash-metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+    }
+
+        .dash-metrics-grid.dense {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
 
     .stat-card {
         background: var(--card-bg);
-        border-radius: 15px;
-        padding: 15px 15px 13px;
         border: 1px solid var(--border);
-        box-shadow: var(--card-shadow);
-        transition: transform .2s,box-shadow .2s;
+        border-radius: 6px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
     }
 
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 22px rgba(15,23,42,.1);
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent, var(--purple));
         }
 
+        .stat-card:hover {
+            border-color: var(--purple);
+            transform: translateY(-1px);
+        }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+    }
+
     .stat-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        background: var(--hover-bg);
+        color: var(--accent, var(--purple));
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
-
-    .ic-pu {
-        background: var(--pu-l);
-        color: var(--purple);
-    }
-
-    .ic-bl {
-        background: var(--bl-l);
-        color: var(--blue);
-    }
-
-    .ic-gr {
-        background: var(--gr-l);
-        color: var(--green);
-    }
-
-    .ic-or {
-        background: var(--or-l);
-        color: var(--orange);
-    }
-
-    .ic-rd {
-        background: var(--rd-l);
-        color: var(--red);
-    }
-
-    .stat-label {
-        font-size: 11px;
-        color: var(--text-muted);
-        font-weight: 500;
-        margin-bottom: 3px;
+        font-size: 14px;
     }
 
     .stat-value {
-        font-size: 19px;
+        font-family: 'Manrope', sans-serif;
+        font-size: 25px;
         font-weight: 800;
-        margin-bottom: 3px;
+        color: var(--text-primary);
+        line-height: 1.1;
     }
 
-    .stat-delta {
-        font-size: 11px;
+    .stat-footer {
         display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    .stat-trend-up {
+        color: #22c55e;
+        font-weight: 700;
+        display: inline-flex;
         align-items: center;
         gap: 2px;
     }
 
-    .d-up {
-        color: #16a34a;
+    .stat-bar-track {
+        margin-top: 4px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--hover-bg);
+        overflow: hidden;
     }
 
-    .d-dn {
-        color: #dc2626;
+    .stat-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        background: var(--accent, var(--purple));
     }
 
-    /* ── CARDS & GRIDS ── */
-    .card-box {
-        background: var(--card-bg);
-        border-radius: 15px;
-        padding: 16px 18px;
-        border: 1px solid var(--border);
-        box-shadow: var(--card-shadow);
-    }
-
-    .ch-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 13px;
-    }
-
-    .card-title {
-        font-size: 13.5px;
-        font-weight: 700;
-    }
-
-    .view-all {
-        font-size: 11.5px;
-        color: var(--purple);
-        text-decoration: none;
-        font-weight: 600;
-    }
-
-    .sel-mini {
-        background: var(--input-bg);
-        border: 1.5px solid var(--border);
-        border-radius: 8px;
-        padding: 5px 10px;
-        font-size: 12px;
-        color: var(--text-secondary);
-        cursor: pointer;
-        outline: none;
-    }
-
-    .grid-2 {
+    /* SPLIT GRIDS */
+    .dash-split-grid {
         display: grid;
-        grid-template-columns: 1fr 350px;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-
-    .grid-3 {
-        display: grid;
-        grid-template-columns: 1fr 1fr 350px;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-
-    .grid-last {
-        display: grid;
-        grid-template-columns: 1fr 350px;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-
-    /* ── APPROVALS ── */
-    .appr-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--border);
-    }
-
-        .appr-item:last-child {
-            border-bottom: none;
-        }
-
-    .emp-info {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-    }
-
-    .emp-ava {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .emp-name {
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .emp-type {
-        font-size: 11px;
-        color: var(--text-muted);
-    }
-
-    .act-grp {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .act-time {
-        font-size: 10.5px;
-        color: var(--text-muted);
-        margin-right: 2px;
-    }
-
-    .appr-btn, .rejt-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 12px;
-        transition: all .15s;
-    }
-
-    .appr-btn {
-        background: var(--gr-l);
-        color: var(--green);
-    }
-
-    .rejt-btn {
-        background: var(--rd-l);
-        color: var(--red);
-    }
-
-    /* ── DONUT ── */
-    .donut-wrap {
-        display: flex;
-        align-items: center;
+        grid-template-columns: 2fr 1fr;
         gap: 14px;
     }
 
-    .donut-ctr {
-        position: relative;
-        flex-shrink: 0;
+        .dash-split-grid.even {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .dash-split-grid.thirds {
+            grid-template-columns: 1.3fr 1fr 1fr;
+        }
+
+    @@media (max-width: 1100px) {
+        .dash-split-grid,
+        .dash-split-grid.even,
+        .dash-split-grid.thirds {
+            grid-template-columns: 1fr;
+        }
     }
 
-    .donut-label {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%,-50%);
-        text-align: center;
-        pointer-events: none;
+    .dash-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
 
-        .donut-label .dl {
-            font-size: 10px;
+    .dash-card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--card-bg);
+    }
+
+        .dash-card-header h4 {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .dash-card-header span {
+            font-size: 11px;
             color: var(--text-muted);
         }
 
-        .donut-label .dv {
-            font-size: 16px;
-            font-weight: 800;
+        .dash-card-header a.link-out {
+            font-size: 11px;
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 700;
         }
 
-    .leg-list {
-        list-style: none;
-        flex: 1;
+    .dash-card-body {
+        padding: 18px 16px;
     }
 
-        .leg-list li {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 3px 0;
-            font-size: 11.5px;
-            color: var(--text-secondary);
-        }
-
-    .leg-dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 6px;
-    }
-
-    .leg-left {
+    /* ===== PURE CSS HORIZONTAL BAR CHART ===== */
+    .hbar-list {
         display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .hbar-row {
+        display: grid;
+        grid-template-columns: 150px 1fr 32px;
         align-items: center;
-    }
-
-    .leg-val {
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    /* ── ANNOUNCEMENTS ── */
-    .ann-item {
-        display: flex;
         gap: 10px;
-        padding: 8px 0;
+    }
+
+    .hbar-label {
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .hbar-track {
+        height: 10px;
+        border-radius: 5px;
+        background: var(--hover-bg);
+        overflow: hidden;
+    }
+
+    .hbar-fill {
+        height: 100%;
+        border-radius: 5px;
+        width: var(--pct, 0%);
+        background: var(--bar-color, var(--purple));
+    }
+
+    .hbar-value {
+        font-family: 'Manrope', sans-serif;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--text-primary);
+        text-align: right;
+    }
+
+    /* ===== PURE CSS VERTICAL BAR CHART ===== */
+    .vbar-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px;
+        height: 160px;
+        padding: 0 4px;
         border-bottom: 1px solid var(--border);
     }
 
-        .ann-item:last-child {
-            border-bottom: none;
-        }
+    .vbar-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        height: 100%;
+        justify-content: flex-end;
+    }
 
-    .ann-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
+    .vbar-value {
+        font-family: 'Manrope', sans-serif;
+        font-size: 10.5px;
+        font-weight: 800;
+        color: var(--text-primary);
+    }
+
+    .vbar-fill {
+        width: 26px;
+        border-radius: 4px 4px 0 0;
+        background: var(--purple);
+        height: var(--h, 10%);
+    }
+
+    .vbar-labels {
+        display: flex;
+        gap: 16px;
+        padding-top: 8px;
+    }
+
+    .vbar-label {
+        flex: 1;
+        font-size: 10px;
+        color: var(--text-secondary);
+        text-align: center;
+    }
+
+    /* ===== PURE CSS DONUT CHART ===== */
+    .donut-wrap {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 15px;
+        padding: 6px 0 2px;
+    }
+
+    .donut {
+        width: 128px;
+        height: 128px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+        .donut::before {
+            content: "";
+            position: absolute;
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+    .donut-center {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+        .donut-center .n {
+            font-family: 'Manrope', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .donut-center .l {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+    .chart-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 16px 16px;
+    }
+
+    .legend-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11.5px;
+        color: var(--text-secondary);
+    }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
         flex-shrink: 0;
     }
 
-    .ann-title {
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 1px;
+    .legend-row b {
+        color: var(--text-primary);
+        margin-left: auto;
+        font-family: 'Manrope', sans-serif;
     }
 
-    .ann-desc {
-        font-size: 11px;
-        color: var(--text-muted);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 210px;
+    /* TABLES & BADGES */
+    .dash-table {
+        width: 100%;
+        border-collapse: collapse;
     }
 
-    .ann-time {
+        .dash-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--hover-bg);
+        }
+
+        .dash-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .dash-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dash-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .emp-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+    }
+
+    .emp-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--hover-bg);
+        color: var(--purple);
+        font-size: 9.5px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .cell-sub {
+        display: block;
         font-size: 10px;
         color: var(--text-muted);
         margin-top: 1px;
     }
 
-    /* ── BIRTHDAYS ── */
-    .bday-item {
-        display: flex;
+    .mini-badge {
+        display: inline-flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--border);
+        gap: 5px;
+        height: 18px;
+        padding: 0 7px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
     }
 
-        .bday-item:last-child {
-            border-bottom: none;
+        .mini-badge::before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
         }
 
-    .bday-left {
-        display: flex;
-        align-items: center;
-        gap: 9px;
+    .badge-success {
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
     }
 
-    .bday-ava {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        object-fit: cover;
+    .badge-warning {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
     }
 
-    .bday-name {
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .bday-role {
-        font-size: 11px;
-        color: var(--text-muted);
-    }
-
-    .bday-badge {
-        font-size: 10.5px;
-        font-weight: 600;
-        padding: 3px 9px;
-        border-radius: 20px;
-    }
-
-    .b-today {
-        background: var(--pu-l);
+    .badge-info {
+        background: rgba(124, 58, 237, 0.15);
         color: var(--purple);
     }
 
-    .b-anniv {
-        background: var(--bl-l);
-        color: var(--blue);
+    /* QUICK ACTIONS MATRIX */
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 14px;
     }
 
-    .b-soon {
-        background: var(--gr-l);
-        color: var(--green);
-    }
-
-    /* ── FLOATING THEME ── */
-    .float-settings {
-        position: fixed;
-        bottom: 22px;
-        right: 22px;
-        z-index: 999;
-    }
-
-    .float-btn {
-        width: 46px;
-        height: 46px;
-        background: linear-gradient(135deg,#6d28d9,#7c3aed);
-        border: none;
-        border-radius: 13px;
-        color: #fff;
-        font-size: 19px;
+    .quick-action-btn {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 12px;
+        text-align: left;
         cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .quick-action-btn:hover {
+            border-color: var(--purple);
+            background: var(--hover-bg);
+            transform: translateY(-1px);
+        }
+
+        .quick-action-btn i {
+            font-size: 16px;
+            color: var(--purple);
+        }
+
+        .quick-action-btn span {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .quick-action-btn p {
+            font-size: 10.5px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+    /* TODAY'S FLOOR - who's out avatar strip */
+    .pulse-strip {
+        display: flex;
+        gap: 0;
+        padding: 14px 16px;
+        overflow-x: auto;
+    }
+
+    .pulse-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        min-width: 66px;
+        border-right: 1px solid var(--border);
+        padding: 0 12px;
+    }
+
+        .pulse-item:last-child {
+            border-right: none;
+        }
+
+    .pulse-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--hover-bg);
+        border: 1px solid var(--border);
+        color: var(--purple);
+        font-size: 11px;
+        font-weight: 800;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 6px 20px rgba(109,40,217,.4);
-        transition: transform .2s,box-shadow .2s;
     }
 
-        .float-btn:hover {
-            transform: scale(1.08);
-            box-shadow: 0 10px 28px rgba(109,40,217,.5);
-        }
-
-    .appear-panel {
-        position: absolute;
-        bottom: 56px;
-        right: 0;
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 13px;
-        padding: 10px;
-        width: 185px;
-        box-shadow: 0 10px 36px rgba(0,0,0,.18);
-        display: none;
-    }
-
-        .appear-panel.open {
-            display: block;
-        }
-
-    .theme-opt {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        padding: 8px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 12.5px;
-        font-weight: 600;
+    .pulse-name {
+        font-size: 9.5px;
         color: var(--text-secondary);
-        transition: background .15s;
-        border: 2px solid transparent;
-    }
-
-        .theme-opt:hover {
-            background: var(--hover-bg);
-        }
-
-        .theme-opt.active {
-            border-color: var(--purple);
-            color: var(--purple);
-            background: var(--pu-l);
-        }
-
-    .avail-req-item {
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border);
-    }
-
-        .avail-req-item:last-child {
-            border-bottom: none;
-        }
-
-    .avail-req-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 10px;
-    }
-
-    .avail-req-title {
-        font-size: 12.5px;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    .avail-req-sub {
-        font-size: 11px;
-        color: var(--text-muted);
-        margin-top: 2px;
-    }
-
-    .avail-req-deadline {
-        font-size: 10.5px;
-        font-weight: 600;
-        padding: 3px 9px;
-        border-radius: 20px;
-        background: var(--or-l);
-        color: var(--orange);
         white-space: nowrap;
     }
 
-    .avail-req-done {
-        font-size: 10.5px;
-        font-weight: 600;
-        padding: 3px 9px;
-        border-radius: 20px;
-        background: var(--gr-l);
-        color: var(--green);
-        white-space: nowrap;
-    }
-
-    .avail-slot-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 10px;
-    }
-
-    .avail-slot-chip {
-        border: 1.5px solid var(--border);
-        background: var(--input-bg);
-        color: var(--text-secondary);
-        border-radius: 8px;
-        padding: 7px 12px;
-        font-size: 11.5px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all .15s;
-    }
-
-        .avail-slot-chip.picked {
-            background: var(--purple);
-            border-color: var(--purple);
-            color: #fff;
-        }
-
-        .avail-slot-chip:hover:not(.picked) {
-            border-color: var(--purple);
-        }
-
-    .avail-submit-btn {
-        height: 32px;
-        padding: 0 16px;
-        border-radius: 8px;
-        border: none;
-        background: var(--purple);
-        color: #fff;
+    .dash-note {
+        padding: 14px 16px;
         font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
+        color: var(--text-secondary);
+        border-top: 1px solid var(--border);
+        line-height: 1.6;
     }
 
-        .avail-submit-btn:hover {
-            opacity: .9;
+        .dash-note b {
+            color: var(--text-primary);
+        }
+
+    /* TAB CONTENT PANELS */
+    .dash-tab-pane {
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+        .dash-tab-pane.active {
+            display: flex;
         }
 </style>
 
-@* <div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn"><i class="bi bi-list"></i></button>
-        <div class="search-box">
-            <i class="bi bi-search"></i>
-            <input type="text" placeholder="Search for employees, documents, modules..." />
-        </div>
-    </div>
-    <div class="topbar-right">
-        <button class="tb-icon"><i class="bi bi-gift"></i></button>
-        <button class="tb-icon"><i class="bi bi-bell"></i><span class="notif-dot">8</span></button>
-        <button class="tb-icon"><i class="bi bi-question-circle"></i></button>
-        <div class="tb-sep"></div>
-        <div class="profile-pill">
-            <img src="https://i.pravatar.cc/100?img=12" alt="John Doe" />
-            <div><div class="p-name">John Doe</div><div class="p-role">HR Manager</div></div>
-            <i class="bi bi-chevron-down"></i>
-        </div>
-    </div>
-</div> *@
+<div class="dash-page">
 
-@* <div class="greeting-row">
-    <div class="greeting-section">
-        <h2>Good morning, John! 👋</h2>
-        <p>Here's what's happening in your organization today.</p>
+    <div class="dash-module-tabs">
+        <button class="dash-tab-btn active" onclick="switchDashboardTab(event, 'generalDashboard')">
+            <i class="bi bi-grid"></i> General Overview
+        </button>
+        <button class="dash-tab-btn" onclick="switchDashboardTab(event, 'leaveDashboard')">
+            <i class="bi bi-calendar2-check"></i> Leave & Time Off <span class="tab-count">4</span>
+        </button>
+        <button class="dash-tab-btn" onclick="switchDashboardTab(event, 'recruitmentDashboard')">
+            <i class="bi bi-briefcase"></i> Recruitment & Talent <span class="tab-count">12</span>
+        </button>
+        <button class="dash-tab-btn" onclick="switchDashboardTab(event, 'trainingDashboard')">
+            <i class="bi bi-mortarboard"></i> Training & Development <span class="tab-count">3</span>
+        </button>
+        <button class="dash-tab-btn" onclick="switchDashboardTab(event, 'financeDashboard')">
+            <i class="bi bi-wallet2"></i> Payroll & Finance <span class="tab-count">14</span>
+        </button>
     </div>
-    <div class="date-chip">
-        <i class="bi bi-calendar3"></i>
-        <span id="todayDate">May 9, 2026</span>
-        <i class="bi bi-chevron-down" style="font-size:9px;"></i>
-    </div>
-</div> *@
 
-<div class="stats-row">
-    <div class="stat-card">
-        <div class="stat-icon ic-pu"><i class="bi bi-people"></i></div>
-        <div class="stat-label">Total Employees</div>
-        <div class="stat-value">1,248</div>
-        <div class="stat-delta d-up"><i class="bi bi-arrow-up-short"></i> 12 this month</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon ic-bl"><i class="bi bi-person-plus"></i></div>
-        <div class="stat-label">New Hires</div>
-        <div class="stat-value">24</div>
-        <div class="stat-delta d-up"><i class="bi bi-arrow-up-short"></i> 6 this month</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon ic-gr"><i class="bi bi-calendar-check"></i></div>
-        <div class="stat-label">On Leave Today</div>
-        <div class="stat-value">38</div>
-        <div class="stat-delta d-dn"><i class="bi bi-arrow-down-short"></i> 4% from yesterday</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon ic-or"><i class="bi bi-clock"></i></div>
-        <div class="stat-label">Late Arrivals</div>
-        <div class="stat-value">15</div>
-        <div class="stat-delta d-dn"><i class="bi bi-arrow-down-short"></i> 2% from yesterday</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon ic-rd"><i class="bi bi-cash-stack"></i></div>
-        <div class="stat-label">Payroll This Month</div>
-        <div class="stat-value">$312,430</div>
-        <div class="stat-delta d-up"><i class="bi bi-arrow-up-short"></i> 8% from last month</div>
-    </div>
-</div>
-
-<div class="grid-2">
-    <div class="card-box">
-        <div class="ch-row">
-            <span class="card-title">Employee Overview</span>
-            <select class="sel-mini"><option>This Month</option><option>Last Month</option></select>
-        </div>
-        <canvas id="empChart" height="118"></canvas>
-    </div>
-    <div class="card-box">
-        <div class="ch-row"><span class="card-title">Pending Approvals</span><a href="#" class="view-all">View all</a></div>
-        <div class="appr-item">
-            <div class="emp-info"><img class="emp-ava" src="https://i.pravatar.cc/100?img=32" /><div><div class="emp-name">Sarah Johnson</div><div class="emp-type">Leave Request</div></div></div>
-            <div class="act-grp"><span class="act-time">2 days ago</span><button class="appr-btn"><i class="bi bi-check-lg"></i></button><button class="rejt-btn"><i class="bi bi-x-lg"></i></button></div>
-        </div>
-        <div class="appr-item">
-            <div class="emp-info"><img class="emp-ava" src="https://i.pravatar.cc/100?img=15" /><div><div class="emp-name">Michael Brown</div><div class="emp-type">Expense Claim</div></div></div>
-            <div class="act-grp"><span class="act-time">1 day ago</span><button class="appr-btn"><i class="bi bi-check-lg"></i></button><button class="rejt-btn"><i class="bi bi-x-lg"></i></button></div>
-        </div>
-        <div class="appr-item">
-            <div class="emp-info"><img class="emp-ava" src="https://i.pravatar.cc/100?img=21" /><div><div class="emp-name">Emily Davis</div><div class="emp-type">Leave Request</div></div></div>
-            <div class="act-grp"><span class="act-time">1 day ago</span><button class="appr-btn"><i class="bi bi-check-lg"></i></button><button class="rejt-btn"><i class="bi bi-x-lg"></i></button></div>
-        </div>
-    </div>
-</div>
-<div class="card-box" id="availabilityWidgetCard" style="display:none; margin-bottom:12px;">
-    <div class="ch-row">
-        <span class="card-title"><i class="bi bi-calendar2-check" style="color:var(--purple); margin-right:6px;"></i>Interview Availability Requests</span>
-    </div>
-    <div id="availabilityWidgetBody"></div>
-</div>
-<div class="grid-3">
-    <div class="card-box">
-        <div class="ch-row"><span class="card-title">Leave Summary</span></div>
-        <div class="donut-wrap">
-            <div class="donut-ctr">
-                <canvas id="leaveChart" width="145" height="145"></canvas>
-                <div class="donut-label"><div class="dl">Total</div><div class="dv">1,248</div></div>
+    <!-- ================= GENERAL OVERVIEW ================= -->
+    <div id="generalDashboard" class="dash-tab-pane active">
+        <div class="dash-metrics-grid">
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">Total Employees</span><div class="stat-icon"><i class="bi bi-people"></i></div></div>
+                <div class="stat-value">248</div>
+                <div class="stat-footer"><span class="stat-trend-up"><i class="bi bi-arrow-up-short"></i> +4.2%</span> from last month</div>
             </div>
-            <ul class="leg-list">
-                <li><span class="leg-left"><span class="leg-dot" style="background:#7c3aed"></span>Annual Leave</span><span class="leg-val">512</span></li>
-                <li><span class="leg-left"><span class="leg-dot" style="background:#3b82f6"></span>Sick Leave</span><span class="leg-val">210</span></li>
-                <li><span class="leg-left"><span class="leg-dot" style="background:#22c55e"></span>Casual Leave</span><span class="leg-val">180</span></li>
-            </ul>
-        </div>
-    </div>
-    <div class="card-box">
-        <div class="ch-row"><span class="card-title">Department Distribution</span></div>
-        <div class="donut-wrap">
-            <div class="donut-ctr">
-                <canvas id="deptChart" width="145" height="145"></canvas>
-                <div class="donut-label"><div class="dl">Total</div><div class="dv">1,248</div></div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Active Openings</span><div class="stat-icon"><i class="bi bi-briefcase"></i></div></div>
+                <div class="stat-value">18</div>
+                <div class="stat-footer"><span class="stat-trend-up"><i class="bi bi-arrow-up-short"></i> +2 new</span> this week</div>
             </div>
-            <ul class="leg-list">
-                <li><span class="leg-left"><span class="leg-dot" style="background:#7c3aed"></span>Engineering</span><span class="leg-val">462</span></li>
-                <li><span class="leg-left"><span class="leg-dot" style="background:#3b82f6"></span>HR</span><span class="leg-val">196</span></li>
-                <li><span class="leg-left"><span class="leg-dot" style="background:#22c55e"></span>Sales</span><span class="leg-val">312</span></li>
-            </ul>
+            <div class="stat-card" style="--accent:#f59e0b;">
+                <div class="stat-header"><span class="stat-title">Pending Approvals</span><div class="stat-icon"><i class="bi bi-clock-history"></i></div></div>
+                <div class="stat-value">7</div>
+                <div class="stat-footer"><span style="color:#f59e0b; font-weight:700;"><i class="bi bi-exclamation-circle"></i> Action required</span></div>
+            </div>
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">Attendance Rate</span><div class="stat-icon"><i class="bi bi-person-check"></i></div></div>
+                <div class="stat-value">96.8%</div>
+                <div class="stat-bar-track"><div class="stat-bar-fill" style="width:96.8%;"></div></div>
+                <div class="stat-footer"><span class="stat-trend-up"><i class="bi bi-arrow-up-short"></i> +0.5%</span> stable today</div>
+            </div>
         </div>
-    </div>
-    <div class="card-box">
-        <div class="ch-row"><span class="card-title">Recent Announcements</span></div>
-        <div class="ann-item">
-            <div class="ann-icon ic-pu"><i class="bi bi-megaphone-fill"></i></div>
-            <div><div class="ann-title">Company Offsite 2024</div><div class="ann-desc">Excited to announce our offsite...</div><div class="ann-time">2 hours ago</div></div>
-        </div>
-        <div class="ann-item">
-            <div class="ann-icon ic-gr"><i class="bi bi-people-fill"></i></div>
-            <div><div class="ann-title">Leave Policy</div><div class="ann-desc">Updated policy review...</div><div class="ann-time">1 day ago</div></div>
-        </div>
-    </div>
-</div>
 
-<div class="grid-last">
-    <div class="card-box">
-        <div class="ch-row"><span class="card-title">Attendance Overview</span><select class="sel-mini"><option>This Week</option></select></div>
-        <canvas id="attendChart" height="110"></canvas>
-    </div>
-    <div class="card-box">
-        <div class="ch-row"><span class="card-title">Birthdays</span><a href="#" class="view-all">View all</a></div>
-        <div class="bday-item">
-            <div class="bday-left"><img class="bday-ava" src="https://i.pravatar.cc/100?img=44" /><div><div class="bday-name">Lisa Martinez</div><div class="bday-role">UI Designer</div></div></div>
-            <span class="bday-badge b-today">🎂 Today</span>
-        </div>
-        <div class="bday-item">
-            <div class="bday-left"><img class="bday-ava" src="https://i.pravatar.cc/100?img=60" /><div><div class="bday-name">Robert Chen</div><div class="bday-role">Backend Engineer</div></div></div>
-            <span class="bday-badge b-anniv">🎉 3 Years</span>
-        </div>
-    </div>
-</div>
+        <div class="dash-split-grid">
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Today's Floor</h4><span>Who's out, at a glance</span></div>
+                <div class="pulse-strip">
+                    <div class="pulse-item"><div class="pulse-avatar">EJ</div><div class="pulse-name">Elizabeth</div></div>
+                    <div class="pulse-item"><div class="pulse-avatar">TW</div><div class="pulse-name">Thomas</div></div>
+                    <div class="pulse-item"><div class="pulse-avatar">SJ</div><div class="pulse-name">Sarah</div></div>
+                    <div class="pulse-item"><div class="pulse-avatar">RK</div><div class="pulse-name">Ravi</div></div>
+                    <div class="pulse-item"><div class="pulse-avatar">MN</div><div class="pulse-name">Meera</div></div>
+                </div>
+                <div class="dash-note">
+                    <b>5 employees on leave today.</b> Select <b>Leave & Time Off</b> above to filter specific department streams and review the approval queue.
+                </div>
+            </div>
 
-<div class="float-settings">
-    <div class="appear-panel" id="appearPanel">
-        <h6>Appearance</h6>
-        <div class="theme-opt" id="optLight" onclick="setTheme('light')"><i class="bi bi-sun-fill"></i> Light Mode</div>
-        <div class="theme-opt active" id="optDark" onclick="setTheme('dark')"><i class="bi bi-moon-fill"></i> Dark Mode</div>
-        <div class="theme-opt" id="optSystem" onclick="setTheme('system')"><i class="bi bi-display"></i> System</div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Quick Operations</h4><span>Shortcuts</span></div>
+                <div class="quick-actions-grid">
+                    <a href="/Leave/Requests" class="quick-action-btn">
+                        <i class="bi bi-calendar-check"></i><span>Leave Requests</span><p>Review & approve time off</p>
+                    </a>
+                    <a href="/Onboarding/Index" class="quick-action-btn">
+                        <i class="bi bi-person-plus"></i><span>Onboarding</span><p>Manage new hires</p>
+                    </a>
+                    <a href="/MyInterviews/Index" class="quick-action-btn">
+                        <i class="bi bi-star"></i><span>Interviews</span><p>Feedback & ratings</p>
+                    </a>
+                    <a href="/Leave/Index" class="quick-action-btn">
+                        <i class="bi bi-gear"></i><span>Leave Rules</span><p>Configure quotas</p>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <button class="float-btn" onclick="togglePanel()"><i class="bi bi-moon-fill" id="floatIcon"></i></button>
+
+    <!-- ================= LEAVE & TIME OFF ================= -->
+    <div id="leaveDashboard" class="dash-tab-pane">
+        <div class="dash-metrics-grid">
+            <div class="stat-card" style="--accent:#f59e0b;">
+                <div class="stat-header"><span class="stat-title">Pending Leave Requests</span><div class="stat-icon"><i class="bi bi-hourglass-split"></i></div></div>
+                <div class="stat-value">4</div>
+                <div class="stat-footer"><span style="color:#f59e0b; font-weight:700;">Needs review</span></div>
+            </div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Approved This Month</span><div class="stat-icon"><i class="bi bi-check-circle"></i></div></div>
+                <div class="stat-value">32</div>
+                <div class="stat-footer"><span class="stat-trend-up"><i class="bi bi-arrow-up-short"></i> +12%</span> vs last month</div>
+            </div>
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">On Leave Today</span><div class="stat-icon"><i class="bi bi-airplane"></i></div></div>
+                <div class="stat-value">5</div>
+                <div class="stat-footer"><span style="color:var(--text-muted)">Active absence</span></div>
+            </div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Active Leave Types</span><div class="stat-icon"><i class="bi bi-list-check"></i></div></div>
+                <div class="stat-value">4</div>
+                <div class="stat-footer"><span style="color:#22c55e; font-weight:700;">Configured</span></div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid">
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h4>Recent Leave Applications</h4>
+                    <a href="/Leave/Requests" class="link-out">View All &rarr;</a>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="dash-table">
+                        <thead>
+                            <tr><th>Employee</th><th>Type</th><th>Dates</th><th>Days</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">EJ</span>Elizabeth Jackson</div></td>
+                                <td>Annual Leave</td>
+                                <td>29 Jul — 31 Jul</td>
+                                <td style="font-weight: 700;">3.0</td>
+                                <td><span class="mini-badge badge-warning">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">TW</span>Thomas Wright</div></td>
+                                <td>Casual Leave</td>
+                                <td>29 Jul — 30 Jul</td>
+                                <td style="font-weight: 700;">2.0</td>
+                                <td><span class="mini-badge badge-warning">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">SJ</span>Sarah Jenkins</div></td>
+                                <td>Sick Leave</td>
+                                <td>15 Jul — 16 Jul</td>
+                                <td style="font-weight: 700;">2.0</td>
+                                <td><span class="mini-badge badge-success">Approved</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">RK</span>Ravi Kumar</div></td>
+                                <td>Casual Leave</td>
+                                <td>01 Aug — 01 Aug</td>
+                                <td style="font-weight: 700;">1.0</td>
+                                <td><span class="mini-badge badge-success">Approved</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Quick Operations</h4><span>Shortcuts</span></div>
+                <div class="quick-actions-grid">
+                    <a href="/Leave/Requests" class="quick-action-btn">
+                        <i class="bi bi-calendar-check"></i><span>Leave Requests</span><p>Review & approve time off</p>
+                    </a>
+                    <a href="/Onboarding/Index" class="quick-action-btn">
+                        <i class="bi bi-person-plus"></i><span>Onboarding</span><p>Manage new hires</p>
+                    </a>
+                    <a href="/MyInterviews/Index" class="quick-action-btn">
+                        <i class="bi bi-star"></i><span>Interviews</span><p>Feedback & ratings</p>
+                    </a>
+                    <a href="/Leave/Index" class="quick-action-btn">
+                        <i class="bi bi-gear"></i><span>Leave Rules</span><p>Configure quotas</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid even">
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Leave Type Distribution</h4><span>This quarter</span></div>
+                <div class="donut-wrap">
+                    <div class="donut" style="background: conic-gradient(var(--purple) 0deg 162deg, #22c55e 162deg 252deg, #f59e0b 252deg 324deg, #38bdf8 324deg 360deg);">
+                        <div class="donut-center"><span class="n">61</span><span class="l">Applications</span></div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-row"><span class="legend-dot" style="background:var(--purple);"></span> Annual Leave <b>45%</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#22c55e;"></span> Sick Leave <b>25%</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#f59e0b;"></span> Casual Leave <b>20%</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#38bdf8;"></span> Other <b>10%</b></div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Leave Days by Department</h4><span>This month</span></div>
+                <div class="dash-card-body">
+                    <div class="hbar-list">
+                        <div class="hbar-row">
+                            <div class="hbar-label">Engineering</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:100%; --bar-color:var(--purple);"></div></div>
+                            <div class="hbar-value">12</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Sales</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:66.7%; --bar-color:#22c55e;"></div></div>
+                            <div class="hbar-value">8</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Operations</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:58.3%; --bar-color:#f59e0b;"></div></div>
+                            <div class="hbar-value">7</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Support</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:41.7%; --bar-color:#38bdf8;"></div></div>
+                            <div class="hbar-value">5</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Design</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:33.3%; --bar-color:#a78bfa;"></div></div>
+                            <div class="hbar-value">4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= RECRUITMENT & TALENT ================= -->
+    <div id="recruitmentDashboard" class="dash-tab-pane">
+        <div class="dash-metrics-grid">
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">Active MPRs / Openings</span><div class="stat-icon"><i class="bi bi-kanban"></i></div></div>
+                <div class="stat-value">18</div>
+                <div class="stat-footer"><span class="stat-trend-up"><i class="bi bi-arrow-up-short"></i> Active hiring</span></div>
+            </div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Candidates in Pipeline</span><div class="stat-icon"><i class="bi bi-people"></i></div></div>
+                <div class="stat-value">142</div>
+                <div class="stat-footer"><span style="color:var(--purple); font-weight:700;">Screening stage</span></div>
+            </div>
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">Scheduled Interviews</span><div class="stat-icon"><i class="bi bi-calendar-event"></i></div></div>
+                <div class="stat-value">12</div>
+                <div class="stat-footer"><span>This week</span></div>
+            </div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Offer Acceptance Rate</span><div class="stat-icon"><i class="bi bi-trophy"></i></div></div>
+                <div class="stat-value">88%</div>
+                <div class="stat-bar-track"><div class="stat-bar-fill" style="width:88%; background:#22c55e;"></div></div>
+                <div class="stat-footer"><span class="stat-trend-up">Above target</span></div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid even">
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Hiring Funnel</h4><span>Applied &rarr; Hired</span></div>
+                <div class="dash-card-body">
+                    <div class="hbar-list">
+                        <div class="hbar-row">
+                            <div class="hbar-label">Applied</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:100%; --bar-color:var(--purple);"></div></div>
+                            <div class="hbar-value">142</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Screened</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:60.6%; --bar-color:#38bdf8;"></div></div>
+                            <div class="hbar-value">86</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Interviewed</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:23.9%; --bar-color:#a78bfa;"></div></div>
+                            <div class="hbar-value">34</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Offered</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:9.9%; --bar-color:#f59e0b;"></div></div>
+                            <div class="hbar-value">14</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Hired</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:6.3%; --bar-color:#22c55e;"></div></div>
+                            <div class="hbar-value">9</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Upcoming Interviews</h4><a href="/MyInterviews/Index" class="link-out">View All &rarr;</a></div>
+                <div style="overflow-x:auto;">
+                    <table class="dash-table">
+                        <thead><tr><th>Candidate</th><th>Role</th><th>When</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">AR</span>Ananya Rao</div></td>
+                                <td>Frontend Engineer<span class="cell-sub">Panel: Rohit, Meera</span></td>
+                                <td>05 Aug, 10:30 AM</td>
+                                <td><span class="mini-badge badge-info">Scheduled</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">VS</span>Vikram Shah</div></td>
+                                <td>Product Designer<span class="cell-sub">Panel: Aisha</span></td>
+                                <td>05 Aug, 2:00 PM</td>
+                                <td><span class="mini-badge badge-info">Scheduled</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">NK</span>Neha Kapoor</div></td>
+                                <td>Data Analyst<span class="cell-sub">Panel: Karan, Priya</span></td>
+                                <td>06 Aug, 11:00 AM</td>
+                                <td><span class="mini-badge badge-warning">Shortlisted</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">FA</span>Farhan Ali</div></td>
+                                <td>Backend Engineer<span class="cell-sub">Panel: Rohit</span></td>
+                                <td>06 Aug, 4:00 PM</td>
+                                <td><span class="mini-badge badge-info">Scheduled</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid thirds">
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Openings by Department</h4><span>Active requisitions</span></div>
+                <div class="dash-card-body">
+                    <div class="vbar-chart">
+                        <div class="vbar-col"><div class="vbar-value">7</div><div class="vbar-fill" style="--h:100%; background:var(--purple);"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">4</div><div class="vbar-fill" style="--h:57%; background:#22c55e;"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">3</div><div class="vbar-fill" style="--h:43%; background:#f59e0b;"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">2</div><div class="vbar-fill" style="--h:29%; background:#38bdf8;"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">2</div><div class="vbar-fill" style="--h:29%; background:#a78bfa;"></div></div>
+                    </div>
+                    <div class="vbar-labels">
+                        <div class="vbar-label">Engg</div>
+                        <div class="vbar-label">Sales</div>
+                        <div class="vbar-label">Design</div>
+                        <div class="vbar-label">Support</div>
+                        <div class="vbar-label">Ops</div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Source of Hire</h4><span>Pipeline origin</span></div>
+                <div class="donut-wrap">
+                    <div class="donut" style="background: conic-gradient(var(--purple) 0deg 96.4deg, #22c55e 96.4deg 213deg, #f59e0b 213deg 299.1deg, #38bdf8 299.1deg 360deg);">
+                        <div class="donut-center"><span class="n">142</span><span class="l">Candidates</span></div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-row"><span class="legend-dot" style="background:var(--purple);"></span> Referral <b>38</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#22c55e;"></span> Job Portal <b>46</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#f59e0b;"></span> LinkedIn <b>34</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#38bdf8;"></span> Campus <b>24</b></div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Quick Operations</h4><span>Shortcuts</span></div>
+                <div class="quick-actions-grid">
+                    <a href="/Recruitment/PostJob" class="quick-action-btn">
+                        <i class="bi bi-plus-circle"></i><span>Post Opening</span><p>Create requisition</p>
+                    </a>
+                    <a href="/MyInterviews/Index" class="quick-action-btn">
+                        <i class="bi bi-calendar-plus"></i><span>Schedule Interview</span><p>Book a panel slot</p>
+                    </a>
+                    <a href="/Recruitment/Candidates" class="quick-action-btn">
+                        <i class="bi bi-person-lines-fill"></i><span>View Candidates</span><p>Browse pipeline</p>
+                    </a>
+                    <a href="/Recruitment/Approvals" class="quick-action-btn">
+                        <i class="bi bi-check2-square"></i><span>Requisition Approvals</span><p>Sign off on openings</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TRAINING & DEVELOPMENT ================= -->
+    <div id="trainingDashboard" class="dash-tab-pane">
+        <div class="dash-metrics-grid dense">
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">Total Courses</span><div class="stat-icon"><i class="bi bi-journal-bookmark"></i></div></div>
+                <div class="stat-value">65</div>
+                <div class="stat-footer">Active in catalogue</div>
+            </div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Enrollments</span><div class="stat-icon"><i class="bi bi-person-check"></i></div></div>
+                <div class="stat-value">29</div>
+                <div class="stat-footer">Across all courses</div>
+            </div>
+            <div class="stat-card" style="--accent:#f59e0b;">
+                <div class="stat-header"><span class="stat-title">Pending Requests</span><div class="stat-icon"><i class="bi bi-hourglass-split"></i></div></div>
+                <div class="stat-value">3</div>
+                <div class="stat-footer"><span style="color:#f59e0b; font-weight:700;">Awaiting action</span></div>
+            </div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Closed Requests</span><div class="stat-icon"><i class="bi bi-check2-circle"></i></div></div>
+                <div class="stat-value">0</div>
+                <div class="stat-footer">Completed / fulfilled</div>
+            </div>
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">Present</span><div class="stat-icon"><i class="bi bi-clipboard-check"></i></div></div>
+                <div class="stat-value">1</div>
+                <div class="stat-footer">Attendance records</div>
+            </div>
+            <div class="stat-card" style="--accent:#ef4444;">
+                <div class="stat-header"><span class="stat-title">Absent</span><div class="stat-icon"><i class="bi bi-x-circle"></i></div></div>
+                <div class="stat-value">1</div>
+                <div class="stat-footer">Missed sessions</div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid even">
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Top Courses by Enrollment</h4><span>Most enrolled training programs</span></div>
+                <div class="dash-card-body">
+                    <div class="hbar-list">
+                        <div class="hbar-row">
+                            <div class="hbar-label">Material Inspection &amp; Verification</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:100%; --bar-color:var(--purple);"></div></div>
+                            <div class="hbar-value">9</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Delegation Skills</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:66.7%; --bar-color:#22c55e;"></div></div>
+                            <div class="hbar-value">6</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Construction Method Statement</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:66.7%; --bar-color:#f59e0b;"></div></div>
+                            <div class="hbar-value">6</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Communication Skills</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:55.6%; --bar-color:#38bdf8;"></div></div>
+                            <div class="hbar-value">5</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Effective Decision-Making</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:33.3%; --bar-color:#a78bfa;"></div></div>
+                            <div class="hbar-value">3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Top Courses by Attendance</h4><span>Most attended training programs</span></div>
+                <div class="dash-card-body">
+                    <div class="hbar-list">
+                        <div class="hbar-row">
+                            <div class="hbar-label">Effective Management</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:100%; --bar-color:var(--purple);"></div></div>
+                            <div class="hbar-value">1</div>
+                        </div>
+                    </div>
+                    <div class="dash-note" style="padding:14px 0 0; border-top:none;">
+                        Only one session logged attendance so far — this panel fills in as more sessions close.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid thirds">
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Department-wise Training Hours</h4><span>Total hours by department</span></div>
+                <div class="dash-card-body">
+                    <div class="vbar-chart">
+                        <div class="vbar-col"><div class="vbar-value">62</div><div class="vbar-fill" style="--h:100%; background:var(--purple);"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">34</div><div class="vbar-fill" style="--h:55%; background:#22c55e;"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">21</div><div class="vbar-fill" style="--h:34%; background:#f59e0b;"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">15</div><div class="vbar-fill" style="--h:24%; background:#38bdf8;"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">9</div><div class="vbar-fill" style="--h:15%; background:#a78bfa;"></div></div>
+                    </div>
+                    <div class="vbar-labels">
+                        <div class="vbar-label">Engineering</div>
+                        <div class="vbar-label">Operations</div>
+                        <div class="vbar-label">Sales</div>
+                        <div class="vbar-label">HR</div>
+                        <div class="vbar-label">Finance</div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>By Training Type</h4><span>In-Person / Online / Internal</span></div>
+                <div class="donut-wrap">
+                    <div class="donut" style="background: conic-gradient(var(--purple) 0deg 174deg, #22c55e 174deg 285.5deg, #f59e0b 285.5deg 360deg);">
+                        <div class="donut-center"><span class="n">29</span><span class="l">Total</span></div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-row"><span class="legend-dot" style="background:var(--purple);"></span> In-Person <b>14</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#22c55e;"></span> Online <b>9</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#f59e0b;"></span> Internal <b>6</b></div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>By Category</h4><span>Soft skills / Compliance / Technical</span></div>
+                <div class="donut-wrap">
+                    <div class="donut" style="background: conic-gradient(var(--purple) 0deg 136.5deg, #22c55e 136.5deg 235.7deg, #f59e0b 235.7deg 360deg);">
+                        <div class="donut-center"><span class="n">29</span><span class="l">Total</span></div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-row"><span class="legend-dot" style="background:var(--purple);"></span> Soft Skills <b>11</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#22c55e;"></span> Compliance <b>8</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#f59e0b;"></span> Technical <b>10</b></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAYROLL & FINANCE ================= -->
+    <div id="financeDashboard" class="dash-tab-pane">
+        <div class="dash-metrics-grid dense">
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-header"><span class="stat-title">Monthly Payroll Run</span><div class="stat-icon"><i class="bi bi-cash-stack"></i></div></div>
+                <div class="stat-value">$142.8K</div>
+                <div class="stat-footer"><span style="color:#22c55e; font-weight:700;">Processed</span></div>
+            </div>
+            <div class="stat-card" style="--accent:#f59e0b;">
+                <div class="stat-header"><span class="stat-title">Pending Claims</span><div class="stat-icon"><i class="bi bi-receipt"></i></div></div>
+                <div class="stat-value">14</div>
+                <div class="stat-footer"><span style="color:#f59e0b">Reimbursements</span></div>
+            </div>
+            <div class="stat-card" style="--accent:var(--purple);">
+                <div class="stat-header"><span class="stat-title">Average CTC</span><div class="stat-icon"><i class="bi bi-graph-up"></i></div></div>
+                <div class="stat-value">$9.6K</div>
+                <div class="stat-footer">Per employee / month</div>
+            </div>
+            <div class="stat-card" style="--accent:#ef4444;">
+                <div class="stat-header"><span class="stat-title">Total Deductions</span><div class="stat-icon"><i class="bi bi-dash-circle"></i></div></div>
+                <div class="stat-value">$18.4K</div>
+                <div class="stat-footer">Tax &amp; statutory, this run</div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid even">
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Payroll Trend</h4><span>Last 6 months</span></div>
+                <div class="dash-card-body">
+                    <div class="vbar-chart">
+                        <div class="vbar-col"><div class="vbar-value">$128K</div><div class="vbar-fill" style="--h:89.6%; background:var(--purple);"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">$131K</div><div class="vbar-fill" style="--h:91.7%; background:var(--purple);"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">$126K</div><div class="vbar-fill" style="--h:88.2%; background:var(--purple);"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">$138K</div><div class="vbar-fill" style="--h:96.6%; background:var(--purple);"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">$135K</div><div class="vbar-fill" style="--h:94.5%; background:var(--purple);"></div></div>
+                        <div class="vbar-col"><div class="vbar-value">$142.8K</div><div class="vbar-fill" style="--h:100%; background:#22c55e;"></div></div>
+                    </div>
+                    <div class="vbar-labels">
+                        <div class="vbar-label">Feb</div>
+                        <div class="vbar-label">Mar</div>
+                        <div class="vbar-label">Apr</div>
+                        <div class="vbar-label">May</div>
+                        <div class="vbar-label">Jun</div>
+                        <div class="vbar-label">Jul</div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Expense Breakdown</h4><span>This payroll run</span></div>
+                <div class="donut-wrap">
+                    <div class="donut" style="background: conic-gradient(var(--purple) 0deg 244.8deg, #22c55e 244.8deg 295.2deg, #f59e0b 295.2deg 331.2deg, #38bdf8 331.2deg 360deg);">
+                        <div class="donut-center"><span class="n">$142.8K</span><span class="l">Total</span></div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-row"><span class="legend-dot" style="background:var(--purple);"></span> Salaries <b>68%</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#22c55e;"></span> Benefits <b>14%</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#f59e0b;"></span> Bonuses <b>10%</b></div>
+                    <div class="legend-row"><span class="legend-dot" style="background:#38bdf8;"></span> Taxes <b>8%</b></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-split-grid">
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h4>Pending Reimbursement Claims</h4>
+                    <a href="/Payroll/Claims" class="link-out">View All &rarr;</a>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="dash-table">
+                        <thead><tr><th>Employee</th><th>Claim Type</th><th>Amount</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">RK</span>Ravi Kumar</div></td>
+                                <td>Travel</td>
+                                <td style="font-weight:700;">₹8,200</td>
+                                <td><span class="mini-badge badge-warning">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">PS</span>Priya Singh</div></td>
+                                <td>Medical</td>
+                                <td style="font-weight:700;">₹4,500</td>
+                                <td><span class="mini-badge badge-warning">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">AV</span>Amit Verma</div></td>
+                                <td>Internet Reimbursement</td>
+                                <td style="font-weight:700;">₹1,200</td>
+                                <td><span class="mini-badge badge-success">Approved</span></td>
+                            </tr>
+                            <tr>
+                                <td><div class="emp-cell"><span class="emp-avatar">SG</span>Sneha Gupta</div></td>
+                                <td>Travel</td>
+                                <td style="font-weight:700;">₹6,750</td>
+                                <td><span class="mini-badge badge-warning">Pending</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header"><h4>Payroll Cost by Department</h4><span>Monthly</span></div>
+                <div class="dash-card-body">
+                    <div class="hbar-list">
+                        <div class="hbar-row">
+                            <div class="hbar-label">Engineering</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:100%; --bar-color:var(--purple);"></div></div>
+                            <div class="hbar-value">$52K</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Sales</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:60%; --bar-color:#22c55e;"></div></div>
+                            <div class="hbar-value">$31K</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Operations</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:46%; --bar-color:#f59e0b;"></div></div>
+                            <div class="hbar-value">$24K</div>
+                        </div>
+                        <div class="hbar-row">
+                            <div class="hbar-label">Support</div>
+                            <div class="hbar-track"><div class="hbar-fill" style="--pct:35%; --bar-color:#38bdf8;"></div></div>
+                            <div class="hbar-value">$18K</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    // DATE
-    const mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const nd=new Date();
-        const todayDate = document.getElementById("todayDate");
-
-    if (todayDate) {
-        todayDate.textContent =
-            mo[nd.getMonth()] + ' ' + nd.getDate() + ', ' + nd.getFullYear();
-    }
-        // =========================
-    // CHART VARIABLES
-    // =========================
-    let eC, lC, dC, aC;
-    // THEME
-    let curT=localStorage.getItem('vqT')||'dark';
-    applyT(curT);
-    function applyT(t) {
-
-        let r = t === 'system'
-            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-            : t;
-
-        document.documentElement.setAttribute('data-theme', r);
-
-        document.getElementById('floatIcon')?.classList.remove('bi-sun-fill','bi-moon-fill');
-        document.getElementById('floatIcon')?.classList.add(r === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill');
-
-        document.querySelectorAll('.theme-opt').forEach(e => e.classList.remove('active'));
-
-        const m = { light: 'optLight', dark: 'optDark', system: 'optSystem' };
-
-        document.getElementById(m[t])?.classList.add('active');
-
-        if (typeof eC !== "undefined" && eC) {
-            rCharts();
-        }
-    }
-    function setTheme(t){curT=t;localStorage.setItem('vqT',t);applyT(t);}
-    function togglePanel(){document.getElementById('appearPanel').classList.toggle('open');}
-    document.addEventListener('click',e=>{if(!e.target.closest('.float-settings'))document.getElementById('appearPanel').classList.remove('open');});
-
-
-    function gc(){const dk=document.documentElement.getAttribute('data-theme')==='dark';return{g:dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.06)',t:dk?'#4b5563':'#94a3b8'};}
-    function buildC(){
-      const c=gc();
-      if(!document.getElementById('empChart')) return;
-      eC=new Chart(document.getElementById('empChart'),{type:'line',data:{labels:['May 1','May 10','May 20','May 30'],datasets:[{label:'Employees',data:[800,950,1100,1248],borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,.1)',tension:0.45,fill:true,pointRadius:4,pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.g},ticks:{color:c.t,font:{size:11}}},y:{grid:{color:c.g},ticks:{color:c.t,font:{size:11}}}}}});
-      lC=new Chart(document.getElementById('leaveChart'),{type:'doughnut',data:{labels:['Annual','Sick','Casual','Other'],datasets:[{data:[512,210,180,346],backgroundColor:['#7c3aed','#3b82f6','#22c55e','#f97316'],borderWidth:0,hoverOffset:5}]},options:{cutout:'68%',responsive:false,plugins:{legend:{display:false}}}});
-      dC=new Chart(document.getElementById('deptChart'),{type:'doughnut',data:{labels:['Engineering','HR','Sales','Finance','Others'],datasets:[{data:[462,196,312,146,132],backgroundColor:['#7c3aed','#3b82f6','#22c55e','#f97316','#94a3b8'],borderWidth:0,hoverOffset:5}]},options:{cutout:'68%',responsive:false,plugins:{legend:{display:false}}}});
-      aC=new Chart(document.getElementById('attendChart'),{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat'],datasets:[{label:'Present',data:[1100,1180,1050,1200,1140,420],backgroundColor:'#7c3aed',borderRadius:7},{label:'Absent',data:[148,68,198,48,108,28],backgroundColor:'rgba(239,68,68,.6)',borderRadius:7}]},options:{responsive:true,plugins:{legend:{position:'top',labels:{color:c.t,font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{color:c.t}},y:{grid:{color:c.g},ticks:{color:c.t}}}}});
-    }
-    function rCharts(){
-      if(!eC)return;
-      const c=gc();
-      [eC,aC].forEach(ch=>{
-        ch.options.scales.x.grid.color=c.g;ch.options.scales.x.ticks.color=c.t;
-        ch.options.scales.y.grid.color=c.g;ch.options.scales.y.ticks.color=c.t;
-        ch.update();
-      });
-    }
-    window.addEventListener('load',buildC);
-
-        document.addEventListener('DOMContentLoaded', loadMyAvailabilityRequests);
-
-    async function loadMyAvailabilityRequests() {
-        try {
-            const res = await fetch('/Availability/GetMyPendingAvailabilityRequests');
-            const result = await res.json();
-            const list = result.data || [];
-
-            const card = document.getElementById('availabilityWidgetCard');
-            if (list.length === 0) { card.style.display = 'none'; return; }
-
-            card.style.display = 'block';
-            renderAvailabilityWidget(list);
-        } catch (err) {
-            console.error('Availability widget load fault:', err);
-        }
-    }
-
-    function renderAvailabilityWidget(list) {
-        const body = document.getElementById('availabilityWidgetBody');
-
-        body.innerHTML = list.map(req => {
-            const targetDateFmt = new Date(req.targetDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            const deadlineFmt = new Date(req.replyDeadline).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-
-            const badge = req.alreadyResponded
-                ? `<span class="avail-req-done"><i class="bi bi-check-circle"></i> Responded</span>`
-                : `<span class="avail-req-deadline">Reply by ${deadlineFmt}</span>`;
-
-            const slotsHtml = req.slots.map(s => {
-                const timeFmt = new Date(s.slotDateTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-                return `<button type="button" class="avail-slot-chip ${s.isSelectedByMe ? 'picked' : ''}" data-slot-id="${s.availabilitySlotId}" onclick="toggleWidgetSlot(this)">${timeFmt}</button>`;
-            }).join('');
-
-            return `
-                <div class="avail-req-item" data-request-id="${req.availabilityRequestId}">
-                    <div class="avail-req-top">
-                        <div>
-                            <div class="avail-req-title">${req.roundTypeName}</div>
-                            <div class="avail-req-sub">For ${targetDateFmt} — select all times you're free</div>
-                        </div>
-                        ${badge}
-                    </div>
-                    <div class="avail-slot-grid">${slotsHtml}</div>
-                    <button type="button" class="avail-submit-btn" onclick="submitWidgetAvailability(${req.availabilityRequestId})">
-                        <i class="bi bi-check2"></i> ${req.alreadyResponded ? 'Update Availability' : 'Submit Availability'}
-                    </button>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function toggleWidgetSlot(btn) {
-        btn.classList.toggle('picked');
-    }
-
-    async function submitWidgetAvailability(requestId) {
-        const container = document.querySelector(`.avail-req-item[data-request-id="${requestId}"]`);
-        const selectedSlotIds = Array.from(container.querySelectorAll('.avail-slot-chip.picked'))
-            .map(el => parseInt(el.dataset.slotId));
-
-        if (selectedSlotIds.length === 0) {
-            alert('Please select at least one time slot.');
-            return;
-        }
-
-        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
-
-        try {
-            const res = await fetch('/Availability/SubmitAvailabilityResponse', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
-                body: JSON.stringify({ availabilityRequestId: requestId, selectedSlotIds })
-            });
-            const result = await res.json();
-
-            if (result.success) {
-                await loadMyAvailabilityRequests();
-            } else {
-                alert(result.message || 'Failed to submit availability.');
-            }
-        } catch (err) {
-            console.error('Submit availability fault:', err);
-            alert('Network error while submitting availability.');
-        }
+    function switchDashboardTab(evt, tabId) {
+        document.querySelectorAll('.dash-tab-pane').forEach(function (pane) {
+            pane.classList.remove('active');
+        });
+        document.querySelectorAll('.dash-tab-btn').forEach(function (btn) {
+            btn.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
     }
 </script>

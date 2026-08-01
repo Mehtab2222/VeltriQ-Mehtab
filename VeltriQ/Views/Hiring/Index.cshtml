@@ -1235,11 +1235,10 @@
         document.getElementById('assignSubtitle').innerText =
             `${assignConfirmData.capacitySlots.length} interview slot(s) available · ${assignConfirmData.queuedCandidates.length} candidate(s) matched`;
 
-        currentAssignments = assignConfirmData.queuedCandidates.map((c, i) => ({
-            applicantId: c.applicantId,
-            availabilitySlotId: assignConfirmData.capacitySlots[i]?.availabilitySlotId,
-            employeeId: assignConfirmData.capacitySlots[i]?.employeeId
-        }));
+    currentAssignments = assignConfirmData.queuedCandidates.map((c, i) => {
+        const defaultPick = assignConfirmData.capacitySlots[i];
+        return defaultPick ? [{ availabilitySlotId: defaultPick.availabilitySlotId, employeeId: defaultPick.employeeId }] : [];
+    });
 
         renderAssignMatchTable();
 
@@ -1251,50 +1250,33 @@
         document.getElementById('hirAssignModalBackdrop').classList.add('open');
     }
 
-    function renderAssignMatchTable() {
+        function renderAssignMatchTable() {
         const tbody = document.getElementById('assignMatchTableBody');
         const slotOptions = assignConfirmData.capacitySlots.map(s =>
             `<option value="${s.availabilitySlotId}|${s.employeeId}">${new Date(s.slotDateTime).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} — ${s.employeeName}</option>`
         ).join('');
 
-        tbody.innerHTML = assignConfirmData.queuedCandidates.map((c, i) => {
-            const assigned = currentAssignments[i];
-            const selectedVal = assigned.availabilitySlotId ? `${assigned.availabilitySlotId}|${assigned.employeeId}` : '';
-            return `
-                <tr>
-                    <td>${c.fullName}</td>
-                    <td>${c.matchPercentage !== null ? c.matchPercentage + '%' : '—'}</td>
-                    <td>${c.mprTitle}</td>
-                    <td>
-                        <select onchange="updateAssignment(${i}, this.value)">
-                            <option value="">-- unassigned --</option>
-                            ${slotOptions}
-                        </select>
-                    </td>
-                </tr>
-            `;
-        }).join('').replace(
-            new RegExp('<option value="' + '([^"]+)"', 'g'),
-            (m, val) => m // no-op placeholder, selection applied below
-        );
-
-        // set selected values after render
-        assignConfirmData.queuedCandidates.forEach((c, i) => {
-            const select = tbody.rows[i].querySelector('select');
-            const assigned = currentAssignments[i];
-            if (assigned.availabilitySlotId) select.value = `${assigned.availabilitySlotId}|${assigned.employeeId}`;
-        });
+        tbody.innerHTML = assignConfirmData.queuedCandidates.map((c, i) => `
+            <tr>
+                <td>${c.fullName}</td>
+                <td>${c.matchPercentage !== null ? c.matchPercentage + '%' : '—'}</td>
+                <td>${c.mprTitle}</td>
+                <td>
+                    <select multiple size="4" style="min-width:220px;" onchange="updateAssignmentMulti(${i}, this)">
+                        ${slotOptions}
+                    </select>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:3px;">Ctrl/Cmd+click to select multiple for a panel interview</div>
+                </td>
+            </tr>
+        `).join('');
     }
 
-    function updateAssignment(index, value) {
-        if (!value) {
-            currentAssignments[index].availabilitySlotId = null;
-            currentAssignments[index].employeeId = null;
-            return;
-        }
-        const [slotId, empId] = value.split('|').map(Number);
-        currentAssignments[index].availabilitySlotId = slotId;
-        currentAssignments[index].employeeId = empId;
+    function updateAssignmentMulti(index, selectEl) {
+        const picked = Array.from(selectEl.selectedOptions).map(opt => {
+            const [slotId, empId] = opt.value.split('|').map(Number);
+            return { availabilitySlotId: slotId, employeeId: empId };
+        });
+        currentAssignments[index] = picked; // now an array per candidate, not a single object
     }
 
     function closeAssignModal() {
@@ -1303,14 +1285,24 @@
 
     async function confirmAssignments() {
         const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
-        const validAssignments = currentAssignments.filter(a => a.availabilitySlotId && a.employeeId);
 
-        if (validAssignments.length === 0) { alert('No valid assignments to confirm.'); return; }
+        const flatAssignments = [];
+        assignConfirmData.queuedCandidates.forEach((c, i) => {
+            (currentAssignments[i] || []).forEach(pick => {
+                flatAssignments.push({
+                    applicantId: c.applicantId,
+                    availabilitySlotId: pick.availabilitySlotId,
+                    employeeId: pick.employeeId
+                });
+            });
+        });
+
+        if (flatAssignments.length === 0) { alert('No valid assignments to confirm.'); return; }
 
         const res = await fetch('/Availability/ConfirmAssignments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
-           body: JSON.stringify({ availabilityRequestId: assignConfirmData.availabilityRequestId, assignments: validAssignments })
+            body: JSON.stringify({ availabilityRequestId: assignConfirmData.availabilityRequestId, assignments: flatAssignments })
         });
         const result = await res.json();
 

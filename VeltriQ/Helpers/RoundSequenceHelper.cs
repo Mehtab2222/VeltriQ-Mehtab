@@ -65,5 +65,32 @@ namespace VeltriQ.Helpers
 
             return result;
         }
+        public static async Task<string> GetPanelDecisionAsync(TenantDbContext context, int applicantId, int roundTypeId)
+        {
+            var panelInterviews = await context.ScheduledInterviews
+                .Where(x => x.ApplicantId == applicantId && x.RoundTypeId == roundTypeId && x.IsActive)
+                .ToListAsync();
+
+            if (!panelInterviews.Any()) return "Pending";
+
+            var scheduledInterviewIds = panelInterviews.Select(x => x.ScheduledInterviewId).ToList();
+
+            var feedbacks = await context.InterviewFeedbacks
+                .Where(f => scheduledInterviewIds.Contains(f.ScheduledInterviewId) && f.IsActive)
+                .ToListAsync();
+
+            // Fail-fast: any Strong No decides it immediately, regardless of who else has responded
+            if (feedbacks.Any(f => f.OverallRecommendation == RecommendationOptions.StrongNo))
+                return "Rejected";
+
+            var allCompleted = panelInterviews.All(x => x.Status == ScheduledInterviewStatus.Completed);
+            if (!allCompleted) return "Pending";
+
+            if (feedbacks.Any(f => f.OverallRecommendation == RecommendationOptions.No))
+                return "NeedsReview"; // mixed outcome, no clear consensus — leave for HR
+
+            // Everyone's in, and everyone said Yes/Strong Yes
+            return "Approved";
+        }
     }
 }

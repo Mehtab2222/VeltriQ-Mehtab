@@ -161,11 +161,14 @@ namespace VeltriQ.Controllers
 
                 // A clear "No" is safe to auto-apply — reject immediately.
                 // A "Yes" only marks the round complete; HR advances the stage manually.
+                scheduled.Status = ScheduledInterviewStatus.Completed;
+                await _context.SaveChangesAsync();
+
                 if (scheduled.Applicant != null)
                 {
-                    var stageMapping = scheduled.RoundType?.StageMapping;
+                    var decision = await RoundSequenceHelper.GetPanelDecisionAsync(_context, scheduled.Applicant.ApplicantId, scheduled.RoundTypeId);
 
-                    if (dto.OverallRecommendation == RecommendationOptions.No || dto.OverallRecommendation == RecommendationOptions.StrongNo)
+                    if (decision == "Rejected")
                     {
                         scheduled.Applicant.CurrentStage = ApplicantStages.Rejected;
                         scheduled.Applicant.StageChangedOn = DateTime.Now;
@@ -173,35 +176,40 @@ namespace VeltriQ.Controllers
                         scheduled.Applicant.RejectNotes = dto.Notes;
                         scheduled.Applicant.ModifiedOn = DateTime.Now;
                         scheduled.Applicant.ModifiedBy = employeeId;
+
+                        // Cancel any other panelist's still-pending slot for this round — decision is already made
+                        var stillPending = await _context.ScheduledInterviews
+                            .Where(x => x.ApplicantId == scheduled.Applicant.ApplicantId
+                                     && x.RoundTypeId == scheduled.RoundTypeId
+                                     && x.IsActive
+                                     && x.Status == ScheduledInterviewStatus.Scheduled)
+                            .ToListAsync();
+                        foreach (var s in stillPending) s.Status = ScheduledInterviewStatus.Cancelled;
+
+                        await _context.SaveChangesAsync();
                     }
-                    else if (dto.OverallRecommendation == RecommendationOptions.Yes || dto.OverallRecommendation == RecommendationOptions.StrongYes)
+                    else if (decision == "Approved")
                     {
+                        var stageMapping = scheduled.RoundType?.StageMapping;
+
                         if (stageMapping == "Screening")
                         {
                             scheduled.Applicant.CurrentStage = ApplicantStages.Evaluating;
-                            scheduled.Applicant.StageChangedOn = DateTime.Now;
-                            scheduled.Applicant.ModifiedOn = DateTime.Now;
-                            scheduled.Applicant.ModifiedBy = employeeId;
                         }
                         else if (stageMapping == "Evaluating")
                         {
-                            // Save changes so far so this round shows as Completed before we check the sequence
-                            await _context.SaveChangesAsync();
-
                             var nextRoundTypeId = await RoundSequenceHelper.GetNextRequiredRoundTypeIdAsync(_context, scheduled.Applicant.ApplicantId);
-
                             if (nextRoundTypeId == null)
-                            {
-                                // No more rounds required — ready for offer
                                 scheduled.Applicant.CurrentStage = ApplicantStages.Offered;
-                                scheduled.Applicant.StageChangedOn = DateTime.Now;
-                                scheduled.Applicant.ModifiedOn = DateTime.Now;
-                                scheduled.Applicant.ModifiedBy = employeeId;
-                            }
-                            // else: stay in Evaluating — HR will run "Request Availability" for the next round type,
-                            // and this applicant will now correctly appear in that round's queue (see AvailabilityController change below)
+                            // else: stays in Evaluating, waiting for next round's poll
                         }
+
+                        scheduled.Applicant.StageChangedOn = DateTime.Now;
+                        scheduled.Applicant.ModifiedOn = DateTime.Now;
+                        scheduled.Applicant.ModifiedBy = employeeId;
+                        await _context.SaveChangesAsync();
                     }
+                    // "Pending" (others haven't submitted yet) or "NeedsReview" (mixed) — leave untouched
                 }
 
                 await _context.SaveChangesAsync();
