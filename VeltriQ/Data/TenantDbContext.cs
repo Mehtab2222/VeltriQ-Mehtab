@@ -3,6 +3,7 @@ using VeltriQ.Data.SeedData.HR;
 using VeltriQ.Models;
 using VeltriQ.Models.EmployeeInductionAttendance;
 using VeltriQ.Models.HR;
+using VeltriQ.Models.HR.Attendance;
 using VeltriQ.Models.HR.Onboarding;
 using VeltriQ.Models.Recruitment;
 using VeltriQ.Models.Training;
@@ -35,7 +36,7 @@ namespace VeltriQ.Data
         public DbSet<Department> Departments { get; set; }
 
         public DbSet<Designation> Designations { get; set; }
-
+        public DbSet<Company> Companies { get; set; }
         public DbSet<Branch> Branches { get; set; }
 
         public DbSet<Division> Divisions { get; set; }
@@ -148,6 +149,21 @@ namespace VeltriQ.Data
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveApplication> LeaveApplications { get; set; }
         public DbSet<InterviewFeedback> InterviewFeedbacks { get; set; }
+        public DbSet<AttendancePolicy> AttendancePolicies { get; set; }
+        public DbSet<ShiftBreak> ShiftBreaks { get; set; }
+
+        public DbSet<ShiftMaster> ShiftMasters { get; set; }
+        public DbSet<EmployeeShift> EmployeeShifts { get; set; }
+        public DbSet<HolidayMaster> HolidayMasters { get; set; }
+        public DbSet<WeeklyOffPolicy> WeeklyOffPolicies { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
+
+        public DbSet<AttendancePunch> AttendancePunches { get; set; }
+        public DbSet<AttendanceRegularization> AttendanceRegularizations { get; set; }
+
+        public DbSet<AttendanceHistory> AttendanceHistories { get; set; }
+
+        public DbSet<AttendanceOvertime> AttendanceOvertimes { get; set; }
         // =========================
         // MAP SCHEMAS
         // =========================
@@ -161,6 +177,231 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+            modelBuilder.Entity<AttendanceRegularization>()
+    .ToTable("AttendanceRegularization", "HR");
+
+            modelBuilder.Entity<AttendanceHistory>()
+                .ToTable("AttendanceHistory", "HR");
+
+            modelBuilder.Entity<AttendanceOvertime>()
+                .ToTable("AttendanceOvertime", "HR");
+            modelBuilder.Entity<Attendance>(entity =>
+            {
+                entity.ToTable("Attendance", "HR");
+
+                entity.HasKey(x => x.AttendanceId);
+
+                entity.Property(x => x.WorkingHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.BreakHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.OvertimeHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.AttendanceStatus)
+                      .HasMaxLength(30);
+
+                entity.Property(x => x.Remarks)
+                      .HasMaxLength(500);
+
+                entity.HasIndex(x => new
+                {
+                    x.EmployeeId,
+                    x.AttendanceDate
+                }).IsUnique();
+
+                entity.HasOne(x => x.Company)
+                      .WithMany()
+                      .HasForeignKey(x => x.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Branch)
+                      .WithMany()
+                      .HasForeignKey(x => x.BranchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Employee)
+                      .WithMany()
+                      .HasForeignKey(x => x.EmployeeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.ShiftMaster)
+                      .WithMany()
+                      .HasForeignKey(x => x.ShiftMasterId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.AttendancePolicy)
+                      .WithMany()
+                      .HasForeignKey(x => x.AttendancePolicyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<AttendancePunch>(entity =>
+            {
+                entity.ToTable("AttendancePunch", "HR");
+
+                entity.HasKey(x => x.AttendancePunchId);
+
+                entity.Property(x => x.PunchType)
+                      .HasMaxLength(20);
+
+                entity.Property(x => x.AttendanceSource)
+                      .HasMaxLength(30);
+
+                entity.Property(x => x.IPAddress)
+                      .HasMaxLength(50);
+
+                entity.Property(x => x.DeviceName)
+                      .HasMaxLength(100);
+
+                entity.Property(x => x.SelfiePath)
+                      .HasMaxLength(500);
+
+                entity.HasOne(x => x.Attendance)
+                      .WithMany(x => x.AttendancePunches)
+                      .HasForeignKey(x => x.AttendanceId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.Employee)
+                      .WithMany()
+                      .HasForeignKey(x => x.EmployeeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new
+                {
+                    x.EmployeeId,
+                    x.PunchTime
+                });
+            });
+            modelBuilder.Entity<WeeklyOffPolicy>(entity =>
+            {
+                entity.ToTable("WeeklyOffPolicy", "HR");
+
+                entity.HasKey(x => x.WeeklyOffPolicyId);
+
+                entity.Property(x => x.PolicyName)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.HasOne(x => x.Company)
+                      .WithMany()
+                      .HasForeignKey(x => x.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<HolidayMaster>(entity =>
+            {
+                entity.ToTable("HolidayMaster", "HR");
+
+                entity.HasKey(x => x.HolidayMasterId);
+
+                entity.Property(x => x.HolidayCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(x => x.HolidayName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.HasIndex(x => new
+                {
+                    x.CompanyId,
+                    x.BranchId,
+                    x.HolidayDate
+                }).IsUnique();
+
+                entity.HasOne(x => x.Company)
+                      .WithMany()
+                      .HasForeignKey(x => x.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Branch)
+                      .WithMany()
+                      .HasForeignKey(x => x.BranchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<EmployeeShift>(entity =>
+            {
+                entity.ToTable("EmployeeShift", "HR");
+
+                entity.HasKey(x => x.EmployeeShiftId);
+
+                entity.HasOne(x => x.Employee)
+                      .WithMany()
+                      .HasForeignKey(x => x.EmployeeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.ShiftMaster)
+                      .WithMany(x => x.EmployeeShifts)
+                      .HasForeignKey(x => x.ShiftMasterId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new
+                {
+                    x.EmployeeId,
+                    x.EffectiveFrom
+                });
+            });
+            modelBuilder.Entity<ShiftBreak>(entity =>
+            {
+                entity.ToTable("ShiftBreak", "HR");
+
+                entity.HasKey(x => x.ShiftBreakId);
+
+                entity.Property(x => x.BreakName)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.HasOne(x => x.ShiftMaster)
+                      .WithMany(x => x.ShiftBreaks)
+                      .HasForeignKey(x => x.ShiftMasterId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<ShiftMaster>(entity =>
+            {
+                entity.ToTable("ShiftMaster", "HR");
+
+                entity.HasKey(x => x.ShiftMasterId);
+
+                entity.Property(x => x.ShiftCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(x => x.ShiftName)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.Property(x => x.FullDayHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.HalfDayHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.MinimumWorkingHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.HasIndex(x => new
+                {
+                    x.CompanyId,
+                    x.BranchId,
+                    x.ShiftCode
+                }).IsUnique();
+
+                entity.HasOne(x => x.Company)
+                      .WithMany()
+                      .HasForeignKey(x => x.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Branch)
+                      .WithMany()
+                      .HasForeignKey(x => x.BranchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.AttendancePolicy)
+                      .WithMany(x => x.Shifts)
+                      .HasForeignKey(x => x.AttendancePolicyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
             modelBuilder.Entity<InterviewFeedback>(entity =>
             {
                 entity.HasKey(e => e.InterviewFeedbackId);
@@ -909,7 +1150,14 @@ namespace VeltriQ.Data
 
             modelBuilder.Entity<Designation>()
                 .ToTable("Designation", "HR");
+            modelBuilder.Entity<Company>()
+    .ToTable("Company", "HR");
+            modelBuilder.Entity<Company>(entity =>
+            {
+                entity.ToTable("Company", "HR");
 
+                entity.HasKey(x => x.CompanyId);
+            });
             modelBuilder.Entity<Branch>()
                 .ToTable("Branch", "HR");
 
