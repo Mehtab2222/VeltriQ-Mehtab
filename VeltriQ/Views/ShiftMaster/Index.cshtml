@@ -1,0 +1,1012 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEnumerable<VeltriQ.Models.HR.Attendance.ShiftMaster>
+
+@{
+    ViewData["Title"] = "Shift Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .shift-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .shift-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    .shift-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .shift-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .shift-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .shift-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .shift-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .shift-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .shift-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .shift-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .shift-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .shift-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+    /* WIDER MODAL WINDOW SYSTEM */
+    .custom-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+        .custom-modal.active {
+            display: flex;
+        }
+
+    .custom-modal-box {
+        width: 100%;
+        max-width: 900px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+        max-height: 92vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-header-custom {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+        .modal-header-custom h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+    .close-modal-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 4px;
+        background: var(--card-bg);
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-body-custom {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        scrollbar-width: thin;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .form-group.wide {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--text-secondary);
+        }
+
+    .custom-input, .custom-select {
+        width: 100%;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+        .custom-input:focus, .custom-select:focus {
+            border-color: var(--purple);
+        }
+
+        .custom-input[readonly] {
+            background: var(--hover-bg);
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        .custom-input:disabled {
+            background: var(--hover-bg);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    /* Breaks Table inside Break Modal */
+    .breaks-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 4px;
+    }
+
+        .breaks-table th {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            background: var(--hover-bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .breaks-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+    .add-break-row-btn {
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 4px;
+        border: none;
+        background: var(--purple);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .remove-break-row-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .modal-footer-custom {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+    .cancel-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .save-btn {
+        height: 34px;
+        padding: 0 16px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-weight: 600;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@Html.AntiForgeryToken()
+
+<div class="shift-page">
+    <div class="shift-header">
+        <button class="shift-add-btn" onclick="openShiftModal()">
+            <i class="bi bi-plus-lg"></i> Add New Shift
+        </button>
+    </div>
+
+    <div class="shift-card">
+        <div class="shift-card-top">
+            <div class="shift-card-title">
+                <h3>Shift Master Workspace</h3>
+                <p>Configure company shifts, active working windows, grace periods, and break policies.</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="shift-table">
+                <thead>
+                    <tr>
+                        <th>Shift Code</th>
+                        <th>Shift Name</th>
+                        <th>Company / Branch</th>
+                        <th>Timings (Start — End)</th>
+                        <th style="text-align: center;">Grace (In/Out)</th>
+                        <th style="text-align: center;">Status</th>
+                        <th style="text-align: right; padding-right: 24px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var x in Model)
+                        {
+                            var statusClass = x.IsActive ? "status-active" : "status-inactive";
+                            var statusText = x.IsActive ? "Active" : "Inactive";
+                            <tr id="shift-row-@x.ShiftMasterId">
+                                <td style="font-weight: 700; font-family: monospace;">@x.ShiftCode</td>
+                                <td>@x.ShiftName</td>
+                                <td>
+                                    <div style="font-weight: 600;">@(x.Company?.CompanyName ?? "—")</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">@(x.Branch?.BranchName ?? "—")</div>
+                                </td>
+                                <td>@x.StartTime.ToString(@"hh\:mm") — @x.EndTime.ToString(@"hh\:mm")</td>
+                                <td style="text-align: center;">@x.GraceInMinutes m / @x.GraceOutMinutes m</td>
+                                <td style="text-align: center;">
+                                    <span class="badge-status @statusClass" id="badge-@x.ShiftMasterId">@statusText</span>
+                                </td>
+                                <td style="text-align: right; padding-right: 24px;">
+                                    <div style="display: flex; gap: 4px; justify-content: flex-end;">
+                                        <button class="action-btn" onclick="openBreaksModal(@x.ShiftMasterId, '@x.ShiftName.Replace("'", "\\'")')" title="Manage Breaks" style="color: #6d28d9;">
+                                            <i class="bi bi-clock-history"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="editShift(@x.ShiftMasterId)" title="Edit Shift">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="toggleShiftStatus(@x.ShiftMasterId)" title="Toggle Status" style="color: #f59e0b;">
+                                            <i class="bi bi-power"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="deleteShift(@x.ShiftMasterId)" title="Delete Shift" style="color: #ef4444;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No shift records found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="custom-modal" id="shiftModal">
+    <div class="custom-modal-box">
+        <div class="modal-header-custom">
+            <div>
+                <h3 id="modalTitle">New Shift Configuration</h3>
+                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Define official work timings and parameters.</p>
+            </div>
+            <button type="button" class="close-modal-btn" onclick="closeShiftModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <form id="shiftForm" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="ShiftMasterId" name="Shift.ShiftMasterId" value="0" />
+
+            <div class="modal-body-custom">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Company *</label>
+                        <select name="Shift.CompanyId" class="custom-select" id="modalCompanyId" onchange="onCompanyChange(this.value)" required>
+                            <option value="">Select Company</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Branch *</label>
+                        <select name="Shift.BranchId" class="custom-select" id="modalBranchId" required>
+                            <option value="">Select Branch</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Attendance Policy *</label>
+                        <select name="Shift.AttendancePolicyId" class="custom-select" id="modalAttendancePolicyId" required>
+                            <option value="">Select Policy</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Shift Code * (Auto)</label>
+                        <input type="text" name="Shift.ShiftCode" id="modalShiftCode" class="custom-input" readonly placeholder="Auto-generated" required />
+                    </div>
+
+                    <div class="form-group wide">
+                        <label>Shift Name *</label>
+                        <input type="text" name="Shift.ShiftName" id="modalShiftName" class="custom-input" placeholder="e.g. General Shift (09:00 AM - 06:00 PM)" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Start Time *</label>
+                        <input type="time" name="Shift.StartTime" id="modalStartTime" class="custom-input" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>End Time *</label>
+                        <input type="time" name="Shift.EndTime" id="modalEndTime" class="custom-input" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Grace In (Mins)</label>
+                        <input type="number" name="Shift.GraceInMinutes" id="modalGraceInMinutes" class="custom-input" min="0" value="0" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Grace Out (Mins)</label>
+                        <input type="number" name="Shift.GraceOutMinutes" id="modalGraceOutMinutes" class="custom-input" min="0" value="0" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Full Day Hours</label>
+                        <input type="number" step="0.5" name="Shift.FullDayHours" id="modalFullDayHours" class="custom-input" value="8" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Half Day Hours</label>
+                        <input type="number" step="0.5" name="Shift.HalfDayHours" id="modalHalfDayHours" class="custom-input" value="4" />
+                    </div>
+
+                    <div class="form-group wide">
+                        <label>Minimum Working Hours</label>
+                        <input type="number" step="0.5" name="Shift.MinimumWorkingHours" id="modalMinimumWorkingHours" class="custom-input" value="4" />
+                    </div>
+
+                    <div class="form-group wide" style="display: flex; flex-direction: row; gap: 20px; align-items: center; margin-top: 6px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text-primary); text-transform: none;">
+                            <input type="checkbox" name="Shift.IsNightShift" id="modalIsNightShift" value="true" style="width: 16px; height: 16px; accent-color: var(--purple);" /> Night Shift
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text-primary); text-transform: none;">
+                            <input type="checkbox" name="Shift.IsFlexibleShift" id="modalIsFlexibleShift" value="true" style="width: 16px; height: 16px; accent-color: var(--purple);" /> Flexible Shift
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text-primary); text-transform: none;">
+                            <input type="checkbox" name="Shift.IsCrossDayShift" id="modalIsCrossDayShift" value="true" style="width: 16px; height: 16px; accent-color: var(--purple);" /> Cross Day Shift
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button type="button" class="cancel-btn" onclick="closeShiftModal()">Cancel</button>
+                <button type="submit" class="save-btn"><i class="bi bi-check2-circle"></i> Save Shift</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="custom-modal" id="breaksModal">
+    <div class="custom-modal-box">
+        <div class="modal-header-custom">
+            <div>
+                <h3 id="breaksModalTitle">Manage Shift Breaks</h3>
+                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Configure paid or unpaid break windows for this shift.</p>
+            </div>
+            <button type="button" class="close-modal-btn" onclick="closeBreaksModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div class="modal-body-custom">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Configured Breaks</span>
+                <button type="button" class="add-break-row-btn" onclick="addBreakRow()"><i class="bi bi-plus-lg"></i> Add Break Window</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="breaks-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Break Type</th>
+                            <th style="width: 25%;">Break Custom Name</th>
+                            <th style="width: 18%;">Start Time</th>
+                            <th style="width: 18%;">End Time</th>
+                            <th style="width: 9%; text-align: center;">Paid</th>
+                            <th style="width: 5%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="breaksTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="modal-footer-custom">
+            <button type="button" class="cancel-btn" onclick="closeBreaksModal()">Close</button>
+            <button type="button" class="save-btn" onclick="saveShiftBreaks()"><i class="bi bi-check2-circle"></i> Save Breaks</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeBreakShiftId = 0;
+
+    // Load Companies on page load or modal open
+    async function loadCompaniesDropdown(selectedCompanyId = null) {
+        const companySelect = document.getElementById('modalCompanyId');
+        companySelect.innerHTML = '<option value="">Select Company</option>';
+
+        try {
+            const res = await fetch('/ShiftMaster/GetCompanies');
+            const companies = await res.json();
+            companies.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.companyId;
+                opt.textContent = c.companyName;
+                if (selectedCompanyId && c.companyId === selectedCompanyId) {
+                    opt.selected = true;
+                }
+                companySelect.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('Error loading companies:', err);
+        }
+    }
+
+    // Triggered when company changes to load filtered branches and attendance policies
+    async function onCompanyChange(companyId, selectedBranchId = null, selectedPolicyId = null) {
+        const branchSelect = document.getElementById('modalBranchId');
+        const policySelect = document.getElementById('modalAttendancePolicyId');
+
+        branchSelect.innerHTML = '<option value="">Select Branch</option>';
+        policySelect.innerHTML = '<option value="">Select Policy</option>';
+
+        if (!companyId) return;
+
+        try {
+            // Load Branches
+            const branchRes = await fetch(`/ShiftMaster/GetBranches?companyId=${companyId}`);
+            const branches = await branchRes.json();
+            branches.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.value;
+                opt.textContent = b.text;
+                if (selectedBranchId && b.value === selectedBranchId) {
+                    opt.selected = true;
+                }
+                branchSelect.appendChild(opt);
+            });
+
+            // Load Attendance Policies
+            const policyRes = await fetch(`/ShiftMaster/GetAttendancePolicies?companyId=${companyId}`);
+            const policies = await policyRes.json();
+            policies.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.attendancePolicyId;
+                opt.textContent = p.policyName;
+                if (selectedPolicyId && p.attendancePolicyId === selectedPolicyId) {
+                    opt.selected = true;
+                }
+                policySelect.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('Error loading dependent dropdowns:', err);
+        }
+    }
+
+    async function openShiftModal() {
+        document.getElementById('modalTitle').textContent = 'New Shift Configuration';
+        document.getElementById('shiftForm').action = '/ShiftMaster/Create';
+        document.getElementById('ShiftMasterId').value = 0;
+        document.getElementById('shiftForm').reset();
+
+        await loadCompaniesDropdown();
+        document.getElementById('modalBranchId').innerHTML = '<option value="">Select Branch</option>';
+        document.getElementById('modalAttendancePolicyId').innerHTML = '<option value="">Select Policy</option>';
+
+        const randomCode = 'SHF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('modalShiftCode').value = randomCode;
+
+        document.getElementById('shiftModal').classList.add('active');
+    }
+
+    function closeShiftModal() {
+        document.getElementById('shiftModal').classList.remove('active');
+    }
+
+    async function editShift(id) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Edit Feature',
+            text: 'Edit mapping hook for shift ID: ' + id,
+            confirmButtonColor: '#7c3aed'
+        });
+    }
+
+    // --- BREAKS MODAL LOGIC & VALIDATIONS ---
+    async function openBreaksModal(shiftMasterId, shiftName) {
+        activeBreakShiftId = shiftMasterId;
+        document.getElementById('breaksModalTitle').textContent = `Manage Breaks: ${shiftName}`;
+        const tbody = document.getElementById('breaksTableBody');
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:var(--text-muted);">Loading breaks...</td></tr>`;
+
+        document.getElementById('breaksModal').classList.add('active');
+
+        try {
+            const res = await fetch(`/ShiftMaster/GetBreaks?shiftMasterId=${shiftMasterId}`);
+            const breaks = await res.json();
+            renderBreaksTable(breaks);
+        } catch (err) {
+            console.error('Error loading breaks:', err);
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444; padding: 20px;">Failed to load breaks.</td></tr>`;
+        }
+    }
+
+    function closeBreaksModal() {
+        document.getElementById('breaksModal').classList.remove('active');
+        activeBreakShiftId = 0;
+    }
+
+    function renderBreaksTable(breaks) {
+        const tbody = document.getElementById('breaksTableBody');
+        tbody.innerHTML = '';
+
+        if (!breaks || breaks.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding: 20px; font-style:italic;">No breaks configured for this shift. Click "Add Break Window" above.</td></tr>`;
+            return;
+        }
+
+        breaks.forEach((b) => {
+            const standardTypes = ['Lunch', 'Tea', 'Dinner', 'Prayer'];
+            let typeVal = b.breakName;
+            let customNameVal = '';
+
+            if (!standardTypes.includes(b.breakName)) {
+                typeVal = 'Custom';
+                customNameVal = b.breakName || '';
+            }
+
+            appendBreakRowElement(b.shiftBreakId || 0, typeVal, customNameVal, b.startTime || '13:00', b.endTime || '14:00', b.isPaidBreak);
+        });
+    }
+
+    function addBreakRow() {
+        const tbody = document.getElementById('breaksTableBody');
+        if (tbody.querySelector('td[colspan="6"]')) {
+            tbody.innerHTML = '';
+        }
+        appendBreakRowElement(0, 'Lunch', '', '13:00', '13:30', true);
+    }
+
+    function appendBreakRowElement(id, type, customName, start, end, isPaid) {
+        const tbody = document.getElementById('breaksTableBody');
+        const row = document.createElement('tr');
+
+        const isCustom = type === 'Custom';
+
+        row.innerHTML = `
+            <td>
+                <input type="hidden" class="break-id" value="${id}" />
+                <select class="custom-select break-type" onchange="onBreakTypeChange(this)">
+                    <option value="Lunch" ${type === 'Lunch' ? 'selected' : ''}>Lunch</option>
+                    <option value="Tea" ${type === 'Tea' ? 'selected' : ''}>Tea</option>
+                    <option value="Dinner" ${type === 'Dinner' ? 'selected' : ''}>Dinner</option>
+                    <option value="Prayer" ${type === 'Prayer' ? 'selected' : ''}>Prayer</option>
+                    <option value="Custom" ${type === 'Custom' ? 'selected' : ''}>Custom</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" class="custom-input break-name" value="${customName}" placeholder="Enter name" ${isCustom ? '' : 'disabled'} />
+            </td>
+            <td>
+                <input type="time" class="custom-input break-start" value="${start}" />
+            </td>
+            <td>
+                <input type="time" class="custom-input break-end" value="${end}" />
+            </td>
+            <td style="text-align: center;">
+                <input type="checkbox" class="break-paid" ${isPaid ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--purple);" />
+            </td>
+            <td>
+                <button type="button" class="remove-break-row-btn" onclick="this.closest('tr').remove()"><i class="bi bi-trash"></i></button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    function onBreakTypeChange(selectEl) {
+        const row = selectEl.closest('tr');
+        const nameInput = row.querySelector('.break-name');
+        if (selectEl.value === 'Custom') {
+            nameInput.disabled = false;
+            nameInput.focus();
+        } else {
+            nameInput.disabled = true;
+            nameInput.value = '';
+        }
+    }
+
+    async function saveShiftBreaks() {
+        if (!activeBreakShiftId) return;
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        const rows = document.querySelectorAll('#breaksTableBody tr');
+        const breaksList = [];
+        const seenNames = new Set();
+
+        for (let row of rows) {
+            const typeSelect = row.querySelector('.break-type');
+            if (!typeSelect) continue;
+
+            const breakType = typeSelect.value;
+            const customNameInput = row.querySelector('.break-name');
+
+            let finalBreakName = breakType;
+            if (breakType === 'Custom') {
+                finalBreakName = customNameInput?.value.trim() || '';
+                if (!finalBreakName) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Custom Name',
+                        text: 'Please provide a break name when "Custom" break type is selected.',
+                        confirmButtonColor: '#7c3aed'
+                    });
+                    customNameInput.focus();
+                    return;
+                }
+            }
+
+            const startTime = row.querySelector('.break-start')?.value;
+            const endTime = row.querySelector('.break-end')?.value;
+            const isPaidBreak = row.querySelector('.break-paid')?.checked || false;
+            const breakId = parseInt(row.querySelector('.break-id')?.value || 0);
+
+            // Duplicate Break Name Check
+            if (seenNames.has(finalBreakName.toLowerCase())) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate Break Name',
+                    text: `Break name "${finalBreakName}" is entered more than once. Break names must be unique.`,
+                    confirmButtonColor: '#7c3aed'
+                });
+                return;
+            }
+            seenNames.add(finalBreakName.toLowerCase());
+
+            // Validate End > Start
+            if (!startTime || !endTime || startTime >= endTime) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Time Range',
+                    text: `Break end time must be after break start time for "${finalBreakName}".`,
+                    confirmButtonColor: '#7c3aed'
+                });
+                return;
+            }
+
+            // Maximum break duration safeguard (e.g. max 4 hours per break)
+            const [startH, startM] = startTime.split(':').map(Number);
+            const [endH, endM] = endTime.split(':').map(Number);
+            const durationMins = (endH * 60 + endM) - (startH * 60 + startM);
+
+            if (durationMins > 240) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Excessive Duration',
+                    text: `Break "${finalBreakName}" duration cannot exceed 4 hours.`,
+                    confirmButtonColor: '#7c3aed'
+                });
+                return;
+            }
+
+            breaksList.push({
+                shiftBreakId: breakId,
+                breakName: finalBreakName,
+                startTime: startTime,
+                endTime: endTime,
+                isPaidBreak: isPaidBreak
+            });
+        }
+
+        // Validate Overlapping Breaks
+        breaksList.sort((a, b) => a.startTime.localeCompare(b.startTime));
+        for (let i = 0; i < breaksList.length - 1; i++) {
+            const current = breaksList[i];
+            const next = breaksList[i + 1];
+
+            if (current.endTime > next.startTime) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Overlapping Breaks',
+                    text: `Break "${current.breakName}" (${current.startTime} - ${current.endTime}) overlaps with break "${next.breakName}" (${next.startTime} - ${next.endTime}).`,
+                    confirmButtonColor: '#7c3aed'
+                });
+                return;
+            }
+        }
+
+        try {
+            const res = await fetch(`/ShiftMaster/SaveBreaks?shiftMasterId=${activeBreakShiftId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(breaksList)
+            });
+            const result = await res.json();
+            if (result.success) {
+                closeBreaksModal();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Shift breaks updated successfully.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: result.message || 'Failed to save breaks.',
+                    confirmButtonColor: '#7c3aed'
+                });
+            }
+        } catch (err) {
+            console.error('Save breaks error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Network Error',
+                text: 'Network error while saving breaks.',
+                confirmButtonColor: '#7c3aed'
+            });
+        }
+    }
+
+    // --- TOGGLE / DELETE SHIFT LOGIC WITH SWEETALERT2 ---
+    async function toggleShiftStatus(id) {
+        const confirmResult = await Swal.fire({
+            title: 'Toggle Status?',
+            text: 'Are you sure you want to toggle the status of this shift?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#7c3aed',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, toggle it!'
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch(`/ShiftMaster/ToggleStatus/${id}`, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            });
+            const result = await res.json();
+            if (result.success) {
+                const badge = document.getElementById(`badge-${id}`);
+                if (badge) {
+                    badge.textContent = result.isActive ? 'Active' : 'Inactive';
+                    badge.className = `badge-status ${result.isActive ? 'status-active' : 'status-inactive'}`;
+                }
+                Swal.fire({ icon: 'success', title: 'Updated!', text: result.message, timer: 1200, showConfirmButton: false });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Action Denied', text: result.message, confirmButtonColor: '#7c3aed' });
+            }
+        } catch (err) {
+            console.error('Toggle status error:', err);
+        }
+    }
+
+    async function deleteShift(id) {
+        const confirmResult = await Swal.fire({
+            title: 'Delete Shift?',
+            text: 'Are you sure you want to delete this shift record? This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch(`/ShiftMaster/Delete/${id}`, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            });
+            const result = await res.json();
+            if (result.success) {
+                const row = document.getElementById(`shift-row-${id}`);
+                if (row) row.remove();
+                Swal.fire({ icon: 'success', title: 'Deleted!', text: result.message, timer: 1200, showConfirmButton: false });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Cannot Delete', text: result.message, confirmButtonColor: '#7c3aed' });
+            }
+        } catch (err) {
+            console.error('Delete error:', err);
+        }
+    }
+</script>

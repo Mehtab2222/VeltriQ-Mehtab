@@ -1,0 +1,438 @@
+﻿@model VeltriQ.Models.HR.Attendance.AttendancePolicy
+
+@{
+    ViewData["Title"] = "Create Attendance Policy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .form-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 80px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .form-card-top {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+        .form-card-top h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+    /* TAB NAVIGATION BAR */
+    .policy-tabs {
+        display: flex;
+        gap: 4px;
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        overflow-x: auto;
+        flex-shrink: 0;
+    }
+
+    .policy-tab-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-secondary);
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+
+        .policy-tab-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .policy-tab-btn.active {
+            background: var(--purple);
+            color: #fff;
+            border-color: var(--purple);
+        }
+
+    .form-scroll-body {
+        overflow-y: auto;
+        padding: 20px;
+        flex: 1;
+        scrollbar-width: none;
+    }
+
+        .form-scroll-body::-webkit-scrollbar {
+            display: none;
+        }
+
+    .tab-pane {
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+        .tab-pane.active {
+            display: flex;
+        }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .form-group.wide {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+    .custom-input, .custom-select, .custom-textarea {
+        width: 100%;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 8px 12px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+    .custom-input, .custom-select {
+        height: 36px;
+        padding: 0 12px;
+    }
+
+        .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .custom-textarea {
+        resize: vertical;
+        min-height: 70px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+    }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--purple);
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: none;
+            cursor: pointer;
+        }
+
+    .form-footer {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+    .btn-cancel {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-save {
+        height: 34px;
+        padding: 0 18px;
+        border-radius: 4px;
+        border: none;
+        background: var(--purple);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+</style>
+
+<div class="form-page">
+    <form asp-action="Create" method="post" class="form-card">
+        @Html.AntiForgeryToken()
+
+        <div class="form-card-top">
+            <h3>Create Attendance Policy</h3>
+            <span style="font-size: 11px; color: var(--text-secondary);">Configure company-wide attendance rules and parameters.</span>
+        </div>
+
+        <div class="policy-tabs">
+            <button type="button" class="policy-tab-btn active" onclick="switchTab(event, 'tab-basic')">Basic</button>
+            <button type="button" class="policy-tab-btn" onclick="switchTab(event, 'tab-working')">Working Hours</button>
+            <button type="button" class="policy-tab-btn" onclick="switchTab(event, 'tab-late')">Late</button>
+            <button type="button" class="policy-tab-btn" onclick="switchTab(event, 'tab-early')">Early Out</button>
+            <button type="button" class="policy-tab-btn" onclick="switchTab(event, 'tab-overtime')">Overtime</button>
+            <button type="button" class="policy-tab-btn" onclick="switchTab(event, 'tab-punch')">Punch</button>
+            <button type="button" class="policy-tab-btn" onclick="switchTab(event, 'tab-holiday')">Holiday</button>
+            <button type="button" class="policy-tab-btn" onclick="switchTab(event, 'tab-general')">General</button>
+        </div>
+
+        <div class="form-scroll-body">
+            <div asp-validation-summary="ModelOnly" style="color: #ef4444; font-size: 12px; margin-bottom: 14px;"></div>
+
+            <div id="tab-basic" class="tab-pane active">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="CompanyId">Company *</label>
+
+                        <select asp-for="CompanyId"
+                                asp-items="ViewBag.CompanyDropdown"
+                                class="custom-select"
+                                required>
+                            <option value="">Select Company</option>
+                        </select>
+
+                        <span asp-validation-for="CompanyId"
+                              style="color:#ef4444; font-size:10.5px;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PolicyCode">Policy Code *</label>
+                        <input asp-for="PolicyCode" class="custom-input" readonly />
+                        <span asp-validation-for="PolicyCode" style="color:#ef4444; font-size:10.5px;"></span>
+                    </div>
+
+                    <div class="form-group wide">
+                        <label asp-for="PolicyName">Policy Name *</label>
+                        <input asp-for="PolicyName" class="custom-input" placeholder="e.g. Standard Corporate Policy" autocomplete="off" required />
+                        <span asp-validation-for="PolicyName" style="color:#ef4444; font-size:10.5px;"></span>
+                    </div>
+
+                    <div class="form-group wide">
+                        <label asp-for="Description">Description</label>
+                        <textarea asp-for="Description" class="custom-textarea" placeholder="Optional notes about this policy..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-working" class="tab-pane">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="FullDayHours">Full Day Hours *</label>
+                        <input asp-for="FullDayHours" type="number" step="0.5" class="custom-input" value="8" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="HalfDayHours">Half Day Hours *</label>
+                        <input asp-for="HalfDayHours" type="number" step="0.5" class="custom-input" value="4" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MinimumWorkingHours">Minimum Working Hours *</label>
+                        <input asp-for="MinimumWorkingHours" type="number" step="0.5" class="custom-input" value="4" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-late" class="tab-pane">
+                <div class="form-grid">
+                    <div class="form-group wide">
+                        <div class="checkbox-group">
+                            <input asp-for="EnableLateMark" />
+                            <label asp-for="EnableLateMark"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LateGraceMinutes">Late Grace (Mins)</label>
+                        <input asp-for="LateGraceMinutes" type="number" class="custom-input" value="15" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MaxLateMarksPerMonth">Max Late Marks / Month</label>
+                        <input asp-for="MaxLateMarksPerMonth" type="number" class="custom-input" value="3" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LateMarkDeductionDays">Deduction (Days)</label>
+                        <input asp-for="LateMarkDeductionDays" type="number" step="0.25" class="custom-input" value="0.5" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-early" class="tab-pane">
+                <div class="form-grid">
+                    <div class="form-group wide">
+                        <div class="checkbox-group">
+                            <input asp-for="EnableEarlyOut" />
+                            <label asp-for="EnableEarlyOut"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EarlyOutGraceMinutes">Early Out Grace (Mins)</label>
+                        <input asp-for="EarlyOutGraceMinutes" type="number" class="custom-input" value="15" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MaxEarlyOutPerMonth">Max Early Outs / Month</label>
+                        <input asp-for="MaxEarlyOutPerMonth" type="number" class="custom-input" value="3" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EarlyOutDeductionDays">Deduction (Days)</label>
+                        <input asp-for="EarlyOutDeductionDays" type="number" step="0.25" class="custom-input" value="0.5" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-overtime" class="tab-pane">
+                <div class="form-grid">
+                    <div class="form-group wide">
+                        <div class="checkbox-group">
+                            <input asp-for="EnableOvertime" />
+                            <label asp-for="EnableOvertime"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MinimumOvertimeMinutes">Minimum OT (Mins)</label>
+                        <input asp-for="MinimumOvertimeMinutes" type="number" class="custom-input" value="30" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MaximumOvertimeHours">Max OT Hours / Day</label>
+                        <input asp-for="MaximumOvertimeHours" type="number" class="custom-input" value="4" />
+                    </div>
+                    <div class="form-group wide">
+                        <div class="checkbox-group">
+                            <input asp-for="RoundOvertime" />
+                            <label asp-for="RoundOvertime">Round Off Overtime</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-punch" class="tab-pane">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="MinimumPunchesPerDay">Min Punches Per Day</label>
+                        <input asp-for="MinimumPunchesPerDay" type="number" class="custom-input" value="2" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DuplicatePunchIntervalMinutes">Duplicate Interval (Mins)</label>
+                        <input asp-for="DuplicatePunchIntervalMinutes" type="number" class="custom-input" value="5" />
+                    </div>
+                    <div class="form-group wide" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+                        <div class="checkbox-group">
+                            <input asp-for="AllowSinglePunch" />
+                            <label asp-for="AllowSinglePunch"></label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input asp-for="IgnoreDuplicatePunch" />
+                            <label asp-for="IgnoreDuplicatePunch"></label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input asp-for="AutoAbsentForMissingPunch" />
+                            <label asp-for="AutoAbsentForMissingPunch">Mark Absent for Missing Punch</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input asp-for="AutoHalfDayForMissingPunch" />
+                            <label asp-for="AutoHalfDayForMissingPunch">Mark Half-Day for Missing Punch</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-holiday" class="tab-pane">
+                <div class="form-grid">
+                    <div class="form-group wide" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="checkbox-group">
+                            <input asp-for="EnableSandwichRule" />
+                            <label asp-for="EnableSandwichRule">Enable Sandwich Rule</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input asp-for="IncludeHolidayPrefixSuffix" />
+                            <label asp-for="IncludeHolidayPrefixSuffix">Include Holiday Prefix / Suffix</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input asp-for="IncludeWeeklyOffPrefixSuffix" />
+                            <label asp-for="IncludeWeeklyOffPrefixSuffix">Include Weekly Off Prefix / Suffix</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-general" class="tab-pane">
+                <div class="form-grid">
+                    <div class="form-group wide" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="checkbox-group">
+                            <input asp-for="IsDefaultPolicy" />
+                            <label asp-for="IsDefaultPolicy">Set as Default Policy</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input asp-for="IsActive" />
+                            <label asp-for="IsActive">Is Active</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <a asp-action="Index" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save"><i class="bi bi-check2-circle"></i> Save Policy</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function switchTab(evt, tabId) {
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.querySelectorAll('.policy-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+</script>

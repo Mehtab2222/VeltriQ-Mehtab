@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using VeltriQ.Models.HR;
 
 namespace VeltriQ.Models.HR.Attendance
 {
@@ -8,19 +9,15 @@ namespace VeltriQ.Models.HR.Attendance
 
         public int CompanyId { get; set; }
 
+        public string PolicyCode { get; set; } = string.Empty;
+
         public string PolicyName { get; set; } = string.Empty;
 
-        public DayOfWeek DayOfWeek { get; set; }
+        public string? Description { get; set; }
 
-        // 0 = Every Week
-        // 1 = First
-        // 2 = Second
-        // 3 = Third
-        // 4 = Fourth
-        // 5 = Fifth
-        public int WeekNumber { get; set; }
+        public bool IsDefaultPolicy { get; set; }
 
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; }
 
         public DateTime CreatedOn { get; set; }
 
@@ -32,5 +29,8 @@ namespace VeltriQ.Models.HR.Attendance
 
         [ForeignKey(nameof(CompanyId))]
         public virtual Company? Company { get; set; }
+
+        public virtual ICollection<WeeklyOffPolicyDetail> WeeklyOffDetails { get; set; }
+            = new List<WeeklyOffPolicyDetail>();
     }
 }

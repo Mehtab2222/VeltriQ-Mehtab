@@ -156,6 +156,8 @@ namespace VeltriQ.Data
         public DbSet<EmployeeShift> EmployeeShifts { get; set; }
         public DbSet<HolidayMaster> HolidayMasters { get; set; }
         public DbSet<WeeklyOffPolicy> WeeklyOffPolicies { get; set; }
+
+        public DbSet<WeeklyOffPolicyDetail> WeeklyOffPolicyDetails { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
 
         public DbSet<AttendancePunch> AttendancePunches { get; set; }
@@ -280,14 +282,43 @@ namespace VeltriQ.Data
 
                 entity.HasKey(x => x.WeeklyOffPolicyId);
 
+                entity.Property(x => x.PolicyCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
                 entity.Property(x => x.PolicyName)
                       .HasMaxLength(100)
                       .IsRequired();
+
+                entity.Property(x => x.Description)
+                      .HasMaxLength(500);
 
                 entity.HasOne(x => x.Company)
                       .WithMany()
                       .HasForeignKey(x => x.CompanyId)
                       .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(x => x.WeeklyOffDetails)
+                      .WithOne(x => x.WeeklyOffPolicy)
+                      .HasForeignKey(x => x.WeeklyOffPolicyId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<WeeklyOffPolicyDetail>(entity =>
+            {
+                entity.ToTable("WeeklyOffPolicyDetail", "HR");
+
+                entity.HasKey(x => x.WeeklyOffPolicyDetailId);
+
+                entity.Property(x => x.DayOfWeek)
+                      .IsRequired();
+
+                entity.Property(x => x.WeekNumber)
+                      .IsRequired();
+
+                entity.HasOne(x => x.WeeklyOffPolicy)
+                      .WithMany(x => x.WeeklyOffDetails)
+                      .HasForeignKey(x => x.WeeklyOffPolicyId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
             modelBuilder.Entity<HolidayMaster>(entity =>
             {
@@ -396,9 +427,8 @@ namespace VeltriQ.Data
                       .WithMany()
                       .HasForeignKey(x => x.BranchId)
                       .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(x => x.AttendancePolicy)
-                      .WithMany(x => x.Shifts)
+                      .WithMany(x => x.ShiftMasters)
                       .HasForeignKey(x => x.AttendancePolicyId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
@@ -1300,6 +1330,51 @@ namespace VeltriQ.Data
                 .WithMany()
                 .HasForeignKey(x => x.OnboardingActivityMasterId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<AttendancePolicy>(entity =>
+            {
+                entity.ToTable("AttendancePolicy", "HR");
+
+                entity.HasKey(x => x.AttendancePolicyId);
+
+                entity.Property(x => x.PolicyCode)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(x => x.PolicyName)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.Property(x => x.Description)
+                      .HasMaxLength(500);
+
+                entity.Property(x => x.FullDayHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.HalfDayHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.MinimumWorkingHours)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.LateMarkDeductionDays)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.EarlyOutDeductionDays)
+                      .HasColumnType("decimal(5,2)");
+
+                entity.HasIndex(x => new
+                {
+                    x.CompanyId,
+                    x.PolicyCode
+                }).IsUnique();
+
+                entity.HasOne(x => x.Company)
+                      .WithMany()
+                      .HasForeignKey(x => x.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
         }
+
     }
 }

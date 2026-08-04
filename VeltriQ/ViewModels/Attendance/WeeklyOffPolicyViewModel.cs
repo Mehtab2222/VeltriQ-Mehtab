@@ -3,9 +3,13 @@ using VeltriQ.Models.HR.Attendance;
 
 namespace VeltriQ.ViewModels.Attendance
 {
-    public class AttendancePolicyViewModel
+    public class WeeklyOffPolicyViewModel
     {
-        public AttendancePolicy AttendancePolicy { get; set; } = new();
+        public WeeklyOffPolicy WeeklyOffPolicy { get; set; }
+            = new();
+
+        public List<WeeklyOffPolicyDetailViewModel> WeeklyOffDetails { get; set; }
+            = new();
 
         public IEnumerable<SelectListItem> Companies { get; set; }
             = new List<SelectListItem>();
