@@ -331,15 +331,18 @@ namespace VeltriQ.Data
                       .IsRequired();
 
                 entity.Property(x => x.HolidayName)
-                      .HasMaxLength(200)
+                      .HasMaxLength(150)
                       .IsRequired();
 
-                entity.HasIndex(x => new
-                {
-                    x.CompanyId,
-                    x.BranchId,
-                    x.HolidayDate
-                }).IsUnique();
+                entity.Property(x => x.HolidayType)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(x => x.Description)
+                      .HasMaxLength(500);
+
+                entity.Property(x => x.HalfDaySession)
+                      .HasMaxLength(20);
 
                 entity.HasOne(x => x.Company)
                       .WithMany()
@@ -357,6 +360,14 @@ namespace VeltriQ.Data
 
                 entity.HasKey(x => x.EmployeeShiftId);
 
+                entity.Property(x => x.Remarks)
+                      .HasMaxLength(500);
+
+                entity.HasOne(x => x.Company)
+                      .WithMany()
+                      .HasForeignKey(x => x.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasOne(x => x.Employee)
                       .WithMany()
                       .HasForeignKey(x => x.EmployeeId)
@@ -366,12 +377,6 @@ namespace VeltriQ.Data
                       .WithMany(x => x.EmployeeShifts)
                       .HasForeignKey(x => x.ShiftMasterId)
                       .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasIndex(x => new
-                {
-                    x.EmployeeId,
-                    x.EffectiveFrom
-                });
             });
             modelBuilder.Entity<ShiftBreak>(entity =>
             {

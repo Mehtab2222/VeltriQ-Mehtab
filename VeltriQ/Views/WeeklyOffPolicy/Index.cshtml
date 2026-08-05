@@ -182,6 +182,7 @@
         justify-content: center;
         font-size: 12px;
         cursor: pointer;
+        text-decoration: none;
         transition: background-color 0.2s;
     }
 
@@ -189,200 +190,16 @@
             background: var(--purple);
             color: #fff;
         }
-
-    /* MODAL WINDOW SYSTEM */
-    .custom-modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,.65);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        padding: 20px;
-        backdrop-filter: blur(4px);
-    }
-
-        .custom-modal.active {
-            display: flex;
-        }
-
-    .custom-modal-box {
-        width: 100%;
-        max-width: 650px;
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        overflow: hidden;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .modal-header-custom {
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        background: var(--hover-bg);
-        flex-shrink: 0;
-    }
-
-        .modal-header-custom h3 {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-
-    .close-modal-btn {
-        width: 30px;
-        height: 30px;
-        border: none;
-        border-radius: 4px;
-        background: var(--card-bg);
-        color: var(--text-primary);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal-body-custom {
-        padding: 24px;
-        overflow-y: auto;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        scrollbar-width: thin;
-    }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px 18px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-        .form-group.wide {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            font-size: 10.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            color: var(--text-secondary);
-        }
-
-    .custom-input, .custom-select, .custom-textarea {
-        width: 100%;
-        border-radius: 6px;
-        border: 1px solid var(--border);
-        background: var(--input-bg);
-        color: var(--text-primary);
-        padding: 0 12px;
-        font-size: 12.5px;
-        outline: none;
-    }
-
-    .custom-input, .custom-select {
-        height: 36px;
-    }
-
-    .custom-textarea {
-        resize: vertical;
-        min-height: 70px;
-        padding: 8px 12px;
-    }
-
-        .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
-            border-color: var(--purple);
-        }
-
-    .custom-input[readonly] {
-        background: var(--hover-bg);
-        opacity: 0.8;
-        cursor: not-allowed;
-    }
-
-    .checkbox-group {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 6px;
-    }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--purple);
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-transform: none;
-            cursor: pointer;
-        }
-
-    .modal-footer-custom {
-        padding: 14px 20px;
-        border-top: 1px solid var(--border);
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        background: var(--hover-bg);
-        flex-shrink: 0;
-    }
-
-    .cancel-btn {
-        height: 34px;
-        padding: 0 16px;
-        border-radius: 6px;
-        border: 1px solid var(--border);
-        background: transparent;
-        color: var(--text-primary);
-        font-weight: 600;
-        font-size: 12px;
-        cursor: pointer;
-    }
-
-    .save-btn {
-        height: 34px;
-        padding: 0 16px;
-        border: none;
-        border-radius: 6px;
-        background: linear-gradient(135deg, #6d28d9, #7c3aed);
-        color: #fff;
-        font-weight: 600;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-    }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 @Html.AntiForgeryToken()
 
 <div class="weekly-page">
     <div class="weekly-header-bar">
-        <button class="weekly-add-btn" onclick="openPolicyModal('create')">
+        <a asp-action="Create" class="weekly-add-btn">
             <i class="bi bi-plus-lg"></i> Create Weekly Off Policy
-        </button>
+        </a>
     </div>
 
     <div class="weekly-card">
@@ -393,7 +210,7 @@
             </div>
             <div class="search-box">
                 <i class="bi bi-search"></i>
-                <input type="text" id="policySearchInput" placeholder="Search policies..." onkeyup="filterPolicies()" autocomplete="off" />
+                <input type="text" id="tableSearchKeyword" placeholder="Search policies..." onkeyup="filterPolicies()" autocomplete="off" />
             </div>
         </div>
 
@@ -435,9 +252,9 @@
                                 </td>
                                 <td style="text-align: right; padding-right: 24px;">
                                     <div style="display: flex; gap: 4px; justify-content: flex-end;">
-                                        <button class="action-btn" onclick="openPolicyModal('edit', @x.WeeklyOffPolicyId)" title="Edit Policy">
+                                        <a asp-action="Edit" asp-route-id="@x.WeeklyOffPolicyId" class="action-btn" title="Edit Policy">
                                             <i class="bi bi-pencil-square"></i>
-                                        </button>
+                                        </a>
                                         <button class="action-btn" onclick="togglePolicyStatus(@x.WeeklyOffPolicyId)" title="Toggle Status" style="color: #f59e0b;">
                                             <i class="bi bi-power"></i>
                                         </button>
@@ -460,68 +277,9 @@
     </div>
 </div>
 
-<div class="custom-modal" id="policyModal">
-    <div class="custom-modal-box">
-        <div class="modal-header-custom">
-            <div>
-                <h3 id="modalTitle">Create Weekly Off Policy</h3>
-                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Define policy details and company mappings.</p>
-            </div>
-            <button type="button" class="close-modal-btn" onclick="closePolicyModal()"><i class="bi bi-x-lg"></i></button>
-        </div>
-
-        <form id="policyForm" method="post" onsubmit="submitPolicyForm(event)">
-            @Html.AntiForgeryToken()
-            <input type="hidden" id="WeeklyOffPolicyId" name="WeeklyOffPolicy.WeeklyOffPolicyId" value="0" />
-
-            <div class="modal-body-custom">
-                <div class="form-grid">
-                    <div class="form-group wide">
-                        <label>Company *</label>
-                        <select name="WeeklyOffPolicy.CompanyId" class="custom-select" id="modalCompanyId" required>
-                            <option value="">Select Company</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Policy Code * (Auto)</label>
-                        <input type="text" name="WeeklyOffPolicy.PolicyCode" id="modalPolicyCode" class="custom-input" readonly required />
-                    </div>
-
-                    <div class="form-group">
-                        <label>Policy Name *</label>
-                        <input type="text" name="WeeklyOffPolicy.PolicyName" id="modalPolicyName" class="custom-input" placeholder="e.g. Saturday & Sunday Off" required />
-                    </div>
-
-                    <div class="form-group wide">
-                        <label>Description</label>
-                        <textarea name="WeeklyOffPolicy.Description" id="modalDescription" class="custom-textarea" placeholder="Optional details..."></textarea>
-                    </div>
-
-                    <div class="form-group wide" style="display: flex; flex-direction: row; gap: 24px; margin-top: 4px;">
-                        <div class="checkbox-group">
-                            <input type="checkbox" name="WeeklyOffPolicy.IsDefaultPolicy" id="modalIsDefaultPolicy" value="true" />
-                            <label for="modalIsDefaultPolicy">Set as Default Policy</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" name="WeeklyOffPolicy.IsActive" id="modalIsActive" value="true" checked />
-                            <label for="modalIsActive">Is Active</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer-custom">
-                <button type="button" class="cancel-btn" onclick="closePolicyModal()">Cancel</button>
-                <button type="submit" class="save-btn"><i class="bi bi-check2-circle"></i> Save Policy</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script>
     function filterPolicies() {
-        const input = document.getElementById('policySearchInput');
+        const input = document.getElementById('tableSearchKeyword');
         const filter = input.value.toLowerCase();
         const rows = document.querySelectorAll('#policyTable tbody tr.policy-row');
 
@@ -533,103 +291,6 @@
                 row.style.display = 'none';
             }
         });
-    }
-
-    async function loadCompanies(selectedCompanyId = null) {
-        const companySelect = document.getElementById('modalCompanyId');
-        companySelect.innerHTML = '<option value="">Select Company</option>';
-
-        try {
-            const res = await fetch('/ShiftMaster/GetCompanies');
-            const companies = await res.json();
-            companies.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.companyId || c.value;
-                opt.textContent = c.companyName || c.text;
-                if (selectedCompanyId && opt.value == selectedCompanyId) {
-                    opt.selected = true;
-                }
-                companySelect.appendChild(opt);
-            });
-        } catch (err) {
-            console.error('Error loading companies:', err);
-        }
-    }
-
-    async function openPolicyModal(mode, id = 0) {
-        const modal = document.getElementById('policyModal');
-        const form = document.getElementById('policyForm');
-        const title = document.getElementById('modalTitle');
-
-        modal.classList.add('active');
-        form.reset();
-
-        if (mode === 'create') {
-            title.textContent = 'Create Weekly Off Policy';
-            form.action = '/WeeklyOffPolicy/Create';
-            document.getElementById('WeeklyOffPolicyId').value = 0;
-            document.getElementById('modalIsActive').checked = true;
-            document.getElementById('modalIsDefaultPolicy').checked = false;
-
-            await loadCompanies();
-
-            const randomCode = 'WOP-' + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('modalPolicyCode').value = randomCode;
-        } else {
-            title.textContent = 'Edit Weekly Off Policy';
-            form.action = '/WeeklyOffPolicy/Edit';
-            document.getElementById('WeeklyOffPolicyId').value = id;
-
-            try {
-                const res = await fetch(`/WeeklyOffPolicy/GetPolicyById?id=${id}`);
-                const data = await res.json();
-
-                if (data.success) {
-                    await loadCompanies(data.companyId);
-                    document.getElementById('modalPolicyCode').value = data.policyCode;
-                    document.getElementById('modalPolicyName').value = data.policyName;
-                    document.getElementById('modalDescription').value = data.description || '';
-                    document.getElementById('modalIsDefaultPolicy').checked = data.isDefaultPolicy;
-                    document.getElementById('modalIsActive').checked = data.isActive;
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: data.message, confirmButtonColor: '#7c3aed' });
-                    closePolicyModal();
-                }
-            } catch (err) {
-                console.error('Failed to load policy for editing:', err);
-                Swal.fire({ icon: 'error', title: 'Network Error', text: 'Could not fetch policy details.', confirmButtonColor: '#7c3aed' });
-                closePolicyModal();
-            }
-        }
-    }
-
-    function closePolicyModal() {
-        document.getElementById('policyModal').classList.remove('active');
-    }
-
-    async function submitPolicyForm(e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-
-        try {
-            const res = await fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-
-            if (res.ok) {
-                closePolicyModal();
-                Swal.fire({ icon: 'success', title: 'Success!', text: 'Weekly Off Policy saved successfully.', timer: 1200, showConfirmButton: false });
-                setTimeout(() => location.reload(), 1200);
-            } else {
-                Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Please check your inputs and try again.', confirmButtonColor: '#7c3aed' });
-            }
-        } catch (err) {
-            console.error('Submission error:', err);
-            Swal.fire({ icon: 'error', title: 'Submission Failed', text: 'An unexpected network error occurred.', confirmButtonColor: '#7c3aed' });
-        }
     }
 
     async function togglePolicyStatus(id) {

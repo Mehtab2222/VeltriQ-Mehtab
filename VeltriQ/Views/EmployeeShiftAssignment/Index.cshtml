@@ -1,0 +1,854 @@
+﻿@model IEnumerable<VeltriQ.Models.HR.Attendance.EmployeeShift>
+
+@{
+    ViewData["Title"] = "Employee Shift Assignments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .shift-assign-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .shift-assign-header-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .shift-assign-add-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .shift-assign-add-btn:hover {
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    .shift-assign-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .shift-assign-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .shift-assign-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .shift-assign-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+    .search-box {
+        position: relative;
+        width: 260px;
+    }
+
+        .search-box input {
+            width: 100%;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            padding: 0 12px 0 32px;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .search-box input:focus {
+                border-color: var(--purple);
+            }
+
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+    .table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .shift-assign-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .shift-assign-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .shift-assign-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .shift-assign-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+        .action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+    /* MODAL WINDOW SYSTEM */
+    .custom-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+        .custom-modal.active {
+            display: flex;
+        }
+
+    .custom-modal-box {
+        width: 100%;
+        max-width: 700px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+        max-height: 92vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-header-custom {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+        .modal-header-custom h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+    .close-modal-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 4px;
+        background: var(--card-bg);
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-body-custom {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        scrollbar-width: thin;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .form-group.wide {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--text-secondary);
+        }
+
+    .custom-input, .custom-select, .custom-textarea {
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+    .custom-input, .custom-select {
+        height: 36px;
+    }
+
+    .custom-textarea {
+        resize: vertical;
+        min-height: 60px;
+        padding: 8px 12px;
+    }
+
+        .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .custom-input[readonly], .custom-select:disabled {
+        background: var(--hover-bg);
+        opacity: 0.8;
+        cursor: not-allowed;
+    }
+
+    .modal-footer-custom {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+    .cancel-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .save-btn {
+        height: 34px;
+        padding: 0 16px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #6d28d9, #7c3aed);
+        color: #fff;
+        font-weight: 600;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    /* History Timeline Table */
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 4px;
+    }
+
+        .history-table th {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            background: var(--hover-bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-table td {
+            padding: 9px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12.5px;
+        }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@Html.AntiForgeryToken()
+
+<div class="shift-assign-page">
+    <div class="shift-assign-header-bar">
+        <button class="shift-assign-add-btn" onclick="openAssignModal()">
+            <i class="bi bi-plus-lg"></i> Assign Shift
+        </button>
+    </div>
+
+    <div class="shift-assign-card">
+        <div class="shift-assign-card-top">
+            <div class="shift-assign-card-title">
+                <h3>Employee Shift Assignments Workspace</h3>
+                <p>Manage current shift allocations, effective dates, and view historical transitions.</p>
+            </div>
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="tableSearchKeyword" placeholder="Search assignments..." onkeyup="filterAssignments()" autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="shift-assign-table" id="assignmentTable">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Company</th>
+                        <th>Current Shift</th>
+                        <th>Effective From</th>
+                        <th>Effective To</th>
+                        <th style="text-align: center;">Status</th>
+                        <th style="text-align: right; padding-right: 24px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var x in Model)
+                        {
+                            var statusClass = x.IsActive ? "status-active" : "status-inactive";
+                            var statusText = x.IsActive ? "Active" : "Inactive";
+                            <tr class="assignment-row" id="assignment-row-@x.EmployeeShiftId">
+                                <td class="searchable-text">
+                                    <div style="font-weight: 600;">@(x.Employee?.FirstName + " " + x.Employee?.LastName)</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); font-family: monospace;">@(x.Employee?.EmployeeCode)</div>
+                                </td>
+                                <td class="searchable-text">@(x.Company?.CompanyName ?? "—")</td>
+                                <td class="searchable-text" style="font-weight: 600; color: var(--purple);">@(x.ShiftMaster?.ShiftName ?? "—")</td>
+                                <td>@x.EffectiveFrom.ToString("dd-MMM-yyyy")</td>
+                                <td>@(x.EffectiveTo.HasValue? x.EffectiveTo.Value.ToString("dd-MMM-yyyy") : "Current")</td>
+                                <td style="text-align: center;">
+                                    <span class="badge-status @statusClass" id="badge-@x.EmployeeShiftId">@statusText</span>
+                                </td>
+                                <td style="text-align: right; padding-right: 24px;">
+                                    <div style="display: flex; gap: 4px; justify-content: flex-end;">
+                                        <button class="action-btn" onclick="openHistoryModal(@x.EmployeeId, '@(x.Employee?.FirstName + " " + x.Employee?.LastName)')" title="View Shift History" style="color: #3b82f6;">
+                                            <i class="bi bi-clock-history"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="openEditModal(@x.EmployeeShiftId)" title="Edit Assignment">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="toggleAssignmentStatus(@x.EmployeeShiftId)" title="Toggle Status" style="color: #f59e0b;">
+                                            <i class="bi bi-power"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 24px;">
+                                No current shift assignments found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="custom-modal" id="assignModal">
+    <div class="custom-modal-box">
+        <div class="modal-header-custom">
+            <div>
+                <h3>Assign New Shift</h3>
+                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Allocating a new shift automatically closes the employee's previous shift assignment.</p>
+            </div>
+            <button type="button" class="close-modal-btn" onclick="closeAssignModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <form id="assignForm" method="post" onsubmit="submitAssignForm(event)">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="EmployeeShift.EmployeeShiftId" value="0" />
+
+            <div class="modal-body-custom">
+                <div class="form-grid">
+                    <div class="form-group wide">
+                        <label>Company *</label>
+                        <select name="EmployeeShift.CompanyId" class="custom-select" id="assignCompanyId" onchange="onAssignCompanyChange(this.value)" required>
+                            <option value="">Select Company</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Employee *</label>
+                        <select name="EmployeeShift.EmployeeId" class="custom-select" id="assignEmployeeId" required>
+                            <option value="">Select Employee</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Shift *</label>
+                        <select name="EmployeeShift.ShiftMasterId" class="custom-select" id="assignShiftId" required>
+                            <option value="">Select Shift</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Effective From *</label>
+                        <input type="date" name="EmployeeShift.EffectiveFrom" id="assignEffectiveFrom" class="custom-input" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Effective To (Optional)</label>
+                        <input type="date" name="EmployeeShift.EffectiveTo" id="assignEffectiveTo" class="custom-input" />
+                    </div>
+
+                    <div class="form-group wide">
+                        <label>Remarks</label>
+                        <textarea name="EmployeeShift.Remarks" id="assignRemarks" class="custom-textarea" placeholder="Optional notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button type="button" class="cancel-btn" onclick="closeAssignModal()">Cancel</button>
+                <button type="submit" class="save-btn"><i class="bi bi-check2-circle"></i> Save Assignment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="custom-modal" id="editModal">
+    <div class="custom-modal-box">
+        <div class="modal-header-custom">
+            <div>
+                <h3>Edit Shift Assignment</h3>
+                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Employee and Shift are locked to preserve audit trail.</p>
+            </div>
+            <button type="button" class="close-modal-btn" onclick="closeEditModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <form id="editForm" method="post" onsubmit="submitEditForm(event)">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="editEmployeeShiftId" name="EmployeeShift.EmployeeShiftId" />
+
+            <div class="modal-body-custom">
+                <div class="form-grid">
+                    <div class="form-group wide">
+                        <label>Employee (Locked)</label>
+                        <input type="text" id="editEmployeeDisplay" class="custom-input" readonly />
+                    </div>
+
+                    <div class="form-group wide">
+                        <label>Shift (Locked)</label>
+                        <input type="text" id="editShiftDisplay" class="custom-input" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Effective To</label>
+                        <input type="date" name="EmployeeShift.EffectiveTo" id="editEffectiveTo" class="custom-input" />
+                    </div>
+
+                    <div class="form-group wide">
+                        <label>Remarks</label>
+                        <textarea name="EmployeeShift.Remarks" id="editRemarks" class="custom-textarea" placeholder="Optional notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="save-btn"><i class="bi bi-check2-circle"></i> Update Assignment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="custom-modal" id="historyModal">
+    <div class="custom-modal-box" style="max-width: 650px;">
+        <div class="modal-header-custom">
+            <div>
+                <h3 id="historyModalTitle">Shift History</h3>
+                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Chronological shift allocation timeline.</p>
+            </div>
+            <button type="button" class="close-modal-btn" onclick="closeHistoryModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div class="modal-body-custom">
+            <div style="overflow-x: auto;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Shift Name</th>
+                            <th>From</th>
+                            <th>To</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading history...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="modal-footer-custom">
+            <button type="button" class="cancel-btn" onclick="closeHistoryModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Live Search Filter
+    function filterAssignments() {
+        const input = document.getElementById('tableSearchKeyword');
+        const filter = input.value.toLowerCase();
+        const rows = document.querySelectorAll('#assignmentTable tbody tr.assignment-row');
+
+        rows.forEach(row => {
+            const textContent = row.textContent.toLowerCase();
+            if (textContent.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // --- ASSIGN MODAL LOGIC ---
+    async function loadCompanies() {
+        const sel = document.getElementById('assignCompanyId');
+        sel.innerHTML = '<option value="">Select Company</option>';
+        try {
+            const res = await fetch('/ShiftMaster/GetCompanies');
+            const comps = await res.json();
+            comps.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.companyId || c.value;
+                opt.textContent = c.companyName || c.text;
+                sel.appendChild(opt);
+            });
+        } catch (err) { console.error('Error loading companies:', err); }
+    }
+
+    async function onAssignCompanyChange(companyId) {
+        const empSel = document.getElementById('assignEmployeeId');
+        const shiftSel = document.getElementById('assignShiftId');
+        empSel.innerHTML = '<option value="">Select Employee</option>';
+        shiftSel.innerHTML = '<option value="">Select Shift</option>';
+
+        if (!companyId) return;
+
+        try {
+            // Load Employees
+            const empRes = await fetch(`/EmployeeShiftAssignment/GetEmployeesByCompany?companyId=${companyId}`);
+            const emps = await empRes.json();
+            emps.forEach(e => {
+                const opt = document.createElement('option');
+                opt.value = e.employeeId;
+                opt.textContent = `${e.employeeCode} - ${e.employeeName}`;
+                empSel.appendChild(opt);
+            });
+
+            // Load Shifts
+            const shiftRes = await fetch(`/EmployeeShiftAssignment/GetShiftsByCompany?companyId=${companyId}`);
+            const shifts = await shiftRes.json();
+            shifts.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.shiftMasterId;
+                opt.textContent = s.shiftName;
+                shiftSel.appendChild(opt);
+            });
+        } catch (err) { console.error('Error loading dependent data:', err); }
+    }
+
+    async function openAssignModal() {
+        document.getElementById('assignForm').reset();
+        await loadCompanies();
+        document.getElementById('assignEffectiveFrom').valueAsDate = new Date();
+        document.getElementById('assignModal').classList.add('active');
+    }
+
+    function closeAssignModal() {
+        document.getElementById('assignModal').classList.remove('active');
+    }
+
+    async function submitAssignForm(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        try {
+            const res = await fetch('/EmployeeShiftAssignment/Create', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (res.ok) {
+                closeAssignModal();
+                Swal.fire({ icon: 'success', title: 'Success!', text: 'Shift assigned successfully.', timer: 1200, showConfirmButton: false });
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Please check your input values.', confirmButtonColor: '#7c3aed' });
+            }
+        } catch (err) { console.error('Create error:', err); }
+    }
+
+    // --- EDIT MODAL LOGIC ---
+    async function openEditModal(id) {
+
+        try {
+
+            const res = await fetch(`/EmployeeShiftAssignment/GetAssignment?id=${id}`);
+
+            const data = await res.json();
+
+            if (!data.success) {
+                Swal.fire('Error', 'Assignment not found.', 'error');
+                return;
+            }
+
+            document.getElementById('editEmployeeShiftId').value = data.employeeShiftId;
+            document.getElementById('editEmployeeDisplay').value = data.employeeName;
+            document.getElementById('editShiftDisplay').value = data.shiftName;
+            document.getElementById('editEffectiveTo').value = data.effectiveTo ?? '';
+            document.getElementById('editRemarks').value = data.remarks ?? '';
+
+            document.getElementById('editModal').classList.add('active');
+
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+        async function submitEditForm(e) {
+
+        e.preventDefault();
+
+        const form = e.target;
+
+        const formData = new FormData(form);
+
+        try {
+
+            const res = await fetch('/EmployeeShiftAssignment/Edit', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (res.ok) {
+
+                closeEditModal();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Shift assignment updated successfully.',
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                setTimeout(() => location.reload(), 1200);
+            }
+            else {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Unable to update assignment.',
+                    confirmButtonColor: '#7c3aed'
+                });
+            }
+
+        }
+        catch (err) {
+
+            console.error(err);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong.',
+                confirmButtonColor: '#7c3aed'
+            });
+
+        }
+    }
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active');
+    }
+
+    // --- SHIFT HISTORY MODAL LOGIC ---
+    async function openHistoryModal(employeeId, employeeName) {
+        document.getElementById('historyModalTitle').textContent = `Shift History: ${employeeName}`;
+        const tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading history...</td></tr>`;
+        document.getElementById('historyModal').classList.add('active');
+
+        try {
+            const res = await fetch(`/EmployeeShiftAssignment/GetShiftHistory?employeeId=${employeeId}`);
+            const history = await res.json();
+            tbody.innerHTML = '';
+
+            if (!history || history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 20px; font-style: italic;">No shift history recorded.</td></tr>`;
+                return;
+            }
+
+            history.forEach(h => {
+                const tr = document.createElement('tr');
+                if (h.isCurrent) tr.style.fontWeight = 'bold';
+                tr.innerHTML = `
+                    <td>${h.shiftName} ${h.isCurrent ? '<span style="color:#22c55e; font-size:10px; margin-left:6px;">[CURRENT]</span>' : ''}</td>
+                    <td>${h.effectiveFrom}</td>
+                    <td>${h.effectiveTo}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (err) {
+            console.error('Error loading history:', err);
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #ef4444; padding: 20px;">Failed to load history.</td></tr>`;
+        }
+    }
+
+    function closeHistoryModal() {
+        document.getElementById('historyModal').classList.remove('active');
+    }
+
+    // --- TOGGLE STATUS ---
+    async function toggleAssignmentStatus(id) {
+        const confirmResult = await Swal.fire({
+            title: 'Toggle Status?',
+            text: 'Are you sure you want to toggle the status of this shift assignment?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#7c3aed',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, toggle it!'
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+        try {
+            const res = await fetch(`/EmployeeShiftAssignment/ToggleStatus/${id}`, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            });
+            const result = await res.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                Swal.fire({ icon: 'error', title: 'Action Denied', text: result.message, confirmButtonColor: '#7c3aed' });
+            }
+        } catch (err) { console.error('Toggle status error:', err); }
+    }
+</script>

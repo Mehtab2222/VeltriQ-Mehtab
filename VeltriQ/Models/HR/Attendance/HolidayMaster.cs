@@ -6,6 +6,10 @@ namespace VeltriQ.Models.HR.Attendance
     {
         public int HolidayMasterId { get; set; }
 
+        //====================================================
+        // BASIC INFORMATION
+        //====================================================
+
         public int CompanyId { get; set; }
 
         public int? BranchId { get; set; }
@@ -16,11 +20,34 @@ namespace VeltriQ.Models.HR.Attendance
 
         public DateTime HolidayDate { get; set; }
 
+        public string HolidayType { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        //====================================================
+        // HOLIDAY SETTINGS
+        //====================================================
+
         public bool IsOptional { get; set; }
 
         public bool IsRecurring { get; set; }
 
+        public bool IsHalfDay { get; set; }
+
+        /// <summary>
+        /// Morning / Afternoon
+        /// </summary>
+        public string? HalfDaySession { get; set; }
+
+        //====================================================
+        // STATUS
+        //====================================================
+
         public bool IsActive { get; set; } = true;
+
+        //====================================================
+        // AUDIT
+        //====================================================
 
         public DateTime CreatedOn { get; set; }
 
@@ -29,6 +56,10 @@ namespace VeltriQ.Models.HR.Attendance
         public DateTime? ModifiedOn { get; set; }
 
         public int? ModifiedBy { get; set; }
+
+        //====================================================
+        // NAVIGATION
+        //====================================================
 
         [ForeignKey(nameof(CompanyId))]
         public virtual Company? Company { get; set; }
