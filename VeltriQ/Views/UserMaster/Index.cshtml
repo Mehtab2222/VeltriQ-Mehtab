@@ -1,0 +1,1191 @@
+﻿@model VeltriQ.ViewModels.Administration.UserMasterIndexViewModel
+
+@{
+    ViewData["Title"] = "User Master";
+}
+
+<style>
+
+    /* =========================================================
+           USER MASTER PAGE
+        ========================================================== */
+
+    .user-master-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    /* =========================================================
+           MAIN CARD
+           SAME AS EMPLOYEE DIRECTORY
+        ========================================================== */
+
+    .user-master-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0px;
+        max-height: calc(100vh - var(--topbar-h) - 100px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+           TABS
+        ========================================================== */
+
+    .user-master-tabs {
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+
+
+    .user-master-tab {
+        position: relative;
+        height: 46px;
+        padding: 0 14px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 11.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+
+        .user-master-tab:hover {
+            color: var(--text-primary);
+        }
+
+
+        .user-master-tab.active {
+            color: var(--purple);
+        }
+
+
+            .user-master-tab.active::after {
+                content: "";
+                position: absolute;
+                left: 10px;
+                right: 10px;
+                bottom: -1px;
+                height: 2px;
+                background: var(--purple);
+            }
+
+
+        .user-master-tab i {
+            font-size: 13px;
+        }
+
+
+    .user-master-tab-count {
+        min-width: 19px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9px;
+        background: rgba(124, 58, 237, .12);
+        color: #8b5cf6;
+        font-size: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* =========================================================
+           PANELS
+        ========================================================== */
+
+    .user-master-panel {
+        display: none;
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+    }
+
+
+        .user-master-panel.active {
+            display: flex;
+        }
+
+
+    /* =========================================================
+           CARD HEADER
+           SAME AS EMPLOYEE DIRECTORY
+        ========================================================== */
+
+    .user-master-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        gap: 20px;
+        flex-shrink: 0;
+    }
+
+
+    .user-master-card-title h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+
+    .user-master-card-title p {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+    }
+
+
+    /* =========================================================
+           SEARCH
+           SAME AS EMPLOYEE DIRECTORY
+        ========================================================== */
+
+    .user-master-search {
+        width: 280px;
+        position: relative;
+    }
+
+
+        .user-master-search input {
+            width: 100%;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 0 12px 0 36px;
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+
+            .user-master-search input:focus {
+                border-color: var(--purple);
+            }
+
+
+        .user-master-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+
+    /* =========================================================
+           TABLE WRAPPER
+           SAME AS EMPLOYEE DIRECTORY
+        ========================================================== */
+
+    .user-master-table-wrapper {
+        overflow-y: auto;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        /*
+               Small breathing space between card header
+               and table header.
+            */
+        padding-top: 4px;
+    }
+
+
+        .user-master-table-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+
+    /* =========================================================
+           TABLE
+           SAME AS EMPLOYEE DIRECTORY
+        ========================================================== */
+
+    .user-master-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+
+        .user-master-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+
+        .user-master-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+
+        .user-master-table tbody tr {
+            transition: background-color .1s ease;
+        }
+
+
+            .user-master-table tbody tr:hover {
+                background: var(--hover-bg);
+            }
+
+
+    /* =========================================================
+           EMPLOYEE IDENTITY
+           SAME AS EMPLOYEE DIRECTORY
+        ========================================================== */
+
+    .user-master-employee-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+
+    .user-master-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, #7c3aed, #9333ea );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+
+    .user-master-employee-name {
+        font-weight: 600;
+        margin-bottom: 1px;
+        line-height: 1.2;
+    }
+
+
+    .user-master-employee-code {
+        font-size: 10.5px;
+        color: var(--text-muted);
+        line-height: 1;
+    }
+
+
+    /* =========================================================
+           ROLE BADGE
+        ========================================================== */
+
+    .user-master-role {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        background: rgba(124, 58, 237, .12);
+        color: #8b5cf6;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+           STATUS BADGE
+        ========================================================== */
+
+    .user-master-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+    }
+
+
+        .user-master-status.active {
+            background: rgba(34, 197, 94, .12);
+            color: #22c55e;
+        }
+
+
+        .user-master-status.inactive {
+            background: rgba(239, 68, 68, .12);
+            color: #ef4444;
+        }
+
+
+    /* =========================================================
+           ACTION BUTTONS
+           SAME AS EMPLOYEE DIRECTORY
+        ========================================================== */
+
+    .user-master-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+
+    .user-master-action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+
+        .user-master-action-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+
+        .user-master-action-btn.delete-btn {
+            color: #ef4444;
+        }
+
+
+            .user-master-action-btn.delete-btn:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+
+    /* =========================================================
+           CREATE USER
+        ========================================================== */
+
+    .user-master-create-link {
+        color: var(--purple);
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+
+        .user-master-create-link:hover {
+            color: #9333ea;
+        }
+
+
+    /* =========================================================
+           EMPTY
+        ========================================================== */
+
+    .user-master-empty {
+        text-align: center;
+        padding: 25px 16px !important;
+        color: var(--text-secondary) !important;
+    }
+
+
+    /* =========================================================
+           ALERTS
+        ========================================================== */
+
+    .user-master-alert {
+        padding: 9px 12px;
+        margin-bottom: 12px;
+        font-size: 11px;
+        border: 1px solid var(--border);
+    }
+
+
+        .user-master-alert.success {
+            background: rgba(34, 197, 94, .10);
+            color: #22c55e;
+        }
+
+
+        .user-master-alert.error {
+            background: rgba(239, 68, 68, .10);
+            color: #ef4444;
+        }
+
+
+    /* =========================================================
+           RESPONSIVE
+        ========================================================== */
+
+    @@media (max-width: 900px) {
+
+        .user-master-card {
+            max-height: calc(100vh - var(--topbar-h) - 70px);
+        }
+
+        .user-master-card-top {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .user-master-search {
+            width: 100%;
+        }
+
+        .user-master-tabs {
+            overflow-x: auto;
+        }
+
+        .user-master-tab {
+            white-space: nowrap;
+        }
+    }
+
+</style>
+
+
+<div class="user-master-page">
+
+
+    <!-- =====================================================
+         ALERTS
+    ====================================================== -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="user-master-alert success">
+            <i class="bi bi-check-circle"></i>
+            @TempData["Success"]
+        </div>
+    }
+
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="user-master-alert error">
+            <i class="bi bi-exclamation-circle"></i>
+            @TempData["Error"]
+        </div>
+    }
+
+
+    <!-- =====================================================
+         MAIN CARD
+    ====================================================== -->
+
+    <div class="user-master-card">
+
+
+        <!-- =================================================
+             TABS
+        ================================================== -->
+
+        <div class="user-master-tabs">
+
+
+            <!-- USER ACCOUNTS -->
+
+            <button type="button"
+                    id="usersTab"
+                    class="user-master-tab active"
+                    onclick="switchUserMasterTab('users')">
+
+                <i class="bi bi-people"></i>
+
+                <span>
+                    User Accounts
+                </span>
+
+                <span class="user-master-tab-count">
+                    @Model.Users.Count
+                </span>
+
+            </button>
+
+
+            <!-- EMPLOYEES WITHOUT LOGIN -->
+
+            <button type="button"
+                    id="employeesTab"
+                    class="user-master-tab"
+                    onclick="switchUserMasterTab('employees')">
+
+                <i class="bi bi-person-exclamation"></i>
+
+                <span>
+                    Employees Without Login
+                </span>
+
+                <span class="user-master-tab-count">
+                    @Model.EmployeesWithoutUsers.Count
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             USER ACCOUNTS PANEL
+        ================================================== -->
+
+        <div id="usersPanel"
+             class="user-master-panel active">
+
+
+            <!-- CARD HEADER -->
+
+            <div class="user-master-card-top">
+
+                <div class="user-master-card-title">
+
+                    <h3>
+                        User Accounts
+                    </h3>
+
+                    <p>
+                        Total Accounts: @Model.Users.Count
+                    </p>
+
+                </div>
+
+
+                <div class="user-master-search">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="userSearch"
+                           placeholder="Search users..."
+                           onkeyup="filterUserTable()" />
+
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="user-master-table-wrapper">
+
+                <table class="user-master-table"
+                       id="usersTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Employee
+                            </th>
+
+                            <th>
+                                Username
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Company
+                            </th>
+
+                            <th>
+                                Branch
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model.Users.Any())
+                        {
+                            foreach (var user in Model.Users)
+                            {
+                                <tr>
+
+
+                                    <!-- EMPLOYEE -->
+
+                                    <td>
+
+                                        <div class="user-master-employee-info">
+
+
+                                            <!-- AVATAR -->
+
+                                            <div class="user-master-avatar">
+
+                                                @{
+                                                    var nameParts =
+                                                    user.EmployeeName?
+                                                    .Split(
+                                                    ' ',
+                                                    StringSplitOptions.RemoveEmptyEntries
+                                                    );
+
+                                                    var initials = "?";
+
+                                                    if (nameParts != null &&
+                                                    nameParts.Length > 0)
+                                                    {
+                                                        initials =
+                                                        string.Concat(
+                                                        nameParts
+                                                        .Take(2)
+                                                        .Select(
+                                                        x =>
+                                                        x.Substring(0, 1)
+                                                        .ToUpper()
+                                                        )
+                                                        );
+                                                    }
+                                                }
+
+                                        @initials
+
+                                    </div>
+
+
+                                    <!-- NAME + CODE -->
+
+                                    <div>
+
+                                        <div class="user-master-employee-name">
+                                            @user.EmployeeName
+                                        </div>
+
+                                        <div class="user-master-employee-code">
+                                            @user.EmployeeCode
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- USERNAME -->
+
+                            <td>
+                                @user.Username
+                            </td>
+
+
+                            <!-- ROLE -->
+
+                            <td>
+
+                                <span class="user-master-role">
+                                    @user.Role
+                                </span>
+
+                            </td>
+
+
+                            <!-- COMPANY -->
+
+                            <td>
+                                @user.CompanyName
+                            </td>
+
+
+                            <!-- BRANCH -->
+
+                            <td>
+                                @user.BranchName
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <span class="user-master-status @(user.IsActive ? "active" : "inactive")">
+
+                                    @(user.IsActive
+                                                                        ? "Active"
+                                                                        : "Inactive")
+
+                                </span>
+
+                                    </td>
+
+
+                                    <!-- ACTIONS -->
+
+                                    <td>
+
+                                        <div class="user-master-actions">
+
+
+                                            <!-- EDIT -->
+
+                                            <a asp-action="Edit"
+                                               asp-route-id="@user.UserId"
+                                               class="user-master-action-btn"
+                                               title="Edit User">
+
+                                                <i class="bi bi-pencil"></i>
+
+                                            </a>
+
+
+                                            <!-- ACTIVATE / DEACTIVATE -->
+
+                                            <form asp-action="ToggleStatus"
+                                                  method="post"
+                                                  style="margin:0;">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@user.UserId" />
+
+                                                <button type="submit"
+                                                        class="user-master-action-btn"
+                                                        title="@(user.IsActive ? "Deactivate" : "Activate")">
+
+                                                    <i class="bi @(user.IsActive
+                                                                                                       ? "bi-person-dash"
+                                                                                                       : "bi-person-check")"></i>
+
+                                        </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                                                }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="7"
+                                    class="user-master-empty">
+
+                                    No user accounts found.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             EMPLOYEES WITHOUT LOGIN PANEL
+        ================================================== -->
+
+        <div id="employeesPanel"
+             class="user-master-panel">
+
+
+            <!-- CARD HEADER -->
+
+            <div class="user-master-card-top">
+
+                <div class="user-master-card-title">
+
+                    <h3>
+                        Employees Without Login
+                    </h3>
+
+                    <p>
+                        Employees who have not been mapped to a user account.
+                    </p>
+
+                </div>
+
+
+                <div class="user-master-search">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="employeeSearch"
+                           placeholder="Search employees..."
+                           onkeyup="filterEmployeeTable()" />
+
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="user-master-table-wrapper">
+
+                <table class="user-master-table"
+                       id="employeesTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Employee
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Branch
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model.EmployeesWithoutUsers.Any())
+                        {
+                            var i = 1;
+
+                            foreach (var employee in Model.EmployeesWithoutUsers)
+                            {
+                                <tr>
+
+
+                                    <!-- SERIAL -->
+
+                                    <td>
+                                        @i
+                                    </td>
+
+
+                                    <!-- EMPLOYEE + AVATAR -->
+
+                                    <td>
+
+                                        <div class="user-master-employee-info">
+
+
+                                            <!-- AVATAR -->
+
+                                            <div class="user-master-avatar">
+
+                                                @{
+                                                    var nameParts =
+                                                    employee.EmployeeName?
+                                                    .Split(
+                                                    ' ',
+                                                    StringSplitOptions.RemoveEmptyEntries
+                                                    );
+
+                                                    var initials = "?";
+
+                                                    if (nameParts != null &&
+                                                    nameParts.Length > 0)
+                                                    {
+                                                        initials =
+                                                        string.Concat(
+                                                        nameParts
+                                                        .Take(2)
+                                                        .Select(
+                                                        x =>
+                                                        x.Substring(0, 1)
+                                                        .ToUpper()
+                                                        )
+                                                        );
+                                                    }
+                                                }
+
+                                                @initials
+
+                                            </div>
+
+
+                                            <!-- NAME + CODE -->
+
+                                            <div>
+
+                                                <div class="user-master-employee-name">
+                                                    @employee.EmployeeName
+                                                </div>
+
+                                                <div class="user-master-employee-code">
+                                                    @employee.EmployeeCode
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- EMAIL -->
+
+                                    <td>
+                                        @(employee.OfficialEmail ?? "-")
+                                    </td>
+
+
+                                    <!-- BRANCH -->
+
+                                    <td>
+                                        @employee.BranchName
+                                    </td>
+
+
+                                    <!-- ACTION -->
+
+                                    <td>
+
+                                        <a asp-action="Create"
+                                           asp-route-employeeId="@employee.EmployeeId"
+                                           class="user-master-create-link">
+
+                                            <i class="bi bi-person-plus"></i>
+
+                                            Create User
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="5"
+                                    class="user-master-empty">
+
+                                    All active employees have a user account.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       TAB SWITCH
+    ========================================================== */
+
+    function switchUserMasterTab(tab) {
+
+        const usersTab =
+            document.getElementById("usersTab");
+
+        const employeesTab =
+            document.getElementById("employeesTab");
+
+        const usersPanel =
+            document.getElementById("usersPanel");
+
+        const employeesPanel =
+            document.getElementById("employeesPanel");
+
+
+        if (tab === "users") {
+
+            usersTab.classList.add("active");
+
+            employeesTab.classList.remove("active");
+
+            usersPanel.classList.add("active");
+
+            employeesPanel.classList.remove("active");
+
+        }
+        else {
+
+            employeesTab.classList.add("active");
+
+            usersTab.classList.remove("active");
+
+            employeesPanel.classList.add("active");
+
+            usersPanel.classList.remove("active");
+
+        }
+
+    }
+
+
+    /* =========================================================
+       USER SEARCH
+    ========================================================== */
+
+    function filterUserTable() {
+
+        const input =
+            document.getElementById("userSearch");
+
+        const filter =
+            input.value.toLowerCase();
+
+        const table =
+            document.getElementById("usersTable");
+
+        const rows =
+            table
+                .getElementsByTagName("tbody")[0]
+                .getElementsByTagName("tr");
+
+
+        for (let i = 0; i < rows.length; i++) {
+
+            const textContent =
+                rows[i].textContent ||
+                rows[i].innerText;
+
+
+            if (
+                textContent
+                    .toLowerCase()
+                    .indexOf(filter) > -1
+            ) {
+
+                rows[i].style.display = "";
+
+            }
+            else {
+
+                rows[i].style.display = "none";
+
+            }
+
+        }
+
+    }
+
+
+    /* =========================================================
+       EMPLOYEE SEARCH
+    ========================================================== */
+
+    function filterEmployeeTable() {
+
+        const input =
+            document.getElementById("employeeSearch");
+
+        const filter =
+            input.value.toLowerCase();
+
+        const table =
+            document.getElementById("employeesTable");
+
+        const rows =
+            table
+                .getElementsByTagName("tbody")[0]
+                .getElementsByTagName("tr");
+
+
+        for (let i = 0; i < rows.length; i++) {
+
+            const textContent =
+                rows[i].textContent ||
+                rows[i].innerText;
+
+
+            if (
+                textContent
+                    .toLowerCase()
+                    .indexOf(filter) > -1
+            ) {
+
+                rows[i].style.display = "";
+
+            }
+            else {
+
+                rows[i].style.display = "none";
+
+            }
+
+        }
+
+    }
+
+</script>

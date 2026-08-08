@@ -1,0 +1,619 @@
+﻿@model VeltriQ.ViewModels.HR.ProbationAssessmentViewModel
+
+@{
+    ViewData["Title"] = "Create Probation Assessment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .form-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        max-height: calc(100vh - var(--topbar-h) - 80px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .form-card-top {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+        .form-card-top h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+    .form-scroll-body {
+        overflow-y: auto;
+        padding: 24px;
+        flex: 1;
+        scrollbar-width: none;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+        .form-scroll-body::-webkit-scrollbar {
+            display: none;
+        }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .form-group.wide {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+    .custom-input,
+    .custom-select,
+    .custom-textarea {
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        padding: 0 12px;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+    .custom-input,
+    .custom-select {
+        height: 36px;
+    }
+
+    .custom-textarea {
+        resize: vertical;
+        min-height: 80px;
+        padding: 8px 12px;
+    }
+
+        .custom-input:focus,
+        .custom-select:focus,
+        .custom-textarea:focus {
+            border-color: var(--purple);
+        }
+
+    .custom-input[readonly] {
+        background: var(--hover-bg);
+        opacity: 0.8;
+        cursor: not-allowed;
+    }
+
+    .employee-info {
+        display: none;
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--hover-bg);
+    }
+
+        .employee-info.show {
+            display: grid;
+        }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .info-label {
+        font-size: 9.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        letter-spacing: .4px;
+    }
+
+    .info-value {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .assessment-warning {
+        display: none;
+        grid-column: 1 / -1;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border: 1px solid #f59e0b;
+        background: rgba(245, 158, 11, .08);
+        color: #d97706;
+        font-size: 11px;
+    }
+
+        .assessment-warning.show {
+            display: block;
+        }
+
+    .form-footer {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: var(--hover-bg);
+        flex-shrink: 0;
+    }
+
+    .btn-cancel {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-save {
+        height: 34px;
+        padding: 0 18px;
+        border-radius: 6px;
+        border: none;
+        background: var(--purple);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-save:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+    @@media (max-width: 768px) {
+        .form-grid, .employee-info
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="form-page">
+
+    <form asp-action="Create"
+          asp-controller="ProbationAssessment"
+          method="post"
+          class="form-card"
+          id="probationCreateForm">
+
+        @Html.AntiForgeryToken()
+
+        <div class="form-card-top">
+            <div>
+                <h3>Create Probation Assessment</h3>
+                <span style="font-size:11px;color:var(--text-secondary);">
+                    Initialize probation lifecycle tracking for an active employee.
+                </span>
+            </div>
+        </div>
+
+        <div class="form-scroll-body">
+
+            <div asp-validation-summary="ModelOnly"
+                 style="color:#ef4444;font-size:12px;margin-bottom:10px;">
+            </div>
+
+            <div class="form-grid">
+
+                <!-- EMPLOYEE -->
+                <div class="form-group wide">
+                    <label>Select Probation Employee *</label>
+
+                    <select id="employeeSelect"
+                            name="Master.EmployeeNo"
+                            class="custom-select"
+                            required>
+
+                        <option value="">Loading employees...</option>
+
+                    </select>
+                </div>
+
+                <!-- EMPLOYEE INFORMATION -->
+                <div id="employeeInfo" class="employee-info">
+
+                    <div class="info-item">
+                        <span class="info-label">Employee</span>
+                        <span id="employeeName" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Employee No</span>
+                        <span id="employeeNo" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Assessment Status</span>
+                        <span id="assessmentStatus" class="info-value">-</span>
+                    </div>
+
+                </div>
+
+                <!-- EXISTING ASSESSMENT WARNING -->
+                <div id="assessmentWarning" class="assessment-warning">
+                    An assessment already exists for this employee.
+                    You will be redirected to the existing assessment instead of creating a duplicate.
+                </div>
+
+                <!-- START DATE -->
+                <div class="form-group">
+                    <label>Probation Start Date</label>
+
+                    <input type="text"
+                           id="probStartDate"
+                           class="custom-input"
+                           readonly
+                           placeholder="Auto-populated from employee record" />
+                </div>
+
+                <!-- END DATE -->
+                <div class="form-group">
+                    <label>Probation End Date</label>
+
+                    <input type="text"
+                           id="probEndDate"
+                           class="custom-input"
+                           readonly
+                           placeholder="Auto-calculated from joining date" />
+                </div>
+
+                <!-- HR REMARKS -->
+                <div class="form-group wide">
+                    <label>Initial HR Remarks / Notes</label>
+
+                    <textarea asp-for="Master.HRRemarks"
+                              class="custom-textarea"
+                              placeholder="Optional notes for this assessment workflow...">
+                </textarea>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-footer">
+
+            <a asp-action="Index"
+               class="btn-cancel">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    id="btnInitialize"
+                    class="btn-save">
+
+                <i class="bi bi-check2-circle"></i>
+                Initialize Assessment
+
+            </button>
+
+        </div>
+
+    </form>
+    ```
+
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        loadProbationEmployees();
+
+        document
+            .getElementById("employeeSelect")
+            .addEventListener("change", function () {
+
+                fetchEmployeeDetails(this.value);
+
+            });
+
+    });
+
+
+    // ============================================================
+    // LOAD PROBATION EMPLOYEES
+    // ============================================================
+
+    async function loadProbationEmployees() {
+
+        const select =
+            document.getElementById("employeeSelect");
+
+        try {
+
+            const response =
+                await fetch(
+                    '@Url.Action("GetAllProbationEmployees", "ProbationAssessment")'
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load probation employees."
+                );
+
+            }
+
+            const employees =
+                await response.json();
+
+            console.log(
+                "Probation Employees:",
+                employees
+            );
+
+            select.innerHTML =
+                '<option value="">Select Employee</option>';
+
+            if (
+                Array.isArray(employees) &&
+                employees.length > 0
+            ) {
+
+                employees.forEach(function (employee) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value =
+                        employee.employeeNo;
+
+                    option.textContent =
+                        employee.employeeDisplay ||
+                        (
+                            employee.employeeNo +
+                            " - " +
+                            employee.employeeName
+                        );
+
+                    select.appendChild(option);
+
+                });
+
+            }
+            else {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = "";
+
+                option.textContent =
+                    "-- No active probation employees found --";
+
+                option.disabled = true;
+
+                select.appendChild(option);
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Employee loading error:",
+                error
+            );
+
+            select.innerHTML =
+                '<option value="">Unable to load employees</option>';
+
+            Swal.fire({
+                icon: "error",
+                title: "Unable to Load Employees",
+                text: "The probation employee list could not be loaded.",
+                confirmButtonColor: "#7c3aed"
+            });
+
+        }
+
+    }
+
+
+    // ============================================================
+    // LOAD EMPLOYEE DETAILS
+    // ============================================================
+
+    async function fetchEmployeeDetails(employeeNo) {
+
+        const startDate =
+            document.getElementById("probStartDate");
+
+        const endDate =
+            document.getElementById("probEndDate");
+
+        const employeeInfo =
+            document.getElementById("employeeInfo");
+
+        const warning =
+            document.getElementById("assessmentWarning");
+
+        const initializeButton =
+            document.getElementById("btnInitialize");
+
+        if (!employeeNo) {
+
+            startDate.value = "";
+            endDate.value = "";
+
+            employeeInfo.classList.remove("show");
+            warning.classList.remove("show");
+
+            initializeButton.disabled = false;
+
+            return;
+
+        }
+
+        try {
+
+            const response =
+                await fetch(
+                    '@Url.Action("GetEmployeeAssessmentData", "ProbationAssessment")'
+                    + '?employeeNo='
+                    + encodeURIComponent(employeeNo)
+                );
+
+            const data =
+                await response.json();
+
+            console.log(
+                "Employee Assessment Data:",
+                data
+            );
+
+            if (!data.success) {
+
+                startDate.value = "";
+                endDate.value = "";
+
+                employeeInfo.classList.remove("show");
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Employee Data Not Found",
+                    text:
+                        data.message ||
+                        "Unable to load employee information.",
+                    confirmButtonColor: "#7c3aed"
+                });
+
+                return;
+
+            }
+
+            // Employee information
+
+            document.getElementById("employeeName").textContent =
+                data.employeeName || "-";
+
+            document.getElementById("employeeNo").textContent =
+                data.employeeNo || employeeNo;
+
+            document.getElementById("assessmentStatus").textContent =
+                data.overallStatus || "Pending";
+
+            employeeInfo.classList.add("show");
+
+
+            // Dates
+
+            startDate.value =
+                data.probationStartDate || "—";
+
+            endDate.value =
+                data.probationEndDate || "—";
+
+
+            // Existing assessment
+
+            if (data.assessmentExists) {
+
+                warning.classList.add("show");
+
+                initializeButton.innerHTML =
+                    '<i class="bi bi-arrow-right-circle"></i> Open Existing Assessment';
+
+            }
+            else {
+
+                warning.classList.remove("show");
+
+                initializeButton.innerHTML =
+                    '<i class="bi bi-check2-circle"></i> Initialize Assessment';
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Employee details error:",
+                error
+            );
+
+            Swal.fire({
+                icon: "error",
+                title: "Unable to Load Employee",
+                text:
+                    "An error occurred while loading the employee details.",
+                confirmButtonColor: "#7c3aed"
+            });
+
+        }
+
+    }
+
+
+    // ============================================================
+    // PREVENT DOUBLE SUBMISSION
+    // ============================================================
+
+    document
+        .getElementById("probationCreateForm")
+        .addEventListener("submit", function () {
+
+            const button =
+                document.getElementById("btnInitialize");
+
+            button.disabled = true;
+
+            button.innerHTML =
+                '<i class="bi bi-hourglass-split"></i> Initializing...';
+
+        });
+
+</script>

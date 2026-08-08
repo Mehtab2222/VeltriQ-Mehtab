@@ -5,6 +5,7 @@ using VeltriQ.Models.EmployeeInductionAttendance;
 using VeltriQ.Models.HR;
 using VeltriQ.Models.HR.Attendance;
 using VeltriQ.Models.HR.Onboarding;
+using VeltriQ.Models.HR.ProbationAssessment;
 using VeltriQ.Models.Recruitment;
 using VeltriQ.Models.Training;
 using VeltriQ.Models.TransactionApproval;
@@ -166,11 +167,18 @@ namespace VeltriQ.Data
         public DbSet<AttendanceHistory> AttendanceHistories { get; set; }
 
         public DbSet<AttendanceOvertime> AttendanceOvertimes { get; set; }
-        // =========================
-        // MAP SCHEMAS
-        // =========================
+ 
 
-        protected override void OnModelCreating
+        public DbSet<ProbationCriteriaMaster> ProbationCriteriaMasters { get; set; }
+        public DbSet<ProbationAssessmentMasterModel> ProbationAssessmentMasters { get; set; }
+        public DbSet<ProbationAssessmentDetailsModel> ProbationAssessmentDetails { get; set; }
+        public DbSet<ProbationAssessmentRatingsModel> ProbationAssessmentRatings { get; set; }
+        public DbSet<ProbationExtensionLogModel> ProbationExtensionLogs { get; set; }
+    // =========================
+    // MAP SCHEMAS
+    // =========================
+
+    protected override void OnModelCreating
         (
             ModelBuilder modelBuilder
         )
@@ -179,8 +187,64 @@ namespace VeltriQ.Data
             //============================================================
             // Candidate Invitation
             //============================================================
+            modelBuilder.Entity<ProbationCriteriaMaster>()
+        .HasKey(x => x.CriteriaId);
+
+            modelBuilder.Entity<ProbationAssessmentMasterModel>()
+                .HasKey(x => x.AssessmentId);
+
+            modelBuilder.Entity<ProbationAssessmentMasterModel>()
+                .HasIndex(x => new { x.EmployeeNo, x.CompanyId })
+                .IsUnique();
+
+            modelBuilder.Entity<ProbationAssessmentDetailsModel>()
+                .HasKey(x => x.DetailId);
+
+            modelBuilder.Entity<ProbationAssessmentDetailsModel>()
+                .HasIndex(x => new { x.AssessmentId, x.CheckpointNo })
+                .IsUnique();
+
+            modelBuilder.Entity<ProbationAssessmentDetailsModel>()
+                .HasOne<ProbationAssessmentMasterModel>()
+                .WithMany()
+                .HasForeignKey(x => x.AssessmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProbationAssessmentRatingsModel>()
+                .HasKey(x => x.RatingId);
+
+            modelBuilder.Entity<ProbationAssessmentRatingsModel>()
+                .HasIndex(x => new { x.DetailId, x.CriteriaId })
+                .IsUnique();
+
+            modelBuilder.Entity<ProbationAssessmentRatingsModel>()
+                .HasOne<ProbationAssessmentDetailsModel>()
+                .WithMany()
+                .HasForeignKey(x => x.DetailId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProbationAssessmentRatingsModel>()
+                .HasOne<ProbationCriteriaMaster>()
+                .WithMany()
+                .HasForeignKey(x => x.CriteriaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProbationExtensionLogModel>()
+                .HasKey(x => x.ExtensionId);
+
+            modelBuilder.Entity<ProbationExtensionLogModel>()
+                .HasOne<ProbationAssessmentMasterModel>()
+                .WithMany()
+                .HasForeignKey(x => x.AssessmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProbationExtensionLogModel>()
+                .HasOne<ProbationAssessmentDetailsModel>()
+                .WithMany()
+                .HasForeignKey(x => x.DetailId)
+                .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<AttendanceRegularization>()
-    .ToTable("AttendanceRegularization", "HR");
+            .ToTable("AttendanceRegularization", "HR");
 
             modelBuilder.Entity<AttendanceHistory>()
                 .ToTable("AttendanceHistory", "HR");

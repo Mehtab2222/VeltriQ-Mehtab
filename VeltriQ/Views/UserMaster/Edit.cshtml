@@ -1,0 +1,1005 @@
+﻿@model VeltriQ.ViewModels.Administration.UserMasterEditViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+
+    var employeeName = Model.EmployeeName ?? "";
+    var employeeCode = Model.EmployeeCode ?? "";
+
+    var employeeParts = employeeName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+    var initials = employeeParts.Length switch
+    {
+        0 => "?",
+        1 => employeeParts[0].Substring(0, 1).ToUpper(),
+        _ => (
+            employeeParts[0].Substring(0, 1) +
+            employeeParts[^1].Substring(0, 1)
+        ).ToUpper()
+    };
+}
+
+<style>
+
+    /* =========================================================
+           PAGE
+        ========================================================= */
+
+    .user-edit-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    /* =========================================================
+           MAIN CARD
+        ========================================================= */
+
+    .user-edit-card {
+        width: 100%;
+        height: calc(100vh - var(--topbar-h) - 100px);
+        min-height: 500px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+           FORM
+        ========================================================= */
+
+    .user-edit-form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+    }
+
+
+    /* =========================================================
+           HEADER
+        ========================================================= */
+
+    .user-edit-head {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+
+        .user-edit-head h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-edit-head p {
+            margin: 3px 0 0;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+
+    /* =========================================================
+           BODY
+        ========================================================= */
+
+    .user-edit-body {
+        padding: 20px;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .user-edit-body::-webkit-scrollbar {
+            display: none;
+        }
+
+
+    /* =========================================================
+           SECTION
+        ========================================================= */
+
+    .user-edit-section {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 18px;
+        margin-bottom: 18px;
+    }
+
+        .user-edit-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+
+    /* =========================================================
+           SECTION TITLE
+        ========================================================= */
+
+    .user-edit-section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+        .user-edit-section-title i {
+            color: var(--purple);
+            font-size: 14px;
+        }
+
+        .user-edit-section-title span {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+
+    /* =========================================================
+           GRID
+        ========================================================= */
+
+    .user-edit-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+
+    /* =========================================================
+           FORM GROUP
+        ========================================================= */
+
+    .user-edit-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .user-edit-group.wide {
+            grid-column: 1 / -1;
+        }
+
+        .user-edit-group label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .35px;
+        }
+
+            .user-edit-group label .required {
+                color: #ef4444;
+            }
+
+
+    /* =========================================================
+           INPUT / SELECT
+        ========================================================= */
+
+    .user-edit-input,
+    .user-edit-select {
+        width: 100%;
+        height: 38px;
+        padding: 0 11px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--input-bg);
+        color: var(--text-primary);
+        font-size: 12px;
+        outline: none;
+    }
+
+        .user-edit-input:focus,
+        .user-edit-select:focus {
+            border-color: var(--purple);
+        }
+
+        .user-edit-input[readonly] {
+            opacity: .75;
+            cursor: not-allowed;
+        }
+
+
+    /* =========================================================
+           EMPLOYEE PREVIEW
+        ========================================================= */
+
+    .employee-preview {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border: 1px solid var(--border);
+        background: var(--hover-bg);
+    }
+
+    .employee-preview-avatar {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, #7c3aed, #9333ea );
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .employee-preview-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .employee-preview-code {
+        margin-top: 2px;
+        font-size: 10px;
+        color: var(--text-muted);
+    }
+
+
+    /* =========================================================
+           PASSWORD
+        ========================================================= */
+
+    .user-edit-password-wrap {
+        position: relative;
+    }
+
+        .user-edit-password-wrap input {
+            padding-right: 40px;
+        }
+
+    .user-edit-password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+    }
+
+
+    /* =========================================================
+           STATUS
+        ========================================================= */
+
+    .user-edit-status-box {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 11px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--input-bg);
+    }
+
+    .user-edit-status-text {
+        font-size: 12px;
+        color: var(--text-primary);
+    }
+
+
+    /* =========================================================
+           SWITCH
+        ========================================================= */
+
+    .user-edit-switch {
+        position: relative;
+        width: 38px;
+        height: 20px;
+        flex-shrink: 0;
+    }
+
+        .user-edit-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .user-edit-slider {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        background: #9ca3af;
+        border-radius: 20px;
+        transition: .2s;
+    }
+
+        .user-edit-slider::before {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: .2s;
+        }
+
+    .user-edit-switch input:checked + .user-edit-slider {
+        background: var(--purple);
+    }
+
+        .user-edit-switch input:checked + .user-edit-slider::before {
+            transform: translateX(18px);
+        }
+
+
+    /* =========================================================
+           VALIDATION
+        ========================================================= */
+
+    .user-edit-validation {
+        color: #ef4444;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+           FOOTER
+        ========================================================= */
+
+    .user-edit-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 12px 18px;
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+        background: var(--card-bg);
+    }
+
+
+    /* =========================================================
+           CANCEL
+        ========================================================= */
+
+    .user-edit-cancel {
+        height: 34px;
+        padding: 0 14px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-secondary);
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* =========================================================
+           UPDATE BUTTON
+        ========================================================= */
+
+    .user-edit-save {
+        height: 34px;
+        padding: 0 16px;
+        border: none;
+        background: var(--purple);
+        color: #fff;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .user-edit-save:hover {
+            background: #6d28d9;
+        }
+
+
+    /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+    @@media (max-width: 800px) {
+
+        .user-edit-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .user-edit-group.wide {
+            grid-column: auto;
+        }
+
+        .user-edit-card {
+            height: calc(100vh - var(--topbar-h) - 60px);
+        }
+    }
+
+</style>
+
+
+<div class="user-edit-page">
+
+    <div class="user-edit-card">
+
+
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <div class="user-edit-head">
+
+            <h3>
+                Edit User
+            </h3>
+
+            <p>
+                Update login credentials, role and access settings.
+            </p>
+
+        </div>
+
+
+        <!-- =====================================================
+             FORM
+        ====================================================== -->
+
+        <form asp-action="Edit"
+              method="post"
+              id="editUserForm"
+              class="user-edit-form">
+
+            @Html.AntiForgeryToken()
+
+
+            <!-- =================================================
+                 BODY
+            ================================================== -->
+
+            <div class="user-edit-body">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="user-edit-validation"
+                     style="margin-bottom:14px;">
+                </div>
+
+
+                <!-- =================================================
+                     HIDDEN USER ID
+                ================================================== -->
+
+                <input type="hidden"
+                       asp-for="UserId" />
+
+                <input type="hidden"
+                       asp-for="EmployeeId" />
+
+
+                <!-- =================================================
+                     EMPLOYEE INFORMATION
+                ================================================== -->
+
+                <div class="user-edit-section">
+
+                    <div class="user-edit-section-title">
+
+                        <i class="bi bi-person"></i>
+
+                        <span>
+                            Employee Information
+                        </span>
+
+                    </div>
+
+
+                    <div class="user-edit-grid">
+
+
+                        <!-- EMPLOYEE -->
+
+                        <div class="user-edit-group wide">
+
+                            <label>
+                                Employee
+                            </label>
+
+
+                            <div class="employee-preview">
+
+                                <div class="employee-preview-avatar">
+
+                                    @initials
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="employee-preview-name">
+
+                                        @employeeName
+
+                                    </div>
+
+                                    <div class="employee-preview-code">
+
+                                        @employeeCode
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                Official Email
+                            </label>
+
+                            <input asp-for="OfficialEmail"
+                                   class="user-edit-input"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- USERNAME -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                Username
+                                <span class="required">*</span>
+                            </label>
+
+                            <input asp-for="UserName"
+                                   class="user-edit-input"
+                                   autocomplete="off" />
+
+                            <span asp-validation-for="UserName"
+                                  class="user-edit-validation">
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ACCESS & ROLE
+                ================================================== -->
+
+                <div class="user-edit-section">
+
+                    <div class="user-edit-section-title">
+
+                        <i class="bi bi-shield-lock"></i>
+
+                        <span>
+                            Access & Role
+                        </span>
+
+                    </div>
+
+
+                    <div class="user-edit-grid">
+
+
+                        <!-- ROLE -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                Role
+                                <span class="required">*</span>
+                            </label>
+
+                            <select asp-for="Role"
+                                    asp-items="Model.Roles"
+                                    class="user-edit-select">
+
+                                <option value="">
+                                    Select Role
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="Role"
+                                  class="user-edit-validation">
+                            </span>
+
+                        </div>
+
+
+                        <!-- COMPANY -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                Company Access
+                                <span class="required">*</span>
+                            </label>
+
+                            <select asp-for="CompanyId"
+                                    asp-items="Model.Companies"
+                                    id="companyId"
+                                    class="user-edit-select">
+
+                                <option value="">
+                                    Select Company
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="CompanyId"
+                                  class="user-edit-validation">
+                            </span>
+
+                        </div>
+
+
+                        <!-- BRANCH -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                Branch
+                            </label>
+
+                            <select asp-for="BranchId"
+                                    asp-items="Model.Branches"
+                                    id="branchId"
+                                    class="user-edit-select">
+
+                                <option value="">
+                                    Select Branch
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                Account Status
+                            </label>
+
+
+                            <div class="user-edit-status-box">
+
+                                <span class="user-edit-status-text"
+                                      id="statusText">
+
+                                    @(Model.IsActive
+                                                                        ? "Active"
+                                                                        : "Inactive")
+
+                                </span>
+
+
+                                <label class="user-edit-switch">
+
+                                    <input asp-for="IsActive"
+                                           id="isActive" />
+
+                                    <span class="user-edit-slider"></span>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PASSWORD
+                ================================================== -->
+
+                <div class="user-edit-section">
+
+                    <div class="user-edit-section-title">
+
+                        <i class="bi bi-key"></i>
+
+                        <span>
+                            Change Password
+                        </span>
+
+                    </div>
+
+
+                    <div class="user-edit-grid">
+
+
+                        <!-- NEW PASSWORD -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                New Password
+                            </label>
+
+
+                            <div class="user-edit-password-wrap">
+
+                                <input asp-for="Password"
+                                       id="password"
+                                       type="password"
+                                       class="user-edit-input"
+                                       autocomplete="new-password"
+                                       placeholder="Leave blank to keep current password" />
+
+
+                                <button type="button"
+                                        class="user-edit-password-toggle"
+                                        onclick="togglePassword('password', this)">
+
+                                    <i class="bi bi-eye"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <span asp-validation-for="Password"
+                                  class="user-edit-validation">
+                            </span>
+
+                        </div>
+
+
+                        <!-- CONFIRM PASSWORD -->
+
+                        <div class="user-edit-group">
+
+                            <label>
+                                Confirm Password
+                            </label>
+
+
+                            <div class="user-edit-password-wrap">
+
+                                <input asp-for="ConfirmPassword"
+                                       id="confirmPassword"
+                                       type="password"
+                                       class="user-edit-input"
+                                       autocomplete="new-password"
+                                       placeholder="Confirm new password" />
+
+
+                                <button type="button"
+                                        class="user-edit-password-toggle"
+                                        onclick="togglePassword('confirmPassword', this)">
+
+                                    <i class="bi bi-eye"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <span asp-validation-for="ConfirmPassword"
+                                  class="user-edit-validation">
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 FOOTER
+            ================================================== -->
+
+            <div class="user-edit-footer">
+
+                <a asp-action="Index"
+                   class="user-edit-cancel">
+
+                    Cancel
+
+                </a>
+
+
+                <button type="submit"
+                        class="user-edit-save">
+
+                    <i class="bi bi-check2-circle"></i>
+
+                    Update User
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       COMPANY → BRANCH
+    ========================================================== */
+
+    document
+        .getElementById("companyId")
+        ?.addEventListener("change", async function () {
+
+            const companyId = this.value;
+
+            const branch =
+                document.getElementById("branchId");
+
+
+            branch.innerHTML =
+                '<option value="">Select Branch</option>';
+
+
+            if (!companyId) {
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '@Url.Action("GetBranchesForCompany", "UserMaster")?companyId='
+                        + companyId
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!data.success) {
+                    return;
+                }
+
+
+                data.branches.forEach(function (item) {
+
+                    const option =
+                        document.createElement("option");
+
+
+                    option.value =
+                        item.id;
+
+
+                    option.textContent =
+                        item.name;
+
+
+                    branch.appendChild(option);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Branch loading error:",
+                    error
+                );
+
+            }
+
+        });
+
+
+    /* =========================================================
+       PASSWORD VISIBILITY
+    ========================================================== */
+
+    function togglePassword(
+        inputId,
+        button
+    ) {
+
+        const input =
+            document.getElementById(inputId);
+
+        const icon =
+            button.querySelector("i");
+
+
+        if (input.type === "password") {
+
+            input.type = "text";
+
+            icon.className =
+                "bi bi-eye-slash";
+
+        }
+        else {
+
+            input.type = "password";
+
+            icon.className =
+                "bi bi-eye";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       ACTIVE / INACTIVE TEXT
+    ========================================================== */
+
+    const activeCheckbox =
+        document.getElementById("isActive");
+
+    const statusText =
+        document.getElementById("statusText");
+
+
+    if (activeCheckbox && statusText) {
+
+        activeCheckbox.addEventListener(
+            "change",
+            function () {
+
+                statusText.textContent =
+                    this.checked
+                        ? "Active"
+                        : "Inactive";
+
+            }
+        );
+
+    }
+
+</script>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}
