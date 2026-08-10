@@ -1562,5 +1562,55 @@ namespace VeltriQ.Controllers
             foreach (var error in result.Errors)
                 ModelState.AddModelError(string.Empty, error.Description);
         }
+        // =========================================================
+        // GET CURRENT EMPLOYEE
+        // =========================================================
+
+        private async Task<Employee?> GetLoggedInEmployeeAsync()
+        {
+            var userId =
+                _userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return null;
+            }
+
+            return await _context.Employees
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.UserId == userId &&
+                    x.IsActive);
+        }
+        // =========================================================
+        // CHECK WHETHER CURRENT USER IS A MANAGER
+        // =========================================================
+
+        // =========================================================
+        // CHECK WHETHER CURRENT USER IS A MANAGER
+        // =========================================================
+
+        private async Task<bool> IsCurrentUserManagerAsync()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return false;
+            }
+
+            var currentUser =
+                await _userManager.FindByIdAsync(userId);
+
+            if (currentUser == null)
+            {
+                return false;
+            }
+
+            return await _userManager.IsInRoleAsync(
+                currentUser,
+                "Manager"
+            );
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace VeltriQ.Controllers
         // SESSION / ROLE HELPERS
         // ============================================================
         private string CurrentCompanyId =>
-            HttpContext.Session.GetString("CurrentUserCompany")?.Trim() ?? "";
+            GetCurrentCompanyId()?.ToString() ?? "";
 
         private int? CurrentEmployeeId => GetCurrentEmployeeId();
 
@@ -224,84 +224,470 @@ namespace VeltriQ.Controllers
         // ============================================================
         // INDEX
         // ============================================================
+        // INDEX
+        // ============================================================
         [HttpGet]
-        public async Task<IActionResult> Index(string mode = "")
+        public async Task<IActionResult> Index()
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(CurrentCompanyId))
-                    return View(new List<ProbationIndexViewModel>());
+                // =========================================================
+                // 1. GET CURRENT LOGGED-IN USER
+                // =========================================================
 
-                var masterList = await _context.ProbationAssessmentMasters
-                    .Where(x => x.CompanyId == CurrentCompanyId)
-                    .OrderByDescending(x => x.ModifiedOn ?? x.CreatedOn)
-                    .ToListAsync();
+                var userId = _userManager.GetUserId(User);
 
-                var list = new List<ProbationIndexViewModel>();
-
-                foreach (var master in masterList)
+                if (string.IsNullOrWhiteSpace(userId))
                 {
-                    var employee = await GetEmployeeAsync(master.EmployeeNo, false);
+                    TempData["Message"] = "Logged-in user could not be identified.";
 
-                    // First incomplete checkpoint is the current checkpoint.
-                    var currentCheckpoint = await _context.ProbationAssessmentDetails
-                        .Where(x => x.AssessmentId == master.AssessmentId
-                                 && x.CompanyId == CurrentCompanyId
-                                 && x.Status != "Completed")
-                        .OrderBy(x => x.CheckpointNo)
-                        .FirstOrDefaultAsync()
-                        ?? await _context.ProbationAssessmentDetails
-                            .Where(x => x.AssessmentId == master.AssessmentId
-                                     && x.CompanyId == CurrentCompanyId)
-                            .OrderByDescending(x => x.CheckpointNo)
-                            .FirstOrDefaultAsync();
-
-                    int? daysRemaining = master.ProbationEndDate.HasValue
-                        ? (int)(master.ProbationEndDate.Value.Date - DateTime.Today).TotalDays
-                        : null;
-
-                    list.Add(new ProbationIndexViewModel
-                    {
-                        AssessmentId = master.AssessmentId,
-                        EmployeeNo = master.EmployeeNo,
-                        EmployeeName = EmployeeName(employee),
-                        OverallStatus = master.OverallStatus,
-                        FinalDecision = master.FinalDecision,
-                        CurrentCheckpointNo = currentCheckpoint?.CheckpointNo,
-                        CurrentCheckpointLabel = currentCheckpoint?.CheckpointLabel ?? "-",
-                        CurrentCheckpointDate = currentCheckpoint?.ScheduledDate,
-                        DaysRemaining = daysRemaining,
-                        ModifiedOn = master.ModifiedOn ?? master.CreatedOn
-                    });
+                    return View(
+                        new List<ProbationAssessmentIndexViewModel>()
+                    );
                 }
 
-                ViewBag.TotalCount = list.Count;
-                ViewBag.PendingCount = list.Count(x => x.OverallStatus == "Pending");
-                ViewBag.InProgressCount = list.Count(x => x.OverallStatus == "InProgress");
-                ViewBag.CompletedCount = list.Count(x => x.OverallStatus == "Completed");
-                ViewBag.IsViewMode = mode == "view";
 
-                return View(list);
+                // =========================================================
+                // 2. FIND EMPLOYEE LINKED TO CURRENT USER
+                // =========================================================
+
+                var currentEmployee = await _context.Employees
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.UserId == userId &&
+                        x.IsActive);
+
+                if (currentEmployee == null)
+                {
+                    TempData["Message"] =
+                        "Your user account is not linked to an active employee.";
+
+                    return View(
+                        new List<ProbationAssessmentIndexViewModel>()
+                    );
+                }
+
+
+                // =========================================================
+                // 3. DETERMINE COMPANY
+                // =========================================================
+
+                var companyId = currentEmployee.CompanyId;
+
+                if (!companyId.HasValue)
+                {
+                    TempData["Message"] =
+                        "Your employee is not assigned to a company.";
+
+                    return View(
+                        new List<ProbationAssessmentIndexViewModel>()
+                    );
+                }
+
+
+                // =========================================================
+                // 4. LOAD PROBATION EMPLOYEES
+                // =========================================================
+
+                var query = _context.Employees
+                    .AsNoTracking()
+                    .Include(x => x.Department)
+                    .Include(x => x.Designation)
+                    .Where(x =>
+                        x.IsActive &&
+                        x.CompanyId == companyId.Value &&
+                        (
+                            x.EmployeeStatus == "Probation" ||
+                            x.EmploymentStatus == "Probation"
+                        ));
+
+
+                // =========================================================
+                // 5. MANAGER ACCESS
+                // =========================================================
+
+                if (!IsAdminOrHrAdmin())
+                {
+                    query = query.Where(x =>
+                        x.ReportingManagerId == currentEmployee.EmployeeId);
+                }
+
+
+                // =========================================================
+                // 6. LOAD EMPLOYEES
+                // =========================================================
+
+                var employees = await query
+                    .OrderBy(x => x.FirstName)
+                    .ThenBy(x => x.LastName)
+                    .ToListAsync();
+
+
+                // =========================================================
+                // 7. EMPLOYEE CODES
+                // =========================================================
+
+                var employeeCodes = employees
+                    .Select(x =>
+                        x.EmployeeCode ??
+                        x.EmployeeId.ToString())
+                    .ToList();
+
+
+                // =========================================================
+                // 8. LOAD EXISTING ASSESSMENTS
+                // =========================================================
+
+                var assessments =
+                    await _context.ProbationAssessmentMasters
+                        .AsNoTracking()
+                        .Where(x =>
+                            employeeCodes.Contains(x.EmployeeNo) &&
+                            x.CompanyId == companyId.Value.ToString())
+                        .ToListAsync();
+
+
+                // =========================================================
+                // 9. BUILD INDEX ROWS
+                // =========================================================
+
+                var rows = employees
+                    .Select(employee =>
+                    {
+                        var employeeNo =
+                            employee.EmployeeCode ??
+                            employee.EmployeeId.ToString();
+
+                        var assessment =
+                            assessments.FirstOrDefault(x =>
+                                x.EmployeeNo == employeeNo);
+
+                        return new ProbationAssessmentIndexViewModel
+                        {
+                            EmployeeId =
+                                employee.EmployeeId,
+
+                            EmployeeNo =
+                                employeeNo,
+
+                            EmployeeName =
+                                $"{employee.FirstName} {employee.LastName}"
+                                    .Trim(),
+
+                            OfficialEmail =
+                                employee.OfficialEmail,
+
+                            Department =
+                                employee.Department?.DepartmentName ?? "-",
+
+                            Designation =
+                                employee.Designation?.DesignationName ?? "-",
+
+                            JoiningDate =
+                                employee.JoiningDate,
+
+                            ProbationEndDate =
+                                employee.JoiningDate.HasValue
+                                    ? employee.JoiningDate.Value.AddMonths(6)
+                                    : null,
+
+                            AssessmentId =
+                                assessment?.AssessmentId,
+
+                            OverallStatus =
+                                assessment?.OverallStatus ?? "Not Started",
+
+                            HasAssessment =
+                                assessment != null
+                        };
+                    })
+                    .ToList();
+
+
+                // =========================================================
+                // 10. RETURN VIEW
+                // =========================================================
+
+                return View(rows);
             }
             catch (Exception ex)
             {
-                TempData["Message"] = ex.Message;
-                return View(new List<ProbationIndexViewModel>());
+                TempData["Message"] =
+                    ex.InnerException?.Message ??
+                    ex.Message;
+
+                return View(
+                    new List<ProbationAssessmentIndexViewModel>()
+                );
             }
         }
-
-        // ============================================================
-        // CREATE - GET
-        // ============================================================
         [HttpGet]
-        public IActionResult Create(bool skipManager = false)
+        public async Task<IActionResult> Create(int employeeId)
         {
-            return View(new ProbationAssessmentViewModel
+            try
             {
-                CompanyId = CurrentCompanyId,
-                IsHR = IsAdminOrHrAdmin(),
-                IsManager = !IsAdminOrHrAdmin()
-            });
+                // =========================================================
+                // CURRENT USER
+                // =========================================================
+
+                var userId = _userManager.GetUserId(User);
+
+                if (string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+
+                // =========================================================
+                // CURRENT EMPLOYEE
+                // =========================================================
+
+                var currentEmployee = await _context.Employees
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.UserId == userId &&
+                        x.IsActive);
+
+                if (currentEmployee == null)
+                    return Forbid();
+
+
+                // =========================================================
+                // COMPANY
+                // =========================================================
+
+                var companyId = currentEmployee.CompanyId;
+
+                if (!companyId.HasValue)
+                {
+                    TempData["Message"] =
+                        "Your employee is not assigned to a company.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var companyIdString = companyId.Value.ToString();
+
+
+                // =========================================================
+                // SELECTED PROBATION EMPLOYEE
+                // =========================================================
+
+                var employee = await _context.Employees
+                    .AsNoTracking()
+                    .Include(x => x.Department)
+                    .Include(x => x.Designation)
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == employeeId &&
+                        x.IsActive &&
+                        x.CompanyId == companyId.Value &&
+                        (
+                            x.EmployeeStatus == "Probation" ||
+                            x.EmploymentStatus == "Probation"
+                        ));
+
+                if (employee == null)
+                    return NotFound();
+
+
+                // =========================================================
+                // MANAGER ACCESS
+                // =========================================================
+
+                if (!IsAdminOrHrAdmin())
+                {
+                    if (employee.ReportingManagerId != currentEmployee.EmployeeId)
+                        return Forbid();
+                }
+
+
+                // =========================================================
+                // EMPLOYEE NUMBER
+                // =========================================================
+
+                var employeeNo =
+                    employee.EmployeeCode ??
+                    employee.EmployeeId.ToString();
+
+
+                // =========================================================
+                // CHECK EXISTING ASSESSMENT
+                // =========================================================
+
+                var existingAssessment =
+                    await _context.ProbationAssessmentMasters
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeNo == employeeNo &&
+                            x.CompanyId == companyIdString);
+
+                if (existingAssessment != null)
+                {
+                    return RedirectToAction(
+                        nameof(Edit),
+                        new
+                        {
+                            id = existingAssessment.AssessmentId
+                        });
+                }
+
+
+                // =========================================================
+                // JOINING DATE
+                // =========================================================
+
+                if (!employee.JoiningDate.HasValue)
+                {
+                    TempData["Message"] =
+                        "Employee joining date is required before creating the probation assessment.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+
+                var joiningDate =
+                    employee.JoiningDate.Value.Date;
+
+                var probationEndDate =
+                    joiningDate.AddMonths(6);
+
+
+                // =========================================================
+                // LOAD ACTIVE CRITERIA
+                // =========================================================
+
+                var criteria =
+                    await _context.ProbationCriteriaMasters
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.IsActive &&
+                            x.CompanyId == companyIdString)
+                        .OrderBy(x => x.DisplayOrder)
+                        .ToListAsync();
+
+
+                // =========================================================
+                // CREATE CHECKPOINT STRUCTURE
+                // =========================================================
+
+                var checkpoints =
+                    new List<ProbationAssessmentDetailsModel>
+                    {
+                new ProbationAssessmentDetailsModel
+                {
+                    CheckpointNo = 1,
+                    CheckpointLabel = "6-Week Evaluation",
+                    ScheduledDate = joiningDate.AddDays(42),
+                    Status = "Pending",
+                    CompanyId = companyIdString
+                },
+
+                new ProbationAssessmentDetailsModel
+                {
+                    CheckpointNo = 2,
+                    CheckpointLabel = "10-Week Evaluation",
+                    ScheduledDate = joiningDate.AddDays(70),
+                    Status = "Pending",
+                    CompanyId = companyIdString
+                },
+
+                new ProbationAssessmentDetailsModel
+                {
+                    CheckpointNo = 3,
+                    CheckpointLabel = "Final Evaluation",
+                    ScheduledDate = probationEndDate,
+                    Status = "Pending",
+                    CompanyId = companyIdString
+                }
+                    };
+
+
+                // =========================================================
+                // DETERMINE AVAILABLE CHECKPOINT
+                // =========================================================
+
+                var today = DateTime.Today;
+
+                var activeCheckpoint =
+                    checkpoints.FirstOrDefault(x =>
+                        x.ScheduledDate.HasValue &&
+                        x.ScheduledDate.Value.Date <= today);
+
+
+                var activeIndex =
+                    activeCheckpoint == null
+                        ? 0
+                        : checkpoints.IndexOf(activeCheckpoint);
+
+
+                // =========================================================
+                // BUILD VIEW MODEL
+                // =========================================================
+
+                var model =
+                    new ProbationAssessmentViewModel
+                    {
+                        Master = new ProbationAssessmentMasterModel
+                        {
+                            EmployeeNo = employeeNo,
+
+                            EmployeeName =
+                                $"{employee.FirstName} {employee.LastName}"
+                                    .Trim(),
+
+                            Department =
+                                employee.Department?.DepartmentName ?? "-",
+
+                            Designation =
+                                employee.Designation?.DesignationName ?? "-",
+
+                            ProbationStartDate =
+                                joiningDate,
+
+                            ProbationEndDate =
+                                probationEndDate,
+
+                            OverallStatus =
+                                "Pending",
+
+                            CompanyId =
+                                companyIdString
+                        },
+
+                        Checkpoints =
+                            checkpoints,
+
+                        ActiveCheckpoint =
+                            activeCheckpoint,
+
+                        ActiveCheckpointIndex =
+                            activeIndex,
+
+                        AllCriteria =
+                            criteria,
+
+                        ActiveRatings =
+                            new List<ProbationAssessmentRatingsModel>(),
+
+                        CompanyId =
+                            companyIdString,
+
+                        IsHR =
+                            IsAdminOrHrAdmin(),
+
+                        IsManager =
+                            !IsAdminOrHrAdmin()
+                    };
+
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] =
+                    ex.InnerException?.Message ??
+                    ex.Message;
+
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // ============================================================
@@ -314,11 +700,36 @@ namespace VeltriQ.Controllers
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(CurrentCompanyId))
-                    return BadRequest("Company information is missing.");
-
                 var employeeNo = model.Master.EmployeeNo?.Trim();
+
                 var employee = await GetEmployeeAsync(employeeNo ?? "");
+
+                if (employee == null)
+                {
+                    ModelState.AddModelError(
+                        "Master.EmployeeNo",
+                        "Probation employee was not found."
+                    );
+
+                    return View(model);
+                }
+
+
+                // =========================================================
+                // DETERMINE COMPANY
+                // =========================================================
+
+                var companyId = CurrentCompanyId;
+
+                if (string.IsNullOrWhiteSpace(companyId))
+                {
+                    if (!employee.CompanyId.HasValue)
+                    {
+                        return BadRequest("Company information is missing.");
+                    }
+
+                    companyId = employee.CompanyId.Value.ToString();
+                }
 
                 if (employee == null)
                 {
@@ -326,22 +737,78 @@ namespace VeltriQ.Controllers
                     return View(model);
                 }
 
-                if (!CanAccessEmployee(employee))
+                // =========================================================
+                // MANAGER ACCESS SECURITY
+                // =========================================================
+
+                var isAdminOrHrAdmin = IsAdminOrHrAdmin();
+
+                var userId = _userManager.GetUserId(User);
+
+                var currentUser =
+                    string.IsNullOrWhiteSpace(userId)
+                        ? null
+                        : await _userManager.FindByIdAsync(userId);
+
+                var isManager =
+                    currentUser != null &&
+                    await _userManager.IsInRoleAsync(
+                        currentUser,
+                        "Manager"
+                    );
+
+
+                // ---------------------------------------------------------
+                // MANAGER → ONLY THEIR DIRECT EMPLOYEES
+                // ---------------------------------------------------------
+
+                if (isManager)
                 {
-                    ModelState.AddModelError("Master.EmployeeNo", "You are not authorized to assess this employee.");
+                    var currentEmployeeId = CurrentEmployeeId;
+
+                    if (!currentEmployeeId.HasValue ||
+                        employee.ReportingManagerId != currentEmployeeId.Value)
+                    {
+                        ModelState.AddModelError(
+                            "Master.EmployeeNo",
+                            "You are not authorized to assess this employee."
+                        );
+
+                        return View(model);
+                    }
+                }
+                // ---------------------------------------------------------
+                // ADMIN / HR ADMIN → ALLOWED
+                // ---------------------------------------------------------
+                else if (isAdminOrHrAdmin)
+                {
+                    // No manager restriction.
+                }
+                // ---------------------------------------------------------
+                // OTHER USERS → USE EXISTING ACCESS CHECK
+                // ---------------------------------------------------------
+                else if (!CanAccessEmployee(employee))
+                {
+                    ModelState.AddModelError(
+                        "Master.EmployeeNo",
+                        "You are not authorized to assess this employee."
+                    );
+
                     return View(model);
                 }
 
                 bool alreadyExists = await _context.ProbationAssessmentMasters
-                    .AnyAsync(x => x.EmployeeNo == employee.EmployeeCode
-                                && x.CompanyId == CurrentCompanyId);
+                    .AnyAsync(x =>
+                        x.EmployeeNo == employee.EmployeeCode &&
+                        x.CompanyId == companyId);
 
                 if (alreadyExists)
                 {
                     var existing = await _context.ProbationAssessmentMasters
-                        .Where(x => x.EmployeeNo == employee.EmployeeCode
-                                 && x.CompanyId == CurrentCompanyId)
-                        .Select(x => x.AssessmentId)
+                        .Where(x =>
+                            x.EmployeeNo == employee.EmployeeCode &&
+                            x.CompanyId == companyId)
+                                            .Select(x => x.AssessmentId)
                         .FirstAsync();
 
                     return RedirectToAction(nameof(Edit), new { id = existing });
@@ -364,7 +831,7 @@ namespace VeltriQ.Controllers
                     ProbationEndDate = probationEndDate,
                     OverallStatus = "Pending",
                     HRRemarks = model.Master.HRRemarks?.Trim(),
-                    CompanyId = CurrentCompanyId,
+                    CompanyId = companyId,
                     CreatedBy = CurrentActorId > 0 ? CurrentActorId : null,
                     CreatedOn = DateTime.Now
                 };
@@ -392,7 +859,7 @@ namespace VeltriQ.Controllers
                         CheckpointLabel = cp.Label,
                         ScheduledDate = cp.Date,
                         Status = "Pending",
-                        CompanyId = CurrentCompanyId,
+                        CompanyId = companyId,
                         CreatedBy = CurrentActorId > 0 ? CurrentActorId : null,
                         CreatedOn = DateTime.Now
                     };
@@ -408,7 +875,7 @@ namespace VeltriQ.Controllers
                             CriteriaId = criterion.CriteriaId,
                             Rating = null,
                             RatingScore = null,
-                            CompanyId = CurrentCompanyId
+                            CompanyId = companyId
                         });
                     }
 
@@ -432,40 +899,147 @@ namespace VeltriQ.Controllers
         [HttpGet]
         public async Task<JsonResult> GetAllProbationEmployees()
         {
-            int? companyId = int.TryParse(CurrentCompanyId, out var parsedCompany)
-                ? parsedCompany
-                : null;
+            // =========================================================
+            // CURRENT COMPANY
+            // =========================================================
 
-            var query = _context.Employees.Where(x => x.IsActive);
+            int? companyId =
+                int.TryParse(CurrentCompanyId, out var parsedCompany)
+                    ? parsedCompany
+                    : null;
+
+
+            // =========================================================
+            // BASE QUERY
+            // =========================================================
+
+            var query = _context.Employees
+                .Where(x => x.IsActive);
+
+
+            // =========================================================
+            // COMPANY FILTER
+            // =========================================================
 
             if (companyId.HasValue)
-                query = query.Where(x => x.CompanyId == companyId.Value);
+            {
+                query = query.Where(
+                    x => x.CompanyId == companyId.Value
+                );
+            }
+
+
+            // =========================================================
+            // PROBATION FILTER
+            // =========================================================
+
+            query = query.Where(x =>
+                x.EmployeeStatus == "Probation" ||
+                x.EmploymentStatus == "Probation"
+            );
+
+
+            // =========================================================
+            // CHECK CURRENT USER
+            // =========================================================
+
+            var currentEmployeeId =
+                CurrentEmployeeId;
+
+
+            var isAdminOrHrAdmin =
+                IsAdminOrHrAdmin();
+
+
+            var userId =
+             _userManager.GetUserId(User);
+
+            var currentUser =
+                string.IsNullOrWhiteSpace(userId)
+                    ? null
+                    : await _userManager.FindByIdAsync(userId);
+
+            var isManager =
+                currentUser != null &&
+                await _userManager.IsInRoleAsync(
+                    currentUser,
+                    "Manager"
+                );
+
+
+            // =========================================================
+            // ACCESS FILTERING
+            // =========================================================
+
+            if (isManager)
+            {
+                // -----------------------------------------------------
+                // MANAGER
+                // Only direct probation employees
+                // -----------------------------------------------------
+
+                if (!currentEmployeeId.HasValue)
+                {
+                    return Json(new List<object>());
+                }
+
+                query = query.Where(
+                    x =>
+                        x.ReportingManagerId ==
+                        currentEmployeeId.Value
+                );
+            }
+            else if (isAdminOrHrAdmin)
+            {
+                // -----------------------------------------------------
+                // ADMIN / HR ADMIN
+                // See all probation employees
+                // -----------------------------------------------------
+
+                // No additional filtering.
+            }
+            else
+            {
+                // -----------------------------------------------------
+                // OTHER USERS
+                // No probation employee access
+                // -----------------------------------------------------
+
+                return Json(new List<object>());
+            }
+
+
+            // =========================================================
+            // LOAD EMPLOYEES
+            // =========================================================
 
             var employees = await query
-                .Where(x =>
-                    x.EmployeeStatus == "Probation" ||
-                    x.EmploymentStatus == "Probation")
                 .OrderBy(x => x.FirstName)
                 .ThenBy(x => x.LastName)
                 .ToListAsync();
 
-            // Managers should see only their direct probation employees.
-            if (!IsAdminOrHrAdmin())
-            {
-                var currentEmployeeId = CurrentEmployeeId;
-                if (currentEmployeeId.HasValue)
-                    employees = employees
-                        .Where(x => x.ReportingManagerId == currentEmployeeId.Value)
-                        .ToList();
-            }
 
-            return Json(employees.Select(x => new
-            {
-                employeeNo = x.EmployeeCode ?? x.EmployeeId.ToString(),
-                employeeName = EmployeeName(x),
-                employeeDisplay = (x.EmployeeCode ?? x.EmployeeId.ToString())
-                                  + " - " + EmployeeName(x)
-            }));
+            // =========================================================
+            // RETURN DROPDOWN DATA
+            // =========================================================
+
+            return Json(
+                employees.Select(x => new
+                {
+                    employeeNo =
+                        x.EmployeeCode ??
+                        x.EmployeeId.ToString(),
+
+                    employeeName =
+                        EmployeeName(x),
+
+                    employeeDisplay =
+                        (x.EmployeeCode ??
+                         x.EmployeeId.ToString())
+                        + " - " +
+                        EmployeeName(x)
+                })
+            );
         }
 
         // ============================================================
@@ -527,75 +1101,221 @@ namespace VeltriQ.Controllers
         {
             try
             {
+                // =========================================================
+                // LOAD ASSESSMENT
+                // =========================================================
+
                 var master = await _context.ProbationAssessmentMasters
-                    .FirstOrDefaultAsync(x => x.AssessmentId == id && x.CompanyId == CurrentCompanyId);
+                    .FirstOrDefaultAsync(x => x.AssessmentId == id);
 
                 if (master == null)
                     return NotFound();
 
-                var employee = await GetEmployeeAsync(master.EmployeeNo, false);
 
-                if (employee == null || !CanAccessEmployee(employee))
+                // =========================================================
+                // DETERMINE COMPANY
+                // =========================================================
+
+                var companyId = CurrentCompanyId;
+
+                // If CurrentCompanyId is not available,
+                // use the company stored against the assessment.
+                if (string.IsNullOrWhiteSpace(companyId))
+                {
+                    companyId = master.CompanyId;
+                }
+
+
+                if (string.IsNullOrWhiteSpace(companyId))
+                    return NotFound();
+
+
+                // =========================================================
+                // COMPANY SECURITY CHECK
+                // =========================================================
+
+                // If a current company is available, make sure the
+                // assessment belongs to that company.
+                if (!string.IsNullOrWhiteSpace(CurrentCompanyId) &&
+                    master.CompanyId != CurrentCompanyId)
+                {
+                    return Forbid();
+                }
+
+
+                // =========================================================
+                // LOAD EMPLOYEE
+                // =========================================================
+
+                var employee = await GetEmployeeAsync(
+                    master.EmployeeNo,
+                    false
+                );
+
+                if (employee == null)
+                    return NotFound();
+
+
+                // =========================================================
+                // EMPLOYEE ACCESS
+                // =========================================================
+
+                if (!CanAccessEmployee(employee))
                     return Forbid();
 
-                master.EmployeeName = EmployeeName(employee);
-                master.AppraiserName = await _context.Employees
-                    .Where(x => x.EmployeeCode == master.AppraiserId)
-                    .Select(x => (x.FirstName + " " + x.LastName).Trim())
-                    .FirstOrDefaultAsync() ?? "-";
 
-                master.Department = employee.Department?.DepartmentName ?? "-";
-                master.Designation = employee.Designation?.DesignationName ?? "-";
+                // =========================================================
+                // EMPLOYEE DISPLAY INFORMATION
+                // =========================================================
 
-                var checkpoints = await _context.ProbationAssessmentDetails
-                    .Where(x => x.AssessmentId == id && x.CompanyId == CurrentCompanyId)
-                    .OrderBy(x => x.CheckpointNo)
-                    .ToListAsync();
+                master.EmployeeName =
+                    EmployeeName(employee);
 
-                var criteria = await GetActiveCriteriaAsync();
+                master.AppraiserName =
+                    await _context.Employees
+                        .Where(x =>
+                            x.EmployeeCode == master.AppraiserId)
+                        .Select(x =>
+                            (x.FirstName + " " + x.LastName).Trim())
+                        .FirstOrDefaultAsync()
+                        ?? "-";
 
-                var activeCheckpoint = checkpoints
-                    .FirstOrDefault(x => x.Status != "Completed")
+                master.Department =
+                    employee.Department?.DepartmentName ?? "-";
+
+                master.Designation =
+                    employee.Designation?.DesignationName ?? "-";
+
+
+                // =========================================================
+                // LOAD CHECKPOINTS
+                // =========================================================
+
+                var checkpoints =
+                    await _context.ProbationAssessmentDetails
+                        .Where(x =>
+                            x.AssessmentId == id &&
+                            x.CompanyId == companyId)
+                        .OrderBy(x => x.CheckpointNo)
+                        .ToListAsync();
+
+
+                // =========================================================
+                // LOAD CRITERIA
+                // =========================================================
+
+                var criteria =
+                    await GetActiveCriteriaAsync();
+
+
+                // =========================================================
+                // DETERMINE ACTIVE CHECKPOINT
+                // =========================================================
+
+                var activeCheckpoint =
+                    checkpoints
+                        .FirstOrDefault(x =>
+                            x.Status != "Completed")
                     ?? checkpoints.LastOrDefault();
 
-                int activeIndex = activeCheckpoint == null
-                    ? 0
-                    : checkpoints.IndexOf(activeCheckpoint);
 
-                var activeRatings = activeCheckpoint == null
-                    ? new List<ProbationAssessmentRatingsModel>()
-                    : await BuildRatingsAsync(activeCheckpoint.DetailId, criteria);
+                int activeIndex =
+                    activeCheckpoint == null
+                        ? 0
+                        : checkpoints.IndexOf(activeCheckpoint);
+
+
+                // =========================================================
+                // LOAD RATINGS
+                // =========================================================
+
+                var activeRatings =
+                    activeCheckpoint == null
+                        ? new List<ProbationAssessmentRatingsModel>()
+                        : await BuildRatingsAsync(
+                            activeCheckpoint.DetailId,
+                            criteria
+                        );
+
+
+                // =========================================================
+                // SET CHECKPOINT STATE
+                // =========================================================
 
                 foreach (var checkpoint in checkpoints)
                 {
-                    checkpoint.IsLocked = checkpoint.Status == "Completed";
-                    checkpoint.IsCurrent = activeCheckpoint?.DetailId == checkpoint.DetailId;
+                    checkpoint.IsLocked =
+                        checkpoint.Status == "Completed";
+
+                    checkpoint.IsCurrent =
+                        activeCheckpoint?.DetailId ==
+                        checkpoint.DetailId;
                 }
 
-                var extensions = await _context.ProbationExtensionLogs
-                    .Where(x => x.AssessmentId == id && x.CompanyId == CurrentCompanyId)
-                    .OrderByDescending(x => x.ExtendedOn)
-                    .ToListAsync();
 
-                var vm = new ProbationAssessmentViewModel
-                {
-                    Master = master,
-                    Checkpoints = checkpoints,
-                    ActiveCheckpoint = activeCheckpoint,
-                    ActiveCheckpointIndex = activeIndex,
-                    AllCriteria = criteria,
-                    ActiveRatings = activeRatings,
-                    ExtensionHistory = extensions,
-                    CompanyId = CurrentCompanyId,
-                    IsHR = IsAdminOrHrAdmin(),
-                    IsManager = !IsAdminOrHrAdmin()
-                };
+                // =========================================================
+                // LOAD EXTENSION HISTORY
+                // =========================================================
+
+                var extensions =
+                    await _context.ProbationExtensionLogs
+                        .Where(x =>
+                            x.AssessmentId == id &&
+                            x.CompanyId == companyId)
+                        .OrderByDescending(x => x.ExtendedOn)
+                        .ToListAsync();
+
+
+                // =========================================================
+                // BUILD VIEW MODEL
+                // =========================================================
+
+                var vm =
+                    new ProbationAssessmentViewModel
+                    {
+                        Master = master,
+
+                        Checkpoints =
+                            checkpoints,
+
+                        ActiveCheckpoint =
+                            activeCheckpoint,
+
+                        ActiveCheckpointIndex =
+                            activeIndex,
+
+                        AllCriteria =
+                            criteria,
+
+                        ActiveRatings =
+                            activeRatings,
+
+                        ExtensionHistory =
+                            extensions,
+
+                        CompanyId =
+                            companyId,
+
+                        IsHR =
+                            IsAdminOrHrAdmin(),
+
+                        IsManager =
+                            !IsAdminOrHrAdmin()
+                    };
+
+
+                // =========================================================
+                // RETURN VIEW
+                // =========================================================
 
                 return View(vm);
             }
             catch (Exception ex)
             {
-                TempData["Message"] = ex.InnerException?.Message ?? ex.Message;
+                TempData["Message"] =
+                    ex.InnerException?.Message
+                    ?? ex.Message;
+
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -1394,17 +2114,5 @@ namespace VeltriQ.Controllers
         public string? Category { get; set; }
     }
 
-    public class ProbationIndexViewModel
-    {
-        public int AssessmentId { get; set; }
-        public string EmployeeNo { get; set; } = string.Empty;
-        public string EmployeeName { get; set; } = string.Empty;
-        public string OverallStatus { get; set; } = string.Empty;
-        public string? FinalDecision { get; set; }
-        public int? CurrentCheckpointNo { get; set; }
-        public string CurrentCheckpointLabel { get; set; } = string.Empty;
-        public DateTime? CurrentCheckpointDate { get; set; }
-        public int? DaysRemaining { get; set; }
-        public DateTime? ModifiedOn { get; set; }
-    }
+
 }
